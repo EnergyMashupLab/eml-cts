@@ -25,5 +25,5 @@ hs_err_pid*
 # VIM swap files
 *.swp
 
-# Apple Mac OS C desktop information files
+# Apple Mac OS X desktop information files
 .DS_Store
