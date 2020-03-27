@@ -1,7 +1,10 @@
 # RestTestbed
 Testbed for ensuring that CTS RESTful interactions are complete and correct before integrating into the [NIST Common Transactive Services Agents Project](https://github.com/EnergyMashupLab/NIST-CTS-Agents).
 
-The code can be exercised using tools such as cURL and Postman. Documentation of the RESTful APIs is pending.
+Types and type names (Java class declarations and names) do not precisely match those in NIST-CTS-Agents as they were developed in parallel, although both are derived from the standards described below.
+The rationalizing of types is an active task in the NIST-CTS-Agents project.
+
+The code can be exercised using tools such as cURL and [Postman](https://www.postman.com/). Documentation of the RESTful APIs is pending.
 
 Based On
 ------------
