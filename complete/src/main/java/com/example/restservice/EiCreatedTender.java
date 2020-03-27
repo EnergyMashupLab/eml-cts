@@ -3,13 +3,19 @@ package com.example.restservice;
 import java.time.*;
 
 public class EiCreatedTender {
-	private final TenderId tenderId;
-	private final ActorId partyId;
-	private final ActorId counterPartyId;
+	private TenderId tenderId;
+	private ActorId partyId;
+	private ActorId counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
 	private final RefId refId = new RefId();
 
+	/*
+	 * Default constructor for JSON deserialization.
+	 * TO DO change to zero Id values in ActorId and RefId constructors
+	 */
+	public EiCreatedTender()	{		
+	}
 	
 	public EiCreatedTender(
 			TenderId tenderId,

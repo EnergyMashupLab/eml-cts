@@ -12,6 +12,12 @@ public class EiTransaction {
 	private final TransactionId transactionId = new TransactionId();	// will be passed to constructor
 	private EiTender tender;
 	private TransactiveState transactiveState = TransactiveState.TRANSACTION;
+	
+	/*
+	 * Default constructor for JSON deserialization.
+	 */
+	public EiTransaction()	{		
+	}
 
 	public EiTransaction(EiTender tender) {
 //		System.err.println("in EiTransaction Constructor tenderId " + tender.getTenderId().getTenderId());

@@ -3,13 +3,17 @@ package com.example.restservice;
 import java.time.*;
 
 public class EiCreatedTransaction {
-	private final TransactionId transactionId;
-	private final ActorId partyId;
-	private final ActorId counterPartyId;
+	private TransactionId transactionId;
+	private ActorId partyId;
+	private ActorId counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
 	private final RefId refId = new RefId();
 
+	// Default initializer for JSON serialization
+	public EiCreatedTransaction() {
+		this.print();
+	}
 	
 	public EiCreatedTransaction(
 			TransactionId transactionId,
