@@ -84,5 +84,4 @@ public class LmeRestController {
 		
 		return tempCanceled;
 	}
-	
 }

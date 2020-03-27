@@ -33,6 +33,41 @@ public class TeuaRestController {
 	}
 
 	/*
+	 * POST - /createTender
+	 * 		RequestBody is EiCreateTender
+	 * 		ResponseBody is EiCreatedTender
+	 */
+	
+	@PostMapping("/createTender")
+	public EiCreatedTender 	postEiCreateTender(@RequestBody EiCreateTender eiCreateTender)	{
+		EiTender tempTender;
+		EiCreateTender tempCreate;
+		EiCreatedTender tempCreated;
+		
+		tempCreate = eiCreateTender;
+
+		tempTender = eiCreateTender.getTender();
+		tempTender.print();	// DEBUG
+		
+		/*
+			public EiCreatedTender(
+				TenderId tenderId,
+				ActorId partyId,
+				ActorId counterPartyId,
+				EiResponse response)
+		 */
+		
+		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
+				tempCreate.getPartyId(),
+				tempCreate.getCounterPartyId(),
+				new EiResponse(200, "OK"));
+		
+		return tempCreated;
+	}
+
+	
+	
+	/*
 	 * POST - /createTransaction
 	 * 		RequestBody is EiCreateTransaction
 	 * 		ResponseBody is EiCreatedTransaction
@@ -64,5 +99,31 @@ public class TeuaRestController {
 				new EiResponse(200, "OK"));
 		
 		return tempCreated;
-	}	
+	}
+	
+	
+	/*
+	 * POST - /cancelTender
+	 * 		RequestBody is EiCancelTender
+	 * 		ResponseBody is EiCanceledTender
+	 */
+	
+	@PostMapping("/cancelTender")
+	public EICanceledTender postEiCancelTender(@RequestBody EiCancelTender eiCancelTender)	{
+		TenderId tempTenderId;
+		EiCancelTender tempCancel;	
+		EICanceledTender tempCanceled;
+		
+		tempCancel = eiCancelTender;
+		tempTenderId = eiCancelTender.getTenderId();
+	
+		tempCancel.print();	// DEBUG
+		
+		tempCanceled = new EICanceledTender(
+				tempCancel.getPartyId(),
+				tempCancel.getCounterPartyId(),
+				new EiResponse(200, "OK"));
+		
+		return tempCanceled;
+	}
 }
