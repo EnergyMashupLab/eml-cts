@@ -20,10 +20,9 @@ public class EiCreateTransaction {
 	private final Random rand = new Random();
 	 */
 	
-	/*
-	 * Default constructor for JSON deserialization.
-	 * TO DO change to zero Id values in ActorId and RefId constructors
-	 */
+	// Default initializer for JSON serialization
+	public EiCreateTransaction() {
+	}
 
 	public EiCreateTransaction(EiTransaction eiTransaction)	{
 		this.counterPartyId = new ActorId();

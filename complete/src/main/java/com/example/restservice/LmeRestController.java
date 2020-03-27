@@ -43,7 +43,7 @@ public class LmeRestController {
 		tempCreate = eiCreateTender;
 
 		tempTender = eiCreateTender.getTender();
-		tempTender.print();	// DEBUG
+//		tempTender.print();	// DEBUG
 		
 		/*
 			public EiCreatedTender(
@@ -75,7 +75,7 @@ public class LmeRestController {
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
 
-		tempCancel.print();	// DEBUG
+//		tempCancel.print();	// DEBUG
 		
 		tempCanceled = new EICanceledTender(
 				tempCancel.getPartyId(),
@@ -84,4 +84,38 @@ public class LmeRestController {
 		
 		return tempCanceled;
 	}
+
+	public static EiTender getCurrentTender() {
+		return currentTender;
+	}
+
+	public static void setCurrentTender(EiTender currentTender) {
+		LmeRestController.currentTender = currentTender;
+	}
+
+	public static EiTransaction getCurrentTransaction() {
+		return currentTransaction;
+	}
+
+	public static void setCurrentTransaction(EiTransaction currentTransaction) {
+		LmeRestController.currentTransaction = currentTransaction;
+	}
+
+	public static TenderId getCurrentTenderId() {
+		return currentTenderId;
+	}
+
+	public static void setCurrentTenderId(TenderId currentTenderId) {
+		LmeRestController.currentTenderId = currentTenderId;
+	}
+
+	public static AtomicLong getCounter() {
+		return counter;
+	}
+
+	public static ActorId getPartyid() {
+		return partyId;
+	}
+	
+	
 }

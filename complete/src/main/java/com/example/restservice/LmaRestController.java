@@ -9,12 +9,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/lma")
 public class LmaRestController {
-
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
@@ -35,7 +41,7 @@ public class LmaRestController {
 	 * 		ResponseBody is EiCreatedTender
 	 */
 	
-	@PostMapping("/createTender")
+	@PostMapping(path="/createTender", consumes = "application/json", produces = "application/json")
 	public EiCreatedTender 	postEiCreateTender(@RequestBody EiCreateTender eiCreateTender)	{
 		EiTender tempTender;
 		EiCreateTender tempCreate;
@@ -44,7 +50,8 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;
 
 		tempTender = eiCreateTender.getTender();
-		tempTender.print();	// DEBUG
+//		System.err.println("in postEiCreateTender body");
+//		tempTender.print();	
 		
 		/*
 			public EiCreatedTender(
@@ -68,7 +75,7 @@ public class LmaRestController {
 	 * 		ResponseBody is EiCreatedTransaction
 	 */
 	
-	@PostMapping("/createTransaction")
+	@PostMapping(path="/createTransaction", consumes = "application/json", produces = "application/json")
 	public EiCreatedTransaction 	postEiCreateTransaction(@RequestBody EiCreateTransaction eiCreateTransaction)	{
 		EiTender tempTender;
 		EiTransaction tempTransaction;
@@ -87,12 +94,13 @@ public class LmaRestController {
 				ActorId counterPartyId,
 				EiResponse response)
 		 */
-		
+//		System.err.println("in LMA createTransaction before new return object");
 		tempCreated = new EiCreatedTransaction(tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
 		
+//		System.err.println("in LMA createTransaction after new return object");
 		return tempCreated;
 	}
 	
@@ -121,4 +129,38 @@ public class LmaRestController {
 		
 		return tempCanceled;
 	}
+
+	public static EiTender getCurrentTender() {
+		return currentTender;
+	}
+
+	public static void setCurrentTender(EiTender currentTender) {
+		LmaRestController.currentTender = currentTender;
+	}
+
+	public static EiTransaction getCurrentTransaction() {
+		return currentTransaction;
+	}
+
+	public static void setCurrentTransaction(EiTransaction currentTransaction) {
+		LmaRestController.currentTransaction = currentTransaction;
+	}
+
+	public static TenderId getCurrentTenderId() {
+		return currentTenderId;
+	}
+
+	public static void setCurrentTenderId(TenderId currentTenderId) {
+		LmaRestController.currentTenderId = currentTenderId;
+	}
+
+	public static AtomicLong getCounter() {
+		return counter;
+	}
+
+	public static ActorId getPartyid() {
+		return partyId;
+	}
+	
+	
 }

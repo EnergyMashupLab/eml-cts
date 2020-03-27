@@ -47,7 +47,7 @@ public class TeuaRestController {
 		tempCreate = eiCreateTender;
 
 		tempTender = eiCreateTender.getTender();
-		tempTender.print();	// DEBUG
+//		tempTender.print();	// DEBUG
 		
 		/*
 			public EiCreatedTender(
@@ -83,7 +83,7 @@ public class TeuaRestController {
 		tempCreate = eiCreateTransaction;
 		tempTransaction = eiCreateTransaction.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-		tempTender.print();	// DEBUG
+//		tempTender.print();	// DEBUG
 		
 		/*
 			public EiCreatedTender(
@@ -117,7 +117,7 @@ public class TeuaRestController {
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
 	
-		tempCancel.print();	// DEBUG
+//		tempCancel.print();	// DEBUG
 		
 		tempCanceled = new EICanceledTender(
 				tempCancel.getPartyId(),
@@ -126,4 +126,39 @@ public class TeuaRestController {
 		
 		return tempCanceled;
 	}
+
+	public static EiTender getCurrentTender() {
+		return currentTender;
+	}
+
+	public static void setCurrentTender(EiTender currentTender) {
+		TeuaRestController.currentTender = currentTender;
+	}
+
+	public static EiTransaction getCurrentTransaction() {
+		return currentTransaction;
+	}
+
+	public static void setCurrentTransaction(EiTransaction currentTransaction) {
+		TeuaRestController.currentTransaction = currentTransaction;
+	}
+
+	public static TenderId getCurrentTenderId() {
+		return currentTenderId;
+	}
+
+	public static void setCurrentTenderId(TenderId currentTenderId) {
+		TeuaRestController.currentTenderId = currentTenderId;
+	}
+
+	public static AtomicLong getCounter() {
+		return counter;
+	}
+
+	public ActorId getPartyId() {
+		return partyId;
+	}
+	
+	
+	
 }
