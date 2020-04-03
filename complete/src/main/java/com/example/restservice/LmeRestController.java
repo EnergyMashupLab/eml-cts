@@ -102,7 +102,6 @@ public class LmeRestController {
 		return tempCanceled;
 	}
 
-<<<<<<< HEAD
 	/*
 	 * MatchFound is invoked when a match is found in the Parity Engine
 	 * Data from Parity includes both orders rewritten to show actual
@@ -131,7 +130,8 @@ public class LmeRestController {
 	   			" Matched Tender two " +
 	   			tenderMatchTwo.toString());
 		}
-=======
+
+	/*
 	public static EiTender getCurrentTender() {
 		return currentTender;
 	}
@@ -163,7 +163,5 @@ public class LmeRestController {
 	public static ActorId getPartyid() {
 		return partyId;
 	}
-	
-	
->>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
+	*/
 }

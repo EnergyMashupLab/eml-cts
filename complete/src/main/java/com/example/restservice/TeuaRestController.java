@@ -127,9 +127,7 @@ public class TeuaRestController {
 				new EiResponse(200, "OK"));
 		
 		return tempCreated;
-<<<<<<< HEAD
-	}	
-=======
+
 	}
 	
 	
@@ -157,6 +155,7 @@ public class TeuaRestController {
 		
 		return tempCanceled;
 	}
+/*
 
 	public static EiTender getCurrentTender() {
 		return currentTender;
@@ -189,8 +188,5 @@ public class TeuaRestController {
 	public ActorId getPartyId() {
 		return partyId;
 	}
-	
-	
-	
->>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
+*/
 }
