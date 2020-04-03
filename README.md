@@ -11,6 +11,14 @@ Based On
 
 The code skeleton for a simple Greeting RESTful service was taken from [The Spring Guides Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/) and its [code repository](https://github.com/spring-guides/gs-rest-service). The code is provided under the Apache 2.0 License.
 
+How to Use
+----------
+The code builds and runs in Spring Tools Suite 4; it typically would be run on the embedded Tomcat server.
+
+The file ![URIs_for_RestTestbed_GET_operations](./URIs_for_RestTestbed_GET_operations.txt) shows the URIs for the various GET operations that do not require parameters or a RequestBody. These GET operations are in the RestController files **GreetingController.java** (most of the create randomized JSON message bodies) and in the LMA, LME, and TEUA RestController files (for the /party to retrieve the respective actors' PartyId for tenders and transactions/bids and offers.
+
+Documentation is pending, but the comments in the LMA, LME, and TEUA RestController files give the RequestBody and ResponseBody types.
+
 Standards Used
 --------------
 

@@ -24,8 +24,7 @@ public class EiCreateTender {
 	 * Default constructor for JSON deserialization.
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCreateTender()	{
-		
+	public EiCreateTender()	{		
 		this.counterPartyId = new ActorId();
 		this.partyId = new ActorId();
 		this.requestId = new RefId();
@@ -49,7 +48,18 @@ public class EiCreateTender {
 //		System.err.println("EiCreateTender Constructor before this.print()");
 //		this.print();
 	}
-	
+
+	public void print() {
+		String printStringFormat = "EiCreateTender.print() tenderId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
+			
+		System.err.println(String.format(printStringFormat,
+				tender.getTenderId().getTenderId(),
+				partyId.getActorId(), 
+				counterPartyId.getActorId(),
+				requestId.getRefId(),
+				tender.getInterval().dtStart.toString()));
+	}
+
 	public ActorId getCounterPartyId() {
 		return counterPartyId;
 	}
@@ -65,31 +75,23 @@ public class EiCreateTender {
 	public void setPartyId(ActorId partyId) {
 		this.partyId = partyId;
 	}
-	
+
 	public RefId getRequestId() {
 		return requestId;
 	}
-	
+
 	public void setRequestId(RefId requestId) {
 		this.requestId = requestId;
-	}
-
-	public void setTender(EiTender tender) {
-		this.tender = tender;
 	}
 
 	public EiTender getTender() {
 		return tender;
 	}
 
-	public void print() {
-		String printStringFormat = "EiCreateTender.print() tenderId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
-			
-		System.err.println(String.format(printStringFormat,
-				tender.getTenderId().getTenderId(),
-				partyId.getActorId(), 
-				counterPartyId.getActorId(),
-				requestId.getRefId(),
-				tender.getInterval().dtStart.toString()));
+	public void setTender(EiTender tender) {
+		this.tender = tender;
 	}
+	
+	
+	
 }

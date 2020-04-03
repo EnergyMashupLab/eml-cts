@@ -55,7 +55,7 @@ public class LmeRestController {
 		
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
-		tempTender.print();	// DEBUG
+//		tempTender.print();	// DEBUG
 		
 		/*
 			public EiCreatedTender(
@@ -92,7 +92,7 @@ public class LmeRestController {
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
 
-		tempCancel.print();	// DEBUG
+//		tempCancel.print();	// DEBUG
 		
 		tempCanceled = new EICanceledTender(
 				tempCancel.getPartyId(),
@@ -102,6 +102,7 @@ public class LmeRestController {
 		return tempCanceled;
 	}
 
+<<<<<<< HEAD
 	/*
 	 * MatchFound is invoked when a match is found in the Parity Engine
 	 * Data from Parity includes both orders rewritten to show actual
@@ -130,4 +131,39 @@ public class LmeRestController {
 	   			" Matched Tender two " +
 	   			tenderMatchTwo.toString());
 		}
+=======
+	public static EiTender getCurrentTender() {
+		return currentTender;
+	}
+
+	public static void setCurrentTender(EiTender currentTender) {
+		LmeRestController.currentTender = currentTender;
+	}
+
+	public static EiTransaction getCurrentTransaction() {
+		return currentTransaction;
+	}
+
+	public static void setCurrentTransaction(EiTransaction currentTransaction) {
+		LmeRestController.currentTransaction = currentTransaction;
+	}
+
+	public static TenderId getCurrentTenderId() {
+		return currentTenderId;
+	}
+
+	public static void setCurrentTenderId(TenderId currentTenderId) {
+		LmeRestController.currentTenderId = currentTenderId;
+	}
+
+	public static AtomicLong getCounter() {
+		return counter;
+	}
+
+	public static ActorId getPartyid() {
+		return partyId;
+	}
+	
+	
+>>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
 }

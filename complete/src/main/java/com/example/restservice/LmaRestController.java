@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+<<<<<<< HEAD
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,11 +20,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+=======
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+>>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
 
 @RestController
 @RequestMapping("/lma")
 public class LmaRestController {
-
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
@@ -48,15 +56,21 @@ public class LmaRestController {
 	 * 		ResponseBody is EiCreatedTender
 	 */
 	
+<<<<<<< HEAD
 	@PostMapping("/createTender")
 	public EiCreatedTender 	postEiCreateTender(
 			@RequestBody EiCreateTender eiCreateTender)	{
+=======
+	@PostMapping(path="/createTender", consumes = "application/json", produces = "application/json")
+	public EiCreatedTender 	postEiCreateTender(@RequestBody EiCreateTender eiCreateTender)	{
+>>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
 		EiTender tempTender;
 		EiCreateTender tempCreate;
 		EiCreatedTender tempCreated;
 		// for LME response to be passed along EiCreateTender
 		EiCreatedTender tempPostResponse; 
 
+<<<<<<< HEAD
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
@@ -71,6 +85,11 @@ public class LmaRestController {
 		logger.info("LmaController after extracting tender");
 		tempTender.print();	// DEBUG
 		logger.info("LmaController after printing tender");
+=======
+		tempTender = eiCreateTender.getTender();
+//		System.err.println("in postEiCreateTender body");
+//		tempTender.print();	
+>>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
 		
 		/*
 		 * Pass on to LME and use response to reply to origin
@@ -98,9 +117,14 @@ public class LmaRestController {
 	 * 		ResponseBody is EiCreatedTransaction
 	 */
 	
+<<<<<<< HEAD
 	@PostMapping("/createTransaction")
 	public EiCreatedTransaction postEiCreateTransaction(
 			@RequestBody EiCreateTransaction eiCreateTransaction)	{
+=======
+	@PostMapping(path="/createTransaction", consumes = "application/json", produces = "application/json")
+	public EiCreatedTransaction 	postEiCreateTransaction(@RequestBody EiCreateTransaction eiCreateTransaction)	{
+>>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
 		EiTender tempTender;
 		EiTransaction tempTransaction;
 		EiCreateTransaction tempCreate;
@@ -133,9 +157,13 @@ public class LmaRestController {
 				ActorId counterPartyId,
 				EiResponse response)
 		 */
+<<<<<<< HEAD
 		
 		/* Return the EiCreatedTransaction payload received from the TEUA
 
+=======
+//		System.err.println("in LMA createTransaction before new return object");
+>>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
 		tempCreated = new EiCreatedTransaction(tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
@@ -156,7 +184,12 @@ public class LmaRestController {
 		// And send the response from the TEUA back to the LME
 		// NOTE that this is synchronous; consider async responses
 		
+<<<<<<< HEAD
 		return tempPostResponse;
+=======
+//		System.err.println("in LMA createTransaction after new return object");
+		return tempCreated;
+>>>>>>> 8655af1048267b3bcadd1666f9f7b648d0dd74e5
 	}
 	
 	
@@ -185,5 +218,38 @@ public class LmaRestController {
 		
 		return tempCanceled;
 	}
+
+	public static EiTender getCurrentTender() {
+		return currentTender;
+	}
+
+	public static void setCurrentTender(EiTender currentTender) {
+		LmaRestController.currentTender = currentTender;
+	}
+
+	public static EiTransaction getCurrentTransaction() {
+		return currentTransaction;
+	}
+
+	public static void setCurrentTransaction(EiTransaction currentTransaction) {
+		LmaRestController.currentTransaction = currentTransaction;
+	}
+
+	public static TenderId getCurrentTenderId() {
+		return currentTenderId;
+	}
+
+	public static void setCurrentTenderId(TenderId currentTenderId) {
+		LmaRestController.currentTenderId = currentTenderId;
+	}
+
+	public static AtomicLong getCounter() {
+		return counter;
+	}
+
+	public static ActorId getPartyid() {
+		return partyId;
+	}
+	
 	
 }
