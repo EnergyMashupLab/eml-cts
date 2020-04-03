@@ -3,13 +3,20 @@ package com.example.restservice;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+//For RestTemplate
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 /*
  * NEXT STEPS: incorporate dynamic URIs for the TEUAs, of the form
@@ -22,7 +29,8 @@ public class TeuaRestController {
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderId currentTenderId;
-	private final ActorId partyId  = new ActorId();	// TODO assign by constructor
+	// TODO assign in constructor?
+	private final ActorId partyId  = new ActorId();
 	
 	/*
 	 * GET - /teua/{#}/party responds with PartyId
@@ -39,16 +47,29 @@ public class TeuaRestController {
 	 */
 	
 	@PostMapping("/createTransaction")
-	public EiCreatedTransaction 	postEiCreateTransaction(@RequestBody EiCreateTransaction eiCreateTransaction)	{
+	public EiCreatedTransaction postEiCreateTransaction(
+			@RequestBody EiCreateTransaction eiCreateTransaction)	{
 		EiTender tempTender;
 		EiTransaction tempTransaction;
+		// tempPostReponse responds to POST to /sc
 		EiCreateTransaction tempCreate;
-		EiCreatedTransaction tempCreated;
+		EiCreatedTransaction tempCreated, tempPostResponse;
+		
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate;	
+	   	restTemplate = builder.build();
 		
 		tempCreate = eiCreateTransaction;
 		tempTransaction = eiCreateTransaction.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
 		tempTender.print();	// DEBUG
+		
+		tempPostResponse = restTemplate.postForObject(
+				"http://sc/createTender", 
+				tempCreate,
+				EiCreatedTransaction.class);
 		
 		/*
 			public EiCreatedTender(
@@ -58,7 +79,14 @@ public class TeuaRestController {
 				EiResponse response)
 		 */
 		
-		tempCreated = new EiCreatedTransaction(tempTransaction.getTransactionId(),
+		/*
+		 *	Will POST EiCreateTransaction back to the SC at /sc 
+		 *	Shouldn't require that SC reply with an
+		 *	EiCreatedTransaction but that serves as an ACK
+		 */
+		
+		tempCreated = new EiCreatedTransaction(
+				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));

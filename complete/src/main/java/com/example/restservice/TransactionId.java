@@ -31,6 +31,10 @@ public class TransactionId {
 	public String print() {
 		return String.format(template, transactionId);
 	}
+	
+	public String toString()	{
+		return String.valueOf(this.transactionId);
+	}
 
 	public static String getTemplate() {
 		return template;

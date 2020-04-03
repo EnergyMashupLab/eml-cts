@@ -39,6 +39,17 @@ public class EiCreatedTender {
 				refId.getRefId()));
 	}
 	
+	public String toString() {
+		String printStringFormat = "EiCreatedTender tenderId %d partyId %d counterPartyId %d refId %d";
+		
+			String.format(printStringFormat, 
+				tenderId.getTenderId(),
+				partyId.getActorId(), 
+				counterPartyId.getActorId(), 
+				refId.getRefId());
+			return printStringFormat;
+	}
+	
 	public EiResponse getResponse() {
 		return response;
 	}

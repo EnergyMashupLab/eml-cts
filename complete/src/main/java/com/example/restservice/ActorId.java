@@ -21,6 +21,10 @@ public class ActorId {
 //		System.err.format("Creating ActorId = %d", this.actorId); System.err.println();
 	}
 
+	public String toString()	{
+		return String.valueOf(this.actorId);
+	}
+	
 	public long getActorId() {
 		return actorId;
 	}

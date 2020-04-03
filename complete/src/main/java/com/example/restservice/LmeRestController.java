@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//For RestTemplate
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
 @RestController
 @RequestMapping("/lme")
 public class LmeRestController {
@@ -18,7 +26,11 @@ public class LmeRestController {
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderId currentTenderId;
-	private static final ActorId partyId  = new ActorId();	// TODO assign by constructor
+	// TODO assign in constructor?
+	private static final ActorId partyId  = new ActorId();
+	
+	private static final Logger logger = LogManager.getLogger(
+			LmeRestController.class);
 	
 	/*
 	 * GET - /lme/party responds with PartyId
@@ -35,13 +47,13 @@ public class LmeRestController {
 	 */
 	
 	@PostMapping("/createTender")
-	public EiCreatedTender 	postEiCreateTender(@RequestBody EiCreateTender eiCreateTender)	{
+	public EiCreatedTender 	postEiCreateTender(
+			@RequestBody EiCreateTender eiCreateTender)	{
 		EiTender tempTender;
 		EiCreateTender tempCreate;
 		EiCreatedTender tempCreated;
 		
 		tempCreate = eiCreateTender;
-
 		tempTender = eiCreateTender.getTender();
 		tempTender.print();	// DEBUG
 		
@@ -58,6 +70,10 @@ public class LmeRestController {
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
 		
+		// Turn into an order and forward to the parity engine
+		System.err.println(
+			"Ready to forward rewritten tender to Parity as an order");
+		
 		return tempCreated;
 	}
 	
@@ -67,7 +83,8 @@ public class LmeRestController {
 	 * 		ResponseBody is EiCanceledTender
 	 */
 	@PostMapping("/cancelTender")
-	public EICanceledTender postEiCancelTender(@RequestBody EiCancelTender eiCancelTender)	{
+	public EICanceledTender postEiCancelTender(
+			@RequestBody EiCancelTender eiCancelTender)	{
 		TenderId tempTenderId;
 		EiCancelTender tempCancel;	
 		EICanceledTender tempCanceled;
@@ -84,5 +101,33 @@ public class LmeRestController {
 		
 		return tempCanceled;
 	}
-	
+
+	/*
+	 * MatchFound is invoked when a match is found in the Parity Engine
+	 * Data from Parity includes both orders rewritten to show actual
+	 * clearing price and actual quantity.
+	 * 
+	 * The parameters come from two orders that are rewritten with the new
+	 * quantity and price.
+	 * 
+	 * The party and counterParty remain the same and are packaged in two new
+	 * EiCreateTransaction payloads and POSTed to the LMA
+	 * 
+	 * The glue code from Parity to/from CTS maps the Parity Order numbers
+	 * and instrument names to the original TenderIds 
+	 */
+	public static void MatchFound(EiTender tenderMatchOne,
+			EiTender tenderMatchTwo)	{
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder(); 
+		RestTemplate restTemplate;	// scope is function MatchFound
+
+	   	restTemplate = builder.build();
+	   	
+	   	//DEBUG for now
+	   	System.err.println("in MatchFound Matched Tender one " + 
+	   			tenderMatchOne.toString() +
+	   			" Matched Tender two " +
+	   			tenderMatchTwo.toString());
+		}
 }

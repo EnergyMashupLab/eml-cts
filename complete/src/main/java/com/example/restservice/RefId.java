@@ -31,4 +31,8 @@ public class RefId {
 	public String print() {
 		return String.format(template, value);
 	}
+	
+	public String toString()	{
+		return String.valueOf(this.value);
+	}
 }
