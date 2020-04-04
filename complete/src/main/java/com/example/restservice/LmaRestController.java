@@ -81,7 +81,7 @@ public class LmaRestController {
 				tempCreate, 
 				EiCreatedTender.class);
 		
-		System.err.println("LMA after forward to LME " +
+		logger.info("LMA after forward to LME " +
 					tempPostResponse.toString());
 		
 		/*
