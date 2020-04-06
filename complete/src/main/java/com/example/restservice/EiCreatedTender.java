@@ -34,26 +34,23 @@ public class EiCreatedTender {
 		return tenderId.getTenderId();
 	}
 
-	public void print() {
-		String printStringFormat = "EiCreatedTender tenderId %d partyId %d counterPartyId %d refId %d";
-		
+	public void print() {		
 		System.err.println(
-				String.format(printStringFormat, 
-				tenderId.getTenderId(),
-				partyId.getActorId(), 
-				counterPartyId.getActorId(), 
-				refId.getRefId()));
+				"EiCreatedTender tenderId " +
+				tenderId.toString() +
+				" partyId " + partyId.toString() +
+				" counterPartyId " + counterPartyId.toString() +
+				" refId " + refId.toString() +
+				" response " + response.toString());
 	}
 	
 	public String toString() {
-		String printStringFormat = "EiCreatedTender tenderId %d partyId %d counterPartyId %d refId %d";
-		
-			String.format(printStringFormat, 
-				tenderId.getTenderId(),
-				partyId.getActorId(), 
-				counterPartyId.getActorId(), 
-				refId.getRefId());
-			return printStringFormat;
+		return "EiCreatedTender tenderId " +
+				tenderId.toString() +
+				" partyId " + partyId.toString() +
+				" counterPartyId " + counterPartyId.toString() +
+				" refId " + refId.toString() +
+				" response " + response.toString();
 	}
 	
 	public EiResponse getResponse() {

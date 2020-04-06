@@ -43,6 +43,11 @@ public class EiTransaction {
 				this.transactionId.getTransactionId(),
 				this.tender.getTenderId().getTenderId() ));
 	}
+	
+	public String toString() {
+		return ("EiTransaction transactionId " + this.transactionId.toString() +
+				 " tenderId " + this.tender.getTenderId().toString());
+	}
 
 	public TransactiveState getTransactiveState() {
 		return transactiveState;

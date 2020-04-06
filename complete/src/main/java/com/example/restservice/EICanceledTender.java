@@ -10,19 +10,23 @@ public class EICanceledTender {
 //	refId is in the EiResponse
 
 	
-	public EICanceledTender(
-			ActorId partyId,
-			ActorId counterPartyId,
-			EiResponse response) {
-
+	public EICanceledTender(ActorId partyId, ActorId counterPartyId, EiResponse response) {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
-//		this.print();
 	}
 
+	//Default constructor for JSON serialization
+	public EICanceledTender()	{
+		this.partyId = new ActorId();
+		this.counterPartyId = new ActorId();
+		this.response = new EiResponse(200, "OK");
+	}
+	
+	
 	public void print() {
-		String printStringFormat = "EiCanceledTender  partyId %d counterPartyId %d refId %d ";
+		String printStringFormat = 
+				"EiCanceledTender  partyId %d counterPartyId %d refId %d ";
 		
 		System.err.println(
 				String.format(printStringFormat, 
@@ -31,6 +35,14 @@ public class EICanceledTender {
 				response.getRefId()));
 	}
 	
+	public String toString()	{
+		return "EiCanceledTender Soure RefId " +
+				"PENDING" +
+				" partyId " + partyId.toString() +
+				" counterPartyId " + counterPartyId.toString() +
+				" response " + response.toString();
+	}
+
 	public EiResponse getResponse() {
 		return response;
 	}
@@ -46,4 +58,7 @@ public class EICanceledTender {
 	public ActorId getCounterPartyId() {
 		return counterPartyId;
 	}
+	
+	
+
 }

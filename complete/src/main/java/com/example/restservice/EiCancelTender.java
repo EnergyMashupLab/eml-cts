@@ -13,18 +13,13 @@ public class EiCancelTender {
 	private ActorId counterPartyId;
 	private ActorId partyId;
 	private RefId requestId;
+	// Standard has 1..* TenderIds TODO
 	private TenderId tenderId;
-	
-	/*
-	@JsonIgnore
-	private final Random rand = new Random();
-	 */
 	
 	/*
 	 * Default constructor for JSON deserialization.
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-
 	public EiCancelTender()	{
 		this.counterPartyId = new ActorId();
 		this.partyId = new ActorId();
@@ -34,20 +29,15 @@ public class EiCancelTender {
 
 	/* 
 	 * Parallel for EiCreateTransaction, EiCreateTender:
-	 * 		pass in a completed Tender/Transaction which includes through its Tender interval, quantity, price,
-	 * 		or for EiCancelTender only the TenderId.
-	 * 
+	 * 		pass in a completed Tender/Transaction which includes through its Tender
+	 * 		interval, quantity, price, or for EiCancelTender only the TenderId.
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 	public EiCancelTender(TenderId tenderId, ActorId party, ActorId counterParty) {
-
 		this.tenderId = tenderId;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefId();
-		
-//		System.err.println("EiCancelTender Constructor before print()");		
-//		this.print();
 	}
 
 	public void print() {
@@ -58,6 +48,20 @@ public class EiCancelTender {
 				partyId.getActorId(), 
 				counterPartyId.getActorId(),
 				requestId.getRefId()));
+	}
+	
+	public String toString() {
+		String printStringFormat = "EiCancelTender.print() tenderId %d partyId %d counterPartyId %d requestId %d ";
+			
+		System.err.println(String.format(printStringFormat,
+				tenderId.getTenderId(),
+				partyId.getActorId(), 
+				counterPartyId.getActorId(),
+				requestId.getRefId()));
+		return ("EiCancelTender tenderId " + tenderId.toString() +
+				" party " + partyId.toString() +
+				" counterParty " + counterPartyId.toString() +
+				"requestId " + requestId.toString());
 	}
 
 	public ActorId getCounterPartyId() {

@@ -13,6 +13,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 //For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +35,8 @@ public class TeuaRestController {
 	private static TenderId currentTenderId;
 	// TODO assign in constructor?
 	private final ActorId partyId  = new ActorId();
+	private static final Logger logger = LogManager.getLogger(
+			TeuaRestController.class);
 	
 	/*
 	 * GET - /teua/{#}/party responds with PartyId
@@ -55,7 +61,7 @@ public class TeuaRestController {
 		tempCreate = eiCreateTender;
 
 		tempTender = eiCreateTender.getTender();
-//		tempTender.print();	// DEBUG
+		logger.info("TeuaController before response from SC POST of EiCreateTender");
 		
 		/*
 			public EiCreatedTender(
@@ -65,6 +71,10 @@ public class TeuaRestController {
 				EiResponse response)
 		 */
 		
+		/*
+		 * TODO forward eiCreateTender to LMA, respond to SC request
+		 */
+		
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
@@ -72,8 +82,6 @@ public class TeuaRestController {
 		
 		return tempCreated;
 	}
-
-	
 	
 	/*
 	 * POST - /createTransaction
@@ -99,27 +107,31 @@ public class TeuaRestController {
 		tempCreate = eiCreateTransaction;
 		tempTransaction = eiCreateTransaction.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-//		tempTender.print();	// DEBUG
-		
-		tempPostResponse = restTemplate.postForObject(
-				"http://sc/createTender", 
-				tempCreate,
-				EiCreatedTransaction.class);
+		logger.info("TeuaController before forward of EiCreateTransaction to SC");
 		
 		/*
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
-				EiResponse response)
+		 * TODO 
+		 * 		define simplified createTransaction and createdTender for SC-TEUA
+		 * 
+		 * WILL BE TO /sc/createTransaction
+		 * 
+		 * tempPostResponse = restTemplate.postForObject(
+				"http://sc/createTransaction", 
+				tempCreate,
+				EiCreatedTransaction.class);
 		 */
-		
+				
 		/*
 		 *	Will POST EiCreateTransaction back to the SC at /sc 
 		 *	Shouldn't require that SC reply with an
-		 *	EiCreatedTransaction but that serves as an ACK
+		 *	EiCreatedTransaction but something that serves as an ACK
 		 */
 		
+		/*
+		 * TODO
+		 * Build createdTransaction payload from response from SC
+		 * In the alternative, use constructor without ACK from SC
+		 */
 		tempCreated = new EiCreatedTransaction(
 				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
@@ -127,12 +139,11 @@ public class TeuaRestController {
 				new EiResponse(200, "OK"));
 		
 		return tempCreated;
-
 	}
 	
 	
 	/*
-	 * POST - /cancelTender
+	 * POST - /cancelTender sent to LMA
 	 * 		RequestBody is EiCancelTender
 	 * 		ResponseBody is EiCanceledTender
 	 */
@@ -145,8 +156,8 @@ public class TeuaRestController {
 		
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
-	
-//		tempCancel.print();	// DEBUG
+
+		
 		
 		tempCanceled = new EICanceledTender(
 				tempCancel.getPartyId(),

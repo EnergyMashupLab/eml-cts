@@ -10,7 +10,8 @@ public class EiResponse {
 	private Instant createdDateTime = Instant.now();
 	
 	/*
-	 * Three parameters - response code, description string, what will become a refId number
+	 * Three parameters - response code, description string
+	 *	 refId
 	 */
 	public EiResponse (long code, String description, long rid)	{
 		responseCode = code;
@@ -25,6 +26,22 @@ public class EiResponse {
 		responseCode = code;
 		responseDescription = description;
 	}
+	 
+	 /*
+	  * No parameters - for JSON serialization
+	  */
+	 
+	 public EiResponse ()	{
+		responseCode = 0;
+		responseDescription = "";
+	}
+	 
+	 public String toString()	{		
+			return ("EIResponse responseCode " + responseCode + 
+					" responseDescription " + responseDescription +
+					" refId " + refId.toString() +
+					" createdDateTime " + createdDateTime.toString());
+}
 
 	public long getResponseCode() {
 		return responseCode;
@@ -57,4 +74,7 @@ public class EiResponse {
 	public void setCreatedDateTime(Instant createdDateTime) {
 		this.createdDateTime = createdDateTime;
 	}
+
+
+
 }

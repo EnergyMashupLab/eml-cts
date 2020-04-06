@@ -44,6 +44,7 @@ public class LmaRestController {
 	
 	/*
 	 * POST - /createTender - POSTed by TEUA/EMA to LMA
+	 *				Forwarded to LME
 	 * 		RequestBody is EiCreateTender
 	 * 		ResponseBody is EiCreatedTender
 	 */
@@ -55,7 +56,7 @@ public class LmaRestController {
 		EiTender tempTender;
 		EiCreateTender tempCreate;
 		EiCreatedTender tempCreated;
-		// for LME response to be passed along EiCreateTender
+		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
 		EiCreatedTender tempPostResponse; 
 
 		// Is class scope OK for builder?
@@ -68,21 +69,18 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempCreate = eiCreateTender;	
 		logger.info("LmaController before extracting tender");
-		tempTender = eiCreateTender.getTender(); // and pull out Tender
-		logger.info("LmaController after extracting tender");
-		tempTender.print();	// DEBUG
-		logger.info("LmaController after printing tender");
-
+		tempTender = tempCreate.getTender(); // and pull out Tender
+		logger.info("LmaController after extracting tender " + tempTender.toString());
 		
+		logger.info("LmaController after printing tender before forward to LME--");
 		/*
-		 * Pass on to LME and use response to reply to origin
+		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://lme/createTender", 
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
 				tempCreate, 
 				EiCreatedTender.class);
 		
-		logger.info("LMA after forward to LME " +
-					tempPostResponse.toString());
+		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
 		/*
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
@@ -112,11 +110,10 @@ public class LmaRestController {
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
-		
-	   	restTemplate = builder.build();
+		restTemplate = builder.build();
 	   	
 		/*
-		 * Sent by LME based on market match
+		 * Originated by LME and forwarded by LMA to TEUA based on market match
 		 * NOTE synchronous, uses TEUA EiCreatedTransaction back to LME
 		 */
 		
@@ -128,40 +125,22 @@ public class LmaRestController {
 		/*
 		 * Send on to requesting TEUA/EMA
 		 */
-		
-		/*
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
-				EiResponse response)
-		 */
-		
-		/* Return the EiCreatedTransaction payload received from the TEUA
-		//System.err.println("in LMA createTransaction before new return object");
-
-		tempCreated = new EiCreatedTransaction(tempTransaction.getTransactionId(),
-				tempCreate.getPartyId(),
-				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				
+		/* 
+		 * Return the EiCreatedTransaction payload received from the TEUA
 		*/
-		
+		logger.info("LmaController before sending EiCreateTransaction to TEUA");
 		/*
-		 * Now send the same EiCreateTender payload to the requesting TEUA
+		 * Pass the EiCreateTransaction payload to the TEUA
 		 * NOTE with dynamic URIs will require party-Id lookup
 		 */
-		tempPostResponse = restTemplate.postForObject("http://teua/createTender", 
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/createTransaction", 
 				tempCreate,
 				EiCreatedTransaction.class);
-		
-		System.err.println("LMA after forward to TEUA " +
-					tempPostResponse.toString());
-		
-		// And send the response from the TEUA back to the LME
-		// NOTE that this is synchronous; consider async responses
-		
+		logger.info("LmaController after EiCreatedTransaction response from teua to EiCreateTender");
+				
+		// And send the EiCreatedTransaction from the TEUA to the LME
 		return tempPostResponse;
-
 	}
 	
 	
@@ -176,19 +155,38 @@ public class LmaRestController {
 			@RequestBody EiCancelTender eiCancelTender)	{
 		TenderId tempTenderId;
 		EiCancelTender tempCancel;	
-		EICanceledTender tempCanceled;
-		
-		tempCancel = eiCancelTender;
-		tempTenderId = eiCancelTender.getTenderId();
+		EICanceledTender tempCanceled, tempPostResponse;
 
-		tempCancel.print();	// DEBUG
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender
+
+		logger.info("LmaController before builder for /cancelTender");
+		restTemplate = builder.build();
+		logger.info("LmaController after builder for /createTender and before tempCreate save");
+
+		// save CancelTender message as sent by TEUA
+		logger.info("LmaController before forward to LME");
+		tempCancel = eiCancelTender;
 		
+		/*
 		tempCanceled = new EICanceledTender(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
 				new EiResponse(200, "OK"));
+		*/
+
+		logger.info("LmaController before forward to LME");
+		/*
+		 * Pass on to LME and use POST responseBody EiCanceledTender in reply to origin
+		 */
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelTender",			
+				tempCancel, 		
+				EICanceledTender.class);
 		
-		return tempCanceled;
+		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
+		
+		return tempPostResponse;
 	}
 
 	public static EiTender getCurrentTender() {

@@ -21,13 +21,28 @@ public class RefId {
 	 */
 	RefId () {
 		value = refIdCounter.incrementAndGet();
-//		System.err.format("Creating RefId = %d", this.value); System.err.println();
 	}
 	
 	public long getRefId()	{
 		return this.value;
 	}
 	
+	public long getValue() {
+		return value;
+	}
+
+	public void setValue(long value) {
+		this.value = value;
+	}
+
+	public static AtomicLong getRefidcounter() {
+		return refIdCounter;
+	}
+
+	public static String getTemplate() {
+		return template;
+	}
+
 	public String print() {
 		return String.format(template, value);
 	}

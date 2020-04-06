@@ -38,19 +38,25 @@ public class EiTender {
 		this.expirationTime = expirationTime;
 		this.side = side;	// side.BUY or side.SELL
 		// other attributes are set to defaults
-		
-
-		
-//		System.err.println("EiTender Constructor Tender quantity " + quantity + " price " + price + " Side " + side);
-//		this.print();
 	}
 
 	public void print()	{
-		String printStringFormat = "EiTender.print() tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
+		String printStringFormat =
+ "EiTender.print() tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
 		logger.info("LmaController before extracting tender");
 		System.err.println(
 				String.format(printStringFormat, tenderId.getTenderId(),quantity, price, side,integralOnly,
 				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString()));
+	}	
+	
+	public String toString()	{
+		// TODO replace with concatenated strings and toStrings
+		String printStringFormat = 
+"EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
+		logger.info("EiTender toString method");
+
+		return String.format(printStringFormat, tenderId.getTenderId(),quantity, price, side,integralOnly,
+				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString());
 	}	
 	
 	public TenderId getTenderId() {

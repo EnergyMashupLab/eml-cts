@@ -12,9 +12,24 @@ public class EiCreatedTransaction {
 
 	// Default initializer for JSON serialization
 	public EiCreatedTransaction() {
-		this.print();
 	}
 	
+	public TransactionId getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(TransactionId transactionId) {
+		this.transactionId = transactionId;
+	}
+
+	public void setPartyId(ActorId partyId) {
+		this.partyId = partyId;
+	}
+
+	public void setCounterPartyId(ActorId counterPartyId) {
+		this.counterPartyId = counterPartyId;
+	}
+
 	public EiCreatedTransaction(
 			TransactionId transactionId,
 			ActorId partyId,
@@ -25,23 +40,29 @@ public class EiCreatedTransaction {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
-//		this.print();
 	}
 
 	public long getId() {
 		return transactionId.getTransactionId();
 	}
 
-	public void print() {
-		String printStringFormat = "EiCreatedTransaction tenderId %d partyId %d counterPartyId %d refId %d";
-		
+	public void print() {		
 		System.err.println(
-				String.format(printStringFormat, 
-				transactionId.getTransactionId(),
-				partyId.getActorId(), 
-				counterPartyId.getActorId(), 
-				refId.getRefId()));
+				"EiCreatedTransaction transactionId " +
+				transactionId.toString() +
+				" partyId " + partyId.toString() +
+				" counterPartyId " + counterPartyId.toString() +
+				" refId " + refId.toString());
 	}
+	
+	public String toString()	{
+		return ("EiCreatedTransaction transactionId " +
+				transactionId.toString() +
+				" partyId " + partyId.toString() +
+				" counterPartyId " + counterPartyId.toString() +
+				" refId " + refId.toString());
+	}
+	
 	
 	public EiResponse getResponse() {
 		return response;
