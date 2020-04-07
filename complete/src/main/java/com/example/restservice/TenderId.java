@@ -44,4 +44,9 @@ public class TenderId {
 	public String print() {
 		return String.format(template, tenderId);
 	}
+	
+	public String toString()	{
+		return String.valueOf(this.tenderId);
+	}
+	
 }

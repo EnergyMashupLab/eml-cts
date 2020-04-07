@@ -59,6 +59,16 @@ public class EiCreateTransaction {
 				requestId.getRefId(),
 				transaction.getTender().getInterval().dtStart.toString()));
 	}
+	
+	public String toString() {
+		String printStringFormat = "EiCreateTransaction.print() transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
+		
+		return ("EiCreateTransaction transactionId " + transaction.getTransactionId().toString() +
+				" partyid " + partyId.toString() +
+				" counterPartyid " + counterPartyId.toString() +			
+				" requestId " + requestId.toString() +
+				transaction.getTender().toString());
+	}
 
 	public ActorId getCounterPartyId() {
 		return counterPartyId;

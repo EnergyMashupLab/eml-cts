@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+// For RestTemplate
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/lma")
@@ -25,7 +27,12 @@ public class LmaRestController {
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderId currentTenderId;
-	private static final ActorId partyId  = new ActorId();	// TODO assign by constructor
+	// TODO assign in constructor?
+	private static final ActorId partyId  = new ActorId();
+	
+	private static final Logger logger = LogManager.getLogger(
+			LmaRestController.class);
+	
 	
 	/*
 	 * GET - /lma/party responds with PartyId
@@ -36,51 +43,79 @@ public class LmaRestController {
 	}
 	
 	/*
-	 * POST - /createTender
+	 * POST - /createTender - POSTed by TEUA/EMA to LMA
+	 *				Forwarded to LME
 	 * 		RequestBody is EiCreateTender
 	 * 		ResponseBody is EiCreatedTender
 	 */
-	
-	@PostMapping(path="/createTender", consumes = "application/json", produces = "application/json")
-	public EiCreatedTender 	postEiCreateTender(@RequestBody EiCreateTender eiCreateTender)	{
+
+	@PostMapping("/createTender")
+	public EiCreatedTender 	postEiCreateTender(
+			@RequestBody EiCreateTender eiCreateTender)	{
+
 		EiTender tempTender;
 		EiCreateTender tempCreate;
 		EiCreatedTender tempCreated;
-		
-		tempCreate = eiCreateTender;
+		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
+		EiCreatedTender tempPostResponse; 
 
-		tempTender = eiCreateTender.getTender();
-//		System.err.println("in postEiCreateTender body");
-//		tempTender.print();	
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender
+		
+		logger.info("LmaController before builder for /createTender");
+    		restTemplate = builder.build();
+		logger.info("LmaController after builder for /createTender and before tempCreate save");
+		// save CreateTender message as sent by TEUA
+		tempCreate = eiCreateTender;	
+		logger.info("LmaController before extracting tender");
+		tempTender = tempCreate.getTender(); // and pull out Tender
+		logger.info("LmaController after extracting tender " + tempTender.toString());
+		
+		logger.info("LmaController after printing tender before forward to LME--");
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
+				tempCreate, 
+				EiCreatedTender.class);
+		
+		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
 		/*
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
-				EiResponse response)
-		 */
-		
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
+		*/
 		
-		return tempCreated;
+		return tempPostResponse;
 	}
 	
 	/*
-	 * POST - /createTransaction
+	 * POST - /createTransaction - comes from LME based on market matches
 	 * 		RequestBody is EiCreateTransaction
 	 * 		ResponseBody is EiCreatedTransaction
 	 */
 	
-	@PostMapping(path="/createTransaction", consumes = "application/json", produces = "application/json")
-	public EiCreatedTransaction 	postEiCreateTransaction(@RequestBody EiCreateTransaction eiCreateTransaction)	{
+	@PostMapping("/createTransaction")
+	public EiCreatedTransaction postEiCreateTransaction(
+			@RequestBody EiCreateTransaction eiCreateTransaction)	{
+
 		EiTender tempTender;
 		EiTransaction tempTransaction;
 		EiCreateTransaction tempCreate;
-		EiCreatedTransaction tempCreated;
+		EiCreatedTransaction tempCreated, tempPostResponse;
+		
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender
+		restTemplate = builder.build();
+	   	
+		/*
+		 * Originated by LME and forwarded by LMA to TEUA based on market match
+		 * NOTE synchronous, uses TEUA EiCreatedTransaction back to LME
+		 */
 		
 		tempCreate = eiCreateTransaction;
 		tempTransaction = eiCreateTransaction.getTransaction();
@@ -88,20 +123,24 @@ public class LmaRestController {
 		tempTender.print();	// DEBUG
 		
 		/*
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
-				EiResponse response)
+		 * Send on to requesting TEUA/EMA
 		 */
-//		System.err.println("in LMA createTransaction before new return object");
-		tempCreated = new EiCreatedTransaction(tempTransaction.getTransactionId(),
-				tempCreate.getPartyId(),
-				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
-		
-//		System.err.println("in LMA createTransaction after new return object");
-		return tempCreated;
+				
+		/* 
+		 * Return the EiCreatedTransaction payload received from the TEUA
+		*/
+		logger.info("LmaController before sending EiCreateTransaction to TEUA");
+		/*
+		 * Pass the EiCreateTransaction payload to the TEUA
+		 * NOTE with dynamic URIs will require party-Id lookup
+		 */
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/createTransaction", 
+				tempCreate,
+				EiCreatedTransaction.class);
+		logger.info("LmaController after EiCreatedTransaction response from teua to EiCreateTender");
+				
+		// And send the EiCreatedTransaction from the TEUA to the LME
+		return tempPostResponse;
 	}
 	
 	
@@ -112,22 +151,42 @@ public class LmaRestController {
 	 */
 
 	@PostMapping("/cancelTender")
-	public EICanceledTender postEiCancelTender(@RequestBody EiCancelTender eiCancelTender)	{
+	public EICanceledTender postEiCancelTender(
+			@RequestBody EiCancelTender eiCancelTender)	{
 		TenderId tempTenderId;
 		EiCancelTender tempCancel;	
-		EICanceledTender tempCanceled;
-		
-		tempCancel = eiCancelTender;
-		tempTenderId = eiCancelTender.getTenderId();
+		EICanceledTender tempCanceled, tempPostResponse;
 
-		tempCancel.print();	// DEBUG
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender
+
+		logger.info("LmaController before builder for /cancelTender");
+		restTemplate = builder.build();
+		logger.info("LmaController after builder for /createTender and before tempCreate save");
+
+		// save CancelTender message as sent by TEUA
+		logger.info("LmaController before forward to LME");
+		tempCancel = eiCancelTender;
 		
+		/*
 		tempCanceled = new EICanceledTender(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
 				new EiResponse(200, "OK"));
+		*/
+
+		logger.info("LmaController before forward to LME");
+		/*
+		 * Pass on to LME and use POST responseBody EiCanceledTender in reply to origin
+		 */
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelTender",			
+				tempCancel, 		
+				EICanceledTender.class);
 		
-		return tempCanceled;
+		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
+		
+		return tempPostResponse;
 	}
 
 	public static EiTender getCurrentTender() {

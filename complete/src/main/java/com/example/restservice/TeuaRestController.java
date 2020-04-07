@@ -3,13 +3,24 @@ package com.example.restservice;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+//For RestTemplate
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 /*
  * NEXT STEPS: incorporate dynamic URIs for the TEUAs, of the form
@@ -22,7 +33,10 @@ public class TeuaRestController {
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderId currentTenderId;
-	private final ActorId partyId  = new ActorId();	// TODO assign by constructor
+	// TODO assign in constructor?
+	private final ActorId partyId  = new ActorId();
+	private static final Logger logger = LogManager.getLogger(
+			TeuaRestController.class);
 	
 	/*
 	 * GET - /teua/{#}/party responds with PartyId
@@ -47,7 +61,7 @@ public class TeuaRestController {
 		tempCreate = eiCreateTender;
 
 		tempTender = eiCreateTender.getTender();
-//		tempTender.print();	// DEBUG
+		logger.info("TeuaController before response from SC POST of EiCreateTender");
 		
 		/*
 			public EiCreatedTender(
@@ -55,6 +69,10 @@ public class TeuaRestController {
 				ActorId partyId,
 				ActorId counterPartyId,
 				EiResponse response)
+		 */
+		
+		/*
+		 * TODO forward eiCreateTender to LMA, respond to SC request
 		 */
 		
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
@@ -64,8 +82,6 @@ public class TeuaRestController {
 		
 		return tempCreated;
 	}
-
-	
 	
 	/*
 	 * POST - /createTransaction
@@ -74,26 +90,50 @@ public class TeuaRestController {
 	 */
 	
 	@PostMapping("/createTransaction")
-	public EiCreatedTransaction 	postEiCreateTransaction(@RequestBody EiCreateTransaction eiCreateTransaction)	{
+	public EiCreatedTransaction postEiCreateTransaction(
+			@RequestBody EiCreateTransaction eiCreateTransaction)	{
 		EiTender tempTender;
 		EiTransaction tempTransaction;
+		// tempPostReponse responds to POST to /sc
 		EiCreateTransaction tempCreate;
-		EiCreatedTransaction tempCreated;
+		EiCreatedTransaction tempCreated, tempPostResponse;
+		
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate;	
+	   	restTemplate = builder.build();
 		
 		tempCreate = eiCreateTransaction;
 		tempTransaction = eiCreateTransaction.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-//		tempTender.print();	// DEBUG
+		logger.info("TeuaController before forward of EiCreateTransaction to SC");
 		
 		/*
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
-				EiResponse response)
+		 * TODO 
+		 * 		define simplified createTransaction and createdTender for SC-TEUA
+		 * 
+		 * WILL BE TO /sc/createTransaction
+		 * 
+		 * tempPostResponse = restTemplate.postForObject(
+				"http://sc/createTransaction", 
+				tempCreate,
+				EiCreatedTransaction.class);
+		 */
+				
+		/*
+		 *	Will POST EiCreateTransaction back to the SC at /sc 
+		 *	Shouldn't require that SC reply with an
+		 *	EiCreatedTransaction but something that serves as an ACK
 		 */
 		
-		tempCreated = new EiCreatedTransaction(tempTransaction.getTransactionId(),
+		/*
+		 * TODO
+		 * Build createdTransaction payload from response from SC
+		 * In the alternative, use constructor without ACK from SC
+		 */
+		tempCreated = new EiCreatedTransaction(
+				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
@@ -103,7 +143,7 @@ public class TeuaRestController {
 	
 	
 	/*
-	 * POST - /cancelTender
+	 * POST - /cancelTender sent to LMA
 	 * 		RequestBody is EiCancelTender
 	 * 		ResponseBody is EiCanceledTender
 	 */
@@ -116,8 +156,8 @@ public class TeuaRestController {
 		
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
-	
-//		tempCancel.print();	// DEBUG
+
+		
 		
 		tempCanceled = new EICanceledTender(
 				tempCancel.getPartyId(),
@@ -126,6 +166,7 @@ public class TeuaRestController {
 		
 		return tempCanceled;
 	}
+/*
 
 	public static EiTender getCurrentTender() {
 		return currentTender;
@@ -158,7 +199,5 @@ public class TeuaRestController {
 	public ActorId getPartyId() {
 		return partyId;
 	}
-	
-	
-	
+*/
 }
