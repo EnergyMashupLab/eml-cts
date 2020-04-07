@@ -13,11 +13,19 @@ The code skeleton for a simple Greeting RESTful service was taken from [The Spri
 
 How to Use
 ----------
-The code builds and runs in Spring Tools Suite 4; it typically would be run on the embedded Tomcat server.
+The code builds and runs in Spring Tool Suite 4; it typically would be run on the embedded Tomcat server.
 
-The file ![URIs_for_RestTestbed_GET_operations](./URIs_for_RestTestbed_GET_operations.txt) shows the URIs for the various GET operations that do not require parameters or a RequestBody. These GET operations are in the RestController files **GreetingController.java** (most of the create randomized JSON message bodies) and in the LMA, LME, and TEUA RestController files (for the /party to retrieve the respective actors' PartyId for tenders and transactions/bids and offers.
+The files in ![URIs-and-payloads](./URIs-and-payloads) describe
 
-Documentation is pending, but the comments in the LMA, LME, and TEUA RestController files give the RequestBody and ResponseBody types.
+- POST operations to the actors in [NIST-CTS-Agents](https://github.com/EnergyMashupLab/NIST-CTS-Agents)
+- JSON payloads for the POST operations that exercise the services
+- URIs for the various GET operations that do not require parameters or a RequestBody. 
+
+The random payload generating GET operations are in the RestController files **GreetingController.java** 
+
+Other GET operations (.../party) and POST operations and forwarding are in the LMA, LME, and TEUA RestController Java files.
+
+Documentation is pending, but the comments in the LMA, LME, and TEUA RestController files give the RequestBody and ResponseBody types which are also in this repository.
 
 Standards Used
 --------------
