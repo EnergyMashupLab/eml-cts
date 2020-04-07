@@ -40,17 +40,15 @@ The Common Transactive Services Project uses standards including
 -   The TEMIX profile of [OASIS Energy
     Interoperation](https://docs.oasis-open.org/energyinterop/ei/v1.0/os/).
     Energy Interoperation is the profile base of [OpenADR 2] standardized as
-    [IEC 62746-10-1] (<https://webstore.iec.ch/publication/26267>)
+    [IEC 62746-10-1] (https://webstore.iec.ch/publication/26267)
 
 -   Informative UML models for Energy Interoperation/CTS payloads as shown in
     the EI Standard
 
--   ISO 17800 Facility Smart Grid Information Model
-    (<https://www.iso.org/standard/71547.html> )
+-   [ISO 17800 Facility Smart Grid Information Model](https://www.iso.org/standard/71547.html)
 
 -   Adapter methods for integrating with Independent System Operator Wholesale
-    Markets and other energy markets are based on [IEC 62746-10-3:2018]
-    (<https://webstore.iec.ch/publication/59771>)
+    Markets and other energy markets are based on [IEC 62746-10-3:2018](https://webstore.iec.ch/publication/59771)
 
 License
 ---------
