@@ -1,0 +1,11 @@
+bookmarks folder Rest Testbed GET URIs
+
+http://localhost:8080/greeting?name=silly
+http://localhost:8080/greeting
+http://localhost:8080/CreateTender
+http://localhost:8080//CreateTransaction
+http://localhost:8080//CancelTender
+http://localhost:8080/lma/party
+http://localhost:8080/lme/party
+http://localhost:8080//teua/party
+
