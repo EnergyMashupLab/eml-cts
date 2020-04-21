@@ -1,23 +1,47 @@
-package com.example.restservice;
+package org.theenergymashuplab.cts.controller.actors;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.*;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//For RestTemplate
+// For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+// from NIST-CTS-Agents
+import javax.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import org.theenergymashuplab.cts.dao.*;
+import org.theenergymashuplab.cts.model.*;
+
+
 
 @RestController
 @RequestMapping("/lme")
@@ -25,9 +49,9 @@ public class LmeRestController {
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
-	private static TenderIdType currentTenderId;
+	private static TenderId currentTenderId;
 	// TODO assign in constructor?
-	private static final ActorIdType partyId  = new ActorIdType();
+	private static final ActorId partyId  = new ActorId();
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
@@ -36,7 +60,7 @@ public class LmeRestController {
 	 * GET - /lme/party responds with PartyId
 	 */
 	@GetMapping("/party")
-	public ActorIdType getParty() {
+	public ActorId getParty() {
 		return this.partyId;
 	}
 	
@@ -89,7 +113,7 @@ public class LmeRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTender postEiCancelTender(
 			@RequestBody EiCancelTender eiCancelTender)	{
-		TenderIdType tempTenderId;
+		TenderId tempTenderId;
 		EiCancelTender tempCancel;	
 		EICanceledTender tempCanceled;
 		

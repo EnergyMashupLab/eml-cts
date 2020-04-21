@@ -1,10 +1,15 @@
-package com.example.restservice;
+/**
+ * @author Dhruvin
+ * @author Bill
+ */
+
+
+package org.theenergymashuplab.cts.model;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TransactionId {
 	private long transactionId;
-	private static final String template = "transactionId %d";
 	private static final AtomicLong transactionIdCounter = new AtomicLong();
 	
 	TransactionId(long transactionId){
@@ -20,8 +25,6 @@ public class TransactionId {
 	
 	TransactionId(){
 		transactionId = transactionIdCounter.incrementAndGet();
-//		System.err.format("Creating TransactionId = %d ", this.transactionId);
-//		System.err.println();
 	}
 	
 	public long getTransactionId()	{
@@ -38,7 +41,13 @@ public class TransactionId {
 
 	public static String getTemplate() {
 		return template;
+	}a
+
+
+	public long value() {
+		return this.actionId;
 	}
+
 
 	public static AtomicLong getTransactionidcounter() {
 		return transactionIdCounter;

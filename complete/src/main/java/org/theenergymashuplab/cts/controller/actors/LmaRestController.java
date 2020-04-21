@@ -1,8 +1,11 @@
-package com.example.restservice;
+package org.theenergymashuplab.cts.controller.actors;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.*;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,13 +15,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+// from NIST-CTS-Agents
+import javax.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.theenergymashuplab.cts.dao.*;
+import org.theenergymashuplab.cts.model.*;
+import java.util.List;
+
+
+
+
 
 @RestController
 @RequestMapping("/lma")
@@ -26,9 +54,9 @@ public class LmaRestController {
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
-	private static TenderIdType currentTenderId;
+	private static TenderId currentTenderId;
 	// TODO assign in constructor?
-	private static final ActorIdType partyId  = new ActorIdType();
+	private static final ActorId partyId  = new ActorId();
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmaRestController.class);
@@ -38,7 +66,7 @@ public class LmaRestController {
 	 * GET - /lma/party responds with PartyId
 	 */
 	@GetMapping("/party")
-	public ActorIdType getParty() {
+	public ActorId getParty() {
 		return this.partyId;
 	}
 	
@@ -120,7 +148,8 @@ public class LmaRestController {
 		tempCreate = eiCreateTransaction;
 		tempTransaction = eiCreateTransaction.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-
+		tempTender.print();	// DEBUG
+		
 		/*
 		 * Send on to requesting TEUA/EMA
 		 */
@@ -152,7 +181,7 @@ public class LmaRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTender postEiCancelTender(
 			@RequestBody EiCancelTender eiCancelTender)	{
-		TenderIdType tempTenderId;
+		TenderId tempTenderId;
 		EiCancelTender tempCancel;	
 		EICanceledTender tempCanceled, tempPostResponse;
 
@@ -204,11 +233,11 @@ public class LmaRestController {
 		LmaRestController.currentTransaction = currentTransaction;
 	}
 
-	public static TenderIdType getCurrentTenderId() {
+	public static TenderId getCurrentTenderId() {
 		return currentTenderId;
 	}
 
-	public static void setCurrentTenderId(TenderIdType currentTenderId) {
+	public static void setCurrentTenderId(TenderId currentTenderId) {
 		LmaRestController.currentTenderId = currentTenderId;
 	}
 
@@ -216,7 +245,7 @@ public class LmaRestController {
 		return counter;
 	}
 
-	public static ActorIdType getPartyid() {
+	public static ActorId getPartyid() {
 		return partyId;
 	}
 	

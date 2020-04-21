@@ -1,16 +1,32 @@
-package com.example.restservice;
+package org.theenergymashuplab.cts.controller.payloads;
 
 import java.time.*;
 
+
+// from NIST-CTS
+import javax.validation.Valid;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import org.theenergymashuplab.cts.dao.*;
+import org.theenergymashuplab.cts.model.*;
+
+
 public class EICanceledTender {
-	private final ActorIdType partyId;
-	private final ActorIdType counterPartyId;
+	private final ActorId partyId;
+	private final ActorId counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
 //	refId is in the EiResponse
 
 	
-	public EICanceledTender(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response) {
+	public EICanceledTender(ActorId partyId, ActorId counterPartyId, EiResponse response) {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
@@ -18,8 +34,8 @@ public class EICanceledTender {
 
 	//Default constructor for JSON serialization
 	public EICanceledTender()	{
-		this.partyId = new ActorIdType();
-		this.counterPartyId = new ActorIdType();
+		this.partyId = new ActorId();
+		this.counterPartyId = new ActorId();
 		this.response = new EiResponse(200, "OK");
 	}
 	
@@ -30,8 +46,8 @@ public class EICanceledTender {
 		
 		System.err.println(
 				String.format(printStringFormat, 
-				partyId.value(), 
-				counterPartyId.value(), 
+				partyId.getActorId(), 
+				counterPartyId.getActorId(), 
 				response.getRefId()));
 	}
 	
@@ -51,11 +67,11 @@ public class EICanceledTender {
 		this.response = response;
 	}
 
-	public ActorIdType getPartyId() {
+	public ActorId getPartyId() {
 		return partyId;
 	}
 
-	public ActorIdType getCounterPartyId() {
+	public ActorId getCounterPartyId() {
 		return counterPartyId;
 	}
 	

@@ -1,28 +1,25 @@
-package com.example.restservice;
+package org.theenergymashuplab.cts.model;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TenderId {
 	private static final String template = "tenderId %d";
 	private static final AtomicLong tenderIdCounter = new AtomicLong();
-	private long tenderId;
+	private long myTenderId;
 	
 	TenderId(long tenderId){
 		/*
 		 * If parameter is zero, create a TenderId with value zero.
 		 * For creating zero values in initilizers in EiTransaction, EiCancelTender, etc
 		 */
-		this.tenderId = tenderId;
+		this.myTenderId = tenderId;
 		if (tenderId != 0) {
 			tenderIdCounter.set(tenderId + 1); 	//to avoid future collisions
 		}
 	}
 	
 	TenderId(){
-		tenderId = tenderIdCounter.incrementAndGet();
-		
-//		System.err.format("Creating TenderId = %d", this.tenderId);
-//		System.err.println();
+		myTenderId = tenderIdCounter.incrementAndGet();
 	}
 	
 	public static String getTemplate() {
@@ -37,6 +34,11 @@ public class TenderId {
 		this.tenderId = tenderId;
 	}
 	
+	/* synonym for getTenderId() for integration of types - TODO*/
+	public long value()    {
+		return this.myTenderId;
+	}
+
 	public long getTenderId()	{
 		return this.tenderId;
 	}
