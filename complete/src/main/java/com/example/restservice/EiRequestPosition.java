@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EiRequestPosition {
-	private ActorIdType requestorPartyId;
-	private ActorIdType partyId;
-	private RefIdType requestId;
+	private ActorIdType requestor;
+	private ActorIdType party;
+	private RefIdType request;
 	private Interval boundingInterval;
 
 	/*
@@ -21,9 +21,9 @@ public class EiRequestPosition {
 	 */
 	public EiRequestPosition()	{
 		
-		this.requestorPartyId = new ActorIdType();
-		this.partyId = new ActorIdType();
-		this.requestId = new RefIdType();
+		this.requestor = new ActorIdType();
+		this.party = new ActorIdType();
+		this.request = new RefIdType();
 	}
 
 	/* 
@@ -36,9 +36,9 @@ public class EiRequestPosition {
 	public EiRequestPosition(ActorIdType party, ActorIdType requestorParty, Interval boundingInterval) {
 
 		this.boundingInterval = boundingInterval;
-		this.partyId = party;
-		this.requestorPartyId = requestorParty;
-		this.requestId = new RefIdType();
+		this.party = party;
+		this.requestor = requestorParty;
+		this.request = new RefIdType();
 		
 		System.err.println("EiRequestPosition Constructor before this.print()");	
 		this.print();
@@ -48,9 +48,9 @@ public class EiRequestPosition {
 		String printStringFormat = "EiRequestPosition.print() partyId %d requestorPartyId %d requestId %d  dtStart %s duration %s";
 			
 		System.err.println(String.format(printStringFormat,
-				partyId.value(), 
-				requestorPartyId.value(),
-				requestId.value(),
+				party.value(), 
+				requestor.value(),
+				request.value(),
 				boundingInterval.dtStart.toString(),
 				boundingInterval.duration.toString()));
 	}
