@@ -9,7 +9,7 @@ import java.time.*;
  */
 
 public class EiTransaction {
-	private final TransactionId transactionId = new TransactionId();	// will be passed to constructor
+	private final TransactionIdType transactionId = new TransactionIdType();	// will be passed to constructor
 	private EiTender tender;
 	private TransactiveState transactiveState = TransactiveState.TRANSACTION;
 	
@@ -25,7 +25,7 @@ public class EiTransaction {
 //		this.print();
 	}
 
-	public TransactionId getTransactionId() {
+	public TransactionIdType getTransactionId() {
 		return this.transactionId;
 	}
 	
@@ -37,16 +37,16 @@ public class EiTransaction {
 		String printStringFormat = "EiTransaction transactionId %d tenderfId %d";
 		
 		System.err.println("head of EiTransaction.print()");
-		System.err.println("transactionId is " + this.transactionId.getTransactionId());		
-		System.err.println("tender's Id is " + this.tender.getTenderId().getTenderId());		
+		System.err.println("transactionId is " + this.transactionId.value());		
+		System.err.println("tender's Id is " + this.tender.getTenderId().value());		
 		System.err.println(String.format(printStringFormat, 
-				this.transactionId.getTransactionId(),
-				this.tender.getTenderId().getTenderId() ));
+				this.transactionId.value(),
+				this.tender.getTenderId().value() ));
 	}
 	
 	public String toString() {
 		return ("EiTransaction transactionId " + this.transactionId.toString() +
-				 " tenderId " + this.tender.getTenderId().toString());
+				 " tenderId " + this.tender.getTenderId().value());
 	}
 
 	public TransactiveState getTransactiveState() {

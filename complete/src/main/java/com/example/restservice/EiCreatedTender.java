@@ -3,12 +3,12 @@ package com.example.restservice;
 import java.time.*;
 
 public class EiCreatedTender {
-	private TenderId tenderId;
-	private ActorId partyId;
-	private ActorId counterPartyId;
+	private TenderIdType tenderId;
+	private ActorIdType partyId;
+	private ActorIdType counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
-	private final RefId refId = new RefId();
+	private final RefIdType refId = new RefIdType();
 
 	/*
 	 * Default constructor for JSON deserialization.
@@ -18,20 +18,19 @@ public class EiCreatedTender {
 	}
 	
 	public EiCreatedTender(
-			TenderId tenderId,
-			ActorId partyId,
-			ActorId counterPartyId,
+			TenderIdType tenderId,
+			ActorIdType partyId,
+			ActorIdType counterPartyId,
 			EiResponse response) {
 
 		this.tenderId = tenderId;
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
-//		this.print();
 	}
 
 	public long getId() {
-		return tenderId.getTenderId();
+		return tenderId.value();
 	}
 
 	public void print() {		
@@ -61,19 +60,19 @@ public class EiCreatedTender {
 		this.response = response;
 	}
 
-	public TenderId getTenderId() {
+	public TenderIdType getTenderId() {
 		return tenderId;
 	}
 
-	public ActorId getPartyId() {
+	public ActorIdType getPartyId() {
 		return partyId;
 	}
 
-	public ActorId getCounterPartyId() {
+	public ActorIdType getCounterPartyId() {
 		return counterPartyId;
 	}
 
-	public RefId getRefId() {
+	public RefIdType getRefId() {
 		return refId;
 	}
 }

@@ -25,9 +25,9 @@ public class LmeRestController {
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
-	private static TenderId currentTenderId;
+	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
-	private static final ActorId partyId  = new ActorId();
+	private static final ActorIdType partyId  = new ActorIdType();
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
@@ -36,7 +36,7 @@ public class LmeRestController {
 	 * GET - /lme/party responds with PartyId
 	 */
 	@GetMapping("/party")
-	public ActorId getParty() {
+	public ActorIdType getParty() {
 		return this.partyId;
 	}
 	
@@ -89,7 +89,7 @@ public class LmeRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTender postEiCancelTender(
 			@RequestBody EiCancelTender eiCancelTender)	{
-		TenderId tempTenderId;
+		TenderIdType tempTenderId;
 		EiCancelTender tempCancel;	
 		EICanceledTender tempCanceled;
 		

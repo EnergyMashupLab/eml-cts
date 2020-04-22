@@ -39,9 +39,8 @@ public class GreetingController {
 		EiTender tempTender = new CreateRandomTender().randomTender();
 		EiCreateTender tempEiCreateTender;
 		
-//		tempTender.print();	//DEBUG
 		// actor Ids will come from POST RequestBody
-		return new EiCreateTender(tempTender, new ActorId(), new ActorId());		
+		return new EiCreateTender(tempTender, new ActorIdType(), new ActorIdType());		
 	}
 	
 	/*
@@ -60,8 +59,8 @@ public class GreetingController {
 		// create a new EiCreateTransaction body using random tender held in tempTender and sequential new ActorIds
 		tempEiCreateTransaction = new EiCreateTransaction(
 				tempTransaction,
-				new ActorId(), 
-				new ActorId());
+				new ActorIdType(), 
+				new ActorIdType());
 		
 		return tempEiCreateTransaction;
 	}
@@ -80,9 +79,9 @@ public class GreetingController {
 		
 		// create a new EiCreateTransaction body using random tender held in tempTender and sequential new ActorIds
 		tempEiCancelTender = new EiCancelTender(
-				new TenderId(),
-				new ActorId(), 
-				new ActorId());
+				new TenderIdType(),
+				new ActorIdType(), 
+				new ActorIdType());
 		
 		/*
 		 * 	public EiCancelTender(TenderId tenderId, ActorId party, ActorId counterParty) {

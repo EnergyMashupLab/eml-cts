@@ -3,37 +3,37 @@ package com.example.restservice;
 import java.time.*;
 
 public class EiCreatedTransaction {
-	private TransactionId transactionId;
-	private ActorId partyId;
-	private ActorId counterPartyId;
+	private TransactionIdType transactionId;
+	private ActorIdType partyId;
+	private ActorIdType counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
-	private final RefId refId = new RefId();
+	private final RefIdType refId = new RefIdType();
 
 	// Default initializer for JSON serialization
 	public EiCreatedTransaction() {
 	}
 	
-	public TransactionId getTransactionId() {
+	public TransactionIdType getTransactionId() {
 		return transactionId;
 	}
 
-	public void setTransactionId(TransactionId transactionId) {
+	public void setTransactionId(TransactionIdType transactionId) {
 		this.transactionId = transactionId;
 	}
 
-	public void setPartyId(ActorId partyId) {
+	public void setPartyId(ActorIdType partyId) {
 		this.partyId = partyId;
 	}
 
-	public void setCounterPartyId(ActorId counterPartyId) {
+	public void setCounterPartyId(ActorIdType counterPartyId) {
 		this.counterPartyId = counterPartyId;
 	}
 
 	public EiCreatedTransaction(
-			TransactionId transactionId,
-			ActorId partyId,
-			ActorId counterPartyId,
+			TransactionIdType transactionId,
+			ActorIdType partyId,
+			ActorIdType counterPartyId,
 			EiResponse response) {
 
 		this.transactionId = transactionId;
@@ -43,15 +43,15 @@ public class EiCreatedTransaction {
 	}
 
 	public long getId() {
-		return transactionId.getTransactionId();
+		return transactionId.value();
 	}
 
 	public void print() {		
 		System.err.println(
 				"EiCreatedTransaction transactionId " +
 				transactionId.toString() +
-				" partyId " + partyId.toString() +
-				" counterPartyId " + counterPartyId.toString() +
+				" partyId " + partyId.value() +
+				" counterPartyId " + counterPartyId.value() +
 				" refId " + refId.toString());
 	}
 	
@@ -72,15 +72,15 @@ public class EiCreatedTransaction {
 		this.response = response;
 	}
 
-	public ActorId getPartyId() {
+	public ActorIdType getPartyId() {
 		return partyId;
 	}
 
-	public ActorId getCounterPartyId() {
+	public ActorIdType getCounterPartyId() {
 		return counterPartyId;
 	}
 
-	public RefId getRefId() {
+	public RefIdType getRefId() {
 		return refId;
 	}
 }

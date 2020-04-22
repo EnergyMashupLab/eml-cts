@@ -6,17 +6,18 @@ public class EiResponse {
 	
 	public long responseCode;
 	public String responseDescription;
-	private RefId refId = new RefId();
+	private RefIdType refId = new RefIdType();
 	private Instant createdDateTime = Instant.now();
 	
 	/*
+	 * PROBABLY NO LONGER USED due to id inheritance
 	 * Three parameters - response code, description string
 	 *	 refId
 	 */
 	public EiResponse (long code, String description, long rid)	{
 		responseCode = code;
 		responseDescription = description;
-		refId = new RefId(rid);
+		refId = new RefIdType();
 	}
 	
 	/*
@@ -59,11 +60,11 @@ public class EiResponse {
 		this.responseDescription = responseDescription;
 	}
 
-	public RefId getRefId() {
+	public RefIdType getRefId() {
 		return refId;
 	}
 
-	public void setRefId(RefId refId) {
+	public void setRefId(RefIdType refId) {
 		this.refId = refId;
 	}
 
@@ -74,7 +75,4 @@ public class EiResponse {
 	public void setCreatedDateTime(Instant createdDateTime) {
 		this.createdDateTime = createdDateTime;
 	}
-
-
-
 }

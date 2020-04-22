@@ -26,9 +26,9 @@ public class LmaRestController {
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
-	private static TenderId currentTenderId;
+	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
-	private static final ActorId partyId  = new ActorId();
+	private static final ActorIdType partyId  = new ActorIdType();
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmaRestController.class);
@@ -38,7 +38,7 @@ public class LmaRestController {
 	 * GET - /lma/party responds with PartyId
 	 */
 	@GetMapping("/party")
-	public ActorId getParty() {
+	public ActorIdType getParty() {
 		return this.partyId;
 	}
 	
@@ -120,8 +120,7 @@ public class LmaRestController {
 		tempCreate = eiCreateTransaction;
 		tempTransaction = eiCreateTransaction.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-		tempTender.print();	// DEBUG
-		
+
 		/*
 		 * Send on to requesting TEUA/EMA
 		 */
@@ -153,7 +152,7 @@ public class LmaRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTender postEiCancelTender(
 			@RequestBody EiCancelTender eiCancelTender)	{
-		TenderId tempTenderId;
+		TenderIdType tempTenderId;
 		EiCancelTender tempCancel;	
 		EICanceledTender tempCanceled, tempPostResponse;
 
@@ -205,11 +204,11 @@ public class LmaRestController {
 		LmaRestController.currentTransaction = currentTransaction;
 	}
 
-	public static TenderId getCurrentTenderId() {
+	public static TenderIdType getCurrentTenderId() {
 		return currentTenderId;
 	}
 
-	public static void setCurrentTenderId(TenderId currentTenderId) {
+	public static void setCurrentTenderId(TenderIdType currentTenderId) {
 		LmaRestController.currentTenderId = currentTenderId;
 	}
 
@@ -217,7 +216,7 @@ public class LmaRestController {
 		return counter;
 	}
 
-	public static ActorId getPartyid() {
+	public static ActorIdType getPartyid() {
 		return partyId;
 	}
 	
