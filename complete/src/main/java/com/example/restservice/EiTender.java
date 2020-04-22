@@ -1,12 +1,14 @@
 package com.example.restservice;
 
+// TYPEPS updated not used - see dao/EiTenderType.java
+
 import java.time.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class EiTender {
-	private final TenderId tenderId = new TenderId();	// new tender id on construction
+	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
 	private final Interval interval;
 	private Instant expirationTime;
 	private long quantity = 0;
@@ -40,14 +42,16 @@ public class EiTender {
 		// other attributes are set to defaults
 	}
 
+	/*
 	public void print()	{
 		String printStringFormat =
  "EiTender.print() tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
 		logger.info("LmaController before extracting tender");
 		System.err.println(
-				String.format(printStringFormat, tenderId.getTenderId(),quantity, price, side,integralOnly,
+				String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
 				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString()));
 	}	
+	*/
 	
 	public String toString()	{
 		// TODO replace with concatenated strings and toStrings
@@ -55,11 +59,11 @@ public class EiTender {
 "EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
 		logger.info("EiTender toString method");
 
-		return String.format(printStringFormat, tenderId.getTenderId(),quantity, price, side,integralOnly,
+		return String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
 				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString());
 	}	
 	
-	public TenderId getTenderId() {
+	public TenderIdType getTenderId() {
 		return tenderId;
 	}
 
@@ -114,6 +118,4 @@ public class EiTender {
 	public void setPrice(long price) {
 		this.price = price;
 	}
-
-
 }

@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EiCreateTender {
-	private ActorId counterPartyId;
-	private ActorId partyId;
-	private RefId requestId;
+	private ActorIdType counterPartyId;
+	private ActorIdType partyId;
+	private RefIdType requestId;
 	private EiTender tender;
 	
 	/*
@@ -25,9 +25,9 @@ public class EiCreateTender {
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
 	public EiCreateTender()	{		
-		this.counterPartyId = new ActorId();
-		this.partyId = new ActorId();
-		this.requestId = new RefId();
+		this.counterPartyId = new ActorIdType();
+		this.partyId = new ActorIdType();
+		this.requestId = new RefIdType();
 	}
 
 	/* 
@@ -38,12 +38,12 @@ public class EiCreateTender {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 
-	public EiCreateTender(EiTender tender, ActorId party, ActorId counterParty) {
+	public EiCreateTender(EiTender tender, ActorIdType party, ActorIdType counterParty) {
 
 		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
-		this.requestId = new RefId();
+		this.requestId = new RefIdType();
 		
 //		System.err.println("EiCreateTender Constructor before this.print()");
 //		this.print();
@@ -53,34 +53,34 @@ public class EiCreateTender {
 		String printStringFormat = "EiCreateTender.print() tenderId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 			
 		System.err.println(String.format(printStringFormat,
-				tender.getTenderId().getTenderId(),
-				partyId.getActorId(), 
-				counterPartyId.getActorId(),
-				requestId.getRefId(),
+				tender.getTenderId().value(),
+				partyId.value(), 
+				counterPartyId.value(),
+				requestId.value(),
 				tender.getInterval().dtStart.toString()));
 	}
 
-	public ActorId getCounterPartyId() {
+	public ActorIdType getCounterPartyId() {
 		return counterPartyId;
 	}
 
-	public void setCounterPartyId(ActorId counterPartyId) {
+	public void setCounterPartyId(ActorIdType counterPartyId) {
 		this.counterPartyId = counterPartyId;
 	}
 
-	public ActorId getPartyId() {
+	public ActorIdType getPartyId() {
 		return partyId;
 	}
 
-	public void setPartyId(ActorId partyId) {
+	public void setPartyId(ActorIdType partyId) {
 		this.partyId = partyId;
 	}
 
-	public RefId getRequestId() {
+	public RefIdType getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(RefId requestId) {
+	public void setRequestId(RefIdType requestId) {
 		this.requestId = requestId;
 	}
 

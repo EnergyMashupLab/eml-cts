@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EiCreateTransaction {
-	private ActorId counterPartyId;
-	private ActorId partyId;
-	private RefId requestId;
+	private ActorIdType counterPartyId;
+	private ActorIdType partyId;
+	private RefIdType requestId;
 	private EiTransaction transaction;
 	
 	/*
@@ -25,9 +25,9 @@ public class EiCreateTransaction {
 	}
 
 	public EiCreateTransaction(EiTransaction eiTransaction)	{
-		this.counterPartyId = new ActorId();
-		this.partyId = new ActorId();
-		this.requestId = new RefId();
+		this.counterPartyId = new ActorIdType();
+		this.partyId = new ActorIdType();
+		this.requestId = new RefIdType();
 		this.transaction = eiTransaction;
 	}
 
@@ -38,12 +38,12 @@ public class EiCreateTransaction {
 	 * 
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCreateTransaction(EiTransaction transaction, ActorId party, ActorId counterParty) {
+	public EiCreateTransaction(EiTransaction transaction, ActorIdType party, ActorIdType counterParty) {
 
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
-		this.requestId = new RefId();
+		this.requestId = new RefIdType();
 		
 //		System.err.println("EiCreateTransaction Constructor before print()");
 //		this.print();
@@ -53,11 +53,12 @@ public class EiCreateTransaction {
 		String printStringFormat = "EiCreateTransaction.print() transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 		
 		System.err.println(String.format(printStringFormat,
-				transaction.getTransactionId().getTransactionId(),
-				partyId.getActorId(), 
-				counterPartyId.getActorId(),
-				requestId.getRefId(),
-				transaction.getTender().getInterval().dtStart.toString()));
+				transaction.getTransactionId().value(),
+				partyId.value(), 
+				counterPartyId.value(),
+				requestId.value(),
+				transaction.getTender().
+					getInterval().dtStart.toString()));
 	}
 	
 	public String toString() {
@@ -67,30 +68,30 @@ public class EiCreateTransaction {
 				" partyid " + partyId.toString() +
 				" counterPartyid " + counterPartyId.toString() +			
 				" requestId " + requestId.toString() +
-				transaction.getTender().toString());
+				transaction.getTender().getTenderId().value());
 	}
 
-	public ActorId getCounterPartyId() {
+	public ActorIdType getCounterPartyId() {
 		return counterPartyId;
 	}
 
-	public void setCounterPartyId(ActorId counterPartyId) {
+	public void setCounterPartyId(ActorIdType counterPartyId) {
 		this.counterPartyId = counterPartyId;
 	}
 
-	public ActorId getPartyId() {
+	public ActorIdType getPartyId() {
 		return partyId;
 	}
 
-	public void setPartyId(ActorId partyId) {
+	public void setPartyId(ActorIdType partyId) {
 		this.partyId = partyId;
 	}
 
-	public RefId getRequestId() {
+	public RefIdType getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(RefId requestId) {
+	public void setRequestId(RefIdType requestId) {
 		this.requestId = requestId;
 	}
 
@@ -101,6 +102,4 @@ public class EiCreateTransaction {
 	public void setTransaction(EiTransaction transaction) {
 		this.transaction = transaction;
 	}
-	
-	
 }

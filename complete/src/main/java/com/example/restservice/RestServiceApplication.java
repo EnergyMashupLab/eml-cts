@@ -27,7 +27,7 @@ public class RestServiceApplication {
 
     public static void main(String[] args) {
     	restTemplate = builder.build();
-    	ActorId actorId;
+    	ActorIdType actorId;
  /*   	FAILS - unknown host. Timing in initialization?
 		actorId = restTemplate.getForObject(
 				"https://lma/party", ActorId.class);
@@ -71,18 +71,18 @@ public class RestServiceApplication {
     
 	public static void WaitForAppReady() {
     	restTemplate = builder.build();
-    	ActorId actorId;
+    	ActorIdType actorId;
  
 		actorId = restTemplate.getForObject(
-				"https://lma/party", ActorId.class);
+				"https://lma/party", ActorIdType.class);
 		logger.info(actorId.toString());
 		
 		actorId = restTemplate.getForObject(
-				"https://lme/party", ActorId.class);
+				"https://lme/party", ActorIdType.class);
 		logger.info(actorId.toString());
 
 		actorId = restTemplate.getForObject(
-				"https://teua/party", ActorId.class);
+				"https://teua/party", ActorIdType.class);
 		logger.info(actorId.toString());
 	}
 	

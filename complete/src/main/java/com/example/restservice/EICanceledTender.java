@@ -3,14 +3,14 @@ package com.example.restservice;
 import java.time.*;
 
 public class EICanceledTender {
-	private final ActorId partyId;
-	private final ActorId counterPartyId;
+	private final ActorIdType partyId;
+	private final ActorIdType counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
 //	refId is in the EiResponse
 
 	
-	public EICanceledTender(ActorId partyId, ActorId counterPartyId, EiResponse response) {
+	public EICanceledTender(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response) {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
@@ -18,8 +18,8 @@ public class EICanceledTender {
 
 	//Default constructor for JSON serialization
 	public EICanceledTender()	{
-		this.partyId = new ActorId();
-		this.counterPartyId = new ActorId();
+		this.partyId = new ActorIdType();
+		this.counterPartyId = new ActorIdType();
 		this.response = new EiResponse(200, "OK");
 	}
 	
@@ -30,8 +30,8 @@ public class EICanceledTender {
 		
 		System.err.println(
 				String.format(printStringFormat, 
-				partyId.getActorId(), 
-				counterPartyId.getActorId(), 
+				partyId.value(), 
+				counterPartyId.value(), 
 				response.getRefId()));
 	}
 	
@@ -51,11 +51,11 @@ public class EICanceledTender {
 		this.response = response;
 	}
 
-	public ActorId getPartyId() {
+	public ActorIdType getPartyId() {
 		return partyId;
 	}
 
-	public ActorId getCounterPartyId() {
+	public ActorIdType getCounterPartyId() {
 		return counterPartyId;
 	}
 	
