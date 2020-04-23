@@ -1,22 +1,20 @@
 package com.example.restservice;
 
-import java.util.*;
-
+/*
+ * ArrayList element for the EiR
+ * 
+ * eplyPosition payload - a list of positions
+ */
 public class EiPosition {
-	private static Interval boundingInterval;
-	private static PositionElement positions[];
-	private static ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
-	/*
-	 * For queries to the position manager - the bounding interval for position information.
-	 * A position is for a particular time so product can be acquired in advance
-	 * Initial draft is <Interval, value> pairs
-	 */
-
+	private Interval interval;
+	private long quantity;
 	
-	EiPosition(Interval boundingInterval, PositionElement positions[])	{
-		/* will have an ordered list of positions - consider Java collection classes */
-		this.boundingInterval = boundingInterval;
-		this.positions = positions;
+	EiPosition()	{
+		// empty for JSON serialization
 	}
-
+	
+	EiPosition(Interval interval, long quantity)	{
+		this.interval = interval;
+		this.quantity = quantity;
+	}
 }

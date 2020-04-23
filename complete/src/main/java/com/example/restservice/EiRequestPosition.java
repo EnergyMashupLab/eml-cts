@@ -40,18 +40,20 @@ public class EiRequestPosition {
 		this.requestor = requestorParty;
 		this.request = new RefIdType();
 		
-		System.err.println("EiRequestPosition Constructor before this.print()");	
-		this.print();
+		System.err.println("EiRequestPosition Constructor before this.print()" + this.toString());	
 	}
 	
-	public void print() {
-		String printStringFormat = "EiRequestPosition.print() partyId %d requestorPartyId %d requestId %d  dtStart %s duration %s";
+	public String toString() {
+		String printStringFormat = 
+				"EiRequestPosition.print() partyId %d requestorPartyId %d requestId %d  dtStart %s duration %s";
 			
-		System.err.println(String.format(printStringFormat,
+		String.format(printStringFormat,
 				party.value(), 
 				requestor.value(),
 				request.value(),
 				boundingInterval.dtStart.toString(),
-				boundingInterval.duration.toString()));
+				boundingInterval.duration.toString());
+		
+		return printStringFormat;
 	}
 }
