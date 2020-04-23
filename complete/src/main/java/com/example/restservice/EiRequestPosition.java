@@ -11,32 +11,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EiRequestPosition {
 	private ActorIdType requestor;
-	private ActorIdType party;
+	private ActorIdType positionParty;	// the party whose position is described
 	private RefIdType request;
 	private Interval boundingInterval;
+	private RefIdType requestId = new RefIdType();
 
 	/*
 	 * Default constructor for JSON deserialization.
-	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
 	public EiRequestPosition()	{
 		
 		this.requestor = new ActorIdType();
-		this.party = new ActorIdType();
+		this.positionParty = new ActorIdType();
 		this.request = new RefIdType();
 	}
 
 	/* 
-	 * Parallel for EiCreateTransaction, EiCreateTender, etc:
-	 * 		pass in an Interval
+	 * Parallel to EiCreateTransaction, EiCreateTender, etc:
+	 * 		pass an Interval
 	 * 
-	 * Add party, requestorParty, and requestId for the message payload.
+	 * Add positionParty, requestorParty, and requestId for the message payload.
 	 */
 
-	public EiRequestPosition(ActorIdType party, ActorIdType requestorParty, Interval boundingInterval) {
+	public EiRequestPosition(ActorIdType positionParty, ActorIdType requestorParty, Interval boundingInterval) {
 
 		this.boundingInterval = boundingInterval;
-		this.party = party;
+		this.positionParty = positionParty;
 		this.requestor = requestorParty;
 		this.request = new RefIdType();
 		
@@ -48,7 +48,7 @@ public class EiRequestPosition {
 				"EiRequestPosition.print() partyId %d requestorPartyId %d requestId %d  dtStart %s duration %s";
 			
 		String.format(printStringFormat,
-				party.value(), 
+				positionParty.value(), 
 				requestor.value(),
 				request.value(),
 				boundingInterval.dtStart.toString(),
@@ -56,4 +56,46 @@ public class EiRequestPosition {
 		
 		return printStringFormat;
 	}
+
+	public ActorIdType getRequestor() {
+		return requestor;
+	}
+
+	public void setRequestor(ActorIdType requestor) {
+		this.requestor = requestor;
+	}
+
+	public ActorIdType getPositionParty() {
+		return positionParty;
+	}
+
+	public void setPositionParty(ActorIdType positionParty) {
+		this.positionParty = positionParty;
+	}
+
+	public RefIdType getRequest() {
+		return request;
+	}
+
+	public void setRequest(RefIdType request) {
+		this.request = request;
+	}
+
+	public Interval getBoundingInterval() {
+		return boundingInterval;
+	}
+
+	public void setBoundingInterval(Interval boundingInterval) {
+		this.boundingInterval = boundingInterval;
+	}
+
+	public RefIdType getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(RefIdType requestId) {
+		this.requestId = requestId;
+	}
+	
+	
 }

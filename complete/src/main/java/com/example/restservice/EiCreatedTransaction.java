@@ -7,7 +7,7 @@ public class EiCreatedTransaction {
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
 	public EiResponse response;
-//	public ArrayofResponses responses; NOT USED
+//	public ArrayofResponses responses; NOT USED YET
 	private final RefIdType refId = new RefIdType();
 
 	// Default initializer for JSON serialization
