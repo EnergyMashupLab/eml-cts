@@ -53,10 +53,10 @@ public class TeuaRestController {
 	 */
 	
 	@PostMapping("/createTender")
-	public EiCreatedTender 	postEiCreateTender(@RequestBody EiCreateTender eiCreateTender)	{
+	public EiCreatedTenderPayload 	postEiCreateTenderPayload(@RequestBody EiCreateTenderPayload eiCreateTender)	{
 		EiTender tempTender;
-		EiCreateTender tempCreate;
-		EiCreatedTender tempCreated;
+		EiCreateTenderPayload tempCreate;
+		EiCreatedTenderPayload tempCreated;
 		
 		tempCreate = eiCreateTender;
 
@@ -75,7 +75,7 @@ public class TeuaRestController {
 		 * TODO forward eiCreateTender to LMA, respond to SC request
 		 */
 		
-		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
+		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
@@ -90,13 +90,13 @@ public class TeuaRestController {
 	 */
 	
 	@PostMapping("/createTransaction")
-	public EiCreatedTransaction postEiCreateTransaction(
-			@RequestBody EiCreateTransaction eiCreateTransaction)	{
+	public EiCreatedTransactionPayload postEiCreateTransactionPayload(
+			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
 		EiTender tempTender;
 		EiTransaction tempTransaction;
 		// tempPostReponse responds to POST to /sc
-		EiCreateTransaction tempCreate;
-		EiCreatedTransaction tempCreated, tempPostResponse;
+		EiCreateTransactionPayload tempCreate;
+		EiCreatedTransactionPayload tempCreated, tempPostResponse;
 		
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -104,8 +104,8 @@ public class TeuaRestController {
 		RestTemplate restTemplate;	
 	   	restTemplate = builder.build();
 		
-		tempCreate = eiCreateTransaction;
-		tempTransaction = eiCreateTransaction.getTransaction();
+		tempCreate = eiCreateTransactionPayload;
+		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
 		logger.info("TeuaController before forward of EiCreateTransaction to SC");
 		
@@ -132,7 +132,7 @@ public class TeuaRestController {
 		 * Build createdTransaction payload from response from SC
 		 * In the alternative, use constructor without ACK from SC
 		 */
-		tempCreated = new EiCreatedTransaction(
+		tempCreated = new EiCreatedTransactionPayload(
 				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
@@ -149,17 +149,17 @@ public class TeuaRestController {
 	 */
 	
 	@PostMapping("/cancelTender")
-	public EICanceledTender postEiCancelTender(@RequestBody EiCancelTender eiCancelTender)	{
+	public EICanceledTenderPayload postEiCancelTender(@RequestBody EiCancelTenderPayload eiCancelTender)	{
 		TenderIdType tempTenderId;
-		EiCancelTender tempCancel;	
-		EICanceledTender tempCanceled;
+		EiCancelTenderPayload tempCancel;	
+		EICanceledTenderPayload tempCanceled;
 		
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
 
 		
 		
-		tempCanceled = new EICanceledTender(
+		tempCanceled = new EICanceledTenderPayload(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
 				new EiResponse(200, "OK"));

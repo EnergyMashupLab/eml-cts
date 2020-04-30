@@ -2,7 +2,7 @@ package com.example.restservice;
 
 import java.time.*;
 
-public class EICanceledTender {
+public class EICanceledTenderPayload {
 	private final ActorIdType partyId;
 	private final ActorIdType counterPartyId;
 	public EiResponse response;
@@ -10,14 +10,14 @@ public class EICanceledTender {
 //	refId is in the EiResponse
 
 	
-	public EICanceledTender(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response) {
+	public EICanceledTenderPayload(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response) {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
 	}
 
 	//Default constructor for JSON serialization
-	public EICanceledTender()	{
+	public EICanceledTenderPayload()	{
 		this.partyId = new ActorIdType();
 		this.counterPartyId = new ActorIdType();
 		this.response = new EiResponse(200, "OK");
@@ -26,7 +26,7 @@ public class EICanceledTender {
 	
 	public void print() {
 		String printStringFormat = 
-				"EiCanceledTender  partyId %d counterPartyId %d refId %d ";
+				"EICanceledTenderPayload  partyId %d counterPartyId %d refId %d ";
 		
 		System.err.println(
 				String.format(printStringFormat, 
@@ -36,7 +36,7 @@ public class EICanceledTender {
 	}
 	
 	public String toString()	{
-		return "EiCanceledTender Soure RefId " +
+		return "EICanceledTenderPayload Soure RefId " +
 				"PENDING" +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +

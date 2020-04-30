@@ -13,7 +13,7 @@ public class EiTender {
 	private Instant expirationTime;
 	private long quantity = 0;
 	private long price = 0;	// cents initially. Parity uses long with number of fractional digits
-	private final Side side;
+	private SideType side;
 	private final boolean integralOnly = false;
 	private TransactiveState transactiveState = TransactiveState.TENDER;
 	
@@ -33,7 +33,7 @@ public class EiTender {
 			time interval
 	*/
 
-	public EiTender(Interval interval, long quantity, long price, Instant expirationTime, Side side) {
+	public EiTender(Interval interval, long quantity, long price, Instant expirationTime, SideType side) {
 		this.interval = interval;
 		this.quantity = quantity;
 		this.price = price;
@@ -95,8 +95,12 @@ public class EiTender {
 		return interval;
 	}
 
-	public Side getSide() {
+	public SideType getSide() {
 		return side;
+	}
+
+	public void setSide(SideType side) {
+		this.side = side;
 	}
 
 	public boolean isIntegralOnly() {

@@ -50,14 +50,14 @@ public class LmaRestController {
 	 */
 
 	@PostMapping("/createTender")
-	public EiCreatedTender 	postEiCreateTender(
-			@RequestBody EiCreateTender eiCreateTender)	{
+	public EiCreatedTenderPayload 	postEiCreateTender(
+			@RequestBody EiCreateTenderPayload eiCreateTender)	{
 
 		EiTender tempTender;
-		EiCreateTender tempCreate;
-		EiCreatedTender tempCreated;
+		EiCreateTenderPayload tempCreate;
+		EiCreatedTenderPayload tempCreated;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
-		EiCreatedTender tempPostResponse; 
+		EiCreatedTenderPayload tempPostResponse; 
 
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -78,7 +78,7 @@ public class LmaRestController {
 		 */
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
 				tempCreate, 
-				EiCreatedTender.class);
+				EiCreatedTenderPayload.class);
 		
 		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
@@ -99,13 +99,13 @@ public class LmaRestController {
 	 */
 	
 	@PostMapping("/createTransaction")
-	public EiCreatedTransaction postEiCreateTransaction(
-			@RequestBody EiCreateTransaction eiCreateTransaction)	{
+	public EiCreatedTransactionPayload postEiCreateTransactionPayload(
+			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
 
 		EiTender tempTender;
 		EiTransaction tempTransaction;
-		EiCreateTransaction tempCreate;
-		EiCreatedTransaction tempCreated, tempPostResponse;
+		EiCreateTransactionPayload tempCreate;
+		EiCreatedTransactionPayload tempCreated, tempPostResponse;
 		
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -117,8 +117,8 @@ public class LmaRestController {
 		 * NOTE synchronous, uses TEUA EiCreatedTransaction back to LME
 		 */
 		
-		tempCreate = eiCreateTransaction;
-		tempTransaction = eiCreateTransaction.getTransaction();
+		tempCreate = eiCreateTransactionPayload;
+		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
 
 		/*
@@ -135,7 +135,7 @@ public class LmaRestController {
 		 */
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/createTransaction", 
 				tempCreate,
-				EiCreatedTransaction.class);
+				EiCreatedTransactionPayload.class);
 		logger.info("LmaController after EiCreatedTransaction response from teua to EiCreateTender");
 				
 		// And send the EiCreatedTransaction from the TEUA to the LME
@@ -150,11 +150,11 @@ public class LmaRestController {
 	 */
 
 	@PostMapping("/cancelTender")
-	public EICanceledTender postEiCancelTender(
-			@RequestBody EiCancelTender eiCancelTender)	{
+	public EICanceledTenderPayload postEiCancelTenderPayload(
+			@RequestBody EiCancelTenderPayload eiCancelTender)	{
 		TenderIdType tempTenderId;
-		EiCancelTender tempCancel;	
-		EICanceledTender tempCanceled, tempPostResponse;
+		EiCancelTenderPayload tempCancel;	
+		EICanceledTenderPayload tempCanceled, tempPostResponse;
 
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -181,7 +181,7 @@ public class LmaRestController {
 		 */
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelTender",			
 				tempCancel, 		
-				EICanceledTender.class);
+				EICanceledTenderPayload.class);
 		
 		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
@@ -218,7 +218,5 @@ public class LmaRestController {
 
 	public static ActorIdType getPartyid() {
 		return partyId;
-	}
-	
-	
+	}	
 }

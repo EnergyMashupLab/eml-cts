@@ -3,7 +3,7 @@
 */
 package com.example.restservice;
 
-public enum Side	{
+public enum SideType	{
 	BUY,
 	SELL;
 }

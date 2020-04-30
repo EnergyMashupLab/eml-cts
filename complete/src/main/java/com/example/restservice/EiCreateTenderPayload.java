@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class EiCreateTender {
+public class EiCreateTenderPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
@@ -24,7 +24,7 @@ public class EiCreateTender {
 	 * Default constructor for JSON deserialization.
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCreateTender()	{		
+	public EiCreateTenderPayload()	{		
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
@@ -38,7 +38,7 @@ public class EiCreateTender {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 
-	public EiCreateTender(EiTender tender, ActorIdType party, ActorIdType counterParty) {
+	public EiCreateTenderPayload(EiTender tender, ActorIdType party, ActorIdType counterParty) {
 
 		this.tender = tender;
 		this.partyId = party;
@@ -50,7 +50,7 @@ public class EiCreateTender {
 	}
 
 	public void print() {
-		String printStringFormat = "EiCreateTender.print() tenderId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
+		String printStringFormat = "EiCreateTenderPayload.print() tenderId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 			
 		System.err.println(String.format(printStringFormat,
 				tender.getTenderId().value(),
@@ -91,7 +91,4 @@ public class EiCreateTender {
 	public void setTender(EiTender tender) {
 		this.tender = tender;
 	}
-	
-	
-	
 }

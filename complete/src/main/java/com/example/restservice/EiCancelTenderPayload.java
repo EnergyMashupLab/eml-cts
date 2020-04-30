@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class EiCancelTender {
+public class EiCancelTenderPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
@@ -20,7 +20,7 @@ public class EiCancelTender {
 	 * Default constructor for JSON deserialization.
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCancelTender()	{
+	public EiCancelTenderPayload()	{
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
@@ -33,7 +33,7 @@ public class EiCancelTender {
 	 * 		interval, quantity, price, or for EiCancelTender only the TenderIdType.
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCancelTender(TenderIdType tenderId, ActorIdType party, ActorIdType counterParty) {
+	public EiCancelTenderPayload(TenderIdType tenderId, ActorIdType party, ActorIdType counterParty) {
 		this.tenderId = tenderId;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
@@ -41,7 +41,7 @@ public class EiCancelTender {
 	}
 
 	public void print() {
-		String printStringFormat = "EiCancelTender.print() tenderId %d partyId %d counterPartyId %d requestId %d ";
+		String printStringFormat = "EiCancelTenderPayload.print() tenderId %d partyId %d counterPartyId %d requestId %d ";
 			
 		System.err.println(String.format(printStringFormat,
 				tenderId.toString(),
@@ -51,14 +51,14 @@ public class EiCancelTender {
 	}
 	
 	public String toString() {
-		String printStringFormat = "EiCancelTender.print() tenderId %d partyId %d counterPartyId %d requestId %d ";
+		String printStringFormat = "EiCancelTenderPayload: tenderId %d partyId %d counterPartyId %d requestId %d ";
 			
 		System.err.println(String.format(printStringFormat,
 				tenderId.toString(),
 				partyId.value(), 
 				counterPartyId.value(),
 				requestId.value()));
-		return ("EiCancelTender tenderId " + tenderId.toString() +
+		return ("EiCancelTenderPayload tenderId " + tenderId.toString() +
 				" party " + partyId.toString() +
 				" counterParty " + counterPartyId.toString() +
 				"requestId " + requestId.toString());

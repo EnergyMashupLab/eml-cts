@@ -1,11 +1,11 @@
 package com.example.restservice;
 
 public class ScTender {
-	protected Side side;
+	protected SideType side;
 	protected long quantity;
 	protected long price;
 
-	ScTender(Side side, long quantity, long price)	{
+	ScTender(SideType side, long quantity, long price)	{
 		// Ensure that the number of decimal points in price and
 		/*
 		 * Ensure that the number of decimal fraction digits
@@ -20,24 +20,24 @@ public class ScTender {
 	}
 	
 	public String toString()	{
-		Side tempSide = this.side;
+		SideType tempSide = this.side;
 		String tempString;
 		
 		tempString = new String ("S");
-		if (tempSide == Side.BUY)	{
+		if (tempSide == SideType.BUY)	{
 			tempString = new String ("B");
 		}
 		
-		tempString = (tempSide == Side.BUY)? "B" : "S";
+		tempString = (tempSide == SideType.BUY)? "B" : "S";
 		
 		return ("ScTender: side " + tempString + " quantity " + quantity + " price " + price);
 	}
 
-	public Side getSide() {
+	public SideType getSide() {
 		return side;
 	}
 
-	public void setSide(Side side) {
+	public void setSide(SideType side) {
 		this.side = side;
 	}
 

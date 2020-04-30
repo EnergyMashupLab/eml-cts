@@ -63,17 +63,12 @@ public class CreateRandomTender {
 			long price = 12; // cents
 			
 			price = rand.nextInt(29) + 1;	//random price from 1..30 cents
-			
-//			System.err.println("CreateRandomTender head of createRandomTender");
 			Instant exp = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
-//			System.err.println("CreateRandomTender dtStart is " + dtStart);
-//			System.err.print("CreateRandomTender expiration ");
-//			System.err.println(exp);
-			Side side =Side.BUY;
+
+			SideType side = SideType.BUY;
 			if (rand.nextInt(100) > 50)	{
-				side = Side.SELL;
+				side = SideType.SELL;
 			}
-//			System.err.println("CreateRandomTender Side is now " + side);
 			
 			randTender = new EiTender(interval, randQuantity, price, exp, side);	
 			return randTender;

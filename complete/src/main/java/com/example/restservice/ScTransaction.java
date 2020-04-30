@@ -2,13 +2,13 @@ package com.example.restservice;
 
 public class ScTransaction {
 	String info = "ScTransaction";
-	Side side;
+	SideType side;
 	long quantity;
 	long price;
 	// tenderId is the CTS ID of the tender made by this SC that cleared
 	long tenderId;
 	
-	ScTransaction(Side side, long quantity, long price, long tenderId)	{
+	ScTransaction(SideType side, long quantity, long price, long tenderId)	{
 		// values from EiTransaction that are not implicit (e.g. market, product)
 		this.side = side;
 		this.quantity = quantity;

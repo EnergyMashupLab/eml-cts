@@ -35,12 +35,12 @@ public class GreetingController {
 	 * 	DEBUG version - uses CreateRandomTender, sequential actorId, response tenderId not correlated to any RequestBody
 	 */
 	@GetMapping("/CreateTender")
-	public EiCreateTender eiCreateTender(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
+	public EiCreateTenderPayload eiCreateTenderPayload(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
 		EiTender tempTender = new CreateRandomTender().randomTender();
-		EiCreateTender tempEiCreateTender;
+		EiCreateTenderPayload tempEiCreateTender;
 		
 		// actor Ids will come from POST RequestBody
-		return new EiCreateTender(tempTender, new ActorIdType(), new ActorIdType());		
+		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType());		
 	}
 	
 	/*
@@ -49,20 +49,21 @@ public class GreetingController {
 	 * 	DEBUG version - uses CreateRandomTender, sequential actorId, response tenderId not correlated to any RequestBody
 	 */
 	@GetMapping("/CreateTransaction")
-	public EiCreateTransaction eiCreateTransaction(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
+	public EiCreateTransactionPayload eiCreateTransactionPayload(@RequestParam(name = "number", 
+							defaultValue = "tid not assigned") String tid) {
 		EiTender tempTender = new CreateRandomTender().randomTender();
-		EiCreateTransaction tempEiCreateTransaction;
+		EiCreateTransactionPayload tempEiCreateTransactionPayload;
 		EiTransaction tempTransaction;
 
 		tempTransaction = new EiTransaction(tempTender);
 		
 		// create a new EiCreateTransaction body using random tender held in tempTender and sequential new ActorIds
-		tempEiCreateTransaction = new EiCreateTransaction(
+		tempEiCreateTransactionPayload = new EiCreateTransactionPayload(
 				tempTransaction,
 				new ActorIdType(), 
 				new ActorIdType());
 		
-		return tempEiCreateTransaction;
+		return tempEiCreateTransactionPayload;
 	}
 	
 	/*
@@ -70,25 +71,22 @@ public class GreetingController {
 	 * 		ResponseBody is EiCancelTender
 	 */
 	@GetMapping("/CancelTender")
-	public EiCancelTender eiCancelTender(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
+	public EiCancelTenderPayload eiCancelTender(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
 		EiTender tempTender = new CreateRandomTender().randomTender();
-		EiCancelTender tempEiCancelTender;
+		EiCancelTenderPayload tempEiCancelTender;
 		EiTransaction tempTransaction;
 
 		tempTransaction = new EiTransaction(tempTender);
 		
 		// create a new EiCreateTransaction body using random tender held in tempTender and sequential new ActorIds
-		tempEiCancelTender = new EiCancelTender(
+		tempEiCancelTender = new EiCancelTenderPayload(
 				new TenderIdType(),
 				new ActorIdType(), 
 				new ActorIdType());
-		
 		/*
 		 * 	public EiCancelTender(TenderId tenderId, ActorId party, ActorId counterParty) {
 		 */
 		
 		return tempEiCancelTender;
 	}
-	
-	
 }

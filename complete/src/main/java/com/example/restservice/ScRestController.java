@@ -66,7 +66,7 @@ public class ScRestController {
 	 * TODO verify price and quantity transform
 	 */
 	
-	long PostTenderToCTS(Side side, long quantity, long price)	{
+	long PostTenderToCTS(SideType side, long quantity, long price)	{
 		/*
 		 * package core tender information
 		 * 		Side
@@ -88,7 +88,7 @@ public class ScRestController {
 
 		restTemplate = builder.build();
 		
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/tender", 
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/scTender", 
 				scTender,
 				ScTenderResponse.class);
 		logger.info("ScController after POST response received from teua. returned TenderId " +
@@ -103,22 +103,22 @@ public class ScRestController {
 	 */
 	@GetMapping("/scTender")
 	public ScTender getScTender() {
-		Side randSide;
+		SideType randSide;
 		long randQuantity;
 		long randPrice;
 		ScTender tempTender;
 		
 		randQuantity = 20 + rand.nextInt(80);
 		randPrice = 75 + rand.nextInt(50);	
-		randSide =Side.BUY;
+		randSide =SideType.BUY;
 		if (rand.nextInt(100) > 50)	{
-				randSide = Side.SELL;
+				randSide = SideType.SELL;
 			}
 		
 		tempTender = new ScTender(randSide, randQuantity, randPrice);
 //		System.err.println(tempTender.toString());
 		
-		// ScTender(Side side, long quantity, long price)	{
+		// ScTender(SideTypeside, long quantity, long price)	{
 		return  tempTender;
 	}
 	
