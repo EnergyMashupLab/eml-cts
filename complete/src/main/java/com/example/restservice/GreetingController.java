@@ -89,4 +89,40 @@ public class GreetingController {
 		
 		return tempEiCancelTender;
 	}
+	
+	/*
+	 * GET - /clientCreateTender responds with a new ClientCreateTenderPayload
+	 * 		ResponseBody is ClientCreatedTenderPayload
+	 * 	DEBUG version - uses CreateRandomTender, sequential actorId, response tenderId not correlated
+	 * 	to any RequestBody
+	 */
+	@GetMapping("/clientCreateTender")
+	public ClientCreateTenderPayload clientCreateTenderPayload(
+					@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
+		EiTender tempTender = new CreateRandomTender().randomTender();		
+		ClientCreateTenderPayload tempClientCreateTenderPayload;
+		EiCreateTenderPayload tempEiCreateTender;
+		
+		// assign fields for random tender and fill in missing values
+		// tempClientCreateTenderPayload.
+		
+		// actor Ids will come from POST RequestBody
+		return new ClientCreateTenderPayload(tempTender.getSide(),tempTender.getQuantity(), tempTender.getPrice());		
+	}
+
+	/*
+	 * GET - /clientCreatedTender responds with a new ClientCreatedTenderPayload for ResponseBody
+	 *
+	 */
+	@GetMapping("/clientCreatedTender")
+	public ClientCreatedTenderPayload clientCreatedTenderPayload(
+					@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {		
+		
+		ClientCreatedTenderPayload tempClientCreatedTenderPayload = new ClientCreatedTenderPayload(new TenderIdType().value()) ;
+		
+		System.err.println("/clientCreatedTender" + tempClientCreatedTenderPayload.toString());
+		return tempClientCreatedTenderPayload;
+	}
+	
+	
 }

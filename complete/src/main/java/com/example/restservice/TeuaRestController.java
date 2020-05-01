@@ -143,7 +143,7 @@ public class TeuaRestController {
 	
 	
 	/*
-	 * POST - /cancelTender sent to LMA
+	 * POST - /cancelTender sent to LMA, received from Client/SC
 	 * 		RequestBody is EiCancelTender
 	 * 		ResponseBody is EiCanceledTender
 	 */
@@ -166,38 +166,40 @@ public class TeuaRestController {
 		
 		return tempCanceled;
 	}
-/*
 
-	public static EiTender getCurrentTender() {
-		return currentTender;
+	
+	/*
+	 * POST - /cancelTender sent to LMA, received from Client/SC
+	 * 		RequestBody is EiCancelTender
+	 * 		ResponseBody is EiCanceledTender
+	 */
+	
+	@PostMapping("/clientCreateTender")
+	public ClientCreatedTenderPayload postEiCancelTender(@RequestBody ClientCreateTenderPayload clientCreateTender)	{
+		TenderIdType tempTenderId;
+		ClientCreateTenderPayload tempCreate;	
+		
+		EICanceledTenderPayload tempCanceled;
+		
+		tempCreate = clientCreateTender; // and put information into a POSTed EiCreateTender to LMA  TODO
+		tempTenderId = new TenderIdType();	// assign a new unique ID
+		ClientCreatedTenderPayload tempCreated;
+	
+		/*
+		 * Now create a new EiTender using the quantity, interval, and price sent by the Client/SC,
+		 * and insert it via the constructor in a new EiCreateTenderPayload.
+		 * 
+		 * In addition to the new EiTender, party is this.partyId, counterParty is the LME representing the market,
+		 * and the POST is to the LMA..
+		 */
+		
+		System.err.println(clientCreateTender.toString());
+		tempCreated = new ClientCreatedTenderPayload(
+				new TenderIdType().value());
+		System.err.println("TEUA clientCreateTender "+ clientCreateTender.toString() + " " + tempCreated.toString());
+		
+		return tempCreated;
 	}
-
-	public static void setCurrentTender(EiTender currentTender) {
-		TeuaRestController.currentTender = currentTender;
-	}
-
-	public static EiTransaction getCurrentTransaction() {
-		return currentTransaction;
-	}
-
-	public static void setCurrentTransaction(EiTransaction currentTransaction) {
-		TeuaRestController.currentTransaction = currentTransaction;
-	}
-
-	public static TenderId getCurrentTenderId() {
-		return currentTenderId;
-	}
-
-	public static void setCurrentTenderId(TenderId currentTenderId) {
-		TeuaRestController.currentTenderId = currentTenderId;
-	}
-
-	public static AtomicLong getCounter() {
-		return counter;
-	}
-
-	public ActorId getPartyId() {
-		return partyId;
-	}
-*/
+	
+	
 }

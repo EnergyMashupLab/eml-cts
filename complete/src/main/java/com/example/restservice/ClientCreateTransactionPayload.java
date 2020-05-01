@@ -1,14 +1,14 @@
 package com.example.restservice;
 
-public class ScTransaction {
-	String info = "ScTransaction";
+public class ClientCreateTransactionPayload {
+	String info = "ClientCreateTransactionPayload";
 	SideType side;
 	long quantity;
-	long price;
+	long price;	// multiplied by 10**decimal fraction - 3 by convention
 	// tenderId is the CTS ID of the tender made by this SC that cleared
 	long tenderId;
 	
-	ScTransaction(SideType side, long quantity, long price, long tenderId)	{
+	ClientCreateTransactionPayload(SideType side, long quantity, long price, long tenderId)	{
 		// values from EiTransaction that are not implicit (e.g. market, product)
 		this.side = side;
 		this.quantity = quantity;
@@ -17,8 +17,7 @@ public class ScTransaction {
 	}
 	
 	public String toString()	{
-		return ("ScTransaction side " + side.toString() + 
-				" quantity " + Long.toString(quantity) + 
+		return (info + " side " + side.toString() + " quantity " + Long.toString(quantity) + 
 				" price " + Long.toString(price));
 	}
 }

@@ -1,11 +1,16 @@
 package com.example.restservice;
 
-public class ScTransactionResponse {
+public class ClientCreatedTransactionPayload {
 	public Boolean success = false;
 	
-	ScTransactionResponse()	{
+	ClientCreatedTransactionPayload()	{
 		success = true;
 	// class may be extended further
+	}
+	
+	@Override
+	public String toString()	{
+		return ("ClientCreatedTransactionPayload success is " + success.toString());
 	}
 
 	public Boolean getSuccess() {
@@ -14,7 +19,5 @@ public class ScTransactionResponse {
 
 	public void setSuccess(Boolean success) {
 		this.success = success;
-	}
-	
-	
+	}	
 }
