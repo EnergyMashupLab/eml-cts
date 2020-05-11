@@ -121,10 +121,14 @@ public class LmeRestController {
 	 * and instrument names to the original TenderIds and Tenders
 	 * 
 	 * The service request is POSTed to /lme/marketCreateTransaction from the market
+	 * 
+	 * ctsTenderId is from CtsBridge
+	 * Create and send the corresponding EiCreateTransactionPayload
 	 */
 	
 	
-	
+// FROM MARKET - NOW MOVED TO SOCKET SERVER
+/*
 	@PostMapping("/marketCreateTransaction")
 	public MarketCreatedTransactionPayload 	postMarketCreateTransaction	(
 			@RequestBody MarketCreateTransactionPayload marketCreateTransaction)	{
@@ -146,7 +150,7 @@ public class LmeRestController {
 				ActorId partyId,
 				ActorId counterPartyId,
 				EiResponse response)
-		 */
+// fix nested comment
 		
 		tempCreated = new MarketCreatedTransactionPayload(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
@@ -161,6 +165,7 @@ public class LmeRestController {
 		
 		return tempCreated;
 	}	
+	*/
 	
 	
 	
@@ -170,16 +175,14 @@ public class LmeRestController {
 	
 	
 	
-	
-	
+	// REPURPOSE TO SENDING CreateTransaction to LMA
+	// TODO needs price and quantity match. Replace with send EiCreateTransactionPayload for each
+	// side of the match. Note that there may be more than one match made on a tender
 	
 	public static void MatchFound(EiTender tenderMatchOne,
 			EiTender tenderMatchTwo)	{
-
 		EiCreateTransactionPayload	eiCreateTransactionPayload = new EiCreateTransactionPayload();
 		EiCreatedTransactionPayload eiCreatedTransactionPayload, tempPostResponse;
-
-		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder(); 
 		RestTemplate restTemplate;	// scope is function MatchFound
 		restTemplate = builder.build();
