@@ -42,8 +42,8 @@ public class LmeRestController {
 	
 	/*
 	 * POST - /createTender
-	 * 		RequestBody is EiCreateTender
-	 * 		ResponseBody is EiCreatedTender
+	 * 		RequestBody is EiCreateTenderPayload from LMA
+	 * 		ResponseBody is EiCreatedTenderPayload
 	 */
 	
 	@PostMapping("/createTender")
@@ -83,7 +83,7 @@ public class LmeRestController {
 	
 	/*
 	 * POST - /cancelTender
-	 * 		RequestBody is EiCancelTender
+	 * 		RequestBody is EiCancelTender from TEUA/Client by way of LMA
 	 * 		ResponseBody is EiCanceledTender
 	 */
 	@PostMapping("/cancelTender")
@@ -117,9 +117,62 @@ public class LmeRestController {
 	 * The party and counterParty remain the same and are packaged in two new
 	 * EiCreateTransaction payloads and POSTed to the LMA
 	 * 
-	 * The glue code from Parity to/from CTS maps the Parity Order numbers
-	 * and instrument names to the original TenderIds 
+	 * The glue code in the Parity Client (in CtsBridge) maps the Parity Order numbers
+	 * and instrument names to the original TenderIds and Tenders
+	 * 
+	 * The service request is POSTed to /lme/marketCreateTransaction from the market
 	 */
+	
+	
+	
+	@PostMapping("/marketCreateTransaction")
+	public MarketCreatedTransactionPayload 	postMarketCreateTransaction	(
+			@RequestBody MarketCreateTransactionPayload marketCreateTransaction)	{
+		EiTender tempTender;
+		MarketCreateTransactionPayload tempCreate;
+		MarketCreatedTransactionPayload tempCreated;
+		
+		tempCreate = marketCreateTransaction;
+		// need to lookup and retrieve EiTender from TenderId in the MarketCreateTransactionPayload
+		tempTender = eiCreateTender.getTender();
+		// need matched quantity, original tender ID, maybe not the original tender
+
+		logger.info("LmeController before constructor for EiCreatedTender " +
+					  tempTender.toString());
+		
+		/*
+			public EiCreatedTender(
+				TenderId tenderId,
+				ActorId partyId,
+				ActorId counterPartyId,
+				EiResponse response)
+		 */
+		
+		tempCreated = new MarketCreatedTransactionPayload(tempTender.getTenderId(),
+				tempCreate.getPartyId(),
+				tempCreate.getCounterPartyId(),
+				new EiResponse(200, "OK"));
+		
+		// DEBUG
+		tempCreated.print();
+		// Turn into an order and forward to the parity engine
+		logger.info("Ready to forward rewritten tender as Parity order and return. EiCreatedTender " +
+						tempCreated.toString());
+		
+		return tempCreated;
+	}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public static void MatchFound(EiTender tenderMatchOne,
 			EiTender tenderMatchTwo)	{
 
@@ -146,38 +199,4 @@ public class LmeRestController {
 
 		/* and process the EiCreatedTransaction response */
 		}
-
-	/*
-	public static EiTender getCurrentTender() {
-		return currentTender;
-	}
-
-	public static void setCurrentTender(EiTender currentTender) {
-		LmeRestController.currentTender = currentTender;
-	}
-
-	public static EiTransaction getCurrentTransaction() {
-		return currentTransaction;
-	}
-
-	public static void setCurrentTransaction(EiTransaction currentTransaction) {
-		LmeRestController.currentTransaction = currentTransaction;
-	}
-
-	public static TenderId getCurrentTenderId() {
-		return currentTenderId;
-	}
-
-	public static void setCurrentTenderId(TenderId currentTenderId) {
-		LmeRestController.currentTenderId = currentTenderId;
-	}
-
-	public static AtomicLong getCounter() {
-		return counter;
-	}
-
-	public static ActorId getPartyid() {
-		return partyId;
-	}
-	*/
 }
