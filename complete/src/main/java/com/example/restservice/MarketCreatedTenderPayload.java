@@ -1,15 +1,16 @@
 package com.example.restservice;
 
 /*
- * Sent by Market responding to the LME. Includes CtsTenderId
- * as a correlation ID for possible asynchronous service calls
- * (future)
+ * Sent by Market responding to MarketCreateTender from LME.
+ * 
+ * Includes CtsTenderId as a correlation ID
  */
 
 public class MarketCreatedTenderPayload {
-	long ctsTenderId;
+	private long ctsTenderId = 0;
 	public Boolean success = false;
-	protected String info = "ClientCreatedTenderPayload";
+	private String info = "ClientCreatedTenderPayload";
+	private String parityOrderId = null;
 	
 	MarketCreatedTenderPayload(){
 		success = true;
@@ -17,9 +18,24 @@ public class MarketCreatedTenderPayload {
 	
 	MarketCreatedTenderPayload(long id){
 		ctsTenderId = id;
+		// parityOrderId is known after Order is entered
 		this.success = true;
 	}
 	
+	MarketCreatedTenderPayload(long ctsTenderId, String parityOrderId)	{
+		this.ctsTenderId = ctsTenderId;
+		this.parityOrderId = parityOrderId;
+		this.success = true;
+	}
+	
+	public String getParityOrderId() {
+		return parityOrderId;
+	}
+
+	public void setParityOrderId(String parityOrderId) {
+		this.parityOrderId = parityOrderId;
+	}
+
 	@Override
 	public String toString()	{
 		return (info + " success is " + success.toString() +

@@ -6,8 +6,8 @@ package com.example.restservice;
 
 public class ClientCreatedTenderPayload	{
 	long ctsTenderId;
-	public Boolean success = false;
-	protected String info = "ClientCreatedTenderPayload";
+	private Boolean success = false;
+	private String info = "ClientCreatedTenderPayload";
 	
 	ClientCreatedTenderPayload(){
 		success = true;

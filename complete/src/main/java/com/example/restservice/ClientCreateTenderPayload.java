@@ -1,10 +1,10 @@
 package com.example.restservice;
 
 public class ClientCreateTenderPayload {
-	protected SideType side;
-	protected long quantity;
-	protected long price;
-	protected String info = "ClientCreateTenderPayload";
+	private SideType side;
+	private long quantity;
+	private long price;
+	private String info = "ClientCreateTenderPayload";
 	
 	ClientCreateTenderPayload()	{
 	}

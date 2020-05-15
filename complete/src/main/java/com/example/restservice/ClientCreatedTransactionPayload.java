@@ -1,7 +1,10 @@
 package com.example.restservice;
 
+/*
+ * Response from Client/SC to its TEUA
+ */
 public class ClientCreatedTransactionPayload {
-	public Boolean success = false;
+	private Boolean success = false;
 	
 	ClientCreatedTransactionPayload()	{
 		success = true;

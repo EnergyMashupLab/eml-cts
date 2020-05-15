@@ -1,20 +1,25 @@
 package com.example.restservice;
+
+import java.time.Duration;
+import java.time.Instant;
+
 /*
  * Sent by the LME to the Market with information to be
  * mapped and inserted in the market engine
  * 
  * Information is from an EiCreateTenderPayload received from the LMA
- * and used as contructor parameters by the LME Actor.
+ * and used as constructor parameters by the LME Actor.
  */
 
 public class MarketCreateTenderPayload {
-	protected String info = "MarketCreateTenderPayload";
-	protected SideType side;
-	protected long quantity;
-	protected long price;
-	protected long ctsTenderId;
+	private String info = "MarketCreateTenderPayload";
+	private SideType side;
+	private long quantity;
+	private long price;
+	private long ctsTenderId;
+	private Instant expireTime = null;
 
-	MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId)	{
+	MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Instant expireTime)	{
 		/*
 		 * Ensure that the number of decimal fraction digits
 		 * in price and quantity align with the global one which is presently 3
@@ -27,16 +32,15 @@ public class MarketCreateTenderPayload {
 //		System.err.println(this.toString());
 	}
 	
+	// Default constructor for JSON
+	MarketCreateTenderPayload()	{
+	}
+	
 	@Override
 	public String toString()	{
 		SideType tempSide = this.side;
 		String tempString;
-/*		
-		tempString = new String ("S");
-		if (tempSide == SideType.BUY)	{
-			tempString = new String ("B");
-		}
-*/
+
 		tempString = (tempSide == SideType.BUY)? "B" : "S";
 		
 		return (info + " side " + tempString + " quantity " +
@@ -81,5 +85,14 @@ public class MarketCreateTenderPayload {
 
 	public void setCtsTenderId(long ctsTenderId) {
 		this.ctsTenderId = ctsTenderId;
-	}	
+	}
+
+	public Instant getExpireTime() {
+		return expireTime;
+	}
+
+	public void setExpireTime(Instant expireTime) {
+		this.expireTime = expireTime;
+	}
+
 }

@@ -1,15 +1,19 @@
 package com.example.restservice;
+
 /*
  * Sent by LME to Market in response to a MarketCreateTransactionPayload
  */
 
 public class MarketCreatedTransactionPayload {
-	protected Boolean success = false;
-	protected String info = "MarketCreatedTransactionPayload";
+	private Boolean success = false;
+	private String info = "MarketCreatedTransactionPayload";
+	// return  created TransactionIdType to CtsBridge
+	private TransactionIdType ctsTransactionId = new TransactionIdType();
+	//return MarketCreateTransactionPayload matchNumber as correlation ID
+	private long parityMatchNumber = 0; 
 	
 	MarketCreatedTransactionPayload()	{
 		success = true;
-	// class may be extended further
 	}
 	
 	@Override

@@ -5,19 +5,43 @@ package com.example.restservice;
  */
 
 public class MarketCreateTransactionPayload {
-	protected String info = "MarketCreateTransactionPayload";
-	protected SideType side;
-	long quantity;
-	long price;	// multiplied by 10**decimal fraction - 3 by convention
-	// tenderId is the CTS ID of the tender made by this SC that cleared
-	long ctsTenderId;
+	private String info = "MarketCreateTransactionPayload";
+	private SideType side;
+	long quantity = 0;	// quantity transacted. At least two Transactions created for a match
+	long price;	// in minimum price increment. May not equal tendered price
+	// ctsTenderId is the CTS cleared tenderId
+	long ctsTenderId = 0;	// set before sending tender -- Map maintained by CtsBridge	
+	public long getMatchNumber() {
+		return matchNumber;
+	}
+
+	public void setMatchNumber(long matchNumber) {
+		this.matchNumber = matchNumber;
+	}
+
+	public String getParityOrderId() {
+		return parityOrderId;
+	}
+
+	public void setParityOrderId(String parityOrderId) {
+		this.parityOrderId = parityOrderId;
+	}
+
+	long matchNumber = 0;	// parity matchNumber for this match
+	private String parityOrderId = null;
 	
-	MarketCreateTransactionPayload(SideType side, long quantity, long price, long tenderId)	{
+	
+	// 	MarketCreateTransactionPayload(String parityOrderId, long quantity, long price, long matchNumber, SideType side)	
+	
+	
+	MarketCreateTransactionPayload(String parityOrderId, long quantity, long price, long ctsTenderId, long matchNumber, SideType side)	{
 		// values from EiTransaction that are not implicit (e.g. market, product)
-		this.side = side;
+		this.parityOrderId = parityOrderId;
 		this.quantity = quantity;
 		this.price = price;
-		this.ctsTenderId= tenderId;
+		this.ctsTenderId= ctsTenderId;
+		this.matchNumber = matchNumber;	// parity match number - may be useful
+		this.side = side;
 	}
 	
 	public String toString()	{
