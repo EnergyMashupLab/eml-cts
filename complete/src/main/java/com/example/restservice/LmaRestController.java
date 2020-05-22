@@ -61,18 +61,14 @@ public class LmaRestController {
 
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
-		RestTemplate restTemplate;	// scope is function postEiCreateTender
-		
-		logger.info("LmaController before builder for /createTender");
-    		restTemplate = builder.build();
-		logger.info("LmaController after builder for /createTender and before tempCreate save");
+		RestTemplate restTemplate;	// scope is function postEiCreateTender	
+    	restTemplate = builder.build();
+    	
 		// save CreateTender message as sent by TEUA
 		tempCreate = eiCreateTender;	
-		logger.info("LmaController before extracting tender");
 		tempTender = tempCreate.getTender(); // and pull out Tender
-		logger.info("LmaController after extracting tender " + tempTender.toString());
 		
-		logger.info("LmaController after printing tender before forward to LME--");
+		logger.info("LmaController: postEiCreateTender: Tender  " + tempTender.toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */

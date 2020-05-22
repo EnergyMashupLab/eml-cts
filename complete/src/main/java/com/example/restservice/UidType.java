@@ -18,6 +18,7 @@ public class UidType {
 	public long value() {
 		return this.myUidId;
 	}
+
 	
 	public String toString()	{
 		return ("Uid: " + String.valueOf(this.myUidId));

@@ -14,7 +14,7 @@ public class EiTender {
 	private long quantity = 0;
 	private long price = 0;	// cents initially. Parity uses long with number of fractional digits
 	private SideType side;
-	private final boolean integralOnly = false;
+	private final boolean integralOnly = false;	// TODO not set, not serialized but comes through as false. Verify behavior.
 	private TransactiveState transactiveState = TransactiveState.TENDER;
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -52,7 +52,6 @@ public class EiTender {
 		// TODO replace with concatenated strings and toStrings
 		String printStringFormat = 
 "EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
-		logger.info("EiTender toString method");
 
 		return String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
 				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString());

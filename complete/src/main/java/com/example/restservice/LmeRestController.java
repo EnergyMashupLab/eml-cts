@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +31,11 @@ public class LmeRestController {
 	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
+	private static Boolean ctsSocketClientNotRunning = true;
+	
+	// queue put here; queue get in CtsSocketClient
+	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue(20);
+	public static CtsSocketClient ctsSocketClient = new CtsSocketClient();
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
@@ -39,6 +47,7 @@ public class LmeRestController {
 	public ActorIdType getParty() {
 		return this.partyId;
 	}
+	
 	
 	/*
 	 * POST - /createTender
@@ -55,11 +64,16 @@ public class LmeRestController {
 		
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
+		
+		if (ctsSocketClientNotRunning) {
+			ctsSocketClientNotRunning = false;
+			ctsSocketClient.start();
+		}
 
 		logger.info("LmeController before constructor for EiCreatedTender " +
 					  tempTender.toString());
 		
-		/*
+		/*	ResponseBody
 			public EiCreatedTender(
 				TenderId tenderId,
 				ActorId partyId,
@@ -67,16 +81,30 @@ public class LmeRestController {
 				EiResponse response)
 		 */
 		
+		// Conversion to MarketCreateTenderPayload is in CtsSocketServer to Market
+		// Non-blocking add returns true if OK, false if queue is full
+		// Send to CtsBridge to place order in parity engine		
+		System.err.println("Lme.postEiCreateTender queueFromLme space? " + queueFromLme.add(tempCreate) + " Length " + queueFromLme.size() + " TenderId " + tempTender.getTenderId());
+		
+		if (ctsSocketClientNotRunning) {
+			ctsSocketClientNotRunning = false;
+			ctsSocketClient.start();
+		}
+		
+		// Response is from LME; decouple orderEntered call from market	
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
 		
 		// DEBUG
-		tempCreated.print();
-		// Turn into an order and forward to the parity engine
-		logger.info("Ready to forward rewritten tender as Parity order and return. EiCreatedTender " +
-						tempCreated.toString());
+		//	System.err.println("Lme createTender: CreatedTenderPayload is " + tempCreated.toString());
+
+		logger.info("Forward rewritten tender via socket  and return. " + tempCreated.toString());
+		
+		/*
+		 * TODO FORWARD TO MARKET - JSON serialization
+		 */
 		
 		return tempCreated;
 	}
@@ -105,29 +133,9 @@ public class LmeRestController {
 		
 		return tempCanceled;
 	}
-
-	/*
-	 * MatchFound is invoked when a match is found in the Parity Engine
-	 * Data from Parity includes both orders rewritten to show actual
-	 * clearing price and actual quantity.
-	 * 
-	 * The parameters come from two orders that are rewritten with the new
-	 * quantity and price.
-	 * 
-	 * The party and counterParty remain the same and are packaged in two new
-	 * EiCreateTransaction payloads and POSTed to the LMA
-	 * 
-	 * The glue code in the Parity Client (in CtsBridge) maps the Parity Order numbers
-	 * and instrument names to the original TenderIds and Tenders
-	 * 
-	 * The service request is POSTed to /lme/marketCreateTransaction from the market
-	 * 
-	 * ctsTenderId is from CtsBridge
-	 * Create and send the corresponding EiCreateTransactionPayload
-	 */
 	
 	
-// FROM MARKET - NOW MOVED TO SOCKET SERVER
+// TODO FROM MARKET - NOW MOVED TO SOCKET SERVER
 /*
 	@PostMapping("/marketCreateTransaction")
 	public MarketCreatedTransactionPayload 	postMarketCreateTransaction	(
@@ -166,41 +174,110 @@ public class LmeRestController {
 		return tempCreated;
 	}	
 	*/
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		
 	// REPURPOSE TO SENDING CreateTransaction to LMA
 	
-	// TODO needs price and quantity match. Replace with send EiCreateTransactionPayload for each
-	// side of the match. Note that there may be more than one match made on a tender
+	// TODO needs price and quantity match. Socket reads MarketEiCreateTransaction payload
+	// for each side of the match. Note that there may be more than one match made on a tender
 	
-	public static void MatchFound(EiTender tenderMatchOne,
-			EiTender tenderMatchTwo)	{
-		EiCreateTransactionPayload	eiCreateTransactionPayload = new EiCreateTransactionPayload();
-		EiCreatedTransactionPayload eiCreatedTransactionPayload, tempPostResponse;
-		final RestTemplateBuilder builder = new RestTemplateBuilder(); 
-		RestTemplate restTemplate;	// scope is function MatchFound
-		restTemplate = builder.build();
-	   	
-		//DEBUG for now
-		System.err.println("in MatchFound Matched Tender one " + 
-				tenderMatchOne.toString() +
-				" Matched Tender two " +
-				tenderMatchTwo.toString());
+//	public static void MatchFound(EiTender tenderMatchOne,
+//			EiTender tenderMatchTwo)	{
+//		EiCreateTransactionPayload	eiCreateTransactionPayload = new EiCreateTransactionPayload();
+//		EiCreatedTransactionPayload eiCreatedTransactionPayload, tempPostResponse;
+//		final RestTemplateBuilder builder = new RestTemplateBuilder(); 
+//		RestTemplate restTemplate;	// scope is function MatchFound
+//		restTemplate = builder.build();
+//	   	
+//		//DEBUG for now
+//		System.err.println("in MatchFound Matched Tender one " + 
+//				tenderMatchOne.toString() +
+//				" Matched Tender two " +
+//				tenderMatchTwo.toString());
+//
+//		/* construct an EiCreateTransaction payload and send to LMA */
+//		// TODO transaction, party, counterParty from Instrument, actors, orders in Parity
+//		// not the autogenerated no parameter constructor
+//		tempPostResponse = restTemplate.postForObject(
+//				"http://localhost:8080/lma/createTransaction", 
+//				eiCreateTransactionPayload, EiCreatedTransactionPayload.class);
+//
+//		/* and process the EiCreatedTransaction response */
+//		}
 
-		/* construct an EiCreateTransaction payload and send to LMA */
-		// TODO transaction, party, counterParty from Instrument, actors, orders in Parity
-		// not the autogenerated no parameter constructor
-		tempPostResponse = restTemplate.postForObject(
-				"http://localhost:8080/lma/createTransaction", 
-				eiCreateTransactionPayload, EiCreatedTransactionPayload.class);
+	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
+		return queueFromLme;
+	}
 
-		/* and process the EiCreatedTransaction response */
-		}
+	public static void setQueueFromLme(BlockingQueue<EiCreateTenderPayload> queueFromLme) {
+		LmeRestController.queueFromLme = queueFromLme;
+	}
+
+
+	public static EiTender getCurrentTender() {
+		return currentTender;
+	}
+
+
+	public static void setCurrentTender(EiTender currentTender) {
+		LmeRestController.currentTender = currentTender;
+	}
+
+
+	public static EiTransaction getCurrentTransaction() {
+		return currentTransaction;
+	}
+
+
+	public static void setCurrentTransaction(EiTransaction currentTransaction) {
+		LmeRestController.currentTransaction = currentTransaction;
+	}
+
+
+	public static TenderIdType getCurrentTenderId() {
+		return currentTenderId;
+	}
+
+
+	public static void setCurrentTenderId(TenderIdType currentTenderId) {
+		LmeRestController.currentTenderId = currentTenderId;
+	}
+
+
+	public static Boolean getCtsSocketClientNotRunning() {
+		return ctsSocketClientNotRunning;
+	}
+
+
+	public static void setCtsSocketClientNotRunning(Boolean ctsSocketClientNotRunning) {
+		LmeRestController.ctsSocketClientNotRunning = ctsSocketClientNotRunning;
+	}
+
+
+	public static CtsSocketClient getCtsSocketClient() {
+		return ctsSocketClient;
+	}
+
+
+	public static void setCtsSocketClient(CtsSocketClient ctsSocketClient) {
+		LmeRestController.ctsSocketClient = ctsSocketClient;
+	}
+
+
+	public static AtomicLong getCounter() {
+		return counter;
+	}
+
+
+	public static ActorIdType getPartyid() {
+		return partyId;
+	}
+
+
+	public static Logger getLogger() {
+		return logger;
+	}
+	
+	
+	
+	
 }

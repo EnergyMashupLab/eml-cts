@@ -17,9 +17,10 @@ public class MarketCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
-	private Instant expireTime = null;
+	private BridgeInterval bridgeInterval;
+	private BridgeInstant expireTime;
 
-	MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Instant expireTime)	{
+	MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Interval interval, Instant expireTime)	{
 		/*
 		 * Ensure that the number of decimal fraction digits
 		 * in price and quantity align with the global one which is presently 3
@@ -29,7 +30,9 @@ public class MarketCreateTenderPayload {
 		this.side = side;
 		this.quantity = quantity;
 		this.price = price;
-//		System.err.println(this.toString());
+		this.ctsTenderId = ctsTenderId;
+		this.bridgeInterval = new BridgeInterval(interval.getDuration().toMinutes(), interval.getDtStart());
+		this.expireTime = new BridgeInstant(expireTime);
 	}
 	
 	// Default constructor for JSON
@@ -87,12 +90,22 @@ public class MarketCreateTenderPayload {
 		this.ctsTenderId = ctsTenderId;
 	}
 
-	public Instant getExpireTime() {
+	public BridgeInterval getBridgeInterval() {
+		return bridgeInterval;
+	}
+
+	public void setBridgeInterval(BridgeInterval bridgeInterval) {
+		this.bridgeInterval = bridgeInterval;
+	}
+
+	public BridgeInstant getExpireTime() {
 		return expireTime;
 	}
 
-	public void setExpireTime(Instant expireTime) {
+	public void setExpireTime(BridgeInstant expireTime) {
 		this.expireTime = expireTime;
 	}
+
+
 
 }

@@ -18,7 +18,3 @@ public class Greeting {
 		return content;
 	}
 }
-
-
-// replace with EiCreatedTender payload and required items:conf q
-//
