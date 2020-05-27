@@ -11,6 +11,10 @@ import java.time.Instant;
  * and used as constructor parameters by the LME Actor.
  */
 
+/*
+ * TODO needs to carry partyId, counterPartyId from EiTender
+ */
+
 public class MarketCreateTenderPayload {
 	private String info = "MarketCreateTenderPayload";
 	private SideType side;
