@@ -17,6 +17,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Set;
+
 //For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -31,11 +36,30 @@ public class LmeRestController {
 	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
-	private static Boolean ctsSocketClientNotRunning = true;
 	
-	// queue put here; queue get in CtsSocketClient
+	private static Boolean ctsSocketClientNotRunning = true;
+	private static Boolean ctsSocketServerNotRunning = true;
+	
+	// queueFromLme is used by CtsSocketClient to accept CreateTenderPayload
+	// queue.put here in LME, take in CtsSocketClient which connects to the market
+	// TODO tune queue capacity
 	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue(20);
 	public static CtsSocketClient ctsSocketClient = new CtsSocketClient();
+	
+	// parallel for MarketCreateTransactionPayloads here in LME.
+	// queue.put by CtsSocketServer, queue.take here in LME to produce an EiCreateTransactionPayload
+	// forwarded to LMA
+	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQ = new ArrayBlockingQueue(20);
+	public static CtsSocketServer ctsSocketServer = new CtsSocketServer();
+	
+	/*
+	 * HashMap to correlate CTS TenderIdType and EiCreateTenderPayload
+	 * referenced by the MarketCreateTransaction
+	 */
+	// TODO count down original quantity from Transactions against the Tender; remove when zero
+	// Need wrapper class Long to use the long ctsTenderId as returned
+	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap = new HashMap<Long, EiCreateTenderPayload>();
+
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
@@ -61,43 +85,48 @@ public class LmeRestController {
 		EiTender tempTender;
 		EiCreateTenderPayload tempCreate;
 		EiCreatedTenderPayload tempCreated;
+		Boolean addQsuccess = false;
 		
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 		
+		// start market connection sockets
 		if (ctsSocketClientNotRunning) {
 			ctsSocketClientNotRunning = false;
 			ctsSocketClient.start();
 		}
+		
+		if (ctsSocketServerNotRunning)	{
+			ctsSocketServerNotRunning = false;
+			ctsSocketServer.start();
+		}
 
-		logger.info("LmeController before constructor for EiCreatedTender " +
-					  tempTender.toString());
+//		logger.info("LmeController before constructor for EiCreatedTender " +
+//		tempTender.toString());
 		
 		/*	ResponseBody
 			public EiCreatedTender(
 				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
+				ActorId partyId,queueF
 				EiResponse response)
 		 */
 		
-		// Conversion to MarketCreateTenderPayload is in CtsSocketServer to Market
-		// Non-blocking add returns true if OK, false if queue is full
-		// Send to CtsBridge to place order in parity engine		
-		System.err.println("Lme.postEiCreateTender queueFromLme space? " + queueFromLme.add(tempCreate) + " Length " + queueFromLme.size() + " TenderId " + tempTender.getTenderId());
+		// Conversion to MarketCreateTenderPayload is in CtsSocketServer at Market
+		// Non-blocking add returns true if OK, false if queue is full - check return value
+		addQsuccess = queueFromLme.add(tempCreate);
+		System.err.println("Lme.postEiCreateTender queueFromLme addQsucces " + addQsuccess +
+				" Length " + queueFromLme.size() + " TenderId " + tempTender.getTenderId());
 		
-		if (ctsSocketClientNotRunning) {
-			ctsSocketClientNotRunning = false;
-			ctsSocketClient.start();
-		}
-		
-		// Response is from LME; decouple orderEntered call from market	
+		// save EiCreateTenderPayload in map to construct EiCreateTransactionPayload from MarketCreateTransaction
+		ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(), tempCreate);	
+				
+		// Decouple orderEntered insertion from market
+		// Immediate return without waiting for orderEntered message (pending)
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
 		
-		// DEBUG
 		//	System.err.println("Lme createTender: CreatedTenderPayload is " + tempCreated.toString());
 
 		logger.info("Forward rewritten tender via socket  and return. " + tempCreated.toString());
@@ -134,75 +163,58 @@ public class LmeRestController {
 		return tempCanceled;
 	}
 	
-	
-// TODO FROM MARKET - NOW MOVED TO SOCKET SERVER
-/*
-	@PostMapping("/marketCreateTransaction")
-	public MarketCreatedTransactionPayload 	postMarketCreateTransaction	(
-			@RequestBody MarketCreateTransactionPayload marketCreateTransaction)	{
-		EiTender tempTender;
-		MarketCreateTransactionPayload tempCreate;
-		MarketCreatedTransactionPayload tempCreated;
+	/*
+	 * 	Take first EiCreateTransactionPayload from eiCreateTransactionQ and
+	 * 	Post it to the LMA.
+	 * 
+	 * This should be a thread.
+	 */
+	public void setUpCreateTransaction()		{
+		EiCreatedTransactionPayload tempPostResponse;
+		EiCreateTransactionPayload eiCreateTransaction = null;
 		
-		tempCreate = marketCreateTransaction;
-		// need to lookup and retrieve EiTender from TenderId in the MarketCreateTransactionPayload
-		tempTender = eiCreateTender.getTender();
-		// need matched quantity, original tender ID, maybe not the original tender
-
-		logger.info("LmeController before constructor for EiCreatedTender " +
-					  tempTender.toString());
+		try {
+			eiCreateTransaction = eiCreateTransactionQ.take();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.err.println("Lme.setUpCreateTransaction " + eiCreateTransaction.toString());
+		
+		tempPostResponse = postEiCreateTransaction(eiCreateTransaction);
+		
+		// TODO process tempPost Response TBD
+		}
+	
+	public EiCreatedTransactionPayload postEiCreateTransaction(@RequestBody EiCreateTransactionPayload eiCreateTransaction)	{
+		// createTransactionQ.take() is the @RequestBody
+		EiTransaction tempTransaction;
+		EiCreatedTransactionPayload tempPostResponse;
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTransaction
+		restTemplate = builder.build();		
+		
+		tempTransaction = eiCreateTransaction.getTransaction();
+		logger.info("LmaController: postEiCreateTransaction: Transaction  " + tempTransaction.toString());
+		/*
+		 * Pass on to LMA and use POST responseBody in reply origin
+		 */
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
+				eiCreateTransaction, 
+				EiCreatedTransactionPayload.class);
+		
+		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
 		/*
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
-				EiResponse response)
-// fix nested comment
-		
-		tempCreated = new MarketCreatedTransactionPayload(tempTender.getTenderId(),
+			tempCreated = new EiCreatedTender(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
+		*/
 		
-		// DEBUG
-		tempCreated.print();
-		// Turn into an order and forward to the parity engine
-		logger.info("Ready to forward rewritten tender as Parity order and return. EiCreatedTender " +
-						tempCreated.toString());
-		
-		return tempCreated;
-	}	
-	*/
-		
-	// REPURPOSE TO SENDING CreateTransaction to LMA
-	
-	// TODO needs price and quantity match. Socket reads MarketEiCreateTransaction payload
-	// for each side of the match. Note that there may be more than one match made on a tender
-	
-//	public static void MatchFound(EiTender tenderMatchOne,
-//			EiTender tenderMatchTwo)	{
-//		EiCreateTransactionPayload	eiCreateTransactionPayload = new EiCreateTransactionPayload();
-//		EiCreatedTransactionPayload eiCreatedTransactionPayload, tempPostResponse;
-//		final RestTemplateBuilder builder = new RestTemplateBuilder(); 
-//		RestTemplate restTemplate;	// scope is function MatchFound
-//		restTemplate = builder.build();
-//	   	
-//		//DEBUG for now
-//		System.err.println("in MatchFound Matched Tender one " + 
-//				tenderMatchOne.toString() +
-//				" Matched Tender two " +
-//				tenderMatchTwo.toString());
-//
-//		/* construct an EiCreateTransaction payload and send to LMA */
-//		// TODO transaction, party, counterParty from Instrument, actors, orders in Parity
-//		// not the autogenerated no parameter constructor
-//		tempPostResponse = restTemplate.postForObject(
-//				"http://localhost:8080/lma/createTransaction", 
-//				eiCreateTransactionPayload, EiCreatedTransactionPayload.class);
-//
-//		/* and process the EiCreatedTransaction response */
-//		}
+		return tempPostResponse;
+	}
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
 		return queueFromLme;

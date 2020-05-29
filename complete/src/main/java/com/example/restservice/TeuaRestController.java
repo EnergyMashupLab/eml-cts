@@ -203,7 +203,7 @@ public class TeuaRestController {
 			restTemplate = builder.build();
 			lmePartyId = restTemplate.getForObject("http://localhost:8080/lme/party",
 				ActorIdType.class);
-			System.err.println("clientCreateTender: lmePartyId = " + lmePartyId.toString());
+//			System.err.println("clientCreateTender: lmePartyId = " + lmePartyId.toString());
 		}
 
 				

@@ -57,7 +57,6 @@ public class CtsSocketClient	extends Thread {
 	
 	private static String driverLine;	// input line to drive to Market - json encoding
 	private static String s;
-	public static Thread drainQ;	// possible future use
 	private static int ITERATIONS = 27;
 	
 	public CtsSocketClient()	{
@@ -70,7 +69,7 @@ public class CtsSocketClient	extends Thread {
 		MarketCreateTenderPayload toJson;
 		String jsonString = null;	// for JSON string
 		
-		logger.info("Thread name" + Thread.currentThread().getName());
+		logger.info("Thread name" + Thread.currentThread().getName() + " port " + port + " ip " + ip);
 		
 		  try {
 				clientSocket = new Socket(ip, port);
@@ -81,7 +80,7 @@ public class CtsSocketClient	extends Thread {
 		  }
 		  
 		  while(true) {
-			  logger.info("SocketClient while loop head");
+//			  logger.info("SocketClient while loop head. queueFromLme size " + LmeRestController.queueFromLme.size());
 			  try {
 				create = LmeRestController.queueFromLme.take();
 				logger.info("SocketClient take head of queueFromLme: size " + LmeRestController.queueFromLme.size() +
@@ -94,11 +93,15 @@ public class CtsSocketClient	extends Thread {
 							tender.getTenderId().value(),
 							tender.getInterval(),
 							tender.getExpireTime());
+				
+				// TODO save EiCreateTenderPayload in Map <long, EiCreateTenderPayload> for 
+				// retrieval when the MarketCreateTransaction is received by CtsSocketServer
+				
 							
 				// and convert to a JSON string and write to socket
 				jsonString = mapper.writeValueAsString(toJson);
 				out.println(jsonString);			
-				logger.info("SocketClient after println of json " + jsonString);
+//				logger.info("SocketClient after println of json " + jsonString);
 				
 			} catch (InterruptedException e) {
 				System.err.println("queueFromLme.take interrupted");

@@ -18,9 +18,17 @@ public class UidType {
 	public long value() {
 		return this.myUidId;
 	}
-
 	
 	public String toString()	{
 		return ("Uid: " + String.valueOf(this.myUidId));
 	}
+
+	public long getMyUidId() {
+		return myUidId;
+	}
+
+	public void setMyUidId(long myUidId) {
+		this.myUidId = myUidId;
+	}
+	
 }

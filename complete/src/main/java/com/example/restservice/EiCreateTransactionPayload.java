@@ -49,20 +49,22 @@ public class EiCreateTransactionPayload {
 //		this.print();
 	}
 
-	public void print() {
-		String printStringFormat = "EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
-		
-		System.err.println(String.format(printStringFormat,
-				transaction.getTransactionId().value(),
-				partyId.value(), 
-				counterPartyId.value(),
-				requestId.value(),
-				transaction.getTender().
-					getInterval().dtStart.toString()));
-	}
+//	public void print() {
+//		String printStringFormat = 
+//			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
+//		
+//		System.err.println(String.format(printStringFormat,
+//				transaction.getTransactionId().value(),
+//				partyId.value(), 
+//				counterPartyId.value(),
+//				requestId.value(),
+//				transaction.getTender().
+//					getInterval().dtStart.toString()));
+//	}
 	
 	public String toString() {
-		String printStringFormat = "EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
+		String printStringFormat = 
+				"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 		
 		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().toString() +
 				" partyid " + partyId.toString() +
