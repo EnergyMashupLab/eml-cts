@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /*
- * Start by new CtsSocketClient.startConnection(("127.0.0.1",
+ * Start by new LmeSocketClient.startConnection(("127.0.0.1",
  *	port matching server)
  *	
  *	Insert into LmeRestController to receive Tender information
@@ -32,10 +32,10 @@ import org.apache.logging.log4j.Logger;
  */
 
 //	TODO run in separate thread
-public class CtsSocketClient	extends Thread {
+public class LmeSocketClient	extends Thread {
 
 	private static final Logger logger = LogManager.getLogger(
-			CtsSocketClient.class);
+			LmeSocketClient.class);
 	
 	final ObjectMapper mapper = new ObjectMapper();
 
@@ -44,6 +44,10 @@ public class CtsSocketClient	extends Thread {
 	private static InputStreamReader inStream;
 	private BufferedReader in;
 	
+    // Socket Server in LME for CreateTransaction
+    public static final int LME_PORT = 39401;
+    
+    // Socket Server in Market for CreateTender 
 	public static final int MARKET_PORT = 39402;
 	private static int port = MARKET_PORT;
 	private static String ip = "127.0.0.1";
@@ -59,7 +63,9 @@ public class CtsSocketClient	extends Thread {
 	private static String s;
 	private static int ITERATIONS = 27;
 	
-	public CtsSocketClient()	{
+	public LmeSocketClient()	{
+    	System.err.println("LmeSocketClient: 0 param constructor port " +
+    			port + " ip " + ip + " " + Thread.currentThread().getName());
 	}
 
 	@Override
@@ -69,22 +75,24 @@ public class CtsSocketClient	extends Thread {
 		MarketCreateTenderPayload toJson;
 		String jsonString = null;	// for JSON string
 		
-		logger.info("Thread name" + Thread.currentThread().getName() + " port " + port + " ip " + ip);
+		logger.info(Thread.currentThread().getName() + " port " + port + " ip " + ip);
 		
 		  try {
 				clientSocket = new Socket(ip, port);
+				logger.debug("clientSocket is " + clientSocket.toString());
 				out = new PrintWriter(clientSocket.getOutputStream(), true);
+				logger.debug("out constructor " + out.toString());
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		  } catch (IOException e) {
 				logger.debug("SocketClient start IOException: " + e.getMessage());
 		  }
 		  
 		  while(true) {
-//			  logger.info("SocketClient while loop head. queueFromLme size " + LmeRestController.queueFromLme.size());
+//			  logger.debug("SocketClient while loop head. queueFromLme size " + LmeRestController.queueFromLme.size());
 			  try {
 				create = LmeRestController.queueFromLme.take();
-				logger.info("SocketClient take head of queueFromLme: size " + LmeRestController.queueFromLme.size() +
-						create.getTender().toString());
+				logger.debug("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
+						" " + create.getTender().toString());
 				tender = create.getTender();
 				toJson = new MarketCreateTenderPayload(
 							tender.getSide(),
@@ -95,13 +103,13 @@ public class CtsSocketClient	extends Thread {
 							tender.getExpireTime());
 				
 				// TODO save EiCreateTenderPayload in Map <long, EiCreateTenderPayload> for 
-				// retrieval when the MarketCreateTransaction is received by CtsSocketServer
-				
+				// retrieval when the MarketCreateTransaction is received by CtsSocketServer			
 							
-				// and convert to a JSON string and write to socket
+				// convert to a JSON string and write to socket
 				jsonString = mapper.writeValueAsString(toJson);
+//				logger.debug("run() before send of json string " + jsonString);
 				out.println(jsonString);			
-//				logger.info("SocketClient after println of json " + jsonString);
+				logger.info("run() after send of json string " + jsonString);
 				
 			} catch (InterruptedException e) {
 				System.err.println("queueFromLme.take interrupted");
