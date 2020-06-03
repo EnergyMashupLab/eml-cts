@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -68,6 +69,8 @@ public class LmeSocketClient	extends Thread {
     			port + " ip " + ip + " " + Thread.currentThread().getName());
 	}
 
+	
+	
 	@Override
 	public void run() {
 		EiCreateTenderPayload create;
@@ -75,20 +78,23 @@ public class LmeSocketClient	extends Thread {
 		MarketCreateTenderPayload toJson;
 		String jsonString = null;	// for JSON string
 		
-		logger.info(Thread.currentThread().getName() + " port " + port + " ip " + ip);
+//		logger.info("LmeSocketClient.run " + Thread.currentThread().getName() + " port " + port + " ip " + ip);
+ 		System.err.println("LmeSocketClient.run() port: " + port + " ip " + ip +
+ 				" '" + Thread.currentThread().getName() + "'");
 		
-		  try {
+		try {
 				clientSocket = new Socket(ip, port);
 				logger.debug("clientSocket is " + clientSocket.toString());
 				out = new PrintWriter(clientSocket.getOutputStream(), true);
 				logger.debug("out constructor " + out.toString());
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		  } catch (IOException e) {
+		} catch (IOException e) {
 				logger.debug("SocketClient start IOException: " + e.getMessage());
-		  }
+				e.printStackTrace();
+		}
 		  
-		  while(true) {
-//			  logger.debug("SocketClient while loop head. queueFromLme size " + LmeRestController.queueFromLme.size());
+		while(true) {
+			  logger.debug("SocketClient while loop head. queueFromLme size " + LmeRestController.queueFromLme.size());
 			  try {
 				create = LmeRestController.queueFromLme.take();
 				logger.debug("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
@@ -112,13 +118,13 @@ public class LmeSocketClient	extends Thread {
 				logger.info("run() after send of json string " + jsonString);
 				
 			} catch (InterruptedException e) {
-				System.err.println("queueFromLme.take interrupted");
+				System.err.println("queueFromLme.take interrupted" + e.getMessage());
 				e.printStackTrace();
-			} catch (JsonProcessingException e) {
-				System.err.println("JsonProcessingException: Input MarketCreateTenderPayload " + e);
-				e.printStackTrace();
+			} catch (JsonProcessingException e1) {
+				System.err.println("JsonProcessingException: Input MarketCreateTenderPayload " + e1.getMessage());
+				e1.printStackTrace();
 			}
-		  }
+		}
 		  
 	}
 

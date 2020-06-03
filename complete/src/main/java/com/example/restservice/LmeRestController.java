@@ -64,6 +64,24 @@ public class LmeRestController {
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
 	
+	LmeRestController()	{
+		logger.info("LmeRestController zero arg constructor");
+		
+		// start market connection sockets
+		if (lmeSocketClientNotRunning) {
+			lmeSocketClientNotRunning = false;
+			lmeSocketClient.start();
+			logger.info("Starting lmeSocketClient");
+			
+		}
+		
+		if (lmeSocketServerNotRunning)	{
+			lmeSocketServerNotRunning = false;
+			lmeSocketServer.start();
+			logger.info("Starting lmeSocketServer");
+		}
+	}
+	
 	/*
 	 * GET - /lme/party responds with PartyId
 	 */
@@ -90,17 +108,6 @@ public class LmeRestController {
 		
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
-		
-		// start market connection sockets
-		if (lmeSocketClientNotRunning) {
-			lmeSocketClientNotRunning = false;
-			lmeSocketClient.start();
-		}
-		
-		if (lmeSocketServerNotRunning)	{
-			lmeSocketServerNotRunning = false;
-			lmeSocketServer.start();
-		}
 
 //		logger.debug("LmeController before constructor for EiCreatedTender " +
 //		tempTender.toString());

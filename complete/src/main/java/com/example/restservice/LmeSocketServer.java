@@ -76,21 +76,29 @@ public class LmeSocketServer extends Thread	{
     	EiCreateTenderPayload eiCreateTender;
     	EiTransaction transaction;
     	EiTender tender;
-   	
-        try {
-            serverSocket = new ServerSocket(port);
-            clientSocket = serverSocket.accept();
-            if (clientSocket == null)
-            	System.err.println("LmeSocketServer: clientSocket null after accept");
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(
-            			new InputStreamReader(clientSocket.getInputStream()));
-            if (in == null || out == null)	System.err.println("in or out null");
-        
+      
+            try	{
+            	serverSocket = new ServerSocket(port);
+ 
+	            clientSocket = serverSocket.accept();
+	            if (clientSocket == null)
+	            	System.err.println("LmeSocketServer: clientSocket null after accept");
+	            out = new PrintWriter(clientSocket.getOutputStream(), true);
+	            in = new BufferedReader(
+	            			new InputStreamReader(clientSocket.getInputStream()));
+            }	catch (IOException e)	{
+    	        //	LOG.debug(e.getMessage());
+    	    	System.err.println("LmeSocketServer: accept " + e.getMessage());
+    	    	e.printStackTrace();
+            }
+    
+            if (in == null || out == null)	System.err.println("in or out null");        
             System.err.println("LME:LmeSocketServer before while loop");
             
             while (true)	{
             	//	blocking read on BufferedReader for a MarketCreateTransactionPayload 
+            	
+            	try	{
 //            	logger.debug("CTS:SocketClient while loop head");     	
             	jsonReceived = in.readLine(); 
             	// TODO add checks for return values and IOException
@@ -139,15 +147,15 @@ public class LmeSocketServer extends Thread	{
 	                lme.eiCreateTransactionQ.put(eiCreateTransaction);
 	                logger.info("LmeSocketServer: put Transaction on eiCreateTransactionQ " + eiCreateTransaction.toString());
             	}	
-            }
-        }	catch (IOException  e) {       	
-	        //	LOG.debug(e.getMessage());
-	    	System.err.println("LmeSocketServer: IOException in readLine?");
-	    	e.printStackTrace();
-	    } 	catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-	    }
+	        }	catch (IOException  e) {       	
+		        //	LOG.debug(e.getMessage());
+		    	System.err.println("LmeSocketServer: IOException in readLine? " + e.getMessage());
+		    	e.printStackTrace();
+		    } 	catch (InterruptedException e) {
+		    	System.err.println("LmeSocketServer: InterruptedException in readLine? " + e.getMessage());
+				e.printStackTrace();
+		    }
+        }
 
     }
 
@@ -173,8 +181,8 @@ public class LmeSocketServer extends Thread	{
     	System.err.println("LME:LmeSocketServer: 1 param constructor Port: " +
     			port + " " + Thread.currentThread().getName());
     	
-    	LmeSocketServer server = new LmeSocketServer();	
-    	server.start();
+//    	LmeSocketServer server = new LmeSocketServer();	
+//    	server.start();
     	// TODO Lambda Expression for separate thread - current is in thread
     }
     
