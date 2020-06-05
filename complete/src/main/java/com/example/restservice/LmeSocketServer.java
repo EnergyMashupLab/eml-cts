@@ -103,7 +103,7 @@ public class LmeSocketServer extends Thread	{
             	jsonReceived = in.readLine(); 
             	// TODO add checks for return values and IOException
                 
-            	logger.info("LME Received " + jsonReceived);
+            	logger.info("LME got " + jsonReceived);
                 
             	// couldn't read from socket TODO should be IOException
             	if (jsonReceived == null)	continue;	
@@ -145,9 +145,9 @@ public class LmeSocketServer extends Thread	{
 	              
 	                // Put in the LME transaction queue for further processing
 	                lme.eiCreateTransactionQ.put(eiCreateTransaction);
-	                logger.info("LME put on eiCreateTransactionQ TenderId " +
-	                		eiCreateTransaction.getTransaction().getTender().getTenderId().value() +
-	                		" " + eiCreateTransaction.toString());
+//	                logger.info("LME enqueued eiCreateTransactionQ TenderId " +
+//	                		eiCreateTransaction.getTransaction().getTender().getTenderId().value() +
+//	                		" " + eiCreateTransaction.toString());
             	}	
 	        }	catch (IOException  e) {       	
 		        //	LOG.debug(e.getMessage());

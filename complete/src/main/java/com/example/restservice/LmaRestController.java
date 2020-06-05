@@ -68,7 +68,7 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;	
 		tempTender = tempCreate.getTender(); // and pull out Tender
 		
-		logger.debug("LmaController.postEiCreateTender " + tempTender.toString());
+		logger.debug("LMA.postEiCreateTender " + tempTender.toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
@@ -124,7 +124,7 @@ public class LmaRestController {
 		/* 
 		 * Return the EiCreatedTransaction payload received from the TEUA
 		*/
-		logger.info("LmaController before sending EiCreateTransaction to TEUA");
+		logger.info("LMA.postEiCreateTransactionPayload before sending EiCreateTransaction to TEUA");
 		/*
 		 * Pass the EiCreateTransaction payload to the TEUA
 		 * NOTE with dynamic URIs will require party-Id lookup
@@ -132,7 +132,8 @@ public class LmaRestController {
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/createTransaction", 
 				tempCreate,
 				EiCreatedTransactionPayload.class);
-		logger.info("LmaController after EiCreatedTransaction response from teua to EiCreateTender");
+		logger.info(
+		"LMA.postEiCreateTransactionPayload after EiCreatedTransaction response from teua to EiCreateTender");
 				
 		// And send the EiCreatedTransaction from the TEUA to the LME
 		return tempPostResponse;
@@ -156,12 +157,11 @@ public class LmaRestController {
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
 
-		logger.info("LmaController before builder for /cancelTender");
+		logger.info("LMA before builder for /cancelTender");
 		restTemplate = builder.build();
-		logger.info("LmaController after builder for /createTender and before tempCreate save");
 
 		// save CancelTender message as sent by TEUA
-		logger.info("LmaController before forward to LME");
+		logger.info("LMA before forward CancelTender to LME");
 		tempCancel = eiCancelTender;
 		
 		/*
@@ -171,7 +171,6 @@ public class LmaRestController {
 				new EiResponse(200, "OK"));
 		*/
 
-		logger.info("LmaController before forward to LME");
 		/*
 		 * Pass on to LME and use POST responseBody EiCanceledTender in reply to origin
 		 */
@@ -179,7 +178,7 @@ public class LmaRestController {
 				tempCancel, 		
 				EICanceledTenderPayload.class);
 		
-		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
+		logger.info("LMA after forward CancelTender to LME and before return " + tempPostResponse.toString());
 		
 		return tempPostResponse;
 	}

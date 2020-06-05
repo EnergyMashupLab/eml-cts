@@ -68,7 +68,7 @@ public class TeuaRestController {
 		tempCreate = eiCreateTender;
 
 		tempTender = eiCreateTender.getTender();
-		logger.info("TeuaController before response from Client POST of ClientCreateTender");
+		logger.info("TEUA before response from Client POST of ClientCreateTender");
 		
 		/*
 			public EiCreatedTender(
@@ -105,41 +105,59 @@ public class TeuaRestController {
 		// tempPostReponse responds to POST to /sc
 		EiCreateTransactionPayload tempCreate;
 		EiCreatedTransactionPayload tempCreated, tempPostResponse;
+		ClientCreatedTransactionPayload clientCreated;
+		ClientCreateTransactionPayload	clientCreate;
 		
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
-		// scope is function postEiCreateTender
+		// scope is function postEiCreateTransactionPayload
 		RestTemplate restTemplate;	
 	   	restTemplate = builder.build();
 		
 		tempCreate = eiCreateTransactionPayload;
 		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-		logger.info("TeuaController before forward of EiCreateTransaction to SC");
+		logger.info("TEUA before forward ClientCreateTransaction to Client");
 		
 		/*
 		 * TODO 
 		 * 		define simplified createTransaction and createdTender for SC-TEUA
 		 * 
-		 * WILL BE TO /sc/createTransaction
+		 * WILL BE TO /client/clientCreateTransaction
 		 * 
 		 * tempPostResponse = restTemplate.postForObject(
-				"http://sc/createTransaction", 
+				"http://client/clientCreateTransaction", 
 				tempCreate,
-				EiCreatedTransaction.class);
-		 */
-				
-		/*
-		 *	Will POST EiCreateTransaction back to the SC at /sc 
-		 *	Shouldn't require that SC reply with an
-		 *	EiCreatedTransaction but something that serves as an ACK
+				ClientCreatedTransactionPayload.class);
 		 */
 		
 		/*
-		 * TODO
-		 * Build createdTransaction payload from response from SC
-		 * In the alternative, use constructor without ACK from SC
+		 * Build ClientCreateTransaction payload to POST to client
 		 */
+		clientCreate = new ClientCreateTransactionPayload(
+				/* side 	*/	tempTender.getSide(),
+				/* quantity	*/	tempTender.getQuantity(),
+				/* price	*/	tempTender.getPrice(),
+				/* tenderId	*/	tempTender.getTenderId().value()
+				);
+		
+		// and post
+
+		
+//		// TODO Needs functioning Client to accept and reply to POST
+//		clientCreated = restTemplate.postForObject(
+//					"http://client/clientCreateTransaction", 
+//					clientCreate,
+//					ClientCreatedTransactionPayload.class);
+//		
+//		//	Log return value (success true or false)
+//		logger.info("TEUA return from client/SC " + clientCreated.getSuccess());
+		
+		logger.info("POST TO CLIENT/SC " + clientCreate.toString());
+		
+		// 	Return EiCreatedTransactionPayload to sender
+		//	TODO responds before response from Client/SC
+		//	TODO change EiResponse code if clientCreated indicates failure
 		tempCreated = new EiCreatedTransactionPayload(
 				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
