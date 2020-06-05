@@ -47,9 +47,10 @@ public class LmeRestController {
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
 	// parallel for MarketCreateTransactionPayloads here in LME.
-	// queue.put by LmeSocketServer, queue.take here in LME to produce an EiCreateTransactionPayload
-	// forwarded to LMA
-	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQ = new ArrayBlockingQueue(20);
+	// queue.put by LmeSocketServer, queue.take here in LME to produce an 
+	// EiCreateTransactionPayload to be forwarded to LMA
+	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQ =
+			new ArrayBlockingQueue(20);
 	public static LmeSocketServer lmeSocketServer = new LmeSocketServer();
 	
 	/*
@@ -58,27 +59,28 @@ public class LmeRestController {
 	 */
 	// TODO count down original quantity from Transactions against the Tender; remove when zero
 	// Need wrapper class Long to use the long ctsTenderId as returned
-	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap = new HashMap<Long, EiCreateTenderPayload>();
+	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap =
+			new HashMap<Long, EiCreateTenderPayload>();
 
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
 	
 	LmeRestController()	{
-		logger.info("LmeRestController zero arg constructor");
+//		logger.info("LmeRestController zero arg constructor");
 		
 		// start market connection sockets
 		if (lmeSocketClientNotRunning) {
 			lmeSocketClientNotRunning = false;
 			lmeSocketClient.start();
-			logger.info("Starting lmeSocketClient");
+			logger.debug("Starting lmeSocketClient");
 			
 		}
 		
 		if (lmeSocketServerNotRunning)	{
 			lmeSocketServerNotRunning = false;
 			lmeSocketServer.start();
-			logger.info("Starting lmeSocketServer");
+			logger.debug("Starting lmeSocketServer");
 		}
 	}
 	
@@ -122,13 +124,16 @@ public class LmeRestController {
 		// Forward to market
 		// Conversion to MarketCreateTenderPayload is in LmeSocketClient here
 		// TODO Non-blocking add returns true if OK, false if queue is full
+		
 		// TODO switch to blocking after verification
 		addQsuccess = queueFromLme.add(tempCreate);
 		logger.debug("queueFomLme addQsuccess " + addQsuccess +
 				" TenderId " + tempTender.getTenderId());
 		
-		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload from MarketCreateTransaction
-		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(), tempCreate);	
+		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
+		// from MarketCreateTransaction
+		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
+				tempCreate);	
 		
 		if (mapPutReturnValue == null) {
 			logger.debug("mapPutReturnValue is null - new entry");
@@ -192,19 +197,21 @@ public class LmeRestController {
 		// TODO process tempPost Response TBD
 		}
 	
-	public EiCreatedTransactionPayload postEiCreateTransaction(@RequestBody EiCreateTransactionPayload eiCreateTransaction)	{
+	public EiCreatedTransactionPayload postEiCreateTransaction(
+				@RequestBody EiCreateTransactionPayload eiCreateTransaction)	{
 		EiTransaction tempTransaction;
 		EiCreatedTransactionPayload tempPostResponse;
 		
-		//	TODO should this be a PUT? Parity does not get a response back, but logging that
-		//	the CreateTransaction was received may be useful
+		//	TODO should this be a PUT? Parity does not get a response back, but logging
+		//	that the CreateTransaction was received may be useful
 		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTransaction
 		restTemplate = builder.build();		
 		
 		tempTransaction = eiCreateTransaction.getTransaction();
-		logger.info("LmaController: postEiCreateTransaction: Transaction  " + tempTransaction.toString());
+		logger.info("LmaController: postEiCreateTransaction: Transaction  " +
+				tempTransaction.toString());
 		/*
 		 * Pass on to LMA and use POST responseBody in reply origin
 		 */

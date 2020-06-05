@@ -79,7 +79,7 @@ public class LmeSocketClient	extends Thread {
 		String jsonString = null;	// for JSON string
 		
 //		logger.info("LmeSocketClient.run " + Thread.currentThread().getName() + " port " + port + " ip " + ip);
- 		System.err.println("LmeSocketClient.run() port: " + port + " ip " + ip +
+ 		System.err.println("LmeSocketClient.run() port " + port + " ip " + ip +
  				" '" + Thread.currentThread().getName() + "'");
 		
 		try {
@@ -94,11 +94,11 @@ public class LmeSocketClient	extends Thread {
 		}
 		  
 		while(true) {
-			  logger.debug("SocketClient while loop head. queueFromLme size " + LmeRestController.queueFromLme.size());
+//			  logger.debug("SocketClient while loop head. queueFromLme size " + LmeRestController.queueFromLme.size());
 			  try {
 				create = LmeRestController.queueFromLme.take();
-				logger.debug("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
-						" " + create.getTender().toString());
+//				logger.debug("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
+//						" " + create.getTender().toString());
 				tender = create.getTender();
 				toJson = new MarketCreateTenderPayload(
 							tender.getSide(),
@@ -115,7 +115,7 @@ public class LmeSocketClient	extends Thread {
 				jsonString = mapper.writeValueAsString(toJson);
 //				logger.debug("run() before send of json string " + jsonString);
 				out.println(jsonString);			
-				logger.info("run() after send of json string " + jsonString);
+				logger.info("LME Socket Client after sending parity json string " + jsonString);
 				
 			} catch (InterruptedException e) {
 				System.err.println("queueFromLme.take interrupted" + e.getMessage());

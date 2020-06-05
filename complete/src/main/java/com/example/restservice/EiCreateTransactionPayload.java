@@ -15,11 +15,6 @@ public class EiCreateTransactionPayload {
 	private RefIdType requestId;
 	private EiTransaction transaction;
 	
-	/*
-	@JsonIgnore
-	private final Random rand = new Random();
-	 */
-	
 	// Default initializer for JSON serialization
 	public EiCreateTransactionPayload() {
 	}
@@ -39,7 +34,6 @@ public class EiCreateTransactionPayload {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party, ActorIdType counterParty) {
-
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
@@ -63,13 +57,13 @@ public class EiCreateTransactionPayload {
 //	}
 	
 	public String toString() {
-		String printStringFormat = 
-				"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
+//		String printStringFormat = 
+//			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 		
-		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().toString() +
+		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
 				" partyid " + partyId.toString() +
 				" counterPartyid " + counterPartyId.toString() +			
-				" requestId " + requestId.toString() +
+				" requestId " + requestId.value() +
 				transaction.getTender().getTenderId().value());
 	}
 

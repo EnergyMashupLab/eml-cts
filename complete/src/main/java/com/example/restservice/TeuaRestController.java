@@ -225,7 +225,8 @@ public class TeuaRestController {
 		eiCreateTender = new EiCreateTenderPayload(tender, this.partyId, this.lmePartyId);
 		//	System.err.println("clientCreateTender: eiCreateTender is " + eiCreateTender.toString());	
 		
-		logger.info("TeuaController before sending EiCreateTender to LMA. TenderId " + eiCreateTender.getTender().toString());
+		logger.info("TEUA before sending EiCreateTender to LMA. " +
+				eiCreateTender.getTender().toString());
 		
 		
 		//	And forward to the LMA
@@ -237,7 +238,8 @@ public class TeuaRestController {
 		// and select CTS TenderId and put in ClientCreatedTenderPayload
 		
 		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-		logger.info("TeuaController before return ClientCreatedTender to Client/SC:  " + tempReturn.toString());
+		logger.info("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
 		
 		return tempReturn;
 	}

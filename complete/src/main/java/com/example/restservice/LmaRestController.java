@@ -68,7 +68,7 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;	
 		tempTender = tempCreate.getTender(); // and pull out Tender
 		
-		logger.info("LmaController.postEiCreateTender Tender  " + tempTender.toString());
+		logger.debug("LmaController.postEiCreateTender " + tempTender.toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
@@ -76,7 +76,7 @@ public class LmaRestController {
 				tempCreate, 
 				EiCreatedTenderPayload.class);
 		
-		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
+//		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
 		/*
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),

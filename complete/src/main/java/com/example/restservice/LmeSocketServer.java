@@ -69,7 +69,7 @@ public class LmeSocketServer extends Thread	{
     @Override
     public void run() {
     	//	port is set in constructor
- 		System.err.println("LmeSocketServer.run() port: " + port +
+ 		System.err.println("LmeSocketServer.run() port " + port +
  				" '" + Thread.currentThread().getName() + "'");
  		
     	EiCreateTransactionPayload eiCreateTransaction;
@@ -93,7 +93,7 @@ public class LmeSocketServer extends Thread	{
             }
     
             if (in == null || out == null)	System.err.println("in or out null");        
-            System.err.println("LME:LmeSocketServer before while loop");
+//            System.err.println("LME:LmeSocketServer before while loop");
             
             while (true)	{
             	//	blocking read on BufferedReader for a MarketCreateTransactionPayload 
@@ -103,21 +103,21 @@ public class LmeSocketServer extends Thread	{
             	jsonReceived = in.readLine(); 
             	// TODO add checks for return values and IOException
                 
-            	logger.info("LmeSocketServer: start: jsonReceived is '" + 
-            		jsonReceived  + "' Thread " + Thread.currentThread().getName());
+            	logger.info("LME Received " + jsonReceived);
                 
             	// couldn't read from socket TODO should be IOException
             	if (jsonReceived == null)	continue;	
                 
                 payload = mapper.readValue(
                 		jsonReceived, MarketCreateTransactionPayload.class);                          
-                logger.info("payload received object: " + payload.toString());
+//                logger.info("payload received object: " + payload.toString());
                 
                 // 	Check for non-CTS tenders. If the CtsTenderId is not in
                 //	the map, it's from outside CTS or otherwise erroneous.
+                // TODO Ignore for now
                 eiCreateTender = LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
                 
-                // TODO clean up and remove debug logger call
+                // TODO clean up and remove entry when tender quantity becomes zero
                 if (eiCreateTender == null) {
                 	// no match in Map - try again
                 	continue;
@@ -126,14 +126,14 @@ public class LmeSocketServer extends Thread	{
                 	//	original parties and TenderId, with cleared quantity and price
 
 	                tender = eiCreateTender.getTender();	// recover original tender attributes
-                	logger.debug("Original tender " + tender.toString());
+//                	logger.debug("Original tender " + tender.toString());
 	                
 	                tender.setQuantity(payload.getQuantity());
 	                tender.setPrice(payload.getPrice());
 	                // other fields of tender as in EiCreateTender - tenderId, interval, expireTime, side
-                	logger.info("Reconsistuted tender " + tender.toString());
+//                	logger.info("Reconsistuted tender " + tender.toString());
 	                
-	                //	Note that the EiCreateTransaction uses original TenderId
+	                //	The EiCreateTransaction uses original TenderId
 	                transaction = new EiTransaction(tender);
 	                
 	                eiCreateTransaction = new EiCreateTransactionPayload(
@@ -141,11 +141,13 @@ public class LmeSocketServer extends Thread	{
 	                		eiCreateTender.getPartyId(),
 	                		eiCreateTender.getCounterPartyId());
 	                
-	            	logger.debug("LmeSocketServer EiCreateTransaction " + eiCreateTransaction.toString());
+//	            	logger.debug("LmeSocketServer EiCreateTransaction " + eiCreateTransaction.toString());
 	              
 	                // Put in the LME transaction queue for further processing
 	                lme.eiCreateTransactionQ.put(eiCreateTransaction);
-	                logger.info("LmeSocketServer: put Transaction on eiCreateTransactionQ " + eiCreateTransaction.toString());
+	                logger.info("LME put on eiCreateTransactionQ TenderId " +
+	                		eiCreateTransaction.getTransaction().getTender().getTenderId().value() +
+	                		" " + eiCreateTransaction.toString());
             	}	
 	        }	catch (IOException  e) {       	
 		        //	LOG.debug(e.getMessage());
@@ -173,13 +175,13 @@ public class LmeSocketServer extends Thread	{
     }
     
     public LmeSocketServer()	{
-    	System.err.println("LmeSocketServer: 0 param constructor Port: " +
-    			port + " " + Thread.currentThread().getName());
+//    	System.err.println("LmeSocketServer: 0 param constructor Port: " +
+//    			port + " " + Thread.currentThread().getName());
     }
     
     public LmeSocketServer(int port)	{
-    	System.err.println("LME:LmeSocketServer: 1 param constructor Port: " +
-    			port + " " + Thread.currentThread().getName());
+//    	System.err.println("LME:LmeSocketServer: 1 param constructor Port: " +
+//    			port + " " + Thread.currentThread().getName());
     	
 //    	LmeSocketServer server = new LmeSocketServer();	
 //    	server.start();
@@ -187,8 +189,8 @@ public class LmeSocketServer extends Thread	{
     }
     
     public LmeSocketServer(int port, LmeRestController lme)	{
-    	System.err.println("LME:LmeSocketServer: 2 param constructor Port: " +
-    			port + " " + Thread.currentThread().getName());
+//    	System.err.println("LME:LmeSocketServer: 2 param constructor Port: " +
+//    			port + " " + Thread.currentThread().getName());
  
     	this.lme = lme;
     	if (lme == null)	{
