@@ -21,8 +21,9 @@ public class ClientTender {
 	
 	@Override
 	public String toString()	{
-		return ("ClientTender side " + side.toString() + " quantity " + Long.toString(quantity) +
-				" price " + Long.toString((price/1000)));			
+		return ("ClientTender side " + side.toString() + " quantity " +
+				Long.toString(quantity) + " price " +
+				Long.toString((price/1000)));			
 	}
 
 	public SideType getSide() {

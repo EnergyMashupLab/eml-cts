@@ -50,46 +50,48 @@ public class TeuaRestController {
 		return this.partyId;
 	}
 
-	/*
-	 * POST - /createTender
-	 * 		RequestBody is EiCreateTender
-	 * 		ResponseBody is EiCreatedTender
-	 */
-	
-	/*
-	 * TODO this should be dead code; SC/Client posts to /teua/clientCreateTender
-	 */
-	@PostMapping("/createTender")
-	public EiCreatedTenderPayload 	postEiCreateTenderPayload(@RequestBody EiCreateTenderPayload eiCreateTender)	{
-		EiTender tempTender;
-		EiCreateTenderPayload tempCreate;
-		EiCreatedTenderPayload tempCreated;
-		
-		tempCreate = eiCreateTender;
-
-		tempTender = eiCreateTender.getTender();
-		logger.info("TEUA before response from Client POST of ClientCreateTender");
-		
-		/*
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,
-				ActorId counterPartyId,
-				EiResponse response)
-		 */
-		
-		/*
-		 * TODO forward eiCreateTender to LMA, respond to Client request
-		 */
-		
-		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
-				tempCreate.getPartyId(),
-				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
-
-		
-		return tempCreated;
-	}
+//	/*
+//	 * POST - /createTender
+//	 * 		RequestBody is EiCreateTender
+//	 * 		ResponseBody is EiCreatedTender
+//	 */
+//	
+//	/*
+//	 * TODO this should be dead code; SC/Client now posts to 
+//	 * /teua/clientCreateTender
+//	 */
+//	@PostMapping("/createTender")
+//	public EiCreatedTenderPayload 	postEiCreateTenderPayload
+//			(@RequestBody EiCreateTenderPayload eiCreateTender)	{
+//		EiTender tempTender;
+//		EiCreateTenderPayload tempCreate;
+//		EiCreatedTenderPayload tempCreated;
+//		
+//		tempCreate = eiCreateTender;
+//
+//		tempTender = eiCreateTender.getTender();
+//		logger.info("TEUA before response from Client POST of ClientCreateTender");
+//		
+//		/*
+//			public EiCreatedTender(
+//				TenderId tenderId,
+//				ActorId partyId,
+//				ActorId counterPartyId,
+//				EiResponse response)
+//		 */
+//		
+//		/*
+//		 * forward eiCreateTender to LMA, respond to Client request
+//		 */
+//		
+//		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
+//				tempCreate.getPartyId(),
+//				tempCreate.getCounterPartyId(),
+//				new EiResponse(200, "OK"));
+//
+//		
+//		return tempCreated;
+//	}
 	
 	/*
 	 * POST - /createTransaction
@@ -121,9 +123,10 @@ public class TeuaRestController {
 		
 		/*
 		 * TODO 
-		 * 		define simplified createTransaction and createdTender for SC-TEUA
+		 * 		define simplified ClientCreateTransaction and
+		 * 		ClientCreatedTender for SC-TEUA
 		 * 
-		 * WILL BE TO /client/clientCreateTransaction
+		 * WILL POST to /client/clientCreateTransaction
 		 * 
 		 * tempPostResponse = restTemplate.postForObject(
 				"http://client/clientCreateTransaction", 
@@ -175,7 +178,8 @@ public class TeuaRestController {
 	 */
 	
 	@PostMapping("/cancelTender")
-	public EICanceledTenderPayload postEiCancelTender(@RequestBody EiCancelTenderPayload eiCancelTender)	{
+	public EICanceledTenderPayload postEiCancelTender(
+				@RequestBody EiCancelTenderPayload eiCancelTender)	{
 		TenderIdType tempTenderId;
 		EiCancelTenderPayload tempCancel;	
 		EICanceledTenderPayload tempCanceled;
@@ -195,13 +199,17 @@ public class TeuaRestController {
 
 	
 	/*
-	 * POST - /cancelTender sent to LMA, received from Client/SC
-	 * 		RequestBody is EiCancelTender
-	 * 		ResponseBody is EiCanceledTender
+	 * POST - /clientCreateTender processed and sent to LMA,
+	 * received from Client/SC
+	 * 		RequestBody is ClientCreateTenderPayload
+	 * 		ResponseBody is ClientCreatedTenderPayload
+	 * 
+	 * Forward EiCreateTenderPayload to LMA
 	 */
 	
 	@PostMapping("/clientCreateTender")
-	public ClientCreatedTenderPayload postEiCreateTender(@RequestBody ClientCreateTenderPayload clientCreateTender)	{
+	public ClientCreatedTenderPayload postEiCreateTender(
+				@RequestBody ClientCreateTenderPayload clientCreateTender)	{
 		TenderIdType tempTenderId;
 		ClientCreateTenderPayload tempCreate;	
 		ClientCreatedTenderPayload tempCreated, tempReturn;
@@ -219,29 +227,34 @@ public class TeuaRestController {
 		if (lmePartyId == null)	{
 			// builder = new RestTemplateBuilder();
 			restTemplate = builder.build();
-			lmePartyId = restTemplate.getForObject("http://localhost:8080/lme/party",
-				ActorIdType.class);
-//			System.err.println("clientCreateTender: lmePartyId = " + lmePartyId.toString());
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+//			System.err.println("clientCreateTender: lmePartyId = " +
+//				lmePartyId.toString());
 		}
-
-				
+			
 		// TODO address JSON serialization issues as needed	
 		tempCreate = clientCreateTender;	// save the parameter
 
 		/*
-		 * Create a new EiTender using the interval, quantity, price,and expiration time  sent by the Client/SC,
-		 * and insert it via the constructor in a new EiCreateTenderPayload.
+		 * Create a new EiTender using the interval, quantity, price,and expiration
+		 * time  sent by the Client/SC, and insert it via the constructor in a
+		 * new EiCreateTenderPayload.
 		 * 
-		 * partyId is this.partyId, counterPartyId is the LME representing the market
-		 * and the POST is to the LMA..
+		 * partyId is this.partyId, counterPartyId is the LME representing
+		 * the market and the POST is to the LMA..
 		 */
 		tender = new EiTender(
 				tempCreate.getInterval(), tempCreate.getQuantity(),
-				tempCreate.getPrice(), tempCreate.getBridgeExpireTime().asInstant(), tempCreate.getSide());
+				tempCreate.getPrice(), tempCreate.getBridgeExpireTime().asInstant(),
+				tempCreate.getSide());
 		
-		// 	Assemble the EiCreateTender payload to be forwarded to LMA
-		eiCreateTender = new EiCreateTenderPayload(tender, this.partyId, this.lmePartyId);
-		//	System.err.println("clientCreateTender: eiCreateTender is " + eiCreateTender.toString());	
+		// 	Construct the EiCreateTender payload to be forwarded to LMA
+		eiCreateTender = new EiCreateTenderPayload(tender, this.partyId,
+				this.lmePartyId);
+//			System.err.println("clientCreateTender: eiCreateTender is " +
+//					eiCreateTender.toString());	
 		
 		logger.info("TEUA before sending EiCreateTender to LMA. " +
 				eiCreateTender.getTender().toString());

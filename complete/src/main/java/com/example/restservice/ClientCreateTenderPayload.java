@@ -13,7 +13,7 @@ public class ClientCreateTenderPayload {
 	private BridgeInterval bridgeInterval;
 	private BridgeInstant bridgeExpireTime;	
 
-	// JSON ERROR - serializes Interval but none is present
+	// Uses BridgeInterval to avoid serialization issues
 	
 	ClientCreateTenderPayload()	{	// json
 	}
@@ -23,7 +23,8 @@ public class ClientCreateTenderPayload {
 		Instant expire = null;
 		Instant dtStart = Instant.parse("2020-05-31T10:00:00.00Z");	
 		expire = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
-		// System.err.println("ClientCreateTenderPayload: expire " + expire.toString());
+		// System.err.println("ClientCreateTenderPayload: expire " +
+		//		expire.toString());
 		
 		this.side = side;
 		this.quantity = quantity;
@@ -45,11 +46,13 @@ public class ClientCreateTenderPayload {
 	
 	public Interval getInterval()	{
 		// converts internal representation to a CTS Interval
-		Interval tempInterval = new Interval (this.bridgeInterval.getDurationInMinutes(), this.bridgeInterval.getDtStart().asInstant());
+		Interval tempInterval = 
+				new Interval(this.bridgeInterval.getDurationInMinutes(),
+				this.bridgeInterval.getDtStart().asInstant());
 		return tempInterval;
 	}
 
-	public String getInfo() {
+	public String getInfo() { 
 		return info;
 	}
 

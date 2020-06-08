@@ -38,34 +38,54 @@ public class ClientRestController {
 	 * 		ResponseBody is ClientCreatedTransactionPayload
 	 */
 
-	@PostMapping("/transaction")
+	@PostMapping("/clientCreateTransaction")
 	public ClientCreatedTransactionPayload 	postTransaction(
-			@RequestBody ClientCreateTransactionPayload clientCreateTransactionPayload)	{
+		@RequestBody ClientCreateTransactionPayload clientCreateTransactionPayload)	{
 		
-		// payload may be expanded beyond boolean success - defaults to true in constructor
-		ClientCreatedTransactionPayload response = new ClientCreatedTransactionPayload();
+		ClientCreateTransactionPayload tempClientCreateTransaction;
+		tempClientCreateTransaction = clientCreateTransactionPayload;
+		
+		// Build response
+		ClientCreatedTransactionPayload response = 
+					new ClientCreatedTransactionPayload();
 		
 		/*
-		 * HOOK HERE - call client/SC code to update table of tenders sent and the results.
+		 * HOOK HERE - call client/SC code to update table of tenders sent and the
+		 * results.
 		 * 
-		 * This SC previously sent a tender (time, quantity, price); the transaction
-		 * tells the SC which of its tenders have cleared, partially or fully, one message
-		 * per executed tender or part..
+		 * This SC previously posted a tender (time interval, expiration time, quantity,
+		 * price, side). The transaction tells the SC which of its tenders have cleared,
+		 * partially or fully, one message per executed tender or part.
 		 * 
-		 * Suggested pseudocode for SC
+		 * By saving the CtsTendewrId and the ClientCreateTender request, the time interval,
+		 * parties and other information can be retrieved.
 		 * 
-		 * 		Create a table for CtsTenderId with columns for quantity offered,
-		 * 		time interval, price offered
+		 * Possible pseudocode for SC
 		 * 
-		 * 		When a tender (offer to buy or sell) is made by Posting ClientCreateTenderPayload, 
-		 * 		the response ClientCreatedTenderPayload contains the CtsTenderId that was created.
+		 * 		Create a table or Map with fields for quantity offered,
+		 * 		time interval, price offered, and ctsTenderId as returned
 		 * 
-		 * 		Enter the tender with its CtsTenderId and its initial/offered quantity in the table
+		 * 		When a tender is send to the TEUA, the response ClientCreatedTenderPayload
+		 * 		contains the CtsTenderId that was created.
 		 * 
-		 * 		When an ClientCreateTransactionPayload is POSTED to this SC, call back to SC code to 
-		 * 		update the relevant table entry, identified with //HOOK in this RestController
+		 * 		Enter the tender with its CtsTenderId and its initial/offered
+		 * 		quantity in the table
+		 * 
+		 * 		When an ClientCreateTransactionPayload is posted to this SC,
+		 * 		update the relevant table entry.
+		 * 
+		 * 	We just log the ClientCreateTransaction payload.
 		 */
 
+		logger.info("clientCreateTransaction post received " +
+				tempClientCreateTransaction.toString());
+		
+		/*
+		 * INSERT SC/Client code to track tenders and transactions against then
+		 */
+		
+		
+		
 		return response;
 		}
 	
@@ -86,7 +106,8 @@ public class ClientRestController {
 		 * 		<<table entry tender id> = PostTenderToCTS(side, quantity, price);
 		 */
 
-		ClientCreatedTenderPayload tempPostResponse;	// what is to be sent to TEUA
+		// To send to my TEUA
+		ClientCreatedTenderPayload tempPostResponse;
 		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;
@@ -95,18 +116,22 @@ public class ClientRestController {
 
 		restTemplate = builder.build();
 		
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/clientCreateTender", 
+		tempPostResponse = restTemplate.postForObject(
+				"http://localhost:8080/teua/clientCreateTender", 
 				createTender,
 				ClientCreatedTenderPayload.class);
-		logger.info("ClientRestController after response received from teua. returned TenderId " +
+		logger.info("after response received. TenderId " +
 				tempPostResponse.ctsTenderId);
 
 		return ( tempPostResponse.ctsTenderId);
 	}
 	
 	/*
-	 * GET - /client/clientTender responds with a randomized tender, serialized to JSON
-	 * for use with Postman for functional testing
+	 * GET - /client/clientTender responds with a randomized clientCreateTender,
+	 * serialized to JSON for use with Postman for functional testing
+	 * 
+	 * The ClientRestController also accepts those payloads (e.g. from Postman)
+	 * and forwards them unchanged to our TEUA.
 	 */
 	@GetMapping("/clientTender")
 	public ClientTender getClientTender() {
@@ -128,4 +153,38 @@ public class ClientRestController {
 		
 		return  tempTender;
 	}	
+	
+	/*
+	 * POST - /clientCreateTender - a simple pass through to TEUA
+	 * 
+	 * Simplifies use of Postman for testing
+	 */
+	
+	@PostMapping("/clientCreateTender")
+	public ClientCreatedTenderPayload postEiCreateTender(
+				@RequestBody ClientCreateTenderPayload clientCreateTender)	{
+		ClientCreateTenderPayload tempCreate;	
+		ClientCreatedTenderPayload tempCreated, tempReturn;
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();	
+		tempCreate = clientCreateTender;	// as received
+
+		/*
+		 * Forward the @RequestBody as received,
+		 * Wait for and return the @ReponseBody as received
+		 */
+		
+		logger.info("before forwarding CLientCreateTender to TEUA " +
+				tempCreate.toString());
+		
+		//	And forward to the TEUA
+		restTemplate = builder.build();
+		ClientCreatedTenderPayload result = restTemplate.postForObject
+			("http://localhost:8080/teua/clientCreateTender", tempCreate,
+					ClientCreatedTenderPayload.class);		
+		
+		return result;
+	}
 }
