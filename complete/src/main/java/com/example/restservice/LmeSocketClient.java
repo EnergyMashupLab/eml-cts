@@ -79,8 +79,8 @@ public class LmeSocketClient	extends Thread {
 		String jsonString = null;	// for JSON string
 		
 //		logger.info("LmeSocketClient.run " + Thread.currentThread().getName() + " port " + port + " ip " + ip);
- 		System.err.println("LmeSocketClient.run() port " + port + " ip " + ip +
- 				" '" + Thread.currentThread().getName() + "'");
+// 		System.err.println("LmeSocketClient.run() port " + port + " ip " + ip +
+// 				" '" + Thread.currentThread().getName() + "'");
 		
 		try {
 				clientSocket = new Socket(ip, port);
@@ -115,7 +115,7 @@ public class LmeSocketClient	extends Thread {
 				jsonString = mapper.writeValueAsString(toJson);
 //				logger.debug("run() before send of json string " + jsonString);
 				out.println(jsonString);			
-				logger.info("LME Socket Client after sending parity json string " + jsonString);
+//				logger.info("LME Socket Client after sending parity json string " + jsonString);
 				
 			} catch (InterruptedException e) {
 				System.err.println("queueFromLme.take interrupted" + e.getMessage());

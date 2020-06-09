@@ -69,8 +69,8 @@ public class LmeSocketServer extends Thread	{
     @Override
     public void run() {
     	//	port is set in constructor
- 		System.err.println("LmeSocketServer.run() port " + port +
- 				" '" + Thread.currentThread().getName() + "'");
+// 		System.err.println("LmeSocketServer.run() port " + port +
+// 				" '" + Thread.currentThread().getName() + "'");
  		
     	EiCreateTransactionPayload eiCreateTransaction;
     	EiCreateTenderPayload eiCreateTender;
@@ -103,7 +103,7 @@ public class LmeSocketServer extends Thread	{
             	jsonReceived = in.readLine(); 
             	// TODO add checks for return values and IOException
                 
-            	logger.info("LME got " + jsonReceived);
+            	logger.debug("LME received " + jsonReceived);
                 
             	// couldn't read from socket TODO should be IOException
             	if (jsonReceived == null)	continue;	

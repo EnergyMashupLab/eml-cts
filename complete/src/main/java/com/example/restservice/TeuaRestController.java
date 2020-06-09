@@ -49,49 +49,7 @@ public class TeuaRestController {
 	public ActorIdType getParty() {
 		return this.partyId;
 	}
-
-//	/*
-//	 * POST - /createTender
-//	 * 		RequestBody is EiCreateTender
-//	 * 		ResponseBody is EiCreatedTender
-//	 */
-//	
-//	/*
-//	 * TODO this should be dead code; SC/Client now posts to 
-//	 * /teua/clientCreateTender
-//	 */
-//	@PostMapping("/createTender")
-//	public EiCreatedTenderPayload 	postEiCreateTenderPayload
-//			(@RequestBody EiCreateTenderPayload eiCreateTender)	{
-//		EiTender tempTender;
-//		EiCreateTenderPayload tempCreate;
-//		EiCreatedTenderPayload tempCreated;
-//		
-//		tempCreate = eiCreateTender;
-//
-//		tempTender = eiCreateTender.getTender();
-//		logger.info("TEUA before response from Client POST of ClientCreateTender");
-//		
-//		/*
-//			public EiCreatedTender(
-//				TenderId tenderId,
-//				ActorId partyId,
-//				ActorId counterPartyId,
-//				EiResponse response)
-//		 */
-//		
-//		/*
-//		 * forward eiCreateTender to LMA, respond to Client request
-//		 */
-//		
-//		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
-//				tempCreate.getPartyId(),
-//				tempCreate.getCounterPartyId(),
-//				new EiResponse(200, "OK"));
-//
-//		
-//		return tempCreated;
-//	}
+	
 	
 	/*
 	 * POST - /createTransaction
@@ -119,24 +77,16 @@ public class TeuaRestController {
 		tempCreate = eiCreateTransactionPayload;
 		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-		logger.info("TEUA before forward ClientCreateTransaction to Client");
+//		logger.debug("TEUA received createTransaction " +
+//				tempCreate.toString() + " before forward to Client " 
+//				);
 		
+
 		/*
-		 * TODO 
-		 * 		define simplified ClientCreateTransaction and
-		 * 		ClientCreatedTender for SC-TEUA
-		 * 
-		 * WILL POST to /client/clientCreateTransaction
-		 * 
-		 * tempPostResponse = restTemplate.postForObject(
-				"http://client/clientCreateTransaction", 
-				tempCreate,
-				ClientCreatedTransactionPayload.class);
+		 * Build ClientCreateTransactionPayload to POST to client
 		 */
+//		logger.info("Build ClientCreateTransactionPayload");
 		
-		/*
-		 * Build ClientCreateTransaction payload to POST to client
-		 */
 		clientCreate = new ClientCreateTransactionPayload(
 				/* side 	*/	tempTender.getSide(),
 				/* quantity	*/	tempTender.getQuantity(),
@@ -144,28 +94,30 @@ public class TeuaRestController {
 				/* tenderId	*/	tempTender.getTenderId().value()
 				);
 		
+//		logger.info("Built ClientCreateTransactionPayload " +
+//				clientCreate.toString());
 		// and post
-
+		clientCreated = restTemplate.postForObject(
+					"http://localhost:8080/client/clientCreateTransaction", 
+					clientCreate,
+					ClientCreatedTransactionPayload.class);
 		
-//		// TODO Needs functioning Client to accept and reply to POST
-//		clientCreated = restTemplate.postForObject(
-//					"http://client/clientCreateTransaction", 
-//					clientCreate,
-//					ClientCreatedTransactionPayload.class);
-//		
-//		//	Log return value (success true or false)
-//		logger.info("TEUA return from client/SC " + clientCreated.getSuccess());
+//		System.err.println("TEUA POSTed to Client/SC ");
+//		logger.debug("POSTED TO CLIENT/SC ");
 		
-		logger.info("POST TO CLIENT/SC " + clientCreate.toString());
+		//	Log return value (success true or false)
+//		logger.debug("TEUA return from client/SC " + clientCreated.getSuccess());
 		
 		// 	Return EiCreatedTransactionPayload to sender
-		//	TODO responds before response from Client/SC
+		//	NOTE responds before response from Client/SC
 		//	TODO change EiResponse code if clientCreated indicates failure
 		tempCreated = new EiCreatedTransactionPayload(
 				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
+		
+//		logger.info("tempCreated constructed before return " + tempCreated.toString());
 		
 		return tempCreated;
 	}
@@ -198,7 +150,7 @@ public class TeuaRestController {
 	}
 
 	
-	/*
+	/*kl
 	 * POST - /clientCreateTender processed and sent to LMA,
 	 * received from Client/SC
 	 * 		RequestBody is ClientCreateTenderPayload
@@ -256,7 +208,7 @@ public class TeuaRestController {
 //			System.err.println("clientCreateTender: eiCreateTender is " +
 //					eiCreateTender.toString());	
 		
-		logger.info("TEUA before sending EiCreateTender to LMA. " +
+		logger.info("TEUA sending to LMA " +
 				eiCreateTender.getTender().toString());
 		
 		
@@ -269,8 +221,8 @@ public class TeuaRestController {
 		// and select CTS TenderId and put in ClientCreatedTenderPayload
 		
 		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-		logger.info("TEUA before return ClientCreatedTender to Client/SC " +
-				tempReturn.toString());
+//		logger.debug("TEUA before return ClientCreatedTender to Client/SC " +
+//				tempReturn.toString());
 		
 		return tempReturn;
 	}

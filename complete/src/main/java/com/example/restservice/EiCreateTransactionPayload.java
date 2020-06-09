@@ -63,7 +63,7 @@ public class EiCreateTransactionPayload {
 		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
 				" partyid " + partyId.toString() +
 				" counterPartyid " + counterPartyId.toString() +			
-				" requestId " + requestId.value() +
+				" requestId " + requestId.value() + " TenderId " +
 				transaction.getTender().getTenderId().value());
 	}
 

@@ -124,7 +124,7 @@ public class LmaRestController {
 		/* 
 		 * Return the EiCreatedTransaction payload received from the TEUA
 		*/
-		logger.info("LMA.postEiCreateTransactionPayload before sending EiCreateTransaction to TEUA");
+//		logger.debug("LMA.postEiCreateTransactionPayload before sending EiCreateTransaction to TEUA");
 		/*
 		 * Pass the EiCreateTransaction payload to the TEUA
 		 * NOTE with dynamic URIs will require party-Id lookup
@@ -132,8 +132,8 @@ public class LmaRestController {
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/createTransaction", 
 				tempCreate,
 				EiCreatedTransactionPayload.class);
-		logger.info(
-		"LMA.postEiCreateTransactionPayload after EiCreatedTransaction response from teua to EiCreateTender");
+//		logger.debug(
+//		"LMA.postEiCreateTransactionPayload after EiCreatedTransaction response from teua to EiCreateTender");
 				
 		// And send the EiCreatedTransaction from the TEUA to the LME
 		return tempPostResponse;

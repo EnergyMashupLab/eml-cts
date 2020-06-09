@@ -40,7 +40,7 @@ public class LmeSendTransactions	extends Thread	{
 			e.printStackTrace();
 		}
 		if (eiCreateTransaction != null)	{
-			logger.info("CreateTransaction " + eiCreateTransaction.toString());
+			logger.debug("CreateTransaction " + eiCreateTransaction.toString());
 			tempPostResponse = postClientCreateTransaction(eiCreateTransaction);
 		}
 		else logger.info("eiCreateTransaction null");
@@ -62,7 +62,7 @@ public class LmeSendTransactions	extends Thread	{
 		restTemplate = builder.build();		
 		
 		tempTransaction = eiCreateTransaction.getTransaction();
-		logger.info("LmeSendTransactions.postClientCreateTransaction " +
+		logger.debug("LmeSendTransactions.postClientCreateTransaction " +
 				tempTransaction.toString());
 		/*
 		 * Pass on to LMA and use POST responseBody in reply origin
@@ -70,9 +70,7 @@ public class LmeSendTransactions	extends Thread	{
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
 				eiCreateTransaction, 
 				EiCreatedTransactionPayload.class);
-		
-		logger.info("LMA after forward to UA and before return " + tempPostResponse.toString());
-		
+				
 		/*
 			tempCreated = new EiCreatedTender(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
