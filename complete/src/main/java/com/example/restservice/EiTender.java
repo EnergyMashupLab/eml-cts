@@ -51,10 +51,10 @@ public class EiTender {
 	public String toString()	{
 		// TODO replace with concatenated strings and toStrings
 		String printStringFormat = 
-"EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
+				"EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
 
-		return String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
-				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString());
+		return (String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
+				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString()));
 	}	
 	
 	public TenderIdType getTenderId() {

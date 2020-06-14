@@ -115,7 +115,8 @@ public class LmeSocketServer extends Thread	{
                 // 	Check for non-CTS tenders. If the CtsTenderId is not in
                 //	the map, it's from outside CTS or otherwise erroneous.
                 // TODO Ignore for now
-                eiCreateTender = LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
+                eiCreateTender =
+                		LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
                 
                 // TODO clean up and remove entry when tender quantity becomes zero
                 if (eiCreateTender == null) {
@@ -126,12 +127,12 @@ public class LmeSocketServer extends Thread	{
                 	//	original parties and TenderId, with cleared quantity and price
 
 	                tender = eiCreateTender.getTender();	// recover original tender attributes
-//                	logger.debug("Original tender " + tender.toString());
+                	logger.info("Original EiCreateTen derPayload " + eiCreateTender.toString());
 	                
 	                tender.setQuantity(payload.getQuantity());
 	                tender.setPrice(payload.getPrice());
 	                // other fields of tender as in EiCreateTender - tenderId, interval, expireTime, side
-//                	logger.info("Reconsistuted tender " + tender.toString());
+                	logger.info("Reconstituted tender " + tender.toString());
 	                
 	                //	The EiCreateTransaction uses original TenderId
 	                transaction = new EiTransaction(tender);

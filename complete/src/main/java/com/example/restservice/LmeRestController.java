@@ -69,7 +69,7 @@ public class LmeRestController {
 			LmeRestController.class);
 	
 	LmeRestController()	{
-//		logger.info("LmeRestController zero arg constructor");
+//		logger.info("LmeRestController zero arg constructor. partyId " + partyId);
 		
 		//	Start thread to read createTransactionQ and send
 		lmeSendTransactionsThread.start();
@@ -120,6 +120,7 @@ public class LmeRestController {
 
 //		logger.debug("LmeController before constructor for EiCreatedTender " +
 //		tempTender.toString());
+		logger.info("lme/createTender LME partyId " + partyId);
 		
 		/*	ResponseBody
 			public EiCreatedTender(
@@ -158,6 +159,13 @@ public class LmeRestController {
 		return tempCreated;
 	}
 	
+	
+	/*
+	 *	POST EiCreateTransaction to LMA
+	 *
+	 *	is in LmeSendTransaction
+	 */
+	
 	/*
 	 * POST - /cancelTender
 	 * 		RequestBody is EiCancelTender from TEUA/Client by way of LMA
@@ -183,60 +191,6 @@ public class LmeRestController {
 		return tempCanceled;
 	}
 	
-//	/*
-//	 * 	Take first EiCreateTransactionPayload from eiCreateTransactionQ and
-//	 * 	Post it to the LMA.
-//	 */
-//	public void setUpCreateTransaction()		{
-//		EiCreatedTransactionPayload tempPostResponse;
-//		EiCreateTransactionPayload eiCreateTransaction = null;
-//		
-//		try {
-//			eiCreateTransaction = eiCreateTransactionQ.take();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		logger.info("CreateTransaction " + eiCreateTransaction.toString());
-//		
-//		tempPostResponse = postEiCreateTransaction(eiCreateTransaction);
-//		
-//		// TODO process tempPost Response TBD
-//		}
-//	
-//	public EiCreatedTransactionPayload postEiCreateTransaction(
-//				@RequestBody EiCreateTransactionPayload eiCreateTransaction)	{
-//		EiTransaction tempTransaction;
-//		EiCreatedTransactionPayload tempPostResponse;
-//		
-//		//	TODO should this be a PUT? Parity does not get a response back, but logging
-//		//	that the CreateTransaction was received may be useful
-//		
-//		final RestTemplateBuilder builder = new RestTemplateBuilder();
-//		RestTemplate restTemplate;	// scope is function postEiCreateTransaction
-//		restTemplate = builder.build();		
-//		
-//		tempTransaction = eiCreateTransaction.getTransaction();
-//		logger.info("LmaController: postEiCreateTransaction: Transaction  " +
-//				tempTransaction.toString());
-//		/*
-//		 * Pass on to LMA and use POST responseBody in reply origin
-//		 */
-//		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
-//				eiCreateTransaction, 
-//				EiCreatedTransactionPayload.class);
-//		
-//		logger.info("LMA after forward to UA and before return " + tempPostResponse.toString());
-//		
-//		/*
-//			tempCreated = new EiCreatedTender(tempTender.getTenderId(),
-//				tempCreate.getPartyId(),
-//				tempCreate.getCounterPartyId(),
-//				new EiResponse(200, "OK"));
-//		*/
-//		
-//		return tempPostResponse;
-//	}
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
 		return queueFromLme;

@@ -33,7 +33,8 @@ public class EiCreateTransactionPayload {
 	 * 
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party, ActorIdType counterParty) {
+	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party,
+				ActorIdType counterParty) {
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
