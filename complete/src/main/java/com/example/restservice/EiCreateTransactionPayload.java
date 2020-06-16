@@ -39,23 +39,7 @@ public class EiCreateTransactionPayload {
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
-		
-//		System.err.println("EiCreateTransactionPayload Constructor before print()");
-//		this.print();
 	}
-
-//	public void print() {
-//		String printStringFormat = 
-//			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
-//		
-//		System.err.println(String.format(printStringFormat,
-//				transaction.getTransactionId().value(),
-//				partyId.value(), 
-//				counterPartyId.value(),
-//				requestId.value(),
-//				transaction.getTender().
-//					getInterval().dtStart.toString()));
-//	}
 	
 	public String toString() {
 //		String printStringFormat = 

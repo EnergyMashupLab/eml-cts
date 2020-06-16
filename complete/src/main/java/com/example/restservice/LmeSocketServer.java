@@ -127,7 +127,7 @@ public class LmeSocketServer extends Thread	{
                 	//	original parties and TenderId, with cleared quantity and price
 
 	                tender = eiCreateTender.getTender();	// recover original tender attributes
-                	logger.info("Original EiCreateTen derPayload " + eiCreateTender.toString());
+                	logger.trace("Original EiCreateTenderPayload " + eiCreateTender.toString());
 	                
 	                tender.setQuantity(payload.getQuantity());
 	                tender.setPrice(payload.getPrice());

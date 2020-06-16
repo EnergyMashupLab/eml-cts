@@ -48,6 +48,7 @@ public class EiTender {
 		
 	}
 	
+	@Override
 	public String toString()	{
 		// TODO replace with concatenated strings and toStrings
 		String printStringFormat = 

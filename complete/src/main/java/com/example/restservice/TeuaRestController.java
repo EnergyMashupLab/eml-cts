@@ -57,10 +57,12 @@ public class TeuaRestController {
 	 *	EiCreateTransactionPayload directly
 	 *	TODO verify on use that the {id} string is convertable to int
 	 */
-	private ActorIdType[] actorIds; 	    // ActorIds for each client/{id}
+	private Long[] actorNumericIds; 	    // actorNumericIds for each client/{id}
+	private ActorIdType[] actorIds;			// ActorIdType values for the created actors
 	String[] postClientCreateTransactionUri;	// URI to post to client[i]
 	private String[] postUriClientTransaction;
-	public static ConcurrentHashMap<ActorIdType, String> postLmaToTeuaPartyIdMap;
+
+//	public static ConcurrentHashMap<ActorIdType, String> postLmaToTeuaPartyIdMap; in LMA
     
     // for managing client/{id} and teua/{id}
     public final int DEFAULT_COUNT = 20;
@@ -102,35 +104,48 @@ public class TeuaRestController {
 	    String clientUriSuffix = "/clientCreateTransaction";
 	    String teuaUriPrefix = "http://localhost:8080/teua/";
 	    String teuaUriSuffix = "/createTransaction";
+	    ActorIdType tempActorId;
+	    String mapReturns;
 	
 		// Initialize global parallel arrays
+	    actorNumericIds = new Long[idLimit];
 	    actorIds = new ActorIdType[idLimit];
 		postClientCreateTransactionUri = new String[this.idLimit];
-		//	TODO verify behavior
-		postLmaToTeuaPartyIdMap = new ConcurrentHashMap<ActorIdType, String>(idLimit);
+		//	Triple the size should limit collisions and chain length
+		LmaRestController.postLmaToTeuaPartyIdMap = 
+					new ConcurrentHashMap<Long, String>(idLimit*3);
 
 		for (i = 0; i < this.idLimit; i++)	{
 			clientUri = clientUriPrefix + String.valueOf(i) + clientUriSuffix;
 			postClientCreateTransactionUri[i] = clientUri;
-			actorIds[i] = new ActorIdType();
+			tempActorId = new ActorIdType();
+			actorIds[i] = tempActorId;
+			actorNumericIds[i] = tempActorId.value();
 			teuaUri = teuaUriPrefix + String.valueOf(i) + teuaUriSuffix;
-			postLmaToTeuaPartyIdMap.put(actorIds[i], teuaUri);
-			logger.info("i = " + i + " " + clientUri + " " + teuaUri +
-					" actorId " + actorIds[i].toString());
+			mapReturns = LmaRestController.postLmaToTeuaPartyIdMap.put(actorNumericIds[i], teuaUri);
+			
+			logger.trace("mapReturns '"+ mapReturns + "' for key " + actorNumericIds[i]);
+			logger.trace("Map size " + LmaRestController.postLmaToTeuaPartyIdMap.size() +
+					" i = " + i + " " + clientUri + " " + teuaUri +
+					" actorId " + actorNumericIds[i].toString());
 		}
 		
-		logger.info("partyId in actorIds[0] " + actorIds[0].toString());
-		logger.info("Push setPostLmaToTeuaPartyIdMap to LMA");
-		//	push map to LMA
-		LmaRestController.setPostLmaToTeuaPartyIdMap(postLmaToTeuaPartyIdMap);
+//		logger.info("partyId in actorNumericIds[1] " + actorNumericIds[1].toString());
 		
-		
-		// dump TeuaRestController.postLmaToTeuaPartyIdMap
-		for (Map.Entry<ActorIdType, String> entry : postLmaToTeuaPartyIdMap.entrySet())	{
-			ActorIdType key = entry.getKey();
-			Object value = entry.getValue();
-			logger.info("postLmaToTeuaPartyIdMap " + key.toString() + " " + value.toString());
+		// LmaRestController by Long values 0..19 DEBUG MAP
+		System.out.println("by postLmaToTeuaPartyIdMap all keys in order from 4 to 24 ");
+		for (i = 4; i < this.idLimit+4; i++) {
+			System.out.println("i = " + i + " " + LmaRestController.postLmaToTeuaPartyIdMap.get(Long.valueOf(i)));
 		}
+		
+//		// DEBUG dump LmaRestController.postLmaToTeuaPartyIdMap
+//		for (Map.Entry<Long, String> entry : 
+//					LmaRestController.postLmaToTeuaPartyIdMap.entrySet())	{
+//			Long key = entry.getKey();
+//			Object value = entry.getValue();
+//			logger.info("LmaRestController.postLmaToTeuaPartyIdMap " +
+//							key.toString() + " " + value.toString());
+//		}
 	}
 	
 	/*
@@ -249,12 +264,14 @@ public class TeuaRestController {
 	 * 
 	 * Forward EiCreateTenderPayload to LMA
 	 */	
+	// Processing the request from the Building Controller (SC/Client)
+	// Return the ClientCreatedTenderPayload which is just CTS TenderId for new tender
 	@PostMapping("{teuaId}/clientCreateTender")
-	public ClientCreatedTenderPayload postEiCreateTender(
+	public ClientCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateTenderPayload clientCreateTender)	{
 		TenderIdType tempTenderId;
-		ClientCreateTenderPayload tempCreate;	
+		ClientCreateTenderPayload tempClientCreateTender;	
 		ClientCreatedTenderPayload tempCreated, tempReturn;
 		EiTender tender;
 		EiCreateTenderPayload eiCreateTender;
@@ -272,44 +289,49 @@ public class TeuaRestController {
 					"http://localhost:8080/lme/party",
 					ActorIdType.class);
 		}
-			
-		numericTeuaId = Integer.valueOf(teuaId);
-		logger.info("postEiCreateTender teuaId " + teuaId +
-					" actorIds[teuaId] " + actorIds[numericTeuaId].toString());
 		
-		tempCreate = clientCreateTender;	// save the parameter
+		numericTeuaId = Integer.valueOf(teuaId);
+		logger.info("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.info("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+		
+		tempClientCreateTender = clientCreateTender;	// save the parameter
 
 		/*
 		 * Create a new EiTender using the interval, quantity, price,and expiration
 		 * time  sent by the Client/SC, and insert it via the constructor in a
 		 * new EiCreateTenderPayload.
 		 * 
-		 * partyId is in actorIds[] , counterPartyId is the LME representing
+		 * partyId is in actorNumericIds[] , counterPartyId is the LME representing
 		 * the market and the POST is to the LMA..
 		 */
+		// if Building sends to /teua/7 that means it's client 7
 		tender = new EiTender(
-				tempCreate.getInterval(), tempCreate.getQuantity(),
-				tempCreate.getPrice(), tempCreate.getBridgeExpireTime().asInstant(),
-				tempCreate.getSide());
+				tempClientCreateTender.getInterval(),
+				tempClientCreateTender.getQuantity(),
+				tempClientCreateTender.getPrice(),
+				tempClientCreateTender.getBridgeExpireTime().asInstant(),
+				tempClientCreateTender.getSide());
 		
 		// 	Construct the EiCreateTender payload to be forwarded to LMA
 		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId],
 				this.lmePartyId);
-//			System.err.println("clientCreateTender: eiCreateTender is " +
-//					eiCreateTender.toString());	
+		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
+		eiCreateTender.setCounterPartyId(lmePartyId);
 		
-		logger.info("TEUA sending EiCreateTender to LMA. " +
+		logger.info("TEUA sending EiCreateTender to LMA " +
 				eiCreateTender.toString());
-		
-		
+			
 		//	And forward to the LMA
 		restTemplate = builder.build();
 		EiCreatedTenderPayload result = restTemplate.postForObject
 			("http://localhost:8080/lma/createTender", eiCreateTender,
 					EiCreatedTenderPayload.class);
 		
-		// and select CTS TenderId and put in ClientCreatedTenderPayload
-		
+		// and put CtsTenderId in ClientCreatedTenderPayload
 		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
 //		logger.debug("TEUA before return ClientCreatedTender to Client/SC " +
 //				tempReturn.toString());

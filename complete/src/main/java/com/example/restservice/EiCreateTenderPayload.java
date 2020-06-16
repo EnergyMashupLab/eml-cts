@@ -51,9 +51,13 @@ public class EiCreateTenderPayload {
 
 	@Override
 	public String toString() {
-		return ("EiCreateTenderPayload party " + partyId.value() +
-				" counterParty " + counterPartyId.value() +
-				" requestId " + requestId.toString() + " " +
+		return ("EiCreateTenderPayload party " +
+				partyId.value() +
+				" counterParty " +
+				counterPartyId.value() +
+				" requestId " +
+				requestId.toString() +
+				" " +
 				tender.toString());
 	}
 

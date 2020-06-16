@@ -40,9 +40,8 @@ public class LmaRestController {
 	
 	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
 	//	pushed here by TEUA which has the ActorId and {id} information
-	public static ConcurrentHashMap<ActorIdType, String> postLmaToTeuaPartyIdMap;
-	//	Created in TeuaRestController and assigned to this static map
-	//			= new ConcurrentHashMap<ActorIdType, String>();
+	public static ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMap;
+	//	Initialized in TeuaRestController as this static map
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmaRestController.class);
@@ -116,6 +115,7 @@ public class LmaRestController {
 			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
 
 		EiTender tempTender;
+		ActorIdType tempPartyId;
 		EiTransaction tempTransaction;
 		EiCreateTransactionPayload tempCreate;
 		EiCreatedTransactionPayload tempCreated, tempPostResponse;
@@ -145,23 +145,28 @@ public class LmaRestController {
 		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
 		 * 	the EiCreateTransactionPayload
 		 */
-		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId());
+		tempPartyId = tempCreate.getPartyId();
+		logger.info("tempCreate partyId toString " + tempPartyId.toString() + " " +
+				tempCreate.toString());
+		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
+		
+		logger.info("tempTeuaUri is '" + tempTeuaUri + "'");
+		
 		if (tempTeuaUri == null) {
-			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
+			logger.debug("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
 					tempCreate.getPartyId().toString());
-
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
 			tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
-			logger.info("Using tempTeuaUri " + tempTeuaUri);
-			if (dumpMap)	{
-				dumpMap = false;	// log map first time only - it doesn't change
-				for (Map.Entry<ActorIdType, String> entry : postLmaToTeuaPartyIdMap.entrySet())	{
-					ActorIdType key = entry.getKey();
-					Object value = entry.getValue();
-					logger.info("postLmaToTeuaPartyIdMap " + key.toString() + " " + value.toString());
-				}
-			}
+			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
+//			if (dumpMap)	{
+//				dumpMap = false;	// log map first time only - it doesn't change
+//				for (Map.Entry<Long, String> entry : postLmaToTeuaPartyIdMap.entrySet())	{
+//					Long key = entry.getKey();
+//					Object value = entry.getValue();
+//					logger.info("postLmaToTeuaPartyIdMap " + key.toString() + " " + value.toString());
+//				}
+//			}
 
 		}	else	{
 			logger.info("tempTeuaUri non-null. post to " + tempTeuaUri);
@@ -243,11 +248,11 @@ public class LmaRestController {
 		LmaRestController.currentTenderId = currentTenderId;
 	}
 
-	public static ConcurrentHashMap<ActorIdType, String> getPostLmaToTeuaPartyIdMap() {
+	public static ConcurrentHashMap<Long, String> getPostLmaToTeuaPartyIdMap() {
 		return postLmaToTeuaPartyIdMap;
 	}
 
-	public static void setPostLmaToTeuaPartyIdMap(ConcurrentHashMap<ActorIdType, String> postLmaToTeuaPartyIdMap) {
+	public static void setPostLmaToTeuaPartyIdMap(ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMap) {
 		LmaRestController.postLmaToTeuaPartyIdMap = postLmaToTeuaPartyIdMap;
 	}
 
