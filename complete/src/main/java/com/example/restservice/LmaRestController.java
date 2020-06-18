@@ -157,8 +157,8 @@ public class LmaRestController {
 					tempCreate.getPartyId().toString());
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
-			tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
-			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
+//			tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
+//			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
 //			if (dumpMap)	{
 //				dumpMap = false;	// log map first time only - it doesn't change
 //				for (Map.Entry<Long, String> entry : postLmaToTeuaPartyIdMap.entrySet())	{
