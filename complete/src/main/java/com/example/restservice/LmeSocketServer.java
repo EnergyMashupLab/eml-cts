@@ -89,7 +89,7 @@ public class LmeSocketServer extends Thread	{
     	EiTender tender;
     	//	For lookup and return value in eiCreateTransactionMatchNumberMap
     	Long matchNumberLong; // cannot use long for HashMap key
-    	EiCreateTransactionPayload matchEiCreateTransaction;
+    	EiCreateTransactionPayload matchEiCreateTransaction, tempCreate;
     	
         /*
          * The Map takes (Long)MarketCreateTransactionPayload.getMatchNumber() to the
@@ -145,7 +145,7 @@ public class LmeSocketServer extends Thread	{
             eiCreateTender =
             	LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
             
-            // TODO clean up and remove entry when tender quantity becomes zero
+            // LATER TODO clean up and remove entry when tender quantity becomes zero
             if (eiCreateTender == null) {
             	// no match in Map - try again
             	continue;
@@ -219,6 +219,19 @@ public class LmeSocketServer extends Thread	{
             				" " + matchEiCreateTransaction.toString());
                     logger.info("LmeSocketServer enqueued " +
                     		" " + eiCreateTransaction.toString());
+                    // safe to remove the previous HashMap entry for this matchNumber as there was
+                    // exactly one in the HashMap
+                    tempCreate = eiCreateTransactionMatchNumberMap.remove(matchNumberLong);
+                    if (tempCreate.equals(matchEiCreateTransaction))	{
+                    	// correctly removed from map
+                    	logger.debug(
+                    		"Removed matchEiCreateTransaction from eiCreateTransactionMatchNumberMap");
+                    	logger.debug("Removed matchEiCreateTransaction from map size now " +
+                    			eiCreateTransactionMatchNumberMap.size());
+                    }	else	{
+                    	// error - wasn't in the map - should never reach this code
+                    	logger.info("Consistency Error in eiCreateTransactionMatchNumberMap - match wasn't in map");
+                    }
             	}
               
         	}	
