@@ -41,6 +41,7 @@ public class EiCreateTransactionPayload {
 		this.requestId = new RefIdType();
 	}
 	
+	@Override
 	public String toString() {
 //		String printStringFormat = 
 //			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
@@ -49,7 +50,9 @@ public class EiCreateTransactionPayload {
 				" partyid " + partyId.toString() +
 				" counterPartyid " + counterPartyId.toString() +			
 				" requestId " + requestId.value() + " TenderId " +
-				transaction.getTender().getTenderId().value());
+				transaction.getTender().getTenderId().value() +
+				" quantity " + transaction.getTender().getQuantity() +
+				" price " + transaction.getTender().getPrice());
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -83,4 +86,5 @@ public class EiCreateTransactionPayload {
 	public void setTransaction(EiTransaction transaction) {
 		this.transaction = transaction;
 	}
+	
 }

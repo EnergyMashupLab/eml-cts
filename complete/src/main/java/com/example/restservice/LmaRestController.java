@@ -83,7 +83,7 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;	
 		tempTender = tempCreate.getTender(); // and pull out Tender
 		
-		logger.info("LMA.postEiCreateTender to LME " +
+		logger.debug("postEiCreateTender to LME. TenderId " +
 				tempCreate.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
@@ -136,10 +136,6 @@ public class LmaRestController {
 		tempCreate = eiCreateTransactionPayload;
 		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-		
-		logger.info("/lma/createTransaction partyId " + tempCreate.getPartyId().toString() +
-				" counterPartyId " + tempCreate.getCounterPartyId().toString() +
-				" " + tempCreate.getTransaction().toString());
 
 		/*
 		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
@@ -157,8 +153,10 @@ public class LmaRestController {
 					tempCreate.getPartyId().toString());
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
-//			tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
-//			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
+
+			tempTeuaUri = "http://localhost:8080/teua/1/createTransaction"; // default if error
+			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
+
 //			if (dumpMap)	{
 //				dumpMap = false;	// log map first time only - it doesn't change
 //				for (Map.Entry<Long, String> entry : postLmaToTeuaPartyIdMap.entrySet())	{
@@ -167,9 +165,11 @@ public class LmaRestController {
 //					logger.info("postLmaToTeuaPartyIdMap " + key.toString() + " " + value.toString());
 //				}
 //			}
-
 		}	else	{
-			logger.info("tempTeuaUri non-null. post to " + tempTeuaUri);
+			logger.info("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+					tempCreate.getPartyId().toString() +
+					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
+					" " + tempCreate.getTransaction().toString());
 		}
 		
 		tempPostResponse = restTemplate.postForObject(tempTeuaUri, 

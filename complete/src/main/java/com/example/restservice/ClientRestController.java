@@ -96,7 +96,8 @@ public class ClientRestController {
 		ClientCreatedTransactionPayload response = 
 					new ClientCreatedTransactionPayload();
 			
-		logger.info("/clientCreateTransaction POSTed " +
+		logger.info("/clientCreateTransaction POSTed to /client/" +
+				id + "clientCreateTransaction " +
 				tempClientCreateTransaction.toString());
 		
 		/*
