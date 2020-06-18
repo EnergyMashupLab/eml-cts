@@ -186,9 +186,9 @@ public class TeuaRestController {
 		tempCreate = eiCreateTransactionPayload;
 		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
-//		logger.debug("TEUA received createTransaction " +
-//				tempCreate.toString() + " before forward to Client " 
-//				);
+		logger.trace("TEUA received createTransaction " +
+				tempCreate.toString() + " before forward to Client " 
+				);
 		
 		/*
 		 * Build ClientCreateTransactionPayload to POST to client with same id
@@ -200,8 +200,8 @@ public class TeuaRestController {
 				/* tenderId	*/	tempTender.getTenderId().value()
 				);
 		
-//		logger.info("Built ClientCreateTransactionPayload " +
-//				clientCreate.toString());
+		logger.trace("Built ClientCreateTransactionPayload " +
+				clientCreate.toString());
 
 		numericTeuaId = Integer.valueOf(teuaId);
 		logger.debug(" Forwarding ClientCreateTransaction to " +
@@ -322,7 +322,7 @@ public class TeuaRestController {
 		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateTender.setCounterPartyId(lmePartyId);
 		
-		logger.info("TEUA sending EiCreateTender to LMA " +
+		logger.debug("TEUA sending EiCreateTender to LMA " +
 				eiCreateTender.toString());
 			
 		//	And forward to the LMA
