@@ -49,7 +49,7 @@ public class LmeRestController {
 	// parallel for MarketCreateTransactionPayloads here in LME.
 	// queue.put by LmeSocketServer, queue.take here in LME to produce an 
 	// EiCreateTransactionPayload to be forwarded to LMA
-	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQ =
+	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQueue =
 			new ArrayBlockingQueue(20);
 	public static LmeSocketServer lmeSocketServer = new LmeSocketServer();
 	

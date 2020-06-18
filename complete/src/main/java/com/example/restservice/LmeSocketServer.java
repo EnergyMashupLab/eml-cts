@@ -63,7 +63,7 @@ public class LmeSocketServer extends Thread	{
     public static EiCreateTransactionPayload eiCreatePayload;
     
     final ObjectMapper mapper = new ObjectMapper();
-    // to put EiCreateTransactionPayload in lme.eiCreateTransactionQ 
+    // to put EiCreateTransactionPayload in lme.eiCreateTransactionQueue 
     public LmeRestController lme;	
 
     @Override
@@ -142,11 +142,13 @@ public class LmeSocketServer extends Thread	{
 	                		eiCreateTender.getPartyId(),
 	                		eiCreateTender.getCounterPartyId());
 	                
+	                // need actual counterparty - TODO
+	                
 //	            	logger.debug("LmeSocketServer EiCreateTransaction " + eiCreateTransaction.toString());
 	              
 	                // Put in the LME transaction queue for further processing
-	                lme.eiCreateTransactionQ.put(eiCreateTransaction);
-//	                logger.info("LME enqueued eiCreateTransactionQ TenderId " +
+	                lme.eiCreateTransactionQueue.put(eiCreateTransaction);
+//	                logger.info("LME enqueued eiCreateTransactionQueue TenderId " +
 //	                		eiCreateTransaction.getTransaction().getTender().getTenderId().value() +
 //	                		" " + eiCreateTransaction.toString());
             	}	

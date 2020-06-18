@@ -47,7 +47,7 @@ public class LmaRestController {
 			LmaRestController.class);
 	
 	public void LmaRestController()	{	// zero parameter constructor
-		logger.info("LMA zero parameter constructor");
+		logger.trace("LMA zero parameter constructor");
 	}
 	
 	/*
@@ -83,8 +83,8 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;	
 		tempTender = tempCreate.getTender(); // and pull out Tender
 		
-		logger.info("LMA.postEiCreateTender " + tempCreate.toString() +
-				" LMA partyId " + partyId);
+		logger.info("LMA.postEiCreateTender to LME " +
+				tempCreate.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
@@ -92,7 +92,7 @@ public class LmaRestController {
 				tempCreate, 
 				EiCreatedTenderPayload.class);
 		
-//		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
 		/*
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
@@ -146,14 +146,14 @@ public class LmaRestController {
 		 * 	the EiCreateTransactionPayload
 		 */
 		tempPartyId = tempCreate.getPartyId();
-		logger.info("tempCreate partyId toString " + tempPartyId.toString() + " " +
+		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
 				tempCreate.toString());
 		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
 		
-		logger.info("tempTeuaUri is '" + tempTeuaUri + "'");
+		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
 		
 		if (tempTeuaUri == null) {
-			logger.debug("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
+			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
 					tempCreate.getPartyId().toString());
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map

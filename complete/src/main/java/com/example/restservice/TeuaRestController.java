@@ -77,7 +77,7 @@ public class TeuaRestController {
 	// Constructor for class TeuaRestController - zero parameters
 	public TeuaRestController()	{
 		this.idLimit = DEFAULT_COUNT;
-		logger.info("Built TeuaRestController zero param constructor idLimit " +
+		logger.trace("Built TeuaRestController zero param constructor idLimit " +
 					this.idLimit);
 		initMapArray(idLimit);
 	}
@@ -85,7 +85,7 @@ public class TeuaRestController {
 	// Constructor for class ClientRestController - zero parameters
 	public TeuaRestController(int howMany)	{
 		if (howMany > MAX_COUNT)	{
-			logger.info("Constructor one parameter howMany " + howMany +
+			logger.trace("Constructor one parameter howMany " + howMany +
 					" > " + MAX_COUNT + " set to " + DEFAULT_COUNT);
 			this.idLimit = DEFAULT_COUNT;
 		}	else {
@@ -133,10 +133,10 @@ public class TeuaRestController {
 //		logger.info("partyId in actorNumericIds[1] " + actorNumericIds[1].toString());
 		
 		// LmaRestController by Long values 0..19 DEBUG MAP
-		System.out.println("by postLmaToTeuaPartyIdMap all keys in order from 4 to 24 ");
-		for (i = 4; i < this.idLimit+4; i++) {
-			System.out.println("i = " + i + " " + LmaRestController.postLmaToTeuaPartyIdMap.get(Long.valueOf(i)));
-		}
+//		System.out.println("by postLmaToTeuaPartyIdMap all keys in order from 4 to 24 ");
+//		for (i = 4; i < this.idLimit+4; i++) {
+//			System.out.println("i = " + i + " " + LmaRestController.postLmaToTeuaPartyIdMap.get(Long.valueOf(i)));
+//		}
 		
 //		// DEBUG dump LmaRestController.postLmaToTeuaPartyIdMap
 //		for (Map.Entry<Long, String> entry : 
@@ -204,7 +204,7 @@ public class TeuaRestController {
 //				clientCreate.toString());
 
 		numericTeuaId = Integer.valueOf(teuaId);
-		logger.info(" Forwarding ClientCreateTransaction to " +
+		logger.debug(" Forwarding ClientCreateTransaction to " +
 				postClientCreateTransactionUri[numericTeuaId]);
 		
 		clientCreated = restTemplate.postForObject(
@@ -224,7 +224,7 @@ public class TeuaRestController {
 				tempCreate.getCounterPartyId(),
 				new EiResponse(200, "OK"));
 		
-//		logger.info("tempCreated constructed before return " + tempCreated.toString());
+		logger.debug("tempCreated constructed before return " + tempCreated.toString());
 		
 		return tempCreated;
 	}
@@ -291,8 +291,8 @@ public class TeuaRestController {
 		}
 		
 		numericTeuaId = Integer.valueOf(teuaId);
-		logger.info("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
-		logger.info("postEiCreateTender teuaId " +
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.debug("postEiCreateTender teuaId " +
 			teuaId +
 			" actorNumericIds[teuaId] " +
 			actorIds[numericTeuaId].toString());
