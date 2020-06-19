@@ -24,7 +24,7 @@ public class LmeSendTransactions	extends Thread	{
 	final RestTemplateBuilder builder = new RestTemplateBuilder();
 	
 	/*
-	 * 	Take first EiCreateTransactionPayload from eiCreateTransactionQ and
+	 * 	Take first EiCreateTransactionPayload from eiCreateTransactionQueue and
 	 * 	Post it to the LMA.
 	 */
 	@Override
@@ -34,7 +34,7 @@ public class LmeSendTransactions	extends Thread	{
 		
 		while(true)	{
 			try {
-			eiCreateTransaction = LmeRestController.eiCreateTransactionQ.take();
+			eiCreateTransaction = LmeRestController.eiCreateTransactionQueue.take();
 		} catch (InterruptedException e) {
 			System.err.println("InterruptedException in LmeSendTransactions");
 			e.printStackTrace();

@@ -49,15 +49,16 @@ public class EiCreateTenderPayload {
 //		this.print();
 	}
 
-	public void print() {
-		String printStringFormat = "EiCreateTenderPayload.print() tenderId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
-			
-		System.err.println(String.format(printStringFormat,
-				tender.getTenderId().value(),
-				partyId.value(), 
-				counterPartyId.value(),
-				requestId.value(),
-				tender.getInterval().dtStart.toString()));
+	@Override
+	public String toString() {
+		return ("EiCreateTenderPayload party " +
+				partyId.value() +
+				" counterParty " +
+				counterPartyId.value() +
+				" requestId " +
+				requestId.toString() +
+				" " +
+				tender.toString());
 	}
 
 	public ActorIdType getCounterPartyId() {

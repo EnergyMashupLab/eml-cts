@@ -10,7 +10,4 @@ public class ActorIdType extends UidType {
 	public String toString()	{
 		return (String.valueOf(myUidId));
 	}
-	
-	// NEED SETTERS AND GETTERS FOR JSON SERIALIZATION?
-
 }

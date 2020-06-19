@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
+
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -38,21 +40,54 @@ public class ClientRestController {
 	private static final Logger logger = LogManager.getLogger(
 			ClientRestController.class);
     final ObjectMapper mapper = new ObjectMapper();
+    
+    // for managing client/{id} and teua/{id}
+    public final int DEFAULT_COUNT = 20;
+    public int idLimit;	// number of teuas hence of clients
+    
+    //	Array uses teua/number/... and matching client/number
+	//	to give the URI string to which to post
+    String[] postClientCreateTenderUri;
+    String uriPrefix = "http://localhost:8080/teua/";
+    String uriSuffix = "/clientCreateTender";
+    String idString = null;
+    int workingId = 0;
 
-	
 	// for randomized quantity and price for testing
 	final static Random rand = new Random();	
 	
-	/*
-	 * POST - To /client/clientCreateTransaction - by TEUA to SC/client
-	 *			(simplified forward of EiCreateTransaction from TEUA)
-	 * 		RequestBody is ClientCreateTransactionPayload
-	 * 		ResponseBody is ClientCreatedTransactionPayload
-	 */
+	// Constructor for class ClientRestController - zero parameters
+	public ClientRestController()	{
+		int i;
+		
+		this.idLimit = DEFAULT_COUNT;
+		postClientCreateTenderUri = new String[this.idLimit];
 
-	@PostMapping("/clientCreateTransaction")
+		for (i = 0; i < this.idLimit; i++)	{
+			postClientCreateTenderUri[i] = uriPrefix+
+					String.valueOf(i) + uriSuffix;
+		}
+	}
+	
+	// Constructor for class ClientRestController - zero parameters
+	public ClientRestController(int howMany)	{
+		int i;
+		postClientCreateTenderUri = new String[howMany];
+		this.idLimit = howMany;
+		
+		for (i = 0; i < this.idLimit; i++)	{
+			postClientCreateTenderUri[i] = uriPrefix+
+					String.valueOf(i) + uriSuffix;
+		}
+	}
+	
+
+	
+	
+	@PostMapping("/{id}/clientCreateTransaction")
 	public ClientCreatedTransactionPayload 	postTransaction(
-		@RequestBody ClientCreateTransactionPayload clientCreateTransactionPayload)	{
+		@RequestBody ClientCreateTransactionPayload clientCreateTransactionPayload,
+		@PathVariable String id)	{
 		
 		ClientCreateTransactionPayload tempClientCreateTransaction;
 		tempClientCreateTransaction = clientCreateTransactionPayload;
@@ -60,38 +95,9 @@ public class ClientRestController {
 		// Build response
 		ClientCreatedTransactionPayload response = 
 					new ClientCreatedTransactionPayload();
-		
-		/*
-		 * 
-		 * HOOK HERE - call client/SC code to update table of tenders sent and the
-		 * results.
-		 * 
-		 * This SC previously posted a tender (time interval, expiration time,
-		 * quantity, price, side). The transaction tells the SC which of its
-		 * tenders have cleared, partially or fully, one message per
-		 * executed tender or part.
-		 * 
-		 * By saving the CtsTendewrId and the ClientCreateTender request, the
-		 * time interval, parties and other information can be retrieved.
-		 * 
-		 * Possible pseudocode for SC
-		 * 
-		 * 		Create a table or Map with fields for quantity offered,
-		 * 		time interval, price offered, and ctsTenderId as returned
-		 * 
-		 * 		When a tender is send to the TEUA, the response
-		 * 		ClientCreatedTenderPayload holds the CtsTenderId that was created.
-		 * 
-		 * 		Enter the tender with its CtsTenderId and its initial/offered
-		 * 		quantity in the table
-		 * 
-		 * 		When an ClientCreateTransactionPayload is posted to this SC,
-		 * 		update the relevant table entry.
-		 * 
-		 * 	We just log the ClientCreateTransaction payload.
-		 */
-
-		logger.info("/clientCreateTransaction POSTed " +
+			
+		logger.info("/clientCreateTransaction POSTed to /client/" +
+				id + "clientCreateTransaction " +
 				tempClientCreateTransaction.toString());
 		
 		/*
@@ -100,7 +106,7 @@ public class ClientRestController {
 
 		return response;
 		}
-	
+
 	
 	/*
 	 * GET - /client/clientTender responds with a randomized clientCreateTender,

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 // Not in Parity
 import org.apache.logging.log4j.LogManager;
@@ -47,10 +48,10 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class LmeSocketServer extends Thread	{
-    private ServerSocket serverSocket;
+	private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
-	private static final Logger logger = LogManager.getLogger(LmeSocketServer.class);
+    private static final Logger logger = LogManager.getLogger(LmeSocketServer.class);
     private BufferedReader in;
     
     // Socket Server in LME for CreateTransaction
@@ -62,13 +63,23 @@ public class LmeSocketServer extends Thread	{
     MarketCreateTransactionPayload payload; // socket read from Market
     public static EiCreateTransactionPayload eiCreatePayload;
     
+    /*
+     * map is from (Long)MarketCreateTransactionPayload.getMatchNumber() to the
+     * EiCreateTenderPayload built from the MarketCreateTransaction.
+     * 
+     * Typically one member only
+     */
+	public static ConcurrentHashMap<Long, EiCreateTransactionPayload>
+		eiCreateTransactionMatchNumberMap =
+			new ConcurrentHashMap<Long, EiCreateTransactionPayload>();	
+    
     final ObjectMapper mapper = new ObjectMapper();
-    // to put EiCreateTransactionPayload in lme.eiCreateTransactionQ 
+    // to put EiCreateTransactionPayload in lme.eiCreateTransactionQueue 
     public LmeRestController lme;	
 
     @Override
     public void run() {
-    	//	port is set in constructor
+//		port is set in constructor
 // 		System.err.println("LmeSocketServer.run() port " + port +
 // 				" '" + Thread.currentThread().getName() + "'");
  		
@@ -76,90 +87,166 @@ public class LmeSocketServer extends Thread	{
     	EiCreateTenderPayload eiCreateTender;
     	EiTransaction transaction;
     	EiTender tender;
-      
-            try	{
+    	//	For lookup and return value in eiCreateTransactionMatchNumberMap
+    	Long matchNumberLong; // cannot use long for HashMap key
+    	EiCreateTransactionPayload matchEiCreateTransaction, tempCreate;
+    	
+        /*
+         * The Map takes (Long)MarketCreateTransactionPayload.getMatchNumber() to the
+         * EiCreateTenderPayload built from that MarketCreateTransaction.
+         * 
+         * In the while loop we take a MarketCreateTransaction and build an
+         * EiCreateTransactionPayload.
+         * 
+         * If the matchNumber is in the Map (the first of two transactions has been processed)
+         * we send the one stored in the Map (and delete the entry).
+         * 
+         * Then we send the one in hand that correlated by matchNumber.
+         */
+    	try	{
             	serverSocket = new ServerSocket(port);
- 
 	            clientSocket = serverSocket.accept();
 	            if (clientSocket == null)
 	            	System.err.println("LmeSocketServer: clientSocket null after accept");
 	            out = new PrintWriter(clientSocket.getOutputStream(), true);
-	            in = new BufferedReader(
-	            			new InputStreamReader(clientSocket.getInputStream()));
-            }	catch (IOException e)	{
-    	        //	LOG.debug(e.getMessage());
-    	    	System.err.println("LmeSocketServer: accept " + e.getMessage());
-    	    	e.printStackTrace();
-            }
-    
-            if (in == null || out == null)	System.err.println("in or out null");        
-//            System.err.println("LME:LmeSocketServer before while loop");
+	            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	    }	catch (IOException e)	{
+	        //	logger.debug(e.getMessage());
+	    	System.err.println("LmeSocketServer: accept " + e.getMessage());
+	    	e.printStackTrace();
+	    }
+
+        if (in == null || out == null)	System.err.println("in or out null");   
+        
+//      logger.info("LME:LmeSocketServer before while loop");
+        
+        while (true)	{
+        	//	blocking read for MarketCreateTransactionPayload from market
+        	try	{
+        	logger.trace("CTS:SocketClient while loop head");     	
+        	jsonReceived = in.readLine(); 
+        	// TODO add further checks for return values and IOException
             
-            while (true)	{
-            	//	blocking read on BufferedReader for a MarketCreateTransactionPayload 
+        	logger.debug("LME received " + jsonReceived);
+            
+        	// couldn't read from socket TODO have thrown IOException
+        	if (jsonReceived == null)	continue;	
+            
+            payload = mapper.readValue(
+            		jsonReceived, MarketCreateTransactionPayload.class);                          
+            logger.trace("payload received object: " + payload.toString());
+            matchNumberLong = payload.getMatchNumber();	// autoboxing
+            
+            // 	Check for non-CTS tenders. If the CtsTenderId is not in
+            //	the map, it's from outside CTS or otherwise erroneous.
+            // 	TODO Ignore for now
+            
+            //	Get original Tender for this MarketCreateTransaction
+            eiCreateTender =
+            	LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
+            
+            // LATER TODO clean up and remove entry when tender quantity becomes zero
+            if (eiCreateTender == null) {
+            	// no match in Map - try again
+            	continue;
+            }	else	{
+            	/*
+            	 * Need to find a Transaction with same matchNumber and process both.
+            	 * 
+            	 * When [Cts]TenderId has a value in the TenderId map we extract
+            	 * the original tender, and build the EiCreateTransactionPayload using
+				 * original parties and TenderId, with cleared quantity and price.
+            	 */
             	
-            	try	{
-//            	logger.debug("CTS:SocketClient while loop head");     	
-            	jsonReceived = in.readLine(); 
-            	// TODO add checks for return values and IOException
+            	// recover original tender for attributes. CounterParty rewritten below
+                tender = eiCreateTender.getTender();	
+            	logger.trace("Original EiCreateTenderPayload " + eiCreateTender.toString());
                 
-            	logger.debug("LME received " + jsonReceived);
+                tender.setQuantity(payload.getQuantity());
+                tender.setPrice(payload.getPrice());
+                //	other fields of tender as in EiCreateTender - tenderId,
+                //	interval, expireTime, side
+            	logger.debug("Reconstituted tender " + tender.getTenderId().toString());
                 
-            	// couldn't read from socket TODO should be IOException
-            	if (jsonReceived == null)	continue;	
+                //	The EiCreateTransaction uses original TenderId
+                transaction = new EiTransaction(tender);
                 
-                payload = mapper.readValue(
-                		jsonReceived, MarketCreateTransactionPayload.class);                          
-//                logger.info("payload received object: " + payload.toString());
+                eiCreateTransaction = new EiCreateTransactionPayload(
+                		transaction,
+                		eiCreateTender.getPartyId(),
+                		eiCreateTender.getCounterPartyId());
                 
-                // 	Check for non-CTS tenders. If the CtsTenderId is not in
-                //	the map, it's from outside CTS or otherwise erroneous.
-                // TODO Ignore for now
-                eiCreateTender = LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
-                
-                // TODO clean up and remove entry when tender quantity becomes zero
-                if (eiCreateTender == null) {
-                	// no match in Map - try again
-                	continue;
-                }	else	{
-                	// 	match in map - extract original tender, build EiCreateTransactionPayload using 
-                	//	original parties and TenderId, with cleared quantity and price
+            	logger.trace("LmeSocketServer EiCreateTransaction " +
+                		eiCreateTransaction.toString());
+              	/*
+            	 * Determine whether a previous EiCreateTransaction built from
+            	 * the same Parity matchNumber was saved in eiCreateTransactionMatchNumberMap
+            	 * 
+            	 * If so, send it then send the current EiCreateTransactionPay;oad
+            	 * If not, save this EiCrerateTransactionPayload in Map key value is
+            	 * matchNumber in MarketCreateTransactionPayload from Parity
+            	 */
+            	matchEiCreateTransaction = eiCreateTransactionMatchNumberMap.get(matchNumberLong);
+            	if (matchEiCreateTransaction == null) {
+            		//	no value in map for matchNumberLong so this is the first
+            		//	Insert working EiCreateTransactionPayload into the map with key
+            		//	Send nothing until this matchNumber matches a future MarketCreateTransaction
+            		eiCreateTransactionMatchNumberMap.put(matchNumberLong, eiCreateTransaction);
+            		continue;
+            	}	else	{
+            		// 	matchEiCreateTransaction - a previous EiCreateTransaction in map
+            		//	eiCreateTransaction - the just-received
+            		//	Rewrite in place the CounterParty for both and send the earlier first
+            		logger.trace("matchEiCreateTransaction before " + matchEiCreateTransaction.toString());
+            		logger.trace("Party match " + matchEiCreateTransaction.getPartyId().toString());
 
-	                tender = eiCreateTender.getTender();	// recover original tender attributes
-//                	logger.debug("Original tender " + tender.toString());
-	                
-	                tender.setQuantity(payload.getQuantity());
-	                tender.setPrice(payload.getPrice());
-	                // other fields of tender as in EiCreateTender - tenderId, interval, expireTime, side
-//                	logger.info("Reconsistuted tender " + tender.toString());
-	                
-	                //	The EiCreateTransaction uses original TenderId
-	                transaction = new EiTransaction(tender);
-	                
-	                eiCreateTransaction = new EiCreateTransactionPayload(
-	                		transaction,
-	                		eiCreateTender.getPartyId(),
-	                		eiCreateTender.getCounterPartyId());
-	                
-//	            	logger.debug("LmeSocketServer EiCreateTransaction " + eiCreateTransaction.toString());
-	              
-	                // Put in the LME transaction queue for further processing
-	                lme.eiCreateTransactionQ.put(eiCreateTransaction);
-//	                logger.info("LME enqueued eiCreateTransactionQ TenderId " +
-//	                		eiCreateTransaction.getTransaction().getTender().getTenderId().value() +
-//	                		" " + eiCreateTransaction.toString());
-            	}	
-	        }	catch (IOException  e) {       	
-		        //	LOG.debug(e.getMessage());
-		    	System.err.println("LmeSocketServer: IOException in readLine? " + e.getMessage());
-		    	e.printStackTrace();
-		    } 	catch (InterruptedException e) {
-		    	System.err.println("LmeSocketServer: InterruptedException in readLine? " + e.getMessage());
-				e.printStackTrace();
-		    }
-        }
+            		logger.trace("eiCreateTransaction before " + eiCreateTransaction.toString());
+            		logger.trace("Party eiCreate " + eiCreateTransaction.getPartyId().toString());
+            		
+            		matchEiCreateTransaction.setCounterPartyId(
+            				eiCreateTransaction.getPartyId());
+            		logger.trace("matchEiCreateTransaction after update " + matchEiCreateTransaction.toString());
 
+             		eiCreateTransaction.setCounterPartyId(
+            				matchEiCreateTransaction.getPartyId());
+               		logger.trace("eiCreateTransaction after update " + eiCreateTransaction.toString());
+
+                    // Put both in the LME transaction queue for further processing - older first
+            		LmeRestController.eiCreateTransactionQueue.put(matchEiCreateTransaction);
+            		LmeRestController.eiCreateTransactionQueue.put(eiCreateTransaction);
+                    
+            		logger.info("LmeSocketServer enqueued " +             
+            				" " + matchEiCreateTransaction.toString());
+                    logger.info("LmeSocketServer enqueued " +
+                    		" " + eiCreateTransaction.toString());
+                    // safe to remove the previous HashMap entry for this matchNumber as there was
+                    // exactly one in the HashMap
+                    tempCreate = eiCreateTransactionMatchNumberMap.remove(matchNumberLong);
+                    if (tempCreate.equals(matchEiCreateTransaction))	{
+                    	// correctly removed from map
+                    	logger.debug(
+                    		"Removed matchEiCreateTransaction from eiCreateTransactionMatchNumberMap");
+                    	logger.debug("Removed matchEiCreateTransaction from map size now " +
+                    			eiCreateTransactionMatchNumberMap.size());
+                    }	else	{
+                    	// error - wasn't in the map - should never reach this code
+                    	logger.info("Consistency Error in eiCreateTransactionMatchNumberMap - match wasn't in map");
+                    }
+            	}
+              
+        	}	
+        }	catch (IOException  e) {       	
+        	logger.info(e.getMessage());
+	    	System.err.println("LmeSocketServer: IOException in readLine? " +
+	    			e.getMessage());
+	    	e.printStackTrace();
+	    } 	catch (InterruptedException e) {
+	    	System.err.println("LmeSocketServer: InterruptedException in readLine? " +
+	    			e.getMessage());
+			e.printStackTrace();
+	    }
     }
+}
 
 
     public void shutdown() {

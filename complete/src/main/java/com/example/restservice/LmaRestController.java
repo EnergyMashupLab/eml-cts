@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,10 +35,20 @@ public class LmaRestController {
 	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
+	private static boolean dumpMap = true;
+	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
+	
+	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
+	//	pushed here by TEUA which has the ActorId and {id} information
+	public static ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMap;
+	//	Initialized in TeuaRestController as this static map
 	
 	private static final Logger logger = LogManager.getLogger(
 			LmaRestController.class);
 	
+	public void LmaRestController()	{	// zero parameter constructor
+		logger.trace("LMA zero parameter constructor");
+	}
 	
 	/*
 	 * GET - /lma/party responds with PartyId
@@ -48,7 +64,6 @@ public class LmaRestController {
 	 * 		RequestBody is EiCreateTender
 	 * 		ResponseBody is EiCreatedTender
 	 */
-
 	@PostMapping("/createTender")
 	public EiCreatedTenderPayload 	postEiCreateTender(
 			@RequestBody EiCreateTenderPayload eiCreateTender)	{
@@ -68,7 +83,8 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;	
 		tempTender = tempCreate.getTender(); // and pull out Tender
 		
-		logger.debug("LMA.postEiCreateTender " + tempTender.toString());
+		logger.debug("postEiCreateTender to LME. TenderId " +
+				tempCreate.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
@@ -76,7 +92,7 @@ public class LmaRestController {
 				tempCreate, 
 				EiCreatedTenderPayload.class);
 		
-//		logger.info("LMA after forward to LME and before return " + tempPostResponse.toString());
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
 		/*
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
@@ -99,43 +115,68 @@ public class LmaRestController {
 			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
 
 		EiTender tempTender;
+		ActorIdType tempPartyId;
 		EiTransaction tempTransaction;
 		EiCreateTransactionPayload tempCreate;
 		EiCreatedTransactionPayload tempCreated, tempPostResponse;
-		
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
 		restTemplate = builder.build();
-	   	
+
 		/*
 		 * Originated by LME and forwarded by LMA to TEUA based on market match
+		 * and party
+		 * 
+		 * TODO verify that rewritten message has correct party and counterparty
+		 * 
 		 * NOTE synchronous, uses TEUA EiCreatedTransaction back to LME
 		 */
-		
+		//	local temporary variables
 		tempCreate = eiCreateTransactionPayload;
 		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
 
 		/*
-		 * Send on to requesting TEUA/EMA
+		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
+		 * 	the EiCreateTransactionPayload
 		 */
-				
-		/* 
-		 * Return the EiCreatedTransaction payload received from the TEUA
-		*/
-//		logger.debug("LMA.postEiCreateTransactionPayload before sending EiCreateTransaction to TEUA");
-		/*
-		 * Pass the EiCreateTransaction payload to the TEUA
-		 * NOTE with dynamic URIs will require party-Id lookup
-		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/teua/createTransaction", 
+		tempPartyId = tempCreate.getPartyId();
+		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
+				tempCreate.toString());
+		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
+		
+		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
+		
+		if (tempTeuaUri == null) {
+			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
+					tempCreate.getPartyId().toString());
+			// dump LmaRestController.postLmaToTeuaPartyIdMap
+			// use the value shown in TEUA initialization of the map
+
+			tempTeuaUri = "http://localhost:8080/teua/1/createTransaction"; // default if error
+			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
+
+//			if (dumpMap)	{
+//				dumpMap = false;	// log map first time only - it doesn't change
+//				for (Map.Entry<Long, String> entry : postLmaToTeuaPartyIdMap.entrySet())	{
+//					Long key = entry.getKey();
+//					Object value = entry.getValue();
+//					logger.info("postLmaToTeuaPartyIdMap " + key.toString() + " " + value.toString());
+//				}
+//			}
+		}	else	{
+			logger.info("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+					tempCreate.getPartyId().toString() +
+					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
+					" " + tempCreate.getTransaction().toString());
+		}
+		
+		tempPostResponse = restTemplate.postForObject(tempTeuaUri, 
 				tempCreate,
 				EiCreatedTransactionPayload.class);
-//		logger.debug(
-//		"LMA.postEiCreateTransactionPayload after EiCreatedTransaction response from teua to EiCreateTender");
 				
-		// And send the EiCreatedTransaction from the TEUA to the LME
+		// And send the EiCreatedTransaction from the TEUA back to the LME
 		return tempPostResponse;
 	}
 	
@@ -207,11 +248,24 @@ public class LmaRestController {
 		LmaRestController.currentTenderId = currentTenderId;
 	}
 
+	public static ConcurrentHashMap<Long, String> getPostLmaToTeuaPartyIdMap() {
+		return postLmaToTeuaPartyIdMap;
+	}
+
+	public static void setPostLmaToTeuaPartyIdMap(ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMap) {
+		LmaRestController.postLmaToTeuaPartyIdMap = postLmaToTeuaPartyIdMap;
+	}
+
 	public static AtomicLong getCounter() {
 		return counter;
 	}
 
 	public static ActorIdType getPartyid() {
 		return partyId;
-	}	
+	}
+
+	public static Logger getLogger() {
+		return logger;
+	}
+
 }
