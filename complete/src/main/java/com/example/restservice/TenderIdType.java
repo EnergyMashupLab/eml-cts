@@ -6,6 +6,9 @@ public class TenderIdType extends RefIdType	{
 		return this.myUidId;
 	}
 	
+	public TenderIdType()	{
+	}
+	
 	@Override
 	public String toString()	{
 		return String.valueOf(myUidId);

@@ -32,17 +32,6 @@ public class EiTransaction {
 	public EiTender getTender()	{
 		return tender;
 	}
-
-	public void print() {
-		String printStringFormat = "EiTransaction transactionId %d tenderfId %d";
-		
-		System.err.println("head of EiTransaction.print()");
-		System.err.println("transactionId is " + this.transactionId.value());		
-		System.err.println("tender's Id is " + this.tender.getTenderId().value());		
-		System.err.println(String.format(printStringFormat, 
-				this.transactionId.value(),
-				this.tender.getTenderId().value() ));
-	}
 	
 	public String toString() {
 		return ("EiTransaction transactionId " + this.transactionId.toString() +
@@ -56,6 +45,5 @@ public class EiTransaction {
 	public void setTransactiveState(TransactiveState transactiveState) {
 		this.transactiveState = transactiveState;
 	}	
-	
 	
 }

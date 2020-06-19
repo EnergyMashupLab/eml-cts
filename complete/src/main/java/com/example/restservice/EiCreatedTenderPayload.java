@@ -2,7 +2,7 @@ package com.example.restservice;
 
 import java.time.*;
 
-public class EiCreatedTender {
+public class EiCreatedTenderPayload {
 	private TenderIdType tenderId;
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
@@ -14,10 +14,10 @@ public class EiCreatedTender {
 	 * Default constructor for JSON deserialization.
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCreatedTender()	{		
+	public EiCreatedTenderPayload()	{		
 	}
 	
-	public EiCreatedTender(
+	public EiCreatedTenderPayload(
 			TenderIdType tenderId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,

@@ -2,16 +2,16 @@ package com.example.restservice;
 
 import java.time.*;
 
-public class EiCreatedTransaction {
+public class EiCreatedTransactionPayload {
 	private TransactionIdType transactionId;
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
 	public EiResponse response;
-//	public ArrayofResponses responses; NOT USED
+//	public ArrayofResponses responses; NOT USED YET
 	private final RefIdType refId = new RefIdType();
 
 	// Default initializer for JSON serialization
-	public EiCreatedTransaction() {
+	public EiCreatedTransactionPayload() {
 	}
 	
 	public TransactionIdType getTransactionId() {
@@ -30,7 +30,7 @@ public class EiCreatedTransaction {
 		this.counterPartyId = counterPartyId;
 	}
 
-	public EiCreatedTransaction(
+	public EiCreatedTransactionPayload(
 			TransactionIdType transactionId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,
@@ -48,7 +48,7 @@ public class EiCreatedTransaction {
 
 	public void print() {		
 		System.err.println(
-				"EiCreatedTransaction transactionId " +
+				"EiCreatedTransactionPayload transactionId " +
 				transactionId.toString() +
 				" partyId " + partyId.value() +
 				" counterPartyId " + counterPartyId.value() +
@@ -56,7 +56,7 @@ public class EiCreatedTransaction {
 	}
 	
 	public String toString()	{
-		return ("EiCreatedTransaction transactionId " +
+		return ("EiCreatedTransactionPayload transactionId " +
 				transactionId.toString() +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +

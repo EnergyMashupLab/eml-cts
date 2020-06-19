@@ -9,22 +9,17 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class EiCreateTransaction {
+public class EiCreateTransactionPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
 	private EiTransaction transaction;
 	
-	/*
-	@JsonIgnore
-	private final Random rand = new Random();
-	 */
-	
 	// Default initializer for JSON serialization
-	public EiCreateTransaction() {
+	public EiCreateTransactionPayload() {
 	}
 
-	public EiCreateTransaction(EiTransaction eiTransaction)	{
+	public EiCreateTransactionPayload(EiTransaction eiTransaction)	{
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
@@ -32,43 +27,32 @@ public class EiCreateTransaction {
 	}
 
 	/* 
-	 * Parallel for EiCreateTransaction, EiCreateTender:
+	 * Parallel for EiCreateTransactionPayload, EiCreateTender:
 	 * 		pass in a completed Tender/Transaction which includes through its Tender interval, quantity, price,
 	 * 		or for EiCancelTender only the TenderId.
 	 * 
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCreateTransaction(EiTransaction transaction, ActorIdType party, ActorIdType counterParty) {
-
+	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party,
+				ActorIdType counterParty) {
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
-		
-//		System.err.println("EiCreateTransaction Constructor before print()");
-//		this.print();
-	}
-
-	public void print() {
-		String printStringFormat = "EiCreateTransaction.print() transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
-		
-		System.err.println(String.format(printStringFormat,
-				transaction.getTransactionId().value(),
-				partyId.value(), 
-				counterPartyId.value(),
-				requestId.value(),
-				transaction.getTender().
-					getInterval().dtStart.toString()));
 	}
 	
+	@Override
 	public String toString() {
-		String printStringFormat = "EiCreateTransaction.print() transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
+//		String printStringFormat = 
+//			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 		
-		return ("EiCreateTransaction transactionId " + transaction.getTransactionId().toString() +
+		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
 				" partyid " + partyId.toString() +
 				" counterPartyid " + counterPartyId.toString() +			
-				" requestId " + requestId.toString() +
-				transaction.getTender().getTenderId().value());
+				" requestId " + requestId.value() + " TenderId " +
+				transaction.getTender().getTenderId().value() +
+				" quantity " + transaction.getTender().getQuantity() +
+				" price " + transaction.getTender().getPrice());
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -102,4 +86,5 @@ public class EiCreateTransaction {
 	public void setTransaction(EiTransaction transaction) {
 		this.transaction = transaction;
 	}
+	
 }

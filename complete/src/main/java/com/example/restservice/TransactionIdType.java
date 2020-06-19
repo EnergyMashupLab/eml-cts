@@ -8,7 +8,7 @@ public class TransactionIdType extends UidType {
 	
 	@Override
 	public String toString()	{
-		return ("RefId: " + String.valueOf(myUidId));
+		return (String.valueOf(myUidId));
 	}
 
 	// NEED SETTERS AND GETTERS FOR JSON SERIALIZATION?

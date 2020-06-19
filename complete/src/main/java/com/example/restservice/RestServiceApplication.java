@@ -15,6 +15,14 @@ import java.time.*;
 
 @SpringBootApplication
 public class RestServiceApplication {
+	
+	/*
+	 * Global constants
+	 */
+	public final int LME_PORT = 39401;		// for Socket Server in LME takes CreateTransaction
+	public final int MARKET_PORT = 39402;	// for Socket Server in Market takes CreateTender 
+	
+	
 	private static final Logger logger = LogManager.getLogger(
 			RestServiceApplication.class);
 	// Application general logger from NIST-CTS-Agents
@@ -41,6 +49,8 @@ public class RestServiceApplication {
 				"https://teua/party", ActorId.class);
 		logger.info(actorId.toString());
  */    	
+    	
+    	
         SpringApplication.run(RestServiceApplication.class, args);
     }
     

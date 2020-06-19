@@ -1,22 +1,49 @@
 package com.example.restservice;
 
-import java.util.*;
-
+/*
+ * ArrayList element for the EiReplyPosition payload -
+ * 		a list of positions
+ */
 public class EiPosition {
-	private static Interval boundingInterval;
-	private static PositionElement positions[];
-	private static ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
-	/*
-	 * For queries to the position manager - the bounding interval for position information.
-	 * A position is for a particular time so product can be acquired in advance
-	 * Initial draft is <Interval, value> pairs
-	 */
-
+	// the party whose position is described
+	private ActorIdType positionParty;	
+	private Interval interval;
+	private long quantity;	// net position for interval
+	// IMPLICIT the market, time granularity, and product
 	
-	EiPosition(Interval boundingInterval, PositionElement positions[])	{
-		/* will have an ordered list of positions - consider Java collection classes */
-		this.boundingInterval = boundingInterval;
-		this.positions = positions;
+	EiPosition()	{
+		// empty for JSON serialization
+	}
+	
+	EiPosition(Interval interval, long quantity, ActorIdType positionParty)	{
+		this.interval = interval;
+		this.quantity = quantity;
+		this.positionParty = positionParty;
 	}
 
+	public ActorIdType getPositionParty() {
+		return positionParty;
+	}
+
+	public void setPositionParty(ActorIdType positionParty) {
+		this.positionParty = positionParty;
+	}
+
+	public Interval getInterval() {
+		return interval;
+	}
+
+	public void setInterval(Interval interval) {
+		this.interval = interval;
+	}
+
+	public long getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
+	}
+	
+	
 }

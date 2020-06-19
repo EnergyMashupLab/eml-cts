@@ -13,8 +13,8 @@ public class EiTender {
 	private Instant expirationTime;
 	private long quantity = 0;
 	private long price = 0;	// cents initially. Parity uses long with number of fractional digits
-	private final Side side;
-	private final boolean integralOnly = false;
+	private SideType side;
+	private final boolean integralOnly = false;	// TODO not set, not serialized but comes through as false. Verify behavior.
 	private TransactiveState transactiveState = TransactiveState.TENDER;
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -33,34 +33,29 @@ public class EiTender {
 			time interval
 	*/
 
-	public EiTender(Interval interval, long quantity, long price, Instant expirationTime, Side side) {
+	public EiTender(Interval interval, long quantity, long price, Instant expirationTime, SideType side) {
 		this.interval = interval;
 		this.quantity = quantity;
 		this.price = price;
 		this.expirationTime = expirationTime;
 		this.side = side;	// side.BUY or side.SELL
-		// other attributes are set to defaults
+		/*
+		 * other attributes are set to defaults
+		 * 
+		 * TODO reorder constructor parameters to mimic parity terminal client -
+		 * 		side, quantity, instrument, price
+		 */
+		
 	}
-
-	/*
-	public void print()	{
-		String printStringFormat =
- "EiTender.print() tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
-		logger.info("LmaController before extracting tender");
-		System.err.println(
-				String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
-				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString()));
-	}	
-	*/
 	
+	@Override
 	public String toString()	{
 		// TODO replace with concatenated strings and toStrings
 		String printStringFormat = 
-"EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
-		logger.info("EiTender toString method");
+				"EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
 
-		return String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
-				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString());
+		return (String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
+				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString()));
 	}	
 	
 	public TenderIdType getTenderId() {
@@ -95,8 +90,12 @@ public class EiTender {
 		return interval;
 	}
 
-	public Side getSide() {
+	public SideType getSide() {
 		return side;
+	}
+
+	public void setSide(SideType side) {
+		this.side = side;
 	}
 
 	public boolean isIntegralOnly() {

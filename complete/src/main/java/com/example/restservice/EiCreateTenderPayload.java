@@ -9,59 +9,56 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class EiCancelTender {
+public class EiCreateTenderPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
-	// Standard has 1..* TenderIdTypes TODO
-	private TenderIdType tenderId;
+	private EiTender tender;
+	
+	/*
+	@JsonIgnore
+	private final Random rand = new Random();
+	 */
 	
 	/*
 	 * Default constructor for JSON deserialization.
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCancelTender()	{
+	public EiCreateTenderPayload()	{		
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
-		this.tenderId = new TenderIdType();
 	}
 
 	/* 
 	 * Parallel for EiCreateTransaction, EiCreateTender:
-	 * 		pass in a completed Tender/Transaction which includes through its Tender
-	 * 		interval, quantity, price, or for EiCancelTender only the TenderIdType.
+	 * 		pass in a completed Tender/Transaction which includes through its Tender interval, quantity, price,
+	 * 		or for EiCancelTender only the TenderId.
+	 * 
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCancelTender(TenderIdType tenderId, ActorIdType party, ActorIdType counterParty) {
-		this.tenderId = tenderId;
+
+	public EiCreateTenderPayload(EiTender tender, ActorIdType party, ActorIdType counterParty) {
+
+		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
+		
+//		System.err.println("EiCreateTender Constructor before this.print()");
+//		this.print();
 	}
 
-	public void print() {
-		String printStringFormat = "EiCancelTender.print() tenderId %d partyId %d counterPartyId %d requestId %d ";
-			
-		System.err.println(String.format(printStringFormat,
-				tenderId.toString(),
-				partyId.value(), 
-				counterPartyId.value(),
-				requestId.value()));
-	}
-	
+	@Override
 	public String toString() {
-		String printStringFormat = "EiCancelTender.print() tenderId %d partyId %d counterPartyId %d requestId %d ";
-			
-		System.err.println(String.format(printStringFormat,
-				tenderId.toString(),
-				partyId.value(), 
-				counterPartyId.value(),
-				requestId.value()));
-		return ("EiCancelTender tenderId " + tenderId.toString() +
-				" party " + partyId.toString() +
-				" counterParty " + counterPartyId.toString() +
-				"requestId " + requestId.toString());
+		return ("EiCreateTenderPayload party " +
+				partyId.value() +
+				" counterParty " +
+				counterPartyId.value() +
+				" requestId " +
+				requestId.toString() +
+				" " +
+				tender.toString());
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -88,14 +85,11 @@ public class EiCancelTender {
 		this.requestId = requestId;
 	}
 
-	public TenderIdType getTenderId() {
-		return tenderId;
+	public EiTender getTender() {
+		return tender;
 	}
 
-	public void setTenderIdType(TenderIdType tenderId) {
-		this.tenderId = tenderId;
+	public void setTender(EiTender tender) {
+		this.tender = tender;
 	}
-	
-	
-	
 }
