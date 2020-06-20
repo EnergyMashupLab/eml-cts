@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * This has more limited functionality than the Parity sim application, which is
  * designed to create random bids and asks
  */
-public class CreateRandomTender {
+public class RandomEiTender {
 
 		@JsonIgnore
 		final static Random rand = new Random();
@@ -51,7 +51,7 @@ public class CreateRandomTender {
 		private EiTender randTender;
 		Interval interval = new Interval(60, dtStart);	//	60 minute interval at dtStart
 		
-		CreateRandomTender()	{
+		RandomEiTender()	{
 			// initialize random generator in class attributes
 			// Local instance variable initializers and instance initializers are executed
 			// after the constructor is invoked
@@ -90,7 +90,7 @@ public class CreateRandomTender {
 
 
 		public static void setDuration(Duration duration) {
-			CreateRandomTender.duration = duration;
+			RandomEiTender.duration = duration;
 		}
 
 

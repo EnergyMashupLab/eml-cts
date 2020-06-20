@@ -32,11 +32,11 @@ public class GreetingController {
 	/*
 	 * GET - /CreateTender responds with a new EiCreateTender
 	 * 		ResponseBody is EiCreateTender
-	 * 	DEBUG version - uses CreateRandomTender, sequential actorId, response tenderId not correlated to any RequestBody
+	 * 	DEBUG version - uses RandomEiTender, sequential actorId, response tenderId not correlated to any RequestBody
 	 */
 	@GetMapping("/CreateTender")
 	public EiCreateTenderPayload eiCreateTenderPayload(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new CreateRandomTender().randomTender();
+		EiTender tempTender = new RandomEiTender().randomTender();
 		EiCreateTenderPayload tempEiCreateTender;
 		
 		// actor Ids will come from POST RequestBody
@@ -46,12 +46,12 @@ public class GreetingController {
 	/*
 	 * GET - /CreateTransaction responds with a new EiCreateTransaction
 	 * 		ResponseBody is EiCreateTransaction
-	 * 	DEBUG version - uses CreateRandomTender, sequential actorId, response tenderId not correlated to any RequestBody
+	 * 	DEBUG version - uses RandomEiTender, sequential actorId, response tenderId not correlated to any RequestBody
 	 */
 	@GetMapping("/CreateTransaction")
 	public EiCreateTransactionPayload eiCreateTransactionPayload(@RequestParam(name = "number", 
 							defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new CreateRandomTender().randomTender();
+		EiTender tempTender = new RandomEiTender().randomTender();
 		EiCreateTransactionPayload tempEiCreateTransactionPayload;
 		EiTransaction tempTransaction;
 
@@ -72,7 +72,7 @@ public class GreetingController {
 	 */
 	@GetMapping("/CancelTender")
 	public EiCancelTenderPayload eiCancelTender(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new CreateRandomTender().randomTender();
+		EiTender tempTender = new RandomEiTender().randomTender();
 		EiCancelTenderPayload tempEiCancelTender;
 		EiTransaction tempTransaction;
 
@@ -93,13 +93,13 @@ public class GreetingController {
 	/*
 	 * GET - /clientCreateTender responds with a new ClientCreateTenderPayload
 	 * 		ResponseBody is ClientCreatedTenderPayload
-	 * 	DEBUG version - uses CreateRandomTender, sequential actorId, response tenderId not correlated
+	 * 	DEBUG version - uses RandomEiTender, sequential actorId, response tenderId not correlated
 	 * 	to any RequestBody
 	 */
 	@GetMapping("/clientCreateTender")
 	public ClientCreateTenderPayload clientCreateTenderPayload(
 					@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new CreateRandomTender().randomTender();		
+		EiTender tempTender = new RandomEiTender().randomTender();		
 		ClientCreateTenderPayload tempClientCreateTenderPayload;
 		EiCreateTenderPayload tempEiCreateTender;
 		

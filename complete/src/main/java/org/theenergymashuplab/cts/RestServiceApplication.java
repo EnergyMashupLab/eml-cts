@@ -36,20 +36,8 @@ public class RestServiceApplication {
     public static void main(String[] args) {
     	restTemplate = builder.build();
     	ActorIdType actorId;
- /*   	FAILS - unknown host. Timing in initialization?
-		actorId = restTemplate.getForObject(
-				"https://lma/party", ActorId.class);
-		logger.info(actorId.toString());
-		
-		actorId = restTemplate.getForObject(
-				"https://lme/party", ActorId.class);
-		logger.info(actorId.toString());
-
-		actorId = restTemplate.getForObject(
-				"https://teua/party", ActorId.class);
-		logger.info(actorId.toString());
- */    	
-    	
+	
+    	new RandomCreateClientTender();	// on System.out before run
     	
         SpringApplication.run(RestServiceApplication.class, args);
     }

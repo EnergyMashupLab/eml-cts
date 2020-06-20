@@ -35,6 +35,21 @@ public class ClientCreateTenderPayload {
 		this.bridgeExpireTime = new BridgeInstant(expire);
 	}
 	
+	// Constructor takes interval description
+	ClientCreateTenderPayload(SideType side, long quantity, long price,
+			Instant dtStart, long minutes)	{
+		// DEBUG start time and expiration time for test payloads
+		Instant expire;
+
+		expire = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
+		
+		this.side = side;
+		this.quantity = quantity;
+		this.price = price;
+		this.bridgeInterval = new BridgeInterval(60, dtStart);
+		this.bridgeExpireTime = new BridgeInstant(expire);
+	}
+	
 	@Override
 	public String toString()	{
 		SideType tempSide = this.side;
