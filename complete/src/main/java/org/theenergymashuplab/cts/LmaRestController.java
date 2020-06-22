@@ -166,7 +166,7 @@ public class LmaRestController {
 //				}
 //			}
 		}	else	{
-			logger.info("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+			logger.debug("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
 					tempCreate.getPartyId().toString() +
 					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
 					" " + tempCreate.getTransaction().toString());

@@ -37,7 +37,7 @@ public class RestServiceApplication {
     	restTemplate = builder.build();
     	ActorIdType actorId;
 	
-    	new RandomCreateClientTender();	// on System.out before run
+//    	new RandomCreateClientTender();	// on System.out before run
     	
         SpringApplication.run(RestServiceApplication.class, args);
     }

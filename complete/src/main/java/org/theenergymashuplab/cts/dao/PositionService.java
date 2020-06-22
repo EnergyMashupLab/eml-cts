@@ -23,7 +23,7 @@ public class PositionService {
 	PositionRepository posRepo;
 	
 	public PositionManagerModel save(@Valid PositionManagerModel pos) {
-		return posRepo.save(pos);
+		return posRepo.save(pos);	// fault
 	}
 	
 	public PositionManagerModel getStatus(long id){

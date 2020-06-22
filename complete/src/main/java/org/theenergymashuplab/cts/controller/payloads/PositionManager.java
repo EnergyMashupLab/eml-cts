@@ -1,3 +1,6 @@
+/*
+ * written by: Dhruvin Desai 202005
+ */
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.Interval;
@@ -24,7 +27,6 @@ import org.theenergymashuplab.cts.dao.PositionService;
 import org.theenergymashuplab.cts.model.PositionManagerModel;
 
 @RestController
-//	@RequestMapping("/position")
 public class PositionManager {
 	private static final Logger logger = LogManager.getLogger(PositionManager.class);
 
@@ -50,13 +52,13 @@ public class PositionManager {
 				posPayload.getInterval().getDtStart(),
 				posPayload.getInterval().getDuration().getSeconds());
 		
-		logger.info(posadd.toString());
+		logger.info("/position/add (signed) " + posadd.toString());
 
 		if (queryresult.isEmpty()) {
 			// New row to be added.
 			// Saving the position.
 			PositionManagerModel temp = null;
-			temp = posDao.save(posadd);
+			temp = posDao.save(posadd);	// invoke native
 
 			// Return output decider.
 			if (temp != null) {
@@ -101,6 +103,9 @@ public class PositionManager {
 		// Querying for data.
 		List<PositionManagerModel> queryresult = posDao.getPositionforDuration(positionParty, interval.getDtStart(),
 				interval.getDuration().getSeconds());
+		
+		logger.info("/position/" + positionParty +"/getPosition: " +
+				"Interval " + interval.toString());
 
 		// Generating response list.
 		PositionGetPayload tpayload = null;

@@ -21,8 +21,8 @@ import javax.validation.constraints.NotNull;
 public class PositionManagerModel {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name = "Sr_No.")
-	private long sr_no;
+	@Column(name = "counter_id")
+	private long counterId;
 	
 	@Column(name = "position_Party")
 	private long positionParty;
@@ -63,6 +63,17 @@ public class PositionManagerModel {
 		this.startTime = null;
 		this.endTime = null;
 	}
+	
+	@Override
+	public String toString()	{
+		return "PositionManagerModel counterId " + counterId +
+				" positionParty " + positionParty +
+				" transactionId " + transactionId +
+				" quantity " + quantity +
+				" startTime " + startTime.toString() +
+				" endTime " + endTime.toString();
+	}
+	
 	/**
 	 * @return the startTime
 	 */
@@ -71,17 +82,17 @@ public class PositionManagerModel {
 	}
 
 	/**
-	 * @return the sr_no
+	 * @return the counterId
 	 */
-	public long getSr_no() {
-		return sr_no;
+	public long getCounterId() {
+		return counterId;
 	}
 
 	/**
-	 * @param sr_no the sr_no to set
+	 * @param counterId the counterId to set
 	 */
-	public void setSr_no(long sr_no) {
-		this.sr_no = sr_no;
+	public void setCounterId(long counterId) {
+		this.counterId = counterId;
 	}
 
 	/**

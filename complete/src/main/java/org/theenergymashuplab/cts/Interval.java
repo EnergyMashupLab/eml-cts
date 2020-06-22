@@ -18,6 +18,11 @@ public class Interval {
 		this.duration = Duration.ofSeconds(60*durationInMinutes);
 		this.dtStart = dtStart;
 	}
+	
+	@Override
+	public String toString()	{
+		return "Interval dtStart" + dtStart.toString() + " duration " + duration.toString();
+	}
 
 	public Duration getDuration() {
 		return duration;

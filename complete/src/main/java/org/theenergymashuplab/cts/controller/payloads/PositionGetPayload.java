@@ -1,7 +1,5 @@
 /*
- * 
- * Updated by: Dhruvin Desai
- * 
+ * written by: Dhruvin Desai 202005
  */
 package org.theenergymashuplab.cts.controller.payloads;
 

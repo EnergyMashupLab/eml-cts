@@ -65,8 +65,8 @@ public class LmeSocketClient	extends Thread {
 	private static int ITERATIONS = 27;
 	
 	public LmeSocketClient()	{
-    	System.err.println("LmeSocketClient: 0 param constructor port " +
-    			port + " ip " + ip + " " + Thread.currentThread().getName());
+//    	System.err.println("LmeSocketClient: 0 param constructor port " +
+//    			port + " ip " + ip + " " + Thread.currentThread().getName());
 	}
 
 	
