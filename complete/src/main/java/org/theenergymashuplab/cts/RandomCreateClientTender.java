@@ -11,6 +11,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class RandomCreateClientTender {
 	
@@ -21,39 +23,54 @@ public class RandomCreateClientTender {
 	// debug - effectively local constants pending richer constructor.
 	public  Instant dtStart = Instant.parse("2020-06-20T00:00:00.00Z");
 	String[] instrumentNames = new String[24];
+	String[] instrumentNamesFromInterval = new String[24];
 	Instant[] instants = new Instant[24];
 	String[] json = new String[50];
 	ClientCreateTenderPayload[] clientTenders = new ClientCreateTenderPayload[50];
 	final ObjectMapper mapper = new ObjectMapper();
 	
 	RandomCreateClientTender()	{
-		// initialize random generator in class attributes
-		// Local instance variable initializers and instance initializers are executed
-		// after the constructor is invoked
+		/*
+		 *	Produces 50 ClientCreateTenderPayload objects and print to System.out.
+		 *
+		 *	initialize random generator in class attributes.
+		 *	Local instance variable initializers and instance initializers are executed
+		 *	after the constructor is invoked 
+		 */
+		
+		System.err.println("RandomCreateClientTender Constructor\n\n");
+//		mapper.configure((SerializationConfig.Feature.valueOf("WRITE_DATES_AS_TIMESTAMPS")), false);		
 		instants[0] = dtStart;
 		for (int i = 1; i < 24; i++) {
 			instants[i] = instants[i-1].plusSeconds(60*60);
-			instrumentNames[i] = new BridgeInstant(instants[i]).toInstrumentName();
 		}
+//		for (int i = 0; i < 24; i++)	{
+////			instrumentNames[i] = new BridgeInstant(instants[i]).toInstrumentName();
+//			instrumentNamesFromInterval[i] = new BridgeInterval(60, instants[i]).toInstrumentName();
+//		}
 		
+		//	TODO BridgeInterval.toInstrumentNames() can address extended interval length encoding
+		
+		// print dtStart and instrument name from each bridgeInstant used BridgeInterval
+		for (int i = 0; i < 24; i++)	{	
+			System.err.println("iteration " + i +
+//				" name from BrInstant " + instrumentNames[i] +
+				" name from BrInterval " + instrumentNamesFromInterval[i] + 
+				" " + instants[i].toString());
+			}
+
+		//	print the json
 		for (int i = 0; i < 50; i++)	{
 			clientTenders[i] = randomTender();
 			try	{
 				json[i] = mapper.writeValueAsString(randomTender());		
 			}	catch (JsonProcessingException e)	{
 				System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
-				}	
-			
+				}				
 			// and print the json
-			System.err.println("***" + json[i] + "***");
-			}
-		
-		// print dtStart and instrument name from each bridgeInstant used BridgeInterval
-		for (int i = 0; i < 24; i++)	{	
-			System.err.println("iteration " + i + " Instrument name " + 
-				clientTenders[i].getBridgeInterval().toInstrumentName() +
-				" " + instants[i].toString());
-			}
+			System.err.println("\n" + json[i] + "***");
+		}
+
 
 		
 	}

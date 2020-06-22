@@ -1,6 +1,6 @@
 package org.theenergymashuplab.cts;
 
-// TYPEPS updated not used - see dao/EiTenderType.java
+// TYPES updated not used - see dao/EiTenderType.java
 
 import java.time.*;
 

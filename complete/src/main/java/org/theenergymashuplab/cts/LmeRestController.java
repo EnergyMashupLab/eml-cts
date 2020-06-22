@@ -69,7 +69,7 @@ public class LmeRestController {
 			LmeRestController.class);
 	
 	LmeRestController()	{
-//		logger.info("LmeRestController zero arg constructor. partyId " + partyId);
+		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
 		
 		//	Start thread to read createTransactionQ and send
 		lmeSendTransactionsThread.start();
@@ -118,9 +118,9 @@ public class LmeRestController {
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
-//		logger.debug("LmeController before constructor for EiCreatedTender " +
-//		tempTender.toString());
-		logger.info("lme/createTender " + eiCreateTender.toString());
+		logger.debug("LmeController before constructor for EiCreatedTender " +
+				tempTender.toString());
+		logger.trace("lme/createTender " + eiCreateTender.toString());
 		
 		/*	ResponseBody
 			public EiCreatedTender(

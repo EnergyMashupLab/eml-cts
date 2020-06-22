@@ -8,14 +8,18 @@
 		<version>2.2.2.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>rest-service</artifactId>
+	<groupId>org.theenergymashuplab</groupId>
+	<artifactId>cts</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>rest-service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Common Transactive Services</name>
+	<description>EML CTS Project Energy Agents</description>
 
 	<properties>
 		<java.version>1.8</java.version>
+		<start-class>org.theenergymashuplab.cts.RestServiceApplication</start-class>
+	<!--
+		<start-class>org.theenergymashuplab.cts.EnergyApplication</start-class>
+	-->
 	</properties>
 
 	<dependencies>

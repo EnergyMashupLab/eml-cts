@@ -98,7 +98,7 @@ public class ClientRestController {
 					new ClientCreatedTransactionPayload();
 			
 		logger.info("/clientCreateTransaction POSTed to /client/" +
-				id + "clientCreateTransaction " +
+				id + "/clientCreateTransaction " +
 				tempClientCreateTransaction.toString());
 		
 		/*
@@ -168,7 +168,7 @@ public class ClientRestController {
 		//	System.err.println(tempTender.toString());	
 		// ClientTender(SideType side, long quantity, long price)	
 		
-		logger.info("End of /client/clientTransaction Return " + tempTransaction.toString());
+		logger.trace("End of /client/clientTransaction Return " + tempTransaction.toString());
 		
 		return  tempTransaction;
 	}
@@ -195,7 +195,7 @@ public class ClientRestController {
 		 * Wait for and return the @ReponseBody as received
 		 */
 		System.err.println("/clientCreateTender received " + clientCreateTender.toString());
-		logger.info("before forwarding CLientCreateTender to TEUA " +
+		logger.debug("before forwarding CLientCreateTender to TEUA " +
 				tempCreate.toString());
 		
 		//	And forward to the TEUA
@@ -204,7 +204,7 @@ public class ClientRestController {
 			("http://localhost:8080/teua/clientCreateTender", tempCreate,
 					ClientCreatedTenderPayload.class);		
 		
-		logger.info("Result is " + result.toString());
+		logger.debug("Result is " + result.toString());
 		
 		return result;
 	}
