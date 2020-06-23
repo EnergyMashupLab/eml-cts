@@ -40,20 +40,45 @@ public class PositionManagerModel {
 	@Column(name = "End_Time")
 	@NotNull
 	private Instant endTime;
+	
+	@Column(name = "unitPrice")
+	private long unitPrice;
+	
+	@Column(name = "counter_Party")
+	private long counterParty;
 
+//	// Class Constructor
+//	public PositionManagerModel(
+//			long positionParty,
+//			long transaction_id,
+//			long quantity,
+//			Instant startTime,
+//			long durationinSeconds) {
+//		this.positionParty = positionParty;
+//		this.transactionId = transaction_id; // Always 0 at this point of time.(Future updated)
+//		this.quantity = quantity;
+//		this.startTime = startTime;
+//		this.endTime = startTime.plusSeconds(durationinSeconds);
+//	}
+	
 	// Class Constructor
 	public PositionManagerModel(
 			long positionParty,
 			long transaction_id,
 			long quantity,
 			Instant startTime,
-			long durationinSeconds) {
+			long durationinSeconds,
+			long unitPrice,
+			long counterParty) {
 		this.positionParty = positionParty;
 		this.transactionId = transaction_id; // Always 0 at this point of time.(Future updated)
 		this.quantity = quantity;
 		this.startTime = startTime;
 		this.endTime = startTime.plusSeconds(durationinSeconds);
+		this.unitPrice = unitPrice;
+		this.counterParty = counterParty;
 	}
+
 	
 	//Default Constructor.
 	public PositionManagerModel() {
@@ -62,16 +87,21 @@ public class PositionManagerModel {
 		this.quantity = 0;
 		this.startTime = null;
 		this.endTime = null;
+		this.unitPrice = 0;;
+		this.counterParty = 0;
 	}
 	
 	@Override
 	public String toString()	{
 		return "PositionManagerModel counterId " + counterId +
 				" positionParty " + positionParty +
-				" transactionId " + transactionId +
+				" counterParty " + counterParty +
 				" quantity " + quantity +
+				" unitPrice " + unitPrice +
+				" transactionId " + transactionId +
 				" startTime " + startTime.toString() +
-				" endTime " + endTime.toString();
+				" endTime " + endTime.toString()
+				;
 	}
 	
 	/**

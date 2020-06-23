@@ -33,8 +33,9 @@ public class PositionManager {
 	@Autowired
 	PositionService posDao;
 
+	// 	add to a position - new version adds a row for each position change and
+	//	stores counterparty and unit price
 	@PostMapping("/position/{positionParty}/add")
-	// add to a position
 	public String createPosition(@PathVariable(value = "positionParty") long positionParty,
 			@RequestBody PositionAddPayload posPayload,
 			HttpServletResponse response) {
@@ -45,16 +46,18 @@ public class PositionManager {
 				0,
 				posPayload.getQuantity(),
 				posPayload.getInterval().getDtStart(),
-				posPayload.getInterval().getDuration().getSeconds());
+				posPayload.getInterval().getDuration().getSeconds(),
+				0,
+				0);
 
-		List<PositionManagerModel> queryresult = posDao.getPositionforUpdate(
-				positionParty,
-				posPayload.getInterval().getDtStart(),
-				posPayload.getInterval().getDuration().getSeconds());
+//		List<PositionManagerModel> queryresult = posDao.getPositionforUpdate(
+//				positionParty,
+//				posPayload.getInterval().getDtStart(),
+//				posPayload.getInterval().getDuration().getSeconds());
 		
 		logger.info("/position/add (signed) " + posadd.toString());
 
-		if (queryresult.isEmpty()) {
+//		if (queryresult.isEmpty()) {
 			// New row to be added.
 			// Saving the position.
 			PositionManagerModel temp = null;
@@ -68,33 +71,35 @@ public class PositionManager {
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				return "ERROR: Not able to store the data.";
 			}
-		} else {
-			// Updating existing row.
-			// Saving the position.
-			int temp = 0;
-			temp = posDao.updatePositionforDuration(
-					positionParty,
-					posPayload.getInterval().getDtStart(),
-					posPayload.getInterval().getDuration().getSeconds(),
-					posPayload.getQuantity());
-
-			// Return output decider.
-			if (temp == 1) {
-				response.setStatus(HttpServletResponse.SC_OK);
-				return "OK";
-			} 
-			else if(temp > 1) {
-				response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-				return "Multiple Rows affected.";
-			}
-			else {
-				response.setStatus(HttpServletResponse.SC_ACCEPTED);
-				return "ERROR: Not able to store the data.";
-			}
-		}
-
+//		} else {
+//			// Updating existing row.
+//			// Saving the position.
+//			int temp = 0;
+//			temp = posDao.updatePositionforDuration(
+//					positionParty,
+//					posPayload.getInterval().getDtStart(),
+//					posPayload.getInterval().getDuration().getSeconds(),
+//					posPayload.getQuantity());
+//
+//			// Return output decider.
+//			if (temp == 1) {
+//				response.setStatus(HttpServletResponse.SC_OK);
+//				return "OK";
+//			} 
+//			else if(temp > 1) {
+//				response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+//				return "Multiple Rows affected.";
+//			}
+//			else {
+//				response.setStatus(HttpServletResponse.SC_ACCEPTED);
+//				return "ERROR: Not able to store the data.";
+//			}
+//		}
 	}
 
+	//	return position - adds up rows in table for positionParty and interval
+	//	Returns a single value as first (and only) item of list.
+	//	TODO consider extension for multiple intervals
 	@GetMapping("/position/{positionParty}/getPosition")
 	public ArrayList<PositionGetPayload> getPosition(@PathVariable(value = "positionParty") long positionParty,
 			@RequestBody Interval interval) {
