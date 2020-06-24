@@ -1,7 +1,5 @@
 package org.theenergymashuplab.cts;
 
-import java.time.*;
-
 public class EiCreatedTransactionPayload {
 	private TransactionIdType transactionId;
 	private ActorIdType partyId;

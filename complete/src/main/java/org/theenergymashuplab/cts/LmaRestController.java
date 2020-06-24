@@ -1,21 +1,12 @@
 package org.theenergymashuplab.cts;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
@@ -35,7 +25,6 @@ public class LmaRestController {
 	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
-	private static boolean dumpMap = true;
 	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
 	
 	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
@@ -46,7 +35,7 @@ public class LmaRestController {
 	private static final Logger logger = LogManager.getLogger(
 			LmaRestController.class);
 	
-	public void LmaRestController()	{	// zero parameter constructor
+	public LmaRestController()	{	// zero parameter constructor
 		logger.trace("LMA zero parameter constructor");
 	}
 	
@@ -55,7 +44,7 @@ public class LmaRestController {
 	 */
 	@GetMapping("/party")
 	public ActorIdType getParty() {
-		return this.partyId;
+		return LmaRestController.partyId;
 	}
 	
 	/*
@@ -68,9 +57,7 @@ public class LmaRestController {
 	public EiCreatedTenderPayload 	postEiCreateTender(
 			@RequestBody EiCreateTenderPayload eiCreateTender)	{
 
-		EiTender tempTender;
 		EiCreateTenderPayload tempCreate;
-		EiCreatedTenderPayload tempCreated;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
 		EiCreatedTenderPayload tempPostResponse; 
 
@@ -81,7 +68,6 @@ public class LmaRestController {
     	
 		// save CreateTender message as sent by TEUA
 		tempCreate = eiCreateTender;	
-		tempTender = tempCreate.getTender(); // and pull out Tender
 		
 		logger.debug("postEiCreateTender to LME. TenderId " +
 				tempCreate.getTender().getTenderId().toString());
@@ -114,11 +100,9 @@ public class LmaRestController {
 	public EiCreatedTransactionPayload postEiCreateTransactionPayload(
 			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
 
-		EiTender tempTender;
 		ActorIdType tempPartyId;
-		EiTransaction tempTransaction;
 		EiCreateTransactionPayload tempCreate;
-		EiCreatedTransactionPayload tempCreated, tempPostResponse;
+		EiCreatedTransactionPayload tempPostResponse;
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
@@ -134,8 +118,6 @@ public class LmaRestController {
 		 */
 		//	local temporary variables
 		tempCreate = eiCreateTransactionPayload;
-		tempTransaction = eiCreateTransactionPayload.getTransaction();
-		tempTender = tempCreate.getTransaction().getTender();
 
 		/*
 		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
@@ -190,9 +172,8 @@ public class LmaRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTenderPayload postEiCancelTenderPayload(
 			@RequestBody EiCancelTenderPayload eiCancelTender)	{
-		TenderIdType tempTenderId;
 		EiCancelTenderPayload tempCancel;	
-		EICanceledTenderPayload tempCanceled, tempPostResponse;
+		EICanceledTenderPayload tempPostResponse;
 
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();

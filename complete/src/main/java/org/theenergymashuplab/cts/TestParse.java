@@ -3,9 +3,6 @@ package org.theenergymashuplab.cts;
 
 import java.time.*;
 
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
-
 /*
 	Tests the java.time parsing of 8601 strings and other indicators
 */
@@ -15,20 +12,16 @@ public class TestParse {
 	public static void main(String[] args) {
 		Instant dtStart;
 		Instant nowInstant;
-		String tempString = "";
 		LocalDateTime localDateTime;
 		// use ZonedDateTime.ofLocal to take local DateTime and include Zone 
 		ZonedDateTime zonedDateTime;
-		ZonedDateTime now = ZonedDateTime.now();
 		ZoneId zoneId = ZoneId.systemDefault();
-		ZoneId zoneIdTemp, zoneIdTemp2, zoneIdTemp3;
+		ZoneId zoneIdTemp, zoneIdTemp2;
 		String zoneIdString = "";
-		ZoneOffset zoneOffset;
 		ZoneOffset current = zoneId.getRules().getOffset(Instant.now());
 		
 		zoneIdTemp = ZoneId.systemDefault().normalized();
 		zoneIdTemp2 = zoneIdTemp.normalized();
-		zoneIdTemp3 = ZoneId.of("America/New_York");
 		System.out.println("zoneIdTemp normalized is " + zoneIdTemp2.toString());
 		
 		OffsetDateTime offsetDateTime;

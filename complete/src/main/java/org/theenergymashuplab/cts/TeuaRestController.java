@@ -1,34 +1,22 @@
 package org.theenergymashuplab.cts;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 //For RestTemplate
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
 
 /*
  * NEXT STEPS: incorporate dynamic URIs for the TEUAs, of the form
@@ -60,7 +48,6 @@ public class TeuaRestController {
 	private Long[] actorNumericIds; 	    // actorNumericIds for each client/{id}
 	private ActorIdType[] actorIds;			// ActorIdType values for the created actors
 	String[] postClientCreateTransactionUri;	// URI to post to client[i]
-	private String[] postUriClientTransaction;
 
 //	public static ConcurrentHashMap<ActorIdType, String> postLmaToTeuaPartyIdMap; in LMA
     
@@ -68,8 +55,6 @@ public class TeuaRestController {
     public final int DEFAULT_COUNT = 20;
     public final int MAX_COUNT = 2000;
     private int idLimit;
-    private String idString = null;
-    private int myWorkingId = 0;
 
 	// for randomized quantity and price for testing
 	final static Random rand = new Random();	
@@ -172,7 +157,7 @@ public class TeuaRestController {
 		EiTransaction tempTransaction;
 		// tempPostReponse responds to POST to /sc
 		EiCreateTransactionPayload tempCreate;
-		EiCreatedTransactionPayload tempCreated, tempPostResponse;
+		EiCreatedTransactionPayload tempCreated;
 		ClientCreatedTransactionPayload clientCreated;
 		ClientCreateTransactionPayload	clientCreate;
 		Integer numericTeuaId = -1;
@@ -239,14 +224,10 @@ public class TeuaRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTenderPayload postEiCancelTender(
 				@RequestBody EiCancelTenderPayload eiCancelTender)	{
-		TenderIdType tempTenderId;
 		EiCancelTenderPayload tempCancel;	
 		EICanceledTenderPayload tempCanceled;
 		
 		tempCancel = eiCancelTender;
-		tempTenderId = eiCancelTender.getTenderId();
-
-		
 		tempCanceled = new EICanceledTenderPayload(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
@@ -270,12 +251,10 @@ public class TeuaRestController {
 	public ClientCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateTenderPayload clientCreateTender)	{
-		TenderIdType tempTenderId;
 		ClientCreateTenderPayload tempClientCreateTender;	
-		ClientCreatedTenderPayload tempCreated, tempReturn;
+		ClientCreatedTenderPayload tempReturn;
 		EiTender tender;
-		EiCreateTenderPayload eiCreateTender;
-		EiCreatedTenderPayload lmaCreatedTender;		
+		EiCreateTenderPayload eiCreateTender;		
 		Integer numericTeuaId = -1;
 		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();

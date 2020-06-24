@@ -8,9 +8,7 @@ public class MarketCreatedTransactionPayload {
 	private Boolean success = false;
 	private String info = "MarketCreatedTransactionPayload";
 	// return  created TransactionIdType to CtsBridge
-	private TransactionIdType ctsTransactionId = new TransactionIdType();
 	//return MarketCreateTransactionPayload matchNumber as correlation ID
-	private long parityMatchNumber = 0; 
 	
 	MarketCreatedTransactionPayload()	{
 		success = true;

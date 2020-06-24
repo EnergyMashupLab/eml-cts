@@ -4,18 +4,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Set;
-
-
 
 public class LmeSendTransactions	extends Thread	{
 	
@@ -29,7 +19,6 @@ public class LmeSendTransactions	extends Thread	{
 	 */
 	@Override
 	public void run()		{
-		EiCreatedTransactionPayload tempPostResponse;
 		EiCreateTransactionPayload eiCreateTransaction = null;
 		
 		while(true)	{
@@ -41,7 +30,6 @@ public class LmeSendTransactions	extends Thread	{
 		}
 		if (eiCreateTransaction != null)	{
 			logger.debug("CreateTransaction " + eiCreateTransaction.toString());
-			tempPostResponse = postClientCreateTransaction(eiCreateTransaction);
 		}
 		else logger.info("eiCreateTransaction null");
 		
