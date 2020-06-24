@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -41,26 +42,16 @@ public class PositionManagerModel {
 	@NotNull
 	private Instant endTime;
 	
+	@Column(name =  "duration_minutes")
+	@NotNull
+	private long durationInMinutes;
+	
 	@Column(name = "unitPrice")
 	private long unitPrice;
 	
 	@Column(name = "counter_Party")
 	private long counterParty;
 
-//	// Class Constructor
-//	public PositionManagerModel(
-//			long positionParty,
-//			long transaction_id,
-//			long quantity,
-//			Instant startTime,
-//			long durationinSeconds) {
-//		this.positionParty = positionParty;
-//		this.transactionId = transaction_id; // Always 0 at this point of time.(Future updated)
-//		this.quantity = quantity;
-//		this.startTime = startTime;
-//		this.endTime = startTime.plusSeconds(durationinSeconds);
-//	}
-	
 	// Class Constructor
 	public PositionManagerModel(
 			long positionParty,
@@ -75,6 +66,7 @@ public class PositionManagerModel {
 		this.quantity = quantity;
 		this.startTime = startTime;
 		this.endTime = startTime.plusSeconds(durationinSeconds);
+		this.durationInMinutes = durationinSeconds/60;
 		this.unitPrice = unitPrice;
 		this.counterParty = counterParty;
 	}
@@ -87,6 +79,7 @@ public class PositionManagerModel {
 		this.quantity = 0;
 		this.startTime = null;
 		this.endTime = null;
+		this.durationInMinutes = 0;
 		this.unitPrice = 0;;
 		this.counterParty = 0;
 	}
@@ -186,6 +179,36 @@ public class PositionManagerModel {
 	 */
 	public void setQuantity(long quantity) {
 		this.quantity = quantity;
+	}
+
+
+	public long getDurationInMinutes() {
+		return durationInMinutes;
+	}
+
+
+	public void setDurationInMinutes(long durationInMinutes) {
+		this.durationInMinutes = durationInMinutes;
+	}
+
+
+	public long getUnitPrice() {
+		return unitPrice;
+	}
+
+
+	public void setUnitPrice(long unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+
+
+	public long getCounterParty() {
+		return counterParty;
+	}
+
+
+	public void setCounterParty(long counterParty) {
+		this.counterParty = counterParty;
 	}
 	
 }

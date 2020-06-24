@@ -4,6 +4,7 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.Interval;
+import org.theenergymashuplab.cts.model.PositionSummaryModel;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -103,23 +104,27 @@ public class PositionManager {
 	@GetMapping("/position/{positionParty}/getPosition")
 	public ArrayList<PositionGetPayload> getPosition(@PathVariable(value = "positionParty") long positionParty,
 			@RequestBody Interval interval) {
+		
 		ArrayList<PositionGetPayload> dataList = new ArrayList<PositionGetPayload>();
 
 		// Querying for data.
-		List<PositionManagerModel> queryresult = posDao.getPositionforDuration(positionParty, interval.getDtStart(),
+		
+		// TODO parameters for getPositionTotalforDuration are wrong?
+		Instant startTime, endTime;	// for the interval
+		startTime = interval.getDtStart();
+		endTime = startTime.plus(interval.getDuration());	// TODO verify
+		List<PositionSummaryModel> queryresult = posDao.getPositionTotalforDuration(positionParty, startTime,
 				interval.getDuration().getSeconds());
 		
-		logger.info("/position/" + positionParty +"/getPosition: " +
-				"Interval " + interval.toString());
+		logger.info("/position/" + positionParty +"/getPosition: " + interval.toString() + queryresult.size());
 
 		// Generating response list.
 		PositionGetPayload tpayload = null;
 		Interval tinterval = null;
 
-		for (PositionManagerModel tposmod : queryresult) {
-			tinterval = new Interval(Duration.between(tposmod.getStartTime(), tposmod.getEndTime()).toMinutes(),
-					tposmod.getStartTime());
-			tpayload = new PositionGetPayload(tinterval, tposmod.getQuantity());
+		for (PositionSummaryModel tposmod : queryresult) {
+			tinterval = new Interval(tposmod.getDurationInMinutes(), tposmod.getStartTime());
+			tpayload = new PositionGetPayload(tinterval, tposmod.getTotalQuantity());
 
 			// Adding to the dataList.
 			dataList.add(tpayload);

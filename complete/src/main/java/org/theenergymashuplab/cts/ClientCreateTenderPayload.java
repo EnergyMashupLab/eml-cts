@@ -30,6 +30,7 @@ public class ClientCreateTenderPayload {
 		this.side = side;
 		this.quantity = quantity;
 		this.price = price;
+		this.ctsTenderId = 0;
 		// DEBUG this.expireTime = expire;
 		this.bridgeInterval = new BridgeInterval(60, dtStart);
 		this.bridgeExpireTime = new BridgeInstant(expire);
