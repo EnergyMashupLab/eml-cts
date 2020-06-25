@@ -321,8 +321,8 @@ public class TeuaRestController {
 		
 		
 		//convert to URI for position manager
-		positionUri = "/position/" +
-				" actorNumericIds[teuaId].toString()" +
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
 				"/getPosition";
 		logger.info("positionUri is " + positionUri);
 		
@@ -404,7 +404,7 @@ public class TeuaRestController {
 		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateTender.setCounterPartyId(lmePartyId);
 		
-		logger.debug("TEUA sending EiCreateTender to LMA " +
+		logger.trace("TEUA sending EiCreateTender to LMA " +
 				eiCreateTender.toString());
 			
 		//	And forward to the LMA

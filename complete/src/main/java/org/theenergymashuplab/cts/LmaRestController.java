@@ -135,34 +135,7 @@ public class LmaRestController {
 		String positionResponse;
 		PositionAddPayload positionAddPayload;
 
-		
-//		//convert to URI for position manager
-//				positionUri = "/position/" +
-//						" actorNumericIds[teuaId].toString()" +
-//						"/getPosition";
-//				logger.info("positionUri is " + positionUri);
-//				
-//				logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
-//				logger.debug("postEiCreateTender teuaId " +
-//					teuaId +
-//					" actorNumericIds[teuaId] " +
-//					actorIds[numericTeuaId].toString());
-
-
-//		// request position for  positionParty in positionInterval
-////		RestTemplate restTemplate = builder.build();
-//		positionUri = "http://localhost:8080/position/" +
-//				positionParty.toString() +
-//				"getPosition";
-//		
-//		
-//		positionResponseList = restTemplate.getForObject(
-//				positionUri,
-//				PositionResponseList.class);
-//		logger.info("return from " + positionUri +
-//				" result " + positionResponseList.toString());
-
-		
+		logger.info("Start of EiCreateTransaction in LMA");
 		/*
 		 * Originated by LME and forwarded by LMA to TEUA based on market match
 		 * and party. Rewrite messages so party and counterpary are counter-symmetric
@@ -175,24 +148,30 @@ public class LmaRestController {
 		tempPartyId = tempCreate.getPartyId();
 		positionParty = tempPartyId;
 		positionInterval = tempTender.getInterval();
+		logger.info("positionParty.toString is " + positionParty + " positionInterval " +
+				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
+		
 		positionUri = "http://localhost:8080/position/" +
 				positionParty.toString() +
-				"add";
+				"/add";
+		logger.info("positionUri '" + positionUri);
 		
 		positionQuantity = (tempTender.getSide() == SideType.BUY ? tempTender.getQuantity() :
 				-tempTender.getQuantity());
 		
-//		restTemplate = builder.build();
+		logger.info("positionQuantity " + positionQuantity);
 
 		// add the algebraic signed position from EiCreateTransactionPayload and send
 		positionAddPayload = new PositionAddPayload(positionInterval, positionQuantity);
 
+		logger.info("Before call to " + positionUri);
 		positionResponse = restTemplate.postForObject(
 				positionUri,
 				positionAddPayload,
 				String.class);
 		logger.info("return from " + positionUri +
 				" result " + positionResponse);
+
 
 		/*
 		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
@@ -223,7 +202,7 @@ public class LmaRestController {
 //				}
 //			}
 		}	else	{
-			logger.debug("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+			logger.info("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
 					tempCreate.getPartyId().toString() +
 					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
 					" " + tempCreate.getTransaction().toString());

@@ -120,7 +120,7 @@ public class LmeRestController {
 
 		logger.debug("LmeController before constructor for EiCreatedTender " +
 				tempTender.toString());
-		logger.info("lme/createTender " + eiCreateTender.toString());
+		logger.debug("lme/createTender " + eiCreateTender.toString());
 		
 		/*	ResponseBody
 			public EiCreatedTender(
