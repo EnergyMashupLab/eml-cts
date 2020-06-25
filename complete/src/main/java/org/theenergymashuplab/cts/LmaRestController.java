@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
@@ -25,6 +26,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+import org.theenergymashuplab.cts.controller.payloads.PositionGetPayload;
+import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/lma")
@@ -123,25 +127,78 @@ public class LmaRestController {
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
 		restTemplate = builder.build();
+		
+		ActorIdType positionParty;
+		Interval positionInterval;
+		String positionUri;
+		long positionQuantity;
+		String positionResponse;
+		PositionAddPayload positionAddPayload;
 
+		
+//		//convert to URI for position manager
+//				positionUri = "/position/" +
+//						" actorNumericIds[teuaId].toString()" +
+//						"/getPosition";
+//				logger.info("positionUri is " + positionUri);
+//				
+//				logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+//				logger.debug("postEiCreateTender teuaId " +
+//					teuaId +
+//					" actorNumericIds[teuaId] " +
+//					actorIds[numericTeuaId].toString());
+
+
+//		// request position for  positionParty in positionInterval
+////		RestTemplate restTemplate = builder.build();
+//		positionUri = "http://localhost:8080/position/" +
+//				positionParty.toString() +
+//				"getPosition";
+//		
+//		
+//		positionResponseList = restTemplate.getForObject(
+//				positionUri,
+//				PositionResponseList.class);
+//		logger.info("return from " + positionUri +
+//				" result " + positionResponseList.toString());
+
+		
 		/*
 		 * Originated by LME and forwarded by LMA to TEUA based on market match
-		 * and party
-		 * 
-		 * TODO verify that rewritten message has correct party and counterparty
-		 * 
-		 * NOTE synchronous, uses TEUA EiCreatedTransaction back to LME
+		 * and party. Rewrite messages so party and counterpary are counter-symmetric
 		 */
 		//	local temporary variables
 		tempCreate = eiCreateTransactionPayload;
 		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
 
+		tempPartyId = tempCreate.getPartyId();
+		positionParty = tempPartyId;
+		positionInterval = tempTender.getInterval();
+		positionUri = "http://localhost:8080/position/" +
+				positionParty.toString() +
+				"add";
+		
+		positionQuantity = (tempTender.getSide() == SideType.BUY ? tempTender.getQuantity() :
+				-tempTender.getQuantity());
+		
+//		restTemplate = builder.build();
+
+		// add the algebraic signed position from EiCreateTransactionPayload and send
+		positionAddPayload = new PositionAddPayload(positionInterval, positionQuantity);
+
+		positionResponse = restTemplate.postForObject(
+				positionUri,
+				positionAddPayload,
+				String.class);
+		logger.info("return from " + positionUri +
+				" result " + positionResponse);
+
 		/*
 		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
 		 * 	the EiCreateTransactionPayload
 		 */
-		tempPartyId = tempCreate.getPartyId();
+		
 		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
 				tempCreate.toString());
 		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());

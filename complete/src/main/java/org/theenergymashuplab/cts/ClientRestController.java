@@ -177,8 +177,12 @@ public class ClientRestController {
 	 * POST - /clientCreateTender - a simple pass through to TEUA
 	 * 
 	 * Simplifies use of Postman for testing
+	 * 
+	 * NOTE that the quantity in a ClientCreateTender is FULL REQUIREMENTS for the
+	 * Interval. The User Agent will adjust that request by energy already bought or sold
+	 * on behalf of this client for the Interval, to get a net amount to go from the client's position
+	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
 	 */
-	
 	@PostMapping("/clientCreateTender")
 	public ClientCreatedTenderPayload postClientCreateTender(
 				@RequestBody ClientCreateTenderPayload clientCreateTender)	{

@@ -17,10 +17,14 @@ public class PositionResponseList {
 		String outString = new String();
 		
 		for (int i = 0; i < responseList.size(); i++)	{
-			outString = outString + responseList.get(i);
+			outString = outString + " '" + responseList.get(i);
 		}
 		
 		return outString;
+	}
+	
+	public long getFirstPositionQuantity()	{
+		return responseList.get(0).getQuantity();
 	}
 
 	public ArrayList<PositionGetPayload> getResponseList() {

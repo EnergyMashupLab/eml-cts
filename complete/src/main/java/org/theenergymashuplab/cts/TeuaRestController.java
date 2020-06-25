@@ -273,7 +273,12 @@ public class TeuaRestController {
 	 * 
 	 * Processing the request from the Building Controller (SC/Client)
 	 * Return the ClientCreatedTenderPayload which is just CTS TenderId for new tender
-	 */	
+	 * 
+	 * NOTE that the quantity in a ClientCreateTender is FULL REQUIREMENTS for the
+	 * Interval. The User Agent will adjust that request by energy already bought or sold
+	 * on behalf of this client for the Interval, to get a net amount to go from the client's position
+	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
+	 */
 	@PostMapping("{teuaId}/clientCreateTender")
 	public ClientCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
@@ -286,12 +291,17 @@ public class TeuaRestController {
 		EiCreatedTenderPayload lmaCreatedTender;		
 		Integer numericTeuaId = -1;
 		long fullRequirements;
+		long fromTenderSigned, fromPositionSigned;
 		ActorIdType positionParty;
 		Interval positionInterval;
 		ArrayList<PositionGetPayload> positionResponse;
 		String positionUri;
 		PositionGetPayload[] positionArrayResponse;
 		PositionResponseList positionResponseList;
+		long positionReponseListSize;
+		SideType tempSide;
+		long newTenderQuantity;
+		SideType newTenderSide;
 
 		
 		
@@ -335,24 +345,49 @@ public class TeuaRestController {
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
 		
-		// build position request for this UA, adjust fullNeeds to netNeeds,
-		// then create the EiTender
-		positionInterval = tempClientCreateTender.getInterval();
-		positionParty = actorIds[numericTeuaId];
-		fullRequirements = tempClientCreateTender.getQuantity();
-		
-		// request position for  positionParty in positionInterval
-//		RestTemplate restTemplate = builder.build();
-		positionUri = "http://localhost:8080/position/" +
-				positionParty.toString() +
-				"getPosition";
-		
-		
-		positionResponseList = restTemplate.getForObject(
-				positionUri,
-				PositionResponseList.class);
-		logger.info("return from " + positionUri +
-				" result " + positionResponseList.toString());
+//		// build position request for this UA, adjust fullNeeds to netNeeds,
+//		// then create the EiTender
+//		positionInterval = tempClientCreateTender.getInterval();
+//		positionParty = actorIds[numericTeuaId];
+//		fullRequirements = tempClientCreateTender.getQuantity();
+//		
+//		// request position for  positionParty in positionInterval
+////		RestTemplate restTemplate = builder.build();
+//		positionUri = "http://localhost:8080/position/" +
+//				positionParty.toString() + "getPosition";
+//		
+//		positionResponseList = restTemplate.getForObject(
+//				positionUri,
+//				PositionResponseList.class);
+//		logger.info("return from " + positionUri +
+//				" result " + positionResponseList.toString());
+//		
+//		positionReponseListSize = positionResponseList.getResponseList().size();
+//
+//		
+//		//	TODO conditioned on whether ClientCreateTenderPayload ignorePosition is true
+//		//	TODO input to Teua algorithms. Issues include how to deal with the fact thast
+//		//	not all Tenders turn into transactions
+//		//	We only record transaction and in the LMA+PositionManager
+//		if (true)	{	// TODO use ignorePosition in future version
+//			// TODO eventually with mixed intervals the response may be a list of size > 1'
+//			if (positionReponseListSize == 0)
+//				logger.info("positionResponseList size not as expected " +
+//						positionReponseListSize);
+//			
+//			// TODO compute modified tender quantity if indicated by ignorePosition
+//			
+//			// from ClientCreateTender use quantity and side
+//			fromTenderSigned = (clientCreateTender.getSide() == SideType.BUY ? clientCreateTender.getQuantity() :
+//				-clientCreateTender.getQuantity());
+//			
+//			//	from getPosition response take signed value
+//			fromPositionSigned = positionResponseList.getFirstPositionQuantity();
+//			// new quantity for EiCreateTender is the sum of these
+//			
+////			newTenderQuantity = fromTenderSigned - fromPositionSigned;
+////			 // compute newTenderSide from signed - may change sides
+//		}
 		
 		
 		tender = new EiTender(
