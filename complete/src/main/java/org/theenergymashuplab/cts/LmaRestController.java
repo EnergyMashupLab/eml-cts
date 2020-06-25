@@ -87,7 +87,7 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;	
 		tempTender = tempCreate.getTender(); // and pull out Tender
 		
-		logger.info("postEiCreateTender to LME. TenderId " +
+		logger.debug("postEiCreateTender to LME. TenderId " +
 				tempCreate.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
@@ -135,7 +135,7 @@ public class LmaRestController {
 		String positionResponse;
 		PositionAddPayload positionAddPayload;
 
-		logger.info("Start of EiCreateTransaction in LMA");
+		logger.debug("Start of EiCreateTransaction in LMA");
 		/*
 		 * Originated by LME and forwarded by LMA to TEUA based on market match
 		 * and party. Rewrite messages so party and counterpary are counter-symmetric
@@ -148,28 +148,27 @@ public class LmaRestController {
 		tempPartyId = tempCreate.getPartyId();
 		positionParty = tempPartyId;
 		positionInterval = tempTender.getInterval();
-		logger.info("positionParty.toString is " + positionParty + " positionInterval " +
+		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
 				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
 		
 		positionUri = "http://localhost:8080/position/" +
 				positionParty.toString() +
 				"/add";
-		logger.info("positionUri '" + positionUri);
 		
 		positionQuantity = (tempTender.getSide() == SideType.BUY ? tempTender.getQuantity() :
 				-tempTender.getQuantity());
 		
-		logger.info("positionQuantity " + positionQuantity);
+		logger.info("positionUri '" + positionUri + " positionQuantity " + positionQuantity);
 
 		// add the algebraic signed position from EiCreateTransactionPayload and send
 		positionAddPayload = new PositionAddPayload(positionInterval, positionQuantity);
 
-		logger.info("Before call to " + positionUri);
+		logger.trace("Before call to " + positionUri);
 		positionResponse = restTemplate.postForObject(
 				positionUri,
 				positionAddPayload,
 				String.class);
-		logger.info("return from " + positionUri +
+		logger.debug("return from " + positionUri +
 				" result " + positionResponse);
 
 
@@ -202,7 +201,7 @@ public class LmaRestController {
 //				}
 //			}
 		}	else	{
-			logger.info("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
 					tempCreate.getPartyId().toString() +
 					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
 					" " + tempCreate.getTransaction().toString());

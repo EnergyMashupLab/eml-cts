@@ -324,7 +324,7 @@ public class TeuaRestController {
 		positionUri = "/position/" 
 				 + actorIds[numericTeuaId] +
 				"/getPosition";
-		logger.info("positionUri is " + positionUri);
+		logger.debug("positionUri is " + positionUri);
 		
 		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
 		logger.debug("postEiCreateTender teuaId " +

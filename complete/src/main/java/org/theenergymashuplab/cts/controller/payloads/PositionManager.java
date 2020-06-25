@@ -52,7 +52,7 @@ public class PositionManager {
 				posPayload.getInterval().getDtStart(),
 				posPayload.getInterval().getDuration().getSeconds());
 		
-		logger.info("/position/add (signed) " + posadd.toString());
+		logger.debug("/position/add (signed) " + posadd.toString());
 
 		if (queryresult.isEmpty()) {
 			// New row to be added.
