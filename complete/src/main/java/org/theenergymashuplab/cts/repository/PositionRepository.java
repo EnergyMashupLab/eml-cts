@@ -51,7 +51,27 @@ public interface PositionRepository extends JpaRepository<PositionManagerModel, 
 	//	getPositionTotalforDuration(positionParty, startTime, endTime) returns list of PositionSummaryModel
 //	@Modifying
 //	@Transactional(readOnly = true)
-	@Query(nativeQuery = true, value = "select row_number() over() as id, " + "position_party, start_time, duration_minutes, SUM(quantity) " +
+	
+	/*	line starting "create or replace" in -
+	 * 		could not extract ResultSet; nested exception is org.hibernate.exception.GenericJDBCException:
+	 * 		could not extract ResultSet
+	 * 
+	 * 	line commentd out -
+	 * 		Interval with no positions - returns []
+	 * 		Interval with positions - error
+	 * 			Failed to convert from type [java.lang.Object[]] to type 
+	 * 			[org.theenergymashuplab.cts.model.PositionSummaryModel] for value 
+	 * 			'{1, 24, 2020-06-30 12:00:00.0, 60, 109}';
+	 * 		 nested exception is org.springframework.core.convert.ConverterNotFoundException:
+	 * 		No converter found capable of converting from type [java.math.BigInteger] to type 
+	 * 		[org.theenergymashuplab.cts.model.PositionSummaryModel]
+	 * 		
+	 */
+	
+	// same line out - 
+	@Query(nativeQuery = true, value = 
+//			"create or replace view Position_Sum as " +
+			"select row_number() over() as id, " + "position_party, start_time, duration_minutes, SUM(quantity) " +
 			"AS TotalQuantity from position p " +
 			"where ((p.position_party = :positionParty) AND (p.start_time >= :sTime AND p.end_time <= :eTime)) " +
 			"group by position_party, start_time, duration_minutes")

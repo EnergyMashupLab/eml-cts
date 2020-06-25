@@ -13,8 +13,8 @@ import javax.persistence.Table;
 
 // Compound Key for the Entity is position_party and start_time NOT USED
 
-//@Entity
-// not needed?		//@Table(name="Position")
+@Entity
+@Table(name="Position_Sum")
 //@IdClass(PositionId.class)
 public class PositionSummaryModel {
 	
@@ -63,12 +63,19 @@ public class PositionSummaryModel {
 	public String toString()	{
 //		return "PositionManagerModel counterId " + counterId +
 				
-		return "PositionManagerModel " +
+		return "PositionSummaryModel " +
+				" id " + id +
 				" positionParty " + positionParty +
 				" startTime " + startTime.toString()
 				+ "durationInMinutes " + durationInMinutes;
 	}
+	
 
+	public long getId() {
+		return id;
+	}
+
+	
 	public long getPositionParty() {
 		return positionParty;
 	}
