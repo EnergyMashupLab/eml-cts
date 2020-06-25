@@ -8,11 +8,13 @@
 		<version>2.1.9.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>corg.theenergymashuplab</groupId>
-	<artifactId>cts</artifactId>
+	<groupId>org.theenergymashuplab</groupId>
+	<artifactId>cts-rtb</artifactId>
+<!--
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>EML Spring Project</name>
+-->
+	<version>0.9-SNAPSHOT</version>
+	<name>EML CTS Project</name>
 	<url>http://maven.apache.org</url>
 	<description>EML project for Spring Boot</description>
 
@@ -109,7 +111,7 @@ Exclude Spring Boot's Default Logging -->
 	</dependencies>
 
 	<build>
-		<finalName>EML Spring Project</finalName>
+		<finalName>eml-cts</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import java.time.*;
 
 @SpringBootApplication
-public class RestServiceApplication {
+public class EnergyApplication {
 	
 	/*
 	 * Global constants
@@ -24,7 +24,7 @@ public class RestServiceApplication {
 	
 	
 	private static final Logger logger = LogManager.getLogger(
-			RestServiceApplication.class);
+			EnergyApplication.class);
 	// Application general logger from NIST-CTS-Agents
 	private static final Logger logger2 = LogManager.getLogger(
 			"application_general_logger");
@@ -39,7 +39,7 @@ public class RestServiceApplication {
 	
 //    	new RandomCreateClientTender();	// on System.out before run
     	
-        SpringApplication.run(RestServiceApplication.class, args);
+        SpringApplication.run(EnergyApplication.class, args);
     }
     
 	@Bean

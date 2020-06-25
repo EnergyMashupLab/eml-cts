@@ -215,9 +215,9 @@ public class LmeSocketServer extends Thread	{
             		LmeRestController.eiCreateTransactionQueue.put(matchEiCreateTransaction);
             		LmeRestController.eiCreateTransactionQueue.put(eiCreateTransaction);
                     
-            		logger.info("LmeSocketServer enqueued " +             
+            		logger.debug("LmeSocketServer enqueued " +             
             				" " + matchEiCreateTransaction.toString());
-                    logger.info("LmeSocketServer enqueued " +
+            		logger.debug("LmeSocketServer enqueued " +
                     		" " + eiCreateTransaction.toString());
                     // safe to remove the previous HashMap entry for this matchNumber as there was
                     // exactly one in the HashMap

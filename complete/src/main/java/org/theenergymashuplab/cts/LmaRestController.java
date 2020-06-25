@@ -83,7 +83,7 @@ public class LmaRestController {
 		tempCreate = eiCreateTender;	
 		tempTender = tempCreate.getTender(); // and pull out Tender
 		
-		logger.debug("postEiCreateTender to LME. TenderId " +
+		logger.info("postEiCreateTender to LME. TenderId " +
 				tempCreate.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin

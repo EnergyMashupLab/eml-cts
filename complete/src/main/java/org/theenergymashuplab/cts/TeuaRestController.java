@@ -2,8 +2,11 @@ package org.theenergymashuplab.cts;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
+//import java.util.Random;
+//import java.util.concurrent.atomic.AtomicLong;
+import java.util.ArrayList;
+import java.util.List;
+import org.theenergymashuplab.cts.controller.payloads.*;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,7 +75,7 @@ public class TeuaRestController {
     private int myWorkingId = 0;
 
 	// for randomized quantity and price for testing
-	final static Random rand = new Random();	
+//	final static Random rand = new Random();	
 	
 	// Constructor for class TeuaRestController - zero parameters
 	public TeuaRestController()	{
@@ -161,6 +164,8 @@ public class TeuaRestController {
 	 * POST - /createTransaction
 	 * 		RequestBody is EiCreateTransaction
 	 * 		ResponseBody is EiCreatedTransaction
+	 * 
+	 * Position for this Party was updated in LMA
 	 */
 	
 	@PostMapping("{teuaId}/createTransaction")
@@ -262,10 +267,13 @@ public class TeuaRestController {
 	 * 		RequestBody is ClientCreateTenderPayload
 	 * 		ResponseBody is ClientCreatedTenderPayload
 	 * 
-	 * Forward EiCreateTenderPayload to LMA
+	 * Query PositionManager for the TEUA's PartyId, net full requirements energy request
+	 * (positive or negative) and forward the EiCreateTenderPayload with adjusted quanity
+	 * and possible different Side to LMA
+	 * 
+	 * Processing the request from the Building Controller (SC/Client)
+	 * Return the ClientCreatedTenderPayload which is just CTS TenderId for new tender
 	 */	
-	// Processing the request from the Building Controller (SC/Client)
-	// Return the ClientCreatedTenderPayload which is just CTS TenderId for new tender
 	@PostMapping("{teuaId}/clientCreateTender")
 	public ClientCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
@@ -277,6 +285,15 @@ public class TeuaRestController {
 		EiCreateTenderPayload eiCreateTender;
 		EiCreatedTenderPayload lmaCreatedTender;		
 		Integer numericTeuaId = -1;
+		long fullRequirements;
+		ActorIdType positionParty;
+		Interval positionInterval;
+		ArrayList<PositionGetPayload> positionResponse;
+		String positionUri;
+		PositionGetPayload[] positionArrayResponse;
+		PositionResponseList positionResponseList;
+
+		
 		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
@@ -291,7 +308,15 @@ public class TeuaRestController {
 		}
 		
 		numericTeuaId = Integer.valueOf(teuaId);
-		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		
+		
+		//convert to URI for position manager
+		positionUri = "/position/" +
+				" actorNumericIds[teuaId].toString()" +
+				"/getPosition";
+		logger.info("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
 		logger.debug("postEiCreateTender teuaId " +
 			teuaId +
 			" actorNumericIds[teuaId] " +
@@ -305,9 +330,31 @@ public class TeuaRestController {
 		 * new EiCreateTenderPayload.
 		 * 
 		 * partyId is in actorNumericIds[] , counterPartyId is the LME representing
-		 * the market and the POST is to the LMA..
+		 * the market and the POST is to the LMA.
+		 * 
+		 * if Building sends to /teua/7 that means it's client 7
 		 */
-		// if Building sends to /teua/7 that means it's client 7
+		
+		// build position request for this UA, adjust fullNeeds to netNeeds,
+		// then create the EiTender
+		positionInterval = tempClientCreateTender.getInterval();
+		positionParty = actorIds[numericTeuaId];
+		fullRequirements = tempClientCreateTender.getQuantity();
+		
+		// request position for  positionParty in positionInterval
+//		RestTemplate restTemplate = builder.build();
+		positionUri = "http://localhost:8080/position/" +
+				positionParty.toString() +
+				"getPosition";
+		
+		
+		positionResponseList = restTemplate.getForObject(
+				positionUri,
+				PositionResponseList.class);
+		logger.info("return from " + positionUri +
+				" result " + positionResponseList.toString());
+		
+		
 		tender = new EiTender(
 				tempClientCreateTender.getInterval(),
 				tempClientCreateTender.getQuantity(),
