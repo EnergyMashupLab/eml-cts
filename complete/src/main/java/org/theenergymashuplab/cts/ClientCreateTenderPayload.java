@@ -1,6 +1,5 @@
 package org.theenergymashuplab.cts;
 
-
 import java.time.*;
 //	import ...Interval; 
 
@@ -10,9 +9,9 @@ public class ClientCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
-
 	private BridgeInterval bridgeInterval;
 	private BridgeInstant bridgeExpireTime;	
+//	private boolean ignorePosition; TODO 1.01	
 
 	// Uses BridgeInterval to avoid serialization issues
 	
@@ -30,6 +29,7 @@ public class ClientCreateTenderPayload {
 		this.side = side;
 		this.quantity = quantity;
 		this.price = price;
+//		this.ignorePosition = true;	// TODO hook and use in TeuaRestController
 		// DEBUG this.expireTime = expire;
 		this.bridgeInterval = new BridgeInterval(60, dtStart);
 		this.bridgeExpireTime = new BridgeInstant(expire);
@@ -124,6 +124,12 @@ public class ClientCreateTenderPayload {
 		this.bridgeExpireTime = bridgeExpireTime;
 	}
 
-
-	
+//	public boolean isIgnorePosition() {
+//		return ignorePosition;
+//	}
+//
+//	public void setIgnorePosition(boolean ignorePosition) {
+//		this.ignorePosition = ignorePosition;
+//	}
+//	
 }

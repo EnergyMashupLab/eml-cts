@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
@@ -25,6 +26,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+import org.theenergymashuplab.cts.controller.payloads.PositionGetPayload;
+import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/lma")
@@ -33,7 +37,6 @@ public class LmaRestController {
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
-	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
 	private static boolean dumpMap = true;
 	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
@@ -123,25 +126,56 @@ public class LmaRestController {
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
 		restTemplate = builder.build();
+		
+		ActorIdType positionParty;
+		Interval positionInterval;
+		String positionUri;
+		long positionQuantity;
+		String positionResponse;
+		PositionAddPayload positionAddPayload;
 
+		logger.debug("Start of EiCreateTransaction in LMA");
 		/*
 		 * Originated by LME and forwarded by LMA to TEUA based on market match
-		 * and party
-		 * 
-		 * TODO verify that rewritten message has correct party and counterparty
-		 * 
-		 * NOTE synchronous, uses TEUA EiCreatedTransaction back to LME
+		 * and party. Rewrite messages so party and counterpary are counter-symmetric
 		 */
 		//	local temporary variables
 		tempCreate = eiCreateTransactionPayload;
 		tempTransaction = eiCreateTransactionPayload.getTransaction();
 		tempTender = tempCreate.getTransaction().getTender();
 
+		tempPartyId = tempCreate.getPartyId();
+		positionParty = tempPartyId;
+		positionInterval = tempTender.getInterval();
+		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
+				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
+		
+		positionUri = "http://localhost:8080/position/" +
+				positionParty.toString() +
+				"/add";
+		
+		positionQuantity = (tempTender.getSide() == SideType.BUY ? tempTender.getQuantity() :
+				-tempTender.getQuantity());
+		
+		logger.info("positionUri '" + positionUri + " positionQuantity " + positionQuantity);
+
+		// add the algebraic signed position from EiCreateTransactionPayload and send
+		positionAddPayload = new PositionAddPayload(positionInterval, positionQuantity);
+
+		logger.trace("Before call to " + positionUri);
+		positionResponse = restTemplate.postForObject(
+				positionUri,
+				positionAddPayload,
+				String.class);
+		logger.debug("return from " + positionUri +
+				" result " + positionResponse);
+
+
 		/*
 		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
 		 * 	the EiCreateTransactionPayload
 		 */
-		tempPartyId = tempCreate.getPartyId();
+		
 		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
 				tempCreate.toString());
 		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
@@ -166,7 +200,7 @@ public class LmaRestController {
 //				}
 //			}
 		}	else	{
-			logger.info("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
 					tempCreate.getPartyId().toString() +
 					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
 					" " + tempCreate.getTransaction().toString());
@@ -182,6 +216,8 @@ public class LmaRestController {
 	
 	
 	/*
+	 * TODO Implement EiCancelTender and ClientCancelTender
+	 * 
 	 * POST - /cancelTender
 	 * 		RequestBody is EiCancelTender
 	 * 		ResponseBody is EiCanceledTender

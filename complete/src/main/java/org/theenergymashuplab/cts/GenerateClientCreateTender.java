@@ -11,7 +11,14 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+/*
+ * Carryover from previous investigatory code. 
+ * TODO Candidate for deletion in future release
+ * 
+ * Implemented to generate ClientCreateTender payloads in JSON
+ * TODO candidate for rationalization with other generators e,g,
+ * Random*
+ */
 public class GenerateClientCreateTender {
 
 	public static void main(String[] args) {	

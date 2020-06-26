@@ -2,8 +2,11 @@ package org.theenergymashuplab.cts;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
+//import java.util.Random;
+//import java.util.concurrent.atomic.AtomicLong;
+import java.util.ArrayList;
+import java.util.List;
+import org.theenergymashuplab.cts.controller.payloads.*;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,21 +33,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-/*
- * NEXT STEPS: incorporate dynamic URIs for the TEUAs, of the form
- *  /teua/{number}/party, etc.
- */
 @RestController
 @RequestMapping("/teua")	// use dynamic URIs - this supports one
 public class TeuaRestController {
-//	private static final AtomicLong counter = new AtomicLong();
-//	private static EiTender currentTender;
-//	private static EiTransaction currentTransaction;
-//	private static TenderIdType currentTenderId;
-	// For /teua/operations without an {id} PathVariable
-	// Array for PathVariable values set from constructor
+
 	private final ActorIdType partyId  = new ActorIdType();
-//	private ActorIdType marketPartyId;
 	private ActorIdType lmePartyId = null;
 
 	private static final Logger logger = LogManager.getLogger(
@@ -70,9 +63,6 @@ public class TeuaRestController {
     private int idLimit;
     private String idString = null;
     private int myWorkingId = 0;
-
-	// for randomized quantity and price for testing
-	final static Random rand = new Random();	
 	
 	// Constructor for class TeuaRestController - zero parameters
 	public TeuaRestController()	{
@@ -129,23 +119,6 @@ public class TeuaRestController {
 					" i = " + i + " " + clientUri + " " + teuaUri +
 					" actorId " + actorNumericIds[i].toString());
 		}
-		
-//		logger.info("partyId in actorNumericIds[1] " + actorNumericIds[1].toString());
-		
-		// LmaRestController by Long values 0..19 DEBUG MAP
-//		System.out.println("by postLmaToTeuaPartyIdMap all keys in order from 4 to 24 ");
-//		for (i = 4; i < this.idLimit+4; i++) {
-//			System.out.println("i = " + i + " " + LmaRestController.postLmaToTeuaPartyIdMap.get(Long.valueOf(i)));
-//		}
-		
-//		// DEBUG dump LmaRestController.postLmaToTeuaPartyIdMap
-//		for (Map.Entry<Long, String> entry : 
-//					LmaRestController.postLmaToTeuaPartyIdMap.entrySet())	{
-//			Long key = entry.getKey();
-//			Object value = entry.getValue();
-//			logger.info("LmaRestController.postLmaToTeuaPartyIdMap " +
-//							key.toString() + " " + value.toString());
-//		}
 	}
 	
 	/*
@@ -161,6 +134,8 @@ public class TeuaRestController {
 	 * POST - /createTransaction
 	 * 		RequestBody is EiCreateTransaction
 	 * 		ResponseBody is EiCreatedTransaction
+	 * 
+	 * Position for this Party was updated in LMA
 	 */
 	
 	@PostMapping("{teuaId}/createTransaction")
@@ -262,10 +237,18 @@ public class TeuaRestController {
 	 * 		RequestBody is ClientCreateTenderPayload
 	 * 		ResponseBody is ClientCreatedTenderPayload
 	 * 
-	 * Forward EiCreateTenderPayload to LMA
-	 */	
-	// Processing the request from the Building Controller (SC/Client)
-	// Return the ClientCreatedTenderPayload which is just CTS TenderId for new tender
+	 * Query PositionManager for the TEUA's PartyId, net full requirements energy request
+	 * (positive or negative) and forward the EiCreateTenderPayload with adjusted quanity
+	 * and possible different Side to LMA
+	 * 
+	 * Processing the request from the Building Controller (SC/Client)
+	 * Return the ClientCreatedTenderPayload which is just CTS TenderId for new tender
+	 * 
+	 * NOTE that the quantity in a ClientCreateTender is FULL REQUIREMENTS for the
+	 * Interval. The User Agent will adjust that request by energy already bought or sold
+	 * on behalf of this client for the Interval, to get a net amount to go from the client's position
+	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
+	 */
 	@PostMapping("{teuaId}/clientCreateTender")
 	public ClientCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
@@ -277,6 +260,20 @@ public class TeuaRestController {
 		EiCreateTenderPayload eiCreateTender;
 		EiCreatedTenderPayload lmaCreatedTender;		
 		Integer numericTeuaId = -1;
+		long fullRequirements;
+		long fromTenderSigned, fromPositionSigned;
+		ActorIdType positionParty;
+		Interval positionInterval;
+		ArrayList<PositionGetPayload> positionResponse;
+		String positionUri;
+		PositionGetPayload[] positionArrayResponse;
+		PositionResponseList positionResponseList;
+		long positionReponseListSize;
+		SideType tempSide;
+		long newTenderQuantity;
+		SideType newTenderSide;
+
+		
 		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
@@ -291,7 +288,15 @@ public class TeuaRestController {
 		}
 		
 		numericTeuaId = Integer.valueOf(teuaId);
-		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
 		logger.debug("postEiCreateTender teuaId " +
 			teuaId +
 			" actorNumericIds[teuaId] " +
@@ -305,9 +310,10 @@ public class TeuaRestController {
 		 * new EiCreateTenderPayload.
 		 * 
 		 * partyId is in actorNumericIds[] , counterPartyId is the LME representing
-		 * the market and the POST is to the LMA..
+		 * the market and the POST is to the LMA.
+		 * 
+		 * if Building sends to /teua/7 that means it's client 7
 		 */
-		// if Building sends to /teua/7 that means it's client 7
 		tender = new EiTender(
 				tempClientCreateTender.getInterval(),
 				tempClientCreateTender.getQuantity(),
@@ -322,7 +328,7 @@ public class TeuaRestController {
 		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateTender.setCounterPartyId(lmePartyId);
 		
-		logger.debug("TEUA sending EiCreateTender to LMA " +
+		logger.trace("TEUA sending EiCreateTender to LMA " +
 				eiCreateTender.toString());
 			
 		//	And forward to the LMA
@@ -333,11 +339,10 @@ public class TeuaRestController {
 		
 		// and put CtsTenderId in ClientCreatedTenderPayload
 		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-//		logger.debug("TEUA before return ClientCreatedTender to Client/SC " +
-//				tempReturn.toString());
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
 		
 		return tempReturn;
 	}
-	
 	
 }

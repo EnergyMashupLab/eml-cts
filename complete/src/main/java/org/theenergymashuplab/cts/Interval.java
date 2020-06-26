@@ -2,7 +2,6 @@ package org.theenergymashuplab.cts;
 
 import java.time.*;
 
-
 public class Interval {
 	public Duration duration = Duration.ZERO;
 	public Instant dtStart;
@@ -15,9 +14,14 @@ public class Interval {
 	 *  Elsewhere duration is number of minutes, converted in the constructor
 	 */
 	
-	Interval(long durationInMinutes, Instant dtStart){
+	public Interval(long durationInMinutes, Instant dtStart){
 		this.duration = Duration.ofSeconds(60*durationInMinutes);
 		this.dtStart = dtStart;
+	}
+	
+	@Override
+	public String toString()	{
+		return "Interval dtStart" + dtStart.toString() + " duration " + duration.toString();
 	}
 
 	public Duration getDuration() {

@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import java.time.*;
 
 @SpringBootApplication
-public class RestServiceApplication {
+public class EnergyApplication {
 	
 	/*
 	 * Global constants
@@ -24,7 +24,7 @@ public class RestServiceApplication {
 	
 	
 	private static final Logger logger = LogManager.getLogger(
-			RestServiceApplication.class);
+			EnergyApplication.class);
 	// Application general logger from NIST-CTS-Agents
 	private static final Logger logger2 = LogManager.getLogger(
 			"application_general_logger");
@@ -37,9 +37,9 @@ public class RestServiceApplication {
     	restTemplate = builder.build();
     	ActorIdType actorId;
 	
-    	new RandomCreateClientTender();	// on System.out before run
+//    	new RandomCreateClientTender();	// on System.out before run
     	
-        SpringApplication.run(RestServiceApplication.class, args);
+        SpringApplication.run(EnergyApplication.class, args);
     }
     
 	@Bean
@@ -49,7 +49,7 @@ public class RestServiceApplication {
 	
 	@Bean
 	// Set up the restTemplate - only for debug print. May not be necessary
-	// EXPERIMENTAL - Candidate for deletion
+	// TODO EXPERIMENTAL - Candidate for deletion
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");	
