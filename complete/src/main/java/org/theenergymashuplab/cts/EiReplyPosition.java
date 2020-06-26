@@ -11,6 +11,8 @@ public class EiReplyPosition {
 	private RefIdType requestId = new RefIdType();
 	public EiResponse response;
 	
+	// Superceded by updated PositionManager - delete in future release
+	
 	/*
 	 * For queries to the position manager - the bounding interval for position information.
 	 * A position is for a particular time so product can be acquired in advance

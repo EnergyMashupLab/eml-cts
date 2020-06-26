@@ -33,21 +33,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-/*
- * NEXT STEPS: incorporate dynamic URIs for the TEUAs, of the form
- *  /teua/{number}/party, etc.
- */
 @RestController
 @RequestMapping("/teua")	// use dynamic URIs - this supports one
 public class TeuaRestController {
-//	private static final AtomicLong counter = new AtomicLong();
-//	private static EiTender currentTender;
-//	private static EiTransaction currentTransaction;
-//	private static TenderIdType currentTenderId;
-	// For /teua/operations without an {id} PathVariable
-	// Array for PathVariable values set from constructor
+
 	private final ActorIdType partyId  = new ActorIdType();
-//	private ActorIdType marketPartyId;
 	private ActorIdType lmePartyId = null;
 
 	private static final Logger logger = LogManager.getLogger(
@@ -73,9 +63,6 @@ public class TeuaRestController {
     private int idLimit;
     private String idString = null;
     private int myWorkingId = 0;
-
-	// for randomized quantity and price for testing
-//	final static Random rand = new Random();	
 	
 	// Constructor for class TeuaRestController - zero parameters
 	public TeuaRestController()	{
@@ -132,23 +119,6 @@ public class TeuaRestController {
 					" i = " + i + " " + clientUri + " " + teuaUri +
 					" actorId " + actorNumericIds[i].toString());
 		}
-		
-//		logger.info("partyId in actorNumericIds[1] " + actorNumericIds[1].toString());
-		
-		// LmaRestController by Long values 0..19 DEBUG MAP
-//		System.out.println("by postLmaToTeuaPartyIdMap all keys in order from 4 to 24 ");
-//		for (i = 4; i < this.idLimit+4; i++) {
-//			System.out.println("i = " + i + " " + LmaRestController.postLmaToTeuaPartyIdMap.get(Long.valueOf(i)));
-//		}
-		
-//		// DEBUG dump LmaRestController.postLmaToTeuaPartyIdMap
-//		for (Map.Entry<Long, String> entry : 
-//					LmaRestController.postLmaToTeuaPartyIdMap.entrySet())	{
-//			Long key = entry.getKey();
-//			Object value = entry.getValue();
-//			logger.info("LmaRestController.postLmaToTeuaPartyIdMap " +
-//							key.toString() + " " + value.toString());
-//		}
 	}
 	
 	/*
@@ -344,52 +314,6 @@ public class TeuaRestController {
 		 * 
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
-		
-//		// build position request for this UA, adjust fullNeeds to netNeeds,
-//		// then create the EiTender
-//		positionInterval = tempClientCreateTender.getInterval();
-//		positionParty = actorIds[numericTeuaId];
-//		fullRequirements = tempClientCreateTender.getQuantity();
-//		
-//		// request position for  positionParty in positionInterval
-////		RestTemplate restTemplate = builder.build();
-//		positionUri = "http://localhost:8080/position/" +
-//				positionParty.toString() + "getPosition";
-//		
-//		positionResponseList = restTemplate.getForObject(
-//				positionUri,
-//				PositionResponseList.class);
-//		logger.info("return from " + positionUri +
-//				" result " + positionResponseList.toString());
-//		
-//		positionReponseListSize = positionResponseList.getResponseList().size();
-//
-//		
-//		//	TODO conditioned on whether ClientCreateTenderPayload ignorePosition is true
-//		//	TODO input to Teua algorithms. Issues include how to deal with the fact thast
-//		//	not all Tenders turn into transactions
-//		//	We only record transaction and in the LMA+PositionManager
-//		if (true)	{	// TODO use ignorePosition in future version
-//			// TODO eventually with mixed intervals the response may be a list of size > 1'
-//			if (positionReponseListSize == 0)
-//				logger.info("positionResponseList size not as expected " +
-//						positionReponseListSize);
-//			
-//			// TODO compute modified tender quantity if indicated by ignorePosition
-//			
-//			// from ClientCreateTender use quantity and side
-//			fromTenderSigned = (clientCreateTender.getSide() == SideType.BUY ? clientCreateTender.getQuantity() :
-//				-clientCreateTender.getQuantity());
-//			
-//			//	from getPosition response take signed value
-//			fromPositionSigned = positionResponseList.getFirstPositionQuantity();
-//			// new quantity for EiCreateTender is the sum of these
-//			
-////			newTenderQuantity = fromTenderSigned - fromPositionSigned;
-////			 // compute newTenderSide from signed - may change sides
-//		}
-		
-		
 		tender = new EiTender(
 				tempClientCreateTender.getInterval(),
 				tempClientCreateTender.getQuantity(),
@@ -415,11 +339,10 @@ public class TeuaRestController {
 		
 		// and put CtsTenderId in ClientCreatedTenderPayload
 		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-//		logger.debug("TEUA before return ClientCreatedTender to Client/SC " +
-//				tempReturn.toString());
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
 		
 		return tempReturn;
 	}
-	
 	
 }

@@ -49,7 +49,7 @@ public class EnergyApplication {
 	
 	@Bean
 	// Set up the restTemplate - only for debug print. May not be necessary
-	// EXPERIMENTAL - Candidate for deletion
+	// TODO EXPERIMENTAL - Candidate for deletion
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");	

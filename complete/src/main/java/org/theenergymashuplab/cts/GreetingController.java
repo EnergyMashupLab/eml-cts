@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 
+
+/*
+ * Carryover from previous investigatory code. 
+ * TODO Candidate for deletion in future release
+ */
 @RestController
 public class GreetingController {
 

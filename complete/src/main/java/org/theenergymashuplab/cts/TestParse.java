@@ -1,6 +1,7 @@
 package org.theenergymashuplab.cts;
 
-
+// TODO old utility routine to verify datetime parsing
+//	move to utilities or delete
 import java.time.*;
 
 import java.util.Random;

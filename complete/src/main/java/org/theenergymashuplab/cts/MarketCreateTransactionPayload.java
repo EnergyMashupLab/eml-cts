@@ -1,7 +1,10 @@
 package org.theenergymashuplab.cts;
 
-// MANUAL MIRROR from package com.paritytrading.parity.client;
-
+/*
+ * MANUAL MIRROR from package com.paritytrading.parity.client;
+ * 
+ * TODO use single package and import both places
+ */
 /*
  * Sent by the Market to the LME with information from a market trade, including
  * 		ctsTenderId (CTS TenderId for the original tender in EiCreateTenderPayload)

@@ -8,6 +8,8 @@ package org.theenergymashuplab.cts.model;
 
 import java.time.Instant;
 
+// TODO extend columns here
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

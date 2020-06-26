@@ -42,7 +42,7 @@ public class LmeRestController {
 	
 	// queueFromLme is used by LmeSocketClient to accept CreateTenderPayload
 	// queue.put here in LME, take in LmeSocketClient which connects to the market
-	// TODO tune queue capacity
+	// Queue capacity is not an issue
 	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue(20);
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
@@ -59,8 +59,9 @@ public class LmeRestController {
 	 * HashMap to correlate CTS TenderIdType and EiCreateTenderPayload
 	 * referenced by the MarketCreateTransaction
 	 */
-	// TODO count down original quantity from Transactions against the Tender; remove when zero
-	// Need wrapper class Long to use the long ctsTenderId as returned
+	// 	TODO count down original quantity from Transactions against the Tender;
+	//	remove from map when zero
+	// 	Need wrapper class Long to use the long ctsTenderId as returned
 	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap =
 			new HashMap<Long, EiCreateTenderPayload>();
 
@@ -133,7 +134,7 @@ public class LmeRestController {
 		// Conversion to MarketCreateTenderPayload is in LmeSocketClient here
 		// TODO Non-blocking add returns true if OK, false if queue is full
 		
-		// TODO switch to blocking after verification
+		// TODO switch .add() to blocking .take() after verification
 		addQsuccess = queueFromLme.add(tempCreate);
 		logger.debug("queueFomLme addQsuccess " + addQsuccess +
 				" TenderId " + tempTender.getTenderId());
@@ -264,8 +265,5 @@ public class LmeRestController {
 	public static Logger getLogger() {
 		return logger;
 	}
-	
-	
-	
 	
 }

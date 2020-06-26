@@ -1,6 +1,7 @@
 package org.theenergymashuplab.cts;
 
 import java.time.*;
+
 import java.time.Instant;
 import java.time.Duration;
 import java.util.Random;
@@ -13,6 +14,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+/*
+ * 	Utility routine to generate random CreateClientTenderPayloads
+ * 	TODO move to utilities package
+ */
 
 public class RandomCreateClientTender {
 	

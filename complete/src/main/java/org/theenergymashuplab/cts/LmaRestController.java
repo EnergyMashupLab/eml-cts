@@ -37,7 +37,6 @@ public class LmaRestController {
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
-	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
 	private static boolean dumpMap = true;
 	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
@@ -217,6 +216,8 @@ public class LmaRestController {
 	
 	
 	/*
+	 * TODO Implement EiCancelTender and ClientCancelTender
+	 * 
 	 * POST - /cancelTender
 	 * 		RequestBody is EiCancelTender
 	 * 		ResponseBody is EiCanceledTender

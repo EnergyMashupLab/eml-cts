@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
 
-
-
 public class LmeSendTransactions	extends Thread	{
 	
 	private static final Logger logger = LogManager.getLogger(
