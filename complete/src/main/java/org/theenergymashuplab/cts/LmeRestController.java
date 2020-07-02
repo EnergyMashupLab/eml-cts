@@ -1,9 +1,29 @@
+/*
+ * Copyright 2019-2020 The Energy Mashup Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.theenergymashuplab.cts;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -14,8 +34,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Set;
 
 //For RestTemplate
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/lme")
@@ -32,16 +58,15 @@ public class LmeRestController {
 	
 	// queueFromLme is used by LmeSocketClient to accept CreateTenderPayload
 	// queue.put here in LME, take in LmeSocketClient which connects to the market
-	// TODO tune queue capacity
-	public static BlockingQueue<EiCreateTenderPayload> queueFromLme 
-		= new ArrayBlockingQueue<EiCreateTenderPayload>(20);
+	// Queue capacity is not an issue
+	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue(20);
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
 	// parallel for MarketCreateTransactionPayloads here in LME.
 	// queue.put by LmeSocketServer, queue.take here in LME to produce an 
 	// EiCreateTransactionPayload to be forwarded to LMA
 	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQueue =
-			new ArrayBlockingQueue<EiCreateTransactionPayload>(20);
+			new ArrayBlockingQueue(20);
 	public static LmeSocketServer lmeSocketServer = new LmeSocketServer();
 	
 	LmeSendTransactions lmeSendTransactionsThread = new LmeSendTransactions();
@@ -50,8 +75,9 @@ public class LmeRestController {
 	 * HashMap to correlate CTS TenderIdType and EiCreateTenderPayload
 	 * referenced by the MarketCreateTransaction
 	 */
-	// TODO count down original quantity from Transactions against the Tender; remove when zero
-	// Need wrapper class Long to use the long ctsTenderId as returned
+	// 	TODO count down original quantity from Transactions against the Tender;
+	//	remove from map when zero
+	// 	Need wrapper class Long to use the long ctsTenderId as returned
 	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap =
 			new HashMap<Long, EiCreateTenderPayload>();
 
@@ -87,7 +113,7 @@ public class LmeRestController {
 	 */
 	@GetMapping("/party")
 	public ActorIdType getParty() {
-		return LmeRestController.partyId;
+		return this.partyId;
 	}
 	
 	
@@ -111,7 +137,7 @@ public class LmeRestController {
 
 		logger.debug("LmeController before constructor for EiCreatedTender " +
 				tempTender.toString());
-		logger.trace("lme/createTender " + eiCreateTender.toString());
+		logger.debug("lme/createTender " + eiCreateTender.toString());
 		
 		/*	ResponseBody
 			public EiCreatedTender(
@@ -124,7 +150,7 @@ public class LmeRestController {
 		// Conversion to MarketCreateTenderPayload is in LmeSocketClient here
 		// TODO Non-blocking add returns true if OK, false if queue is full
 		
-		// TODO switch to blocking after verification
+		// TODO switch .add() to blocking .take() after verification
 		addQsuccess = queueFromLme.add(tempCreate);
 		logger.debug("queueFomLme addQsuccess " + addQsuccess +
 				" TenderId " + tempTender.getTenderId());
@@ -165,10 +191,12 @@ public class LmeRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTenderPayload postEiCancelTenderPayload(
 			@RequestBody EiCancelTenderPayload eiCancelTenderPayload)	{
+		TenderIdType tempTenderId;
 		EiCancelTenderPayload tempCancel;	
 		EICanceledTenderPayload tempCanceled;
 		
 		tempCancel = eiCancelTenderPayload;
+		tempTenderId = eiCancelTenderPayload.getTenderId();
 
 //		tempCancel.print();	// DEBUG
 		
@@ -253,8 +281,5 @@ public class LmeRestController {
 	public static Logger getLogger() {
 		return logger;
 	}
-	
-	
-	
 	
 }
