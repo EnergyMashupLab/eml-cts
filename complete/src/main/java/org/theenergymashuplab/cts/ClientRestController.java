@@ -39,13 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.databind.ser.std.*;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Random;
@@ -203,7 +196,6 @@ public class ClientRestController {
 	public ClientCreatedTenderPayload postClientCreateTender(
 				@RequestBody ClientCreateTenderPayload clientCreateTender)	{
 		ClientCreateTenderPayload tempCreate;	
-		ClientCreatedTenderPayload tempCreated, tempReturn;
 		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender

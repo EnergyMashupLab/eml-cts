@@ -47,11 +47,10 @@ public class EiReplyPosition {
 	}
 	
 	public String toString()	{
-		String tempString;
 		String formattedString = 
 				"EiReplyPosition party '%s' requestor '%s' request %d boundingInterval '%s' positionList %s";
 
-		formattedString.format(formattedString,
+		String.format(formattedString,
 				positionParty.toString(), requestor.toString(),
 				request.toString(), positionList.toString());
 		

@@ -16,15 +16,10 @@
 
 package org.theenergymashuplab.cts;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 /*
@@ -35,9 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class GreetingController {
 
 	private static final String template = "Hello, %s!";
-	private static final String tenderTemplate = "GET %s!";
 	private static final AtomicLong counter = new AtomicLong();
-	private static EiTender currentTender;
 
 	/*
 	 * From original tutorial (Apache 2.0 licensed) kept for function test
@@ -58,7 +51,6 @@ public class GreetingController {
 	@GetMapping("/CreateTender")
 	public EiCreateTenderPayload eiCreateTenderPayload(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
 		EiTender tempTender = new RandomEiTender().randomTender();
-		EiCreateTenderPayload tempEiCreateTender;
 		
 		// actor Ids will come from POST RequestBody
 		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType());		
@@ -121,8 +113,6 @@ public class GreetingController {
 	public ClientCreateTenderPayload clientCreateTenderPayload(
 					@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
 		EiTender tempTender = new RandomEiTender().randomTender();		
-		ClientCreateTenderPayload tempClientCreateTenderPayload;
-		EiCreateTenderPayload tempEiCreateTender;
 		
 		// assign fields for random tender and fill in missing values
 		// tempClientCreateTenderPayload.

@@ -16,8 +16,6 @@
 
 package org.theenergymashuplab.cts;
 
-import java.time.*;
-
 public class EiCreatedTenderPayload {
 	private TenderIdType tenderId;
 	private ActorIdType partyId;

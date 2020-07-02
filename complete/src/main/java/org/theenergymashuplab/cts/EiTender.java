@@ -20,9 +20,6 @@ package org.theenergymashuplab.cts;
 
 import java.time.*;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class EiTender {
 	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
 	private final Interval interval;
@@ -32,9 +29,6 @@ public class EiTender {
 	private SideType side;
 	private final boolean integralOnly = false;	// TODO not set, not serialized but comes through as false. Verify behavior.
 	private TransactiveState transactiveState = TransactiveState.TENDER;
-	
-	private static final Logger logger = LogManager.getLogger(
-			EiTender.class);
 	
 	/* 
 		Attributes OMITTED from the UML Model at 

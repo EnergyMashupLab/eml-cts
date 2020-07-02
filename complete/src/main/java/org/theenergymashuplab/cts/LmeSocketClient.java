@@ -17,20 +17,13 @@
 package org.theenergymashuplab.cts;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,7 +51,6 @@ public class LmeSocketClient	extends Thread {
 
 	private Socket clientSocket;
 	private PrintWriter out;
-	private static InputStreamReader inStream;
 	private BufferedReader in;
 	
     // Socket Server in LME for CreateTransaction
@@ -69,14 +61,7 @@ public class LmeSocketClient	extends Thread {
 	private static int port = MARKET_PORT;
 	private static String ip = "127.0.0.1";
 	
-	// queueToMarket is for processed MarketCreateTenderPayload objects
-	private static BlockingQueue<String> queueToMarket = new ArrayBlockingQueue(20);
-	
 	//	TODO better document queues on parity and CTS side
-	
-	private static String driverLine;	// input line to drive to Market - json encoding
-	private static String s;
-	private static int ITERATIONS = 27;
 	
 	public LmeSocketClient()	{
 	}

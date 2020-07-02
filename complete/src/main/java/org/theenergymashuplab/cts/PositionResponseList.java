@@ -18,7 +18,6 @@ package org.theenergymashuplab.cts;
 
 import org.theenergymashuplab.cts.controller.payloads.*;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class PositionResponseList {

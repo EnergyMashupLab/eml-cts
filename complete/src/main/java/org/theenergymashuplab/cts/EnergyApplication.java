@@ -27,8 +27,6 @@ import org.springframework.web.client.RestTemplate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.*;
-
 @SpringBootApplication
 public class EnergyApplication {
 	
@@ -42,8 +40,6 @@ public class EnergyApplication {
 	private static final Logger logger = LogManager.getLogger(
 			EnergyApplication.class);
 	// Application general logger from NIST-CTS-Agents
-	private static final Logger logger2 = LogManager.getLogger(
-			"application_general_logger");
 	
 	private static RestTemplate restTemplate;
 	final static RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -51,7 +47,6 @@ public class EnergyApplication {
 
     public static void main(String[] args) {
     	restTemplate = builder.build();
-    	ActorIdType actorId;
 	
 //    	new RandomCreateClientTender();	// on System.out before run
     	

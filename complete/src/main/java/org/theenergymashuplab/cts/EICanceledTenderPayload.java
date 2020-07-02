@@ -16,8 +16,6 @@
 
 package org.theenergymashuplab.cts;
 
-import java.time.*;
-
 public class EICanceledTenderPayload {
 	private final ActorIdType partyId;
 	private final ActorIdType counterPartyId;
