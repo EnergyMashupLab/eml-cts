@@ -1,12 +1,38 @@
+/*
+ * Copyright 2019-2020 The Energy Mashup Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.theenergymashuplab.cts;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +40,11 @@ import org.apache.logging.log4j.Logger;
 
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+import org.theenergymashuplab.cts.controller.payloads.PositionGetPayload;
+import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/lma")
@@ -23,8 +53,8 @@ public class LmaRestController {
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
-	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
+	private static boolean dumpMap = true;
 	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
 	
 	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
@@ -35,7 +65,7 @@ public class LmaRestController {
 	private static final Logger logger = LogManager.getLogger(
 			LmaRestController.class);
 	
-	public LmaRestController()	{	// zero parameter constructor
+	public void LmaRestController()	{	// zero parameter constructor
 		logger.trace("LMA zero parameter constructor");
 	}
 	
@@ -44,7 +74,7 @@ public class LmaRestController {
 	 */
 	@GetMapping("/party")
 	public ActorIdType getParty() {
-		return LmaRestController.partyId;
+		return this.partyId;
 	}
 	
 	/*
@@ -57,7 +87,9 @@ public class LmaRestController {
 	public EiCreatedTenderPayload 	postEiCreateTender(
 			@RequestBody EiCreateTenderPayload eiCreateTender)	{
 
+		EiTender tempTender;
 		EiCreateTenderPayload tempCreate;
+		EiCreatedTenderPayload tempCreated;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
 		EiCreatedTenderPayload tempPostResponse; 
 
@@ -68,6 +100,7 @@ public class LmaRestController {
     	
 		// save CreateTender message as sent by TEUA
 		tempCreate = eiCreateTender;	
+		tempTender = tempCreate.getTender(); // and pull out Tender
 		
 		logger.debug("postEiCreateTender to LME. TenderId " +
 				tempCreate.getTender().getTenderId().toString());
@@ -100,30 +133,65 @@ public class LmaRestController {
 	public EiCreatedTransactionPayload postEiCreateTransactionPayload(
 			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
 
+		EiTender tempTender;
 		ActorIdType tempPartyId;
+		EiTransaction tempTransaction;
 		EiCreateTransactionPayload tempCreate;
-		EiCreatedTransactionPayload tempPostResponse;
+		EiCreatedTransactionPayload tempCreated, tempPostResponse;
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		RestTemplate restTemplate;	// scope is function postEiCreateTender
 		restTemplate = builder.build();
+		
+		ActorIdType positionParty;
+		Interval positionInterval;
+		String positionUri;
+		long positionQuantity;
+		String positionResponse;
+		PositionAddPayload positionAddPayload;
 
+		logger.debug("Start of EiCreateTransaction in LMA");
 		/*
 		 * Originated by LME and forwarded by LMA to TEUA based on market match
-		 * and party
-		 * 
-		 * TODO verify that rewritten message has correct party and counterparty
-		 * 
-		 * NOTE synchronous, uses TEUA EiCreatedTransaction back to LME
+		 * and party. Rewrite messages so party and counterpary are counter-symmetric
 		 */
 		//	local temporary variables
 		tempCreate = eiCreateTransactionPayload;
+		tempTransaction = eiCreateTransactionPayload.getTransaction();
+		tempTender = tempCreate.getTransaction().getTender();
+
+		tempPartyId = tempCreate.getPartyId();
+		positionParty = tempPartyId;
+		positionInterval = tempTender.getInterval();
+		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
+				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
+		
+		positionUri = "http://localhost:8080/position/" +
+				positionParty.toString() +
+				"/add";
+		
+		positionQuantity = (tempTender.getSide() == SideType.BUY ? tempTender.getQuantity() :
+				-tempTender.getQuantity());
+		
+		logger.info("positionUri '" + positionUri + " positionQuantity " + positionQuantity);
+
+		// add the algebraic signed position from EiCreateTransactionPayload and send
+		positionAddPayload = new PositionAddPayload(positionInterval, positionQuantity);
+
+		logger.trace("Before call to " + positionUri);
+		positionResponse = restTemplate.postForObject(
+				positionUri,
+				positionAddPayload,
+				String.class);
+		logger.debug("return from " + positionUri +
+				" result " + positionResponse);
+
 
 		/*
 		 * 	Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in 
 		 * 	the EiCreateTransactionPayload
 		 */
-		tempPartyId = tempCreate.getPartyId();
+		
 		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
 				tempCreate.toString());
 		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
@@ -148,7 +216,7 @@ public class LmaRestController {
 //				}
 //			}
 		}	else	{
-			logger.info("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
 					tempCreate.getPartyId().toString() +
 					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
 					" " + tempCreate.getTransaction().toString());
@@ -164,6 +232,8 @@ public class LmaRestController {
 	
 	
 	/*
+	 * TODO Implement EiCancelTender and ClientCancelTender
+	 * 
 	 * POST - /cancelTender
 	 * 		RequestBody is EiCancelTender
 	 * 		ResponseBody is EiCanceledTender
@@ -172,8 +242,9 @@ public class LmaRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTenderPayload postEiCancelTenderPayload(
 			@RequestBody EiCancelTenderPayload eiCancelTender)	{
+		TenderIdType tempTenderId;
 		EiCancelTenderPayload tempCancel;	
-		EICanceledTenderPayload tempPostResponse;
+		EICanceledTenderPayload tempCanceled, tempPostResponse;
 
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
