@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Title: EML CTS Project
-Implementation-Version: 0.9-SNAPSHOT
-Build-Jdk-Spec: 1.8
-Created-By: Maven Integration for Eclipse
-Main-Class: org.theenergymashuplab.cts.EnergyApplication
-
