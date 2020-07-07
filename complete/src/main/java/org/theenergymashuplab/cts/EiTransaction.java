@@ -16,8 +16,6 @@
 
 package org.theenergymashuplab.cts;
 
-import java.time.*;
-
 /*
  * While EiTransaction extends EiTender in the base standards, in Java
  * we use the "has a" construction because the EiTender exists before the

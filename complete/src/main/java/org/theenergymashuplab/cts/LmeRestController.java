@@ -16,14 +16,10 @@
 
 package org.theenergymashuplab.cts;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -34,14 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Set;
-
-//For RestTemplate
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/lme")
@@ -59,14 +47,15 @@ public class LmeRestController {
 	// queueFromLme is used by LmeSocketClient to accept CreateTenderPayload
 	// queue.put here in LME, take in LmeSocketClient which connects to the market
 	// Queue capacity is not an issue
-	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue(20);
+	public static BlockingQueue<EiCreateTenderPayload> queueFromLme 
+		= new ArrayBlockingQueue<EiCreateTenderPayload>(20);
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
 	// parallel for MarketCreateTransactionPayloads here in LME.
 	// queue.put by LmeSocketServer, queue.take here in LME to produce an 
 	// EiCreateTransactionPayload to be forwarded to LMA
 	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQueue =
-			new ArrayBlockingQueue(20);
+			new ArrayBlockingQueue<EiCreateTransactionPayload>(20);
 	public static LmeSocketServer lmeSocketServer = new LmeSocketServer();
 	
 	LmeSendTransactions lmeSendTransactionsThread = new LmeSendTransactions();
@@ -113,7 +102,7 @@ public class LmeRestController {
 	 */
 	@GetMapping("/party")
 	public ActorIdType getParty() {
-		return this.partyId;
+		return LmeRestController.partyId;
 	}
 	
 	
