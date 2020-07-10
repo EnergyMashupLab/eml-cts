@@ -27,6 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
 // Not in Parity
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.theenergymashuplab.cts.controller.LmeRestController;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
+import org.theenergymashuplab.cts.controller.payloads.MarketCreateTransactionPayload;
 
 
 /*
@@ -142,7 +146,7 @@ public class LmeSocketServer extends Thread	{
             
             //	Get original Tender for this MarketCreateTransaction
             eiCreateTender =
-            	LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
+            	LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.getCtsTenderId());
             
             // LATER TODO clean up and remove entry when tender quantity becomes zero
             if (eiCreateTender == null) {

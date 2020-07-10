@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
+
+import org.theenergymashuplab.cts.SideType;
 
 /*
  * MANUAL MIRROR from package com.paritytrading.parity.client;

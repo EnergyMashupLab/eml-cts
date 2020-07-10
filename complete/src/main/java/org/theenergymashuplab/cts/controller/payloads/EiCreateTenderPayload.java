@@ -14,52 +14,62 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
-public class EiCreateTransactionPayload {
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.RefIdType;
+
+public class EiCreateTenderPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
-	private EiTransaction transaction;
+	private EiTender tender;
 	
-	// Default initializer for JSON serialization
-	public EiCreateTransactionPayload() {
-	}
-
-	public EiCreateTransactionPayload(EiTransaction eiTransaction)	{
+	/*
+	@JsonIgnore
+	private final Random rand = new Random();
+	 */
+	
+	/*
+	 * Default constructor for JSON deserialization.
+	 * TO DO change to zero Id values in ActorId and RefId constructors
+	 */
+	public EiCreateTenderPayload()	{		
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
-		this.transaction = eiTransaction;
 	}
 
 	/* 
-	 * Parallel for EiCreateTransactionPayload, EiCreateTender:
+	 * Parallel for EiCreateTransaction, EiCreateTender:
 	 * 		pass in a completed Tender/Transaction which includes through its Tender interval, quantity, price,
 	 * 		or for EiCancelTender only the TenderId.
 	 * 
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party,
-				ActorIdType counterParty) {
-		this.transaction = transaction;
+
+	public EiCreateTenderPayload(EiTender tender, ActorIdType party, ActorIdType counterParty) {
+
+		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
+		
+//		System.err.println("EiCreateTender Constructor before this.print()");
+//		this.print();
 	}
-	
+
 	@Override
 	public String toString() {
-//		String printStringFormat = 
-//			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
-		
-		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
-				" partyid " + partyId.toString() +
-				" counterPartyid " + counterPartyId.toString() +			
-				" requestId " + requestId.value() + " TenderId " +
-				transaction.getTender().getTenderId().value() +
-				" quantity " + transaction.getTender().getQuantity() +
-				" price " + transaction.getTender().getPrice());
+		return ("EiCreateTenderPayload party " +
+				partyId.value() +
+				" counterParty " +
+				counterPartyId.value() +
+				" requestId " +
+				requestId.toString() +
+				" " +
+				tender.toString());
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -86,12 +96,11 @@ public class EiCreateTransactionPayload {
 		this.requestId = requestId;
 	}
 
-	public EiTransaction getTransaction() {
-		return transaction;
+	public EiTender getTender() {
+		return tender;
 	}
 
-	public void setTransaction(EiTransaction transaction) {
-		this.transaction = transaction;
+	public void setTender(EiTender tender) {
+		this.tender = tender;
 	}
-	
 }

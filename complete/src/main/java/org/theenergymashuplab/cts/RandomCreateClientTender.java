@@ -19,6 +19,8 @@ package org.theenergymashuplab.cts;
 import java.time.Instant;
 import java.util.Random;
 
+import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;

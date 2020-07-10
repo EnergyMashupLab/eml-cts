@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.SideType;
 
 public class ClientCreateTransactionPayload {
 	String info = "ClientCreateTransactionPayload";
@@ -27,7 +28,7 @@ public class ClientCreateTransactionPayload {
 	
 	long ctsTenderId; // matched in Parity
 	
-	ClientCreateTransactionPayload(SideType side, long quantity,
+	public ClientCreateTransactionPayload(SideType side, long quantity,
 										long price, long tenderId)	{
 		// values from EiTransaction that are not implicit (e.g. market, product)
 		this.side = side;

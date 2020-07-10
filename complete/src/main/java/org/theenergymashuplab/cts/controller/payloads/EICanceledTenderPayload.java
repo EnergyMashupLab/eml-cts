@@ -14,68 +14,58 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
-public class EiCreatedTenderPayload {
-	private TenderIdType tenderId;
-	private ActorIdType partyId;
-	private ActorIdType counterPartyId;
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiResponse;
+
+public class EICanceledTenderPayload {
+	private final ActorIdType partyId;
+	private final ActorIdType counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
-	private final RefIdType refId = new RefIdType();
+//	refId is in the EiResponse
 
-	/*
-	 * Default constructor for JSON deserialization.
-	 * TO DO change to zero Id values in ActorId and RefId constructors
-	 */
-	public EiCreatedTenderPayload()	{		
-	}
 	
-	public EiCreatedTenderPayload(
-			TenderIdType tenderId,
-			ActorIdType partyId,
-			ActorIdType counterPartyId,
-			EiResponse response) {
-
-		this.tenderId = tenderId;
+	public EICanceledTenderPayload(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response) {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
 	}
 
-	public long getId() {
-		return tenderId.value();
-	}
-
-	public void print() {		
-		System.err.println(
-				"EiCreatedTender tenderId " +
-				tenderId.toString() +
-				" partyId " + partyId.toString() +
-				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
-				" response " + response.toString());
+	//Default constructor for JSON serialization
+	public EICanceledTenderPayload()	{
+		this.partyId = new ActorIdType();
+		this.counterPartyId = new ActorIdType();
+		this.response = new EiResponse(200, "OK");
 	}
 	
-	public String toString() {
-		return "EiCreatedTender tenderId " +
-				tenderId.toString() +
+	
+	public void print() {
+		String printStringFormat = 
+				"EICanceledTenderPayload  partyId %d counterPartyId %d refId %d ";
+		
+		System.err.println(
+				String.format(printStringFormat, 
+				partyId.value(), 
+				counterPartyId.value(), 
+				response.getRefId()));
+	}
+	
+	public String toString()	{
+		return "EICanceledTenderPayload Soure RefId " +
+				"PENDING" +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
 				" response " + response.toString();
 	}
-	
+
 	public EiResponse getResponse() {
 		return response;
 	}
 
 	public void setResponse(EiResponse response) {
 		this.response = response;
-	}
-
-	public TenderIdType getTenderId() {
-		return tenderId;
 	}
 
 	public ActorIdType getPartyId() {
@@ -85,8 +75,7 @@ public class EiCreatedTenderPayload {
 	public ActorIdType getCounterPartyId() {
 		return counterPartyId;
 	}
+	
+	
 
-	public RefIdType getRefId() {
-		return refId;
-	}
 }

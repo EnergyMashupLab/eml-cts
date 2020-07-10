@@ -45,7 +45,7 @@ package org.theenergymashuplab.cts;
 			dtStart = new BridgeInstant(Instant.now()); // a reasonable default
 		}
 
-		BridgeInterval(long durationInMinutes, Instant dtStart) {
+		public BridgeInterval(long durationInMinutes, Instant dtStart) {
 			this.durationInMinutes = durationInMinutes;
 			this.dtStart = new BridgeInstant(dtStart);
 		}
