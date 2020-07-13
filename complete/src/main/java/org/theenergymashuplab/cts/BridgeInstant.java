@@ -29,12 +29,12 @@ public class BridgeInstant {
 	BridgeInstant() {
 	}
 
-	BridgeInstant(Instant javaInstant) {
+	public BridgeInstant(Instant javaInstant) {
 		instantString = javaInstant.toString();
 //		this.instant = javaInstant;
 	}
 
-	Instant asInstant() {
+	public Instant asInstant() {
 		return Instant.parse(instantString);
 	}
 

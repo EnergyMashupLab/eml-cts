@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
 import java.time.Instant;
+
+import org.theenergymashuplab.cts.BridgeInstant;
+import org.theenergymashuplab.cts.BridgeInterval;
+import org.theenergymashuplab.cts.Interval;
+import org.theenergymashuplab.cts.SideType;
 
 /*
  * Sent by the LME to the Market with information to be
@@ -39,7 +44,7 @@ public class MarketCreateTenderPayload {
 	private BridgeInterval bridgeInterval;
 	private BridgeInstant expireTime;
 
-	MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Interval interval, Instant expireTime)	{
+	public MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Interval interval, Instant expireTime)	{
 		/*
 		 * Ensure that the number of decimal fraction digits
 		 * in price and quantity align with the global one which is presently 3

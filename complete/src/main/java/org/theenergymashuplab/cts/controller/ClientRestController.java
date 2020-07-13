@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller;
 
 
 /*
@@ -38,6 +38,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
+import org.theenergymashuplab.cts.ClientTender;
+import org.theenergymashuplab.cts.SideType;
+import org.theenergymashuplab.cts.TenderIdType;
+import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
+import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTransactionPayload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

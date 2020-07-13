@@ -27,6 +27,9 @@ import java.net.Socket;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.theenergymashuplab.cts.controller.LmeRestController;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.MarketCreateTenderPayload;
 
 /*
  * Start by new LmeSocketClient.startConnection(("127.0.0.1",

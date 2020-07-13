@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
 import java.time.*;
 //	import ...Interval; 
+
+import org.theenergymashuplab.cts.BridgeInstant;
+import org.theenergymashuplab.cts.BridgeInterval;
+import org.theenergymashuplab.cts.Interval;
+import org.theenergymashuplab.cts.SideType;
 
 public class ClientCreateTenderPayload {
 	private String info = "ClientCreateTenderPayload";
@@ -34,7 +39,7 @@ public class ClientCreateTenderPayload {
 	ClientCreateTenderPayload()	{	// json
 	}
 	
-	ClientCreateTenderPayload(SideType side, long quantity, long price)	{
+	public ClientCreateTenderPayload(SideType side, long quantity, long price)	{
 		// DEBUG start time and expiration time for test payloads
 		Instant expire = null;
 		Instant dtStart = Instant.parse("2020-05-31T10:00:00.00Z");	
@@ -52,7 +57,7 @@ public class ClientCreateTenderPayload {
 	}
 	
 	// Constructor takes interval description
-	ClientCreateTenderPayload(SideType side, long quantity, long price,
+	public ClientCreateTenderPayload(SideType side, long quantity, long price,
 			Instant dtStart, long minutes)	{
 		// DEBUG start time and expiration time for test payloads
 		Instant expire;

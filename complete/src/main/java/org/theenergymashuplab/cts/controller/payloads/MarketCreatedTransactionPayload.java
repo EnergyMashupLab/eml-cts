@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
 /*
  * Sent by LME to Market in response to a MarketCreateTransactionPayload

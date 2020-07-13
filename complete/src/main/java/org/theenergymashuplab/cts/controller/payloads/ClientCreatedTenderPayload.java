@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
 /*
  * Sent by TEUA to the requesting Client/SC. Includes CtsTenderId
@@ -29,7 +29,7 @@ public class ClientCreatedTenderPayload	{
 		success = true;
 	}
 	
-	ClientCreatedTenderPayload(long id){
+	public ClientCreatedTenderPayload(long id){
 		ctsTenderId = id;
 		this.success = true;
 	}

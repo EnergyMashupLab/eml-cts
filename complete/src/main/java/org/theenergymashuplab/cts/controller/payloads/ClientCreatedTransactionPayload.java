@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
 /*
  * Response from Client/SC to its TEUA
@@ -22,7 +22,7 @@ package org.theenergymashuplab.cts;
 public class ClientCreatedTransactionPayload {
 	private Boolean success = false;
 	
-	ClientCreatedTransactionPayload()	{
+	public ClientCreatedTransactionPayload()	{
 		success = true;
 	// class may be extended further
 	}
