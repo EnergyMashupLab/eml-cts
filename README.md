@@ -56,13 +56,13 @@ market models.
 Bilateral Market is a classification; examples of bilateral markets include Double Auction and Order Book.
 
 To see a description of the components that make up this project, look under the 
-subfolders of the [dev directory](../dev ).
+subfolders of the [source directory](complete/src) as well as the project wiki (in progress) and [documentation folder](complete/docs).
 
 Results
 -------
 
 We expect that this project will make it easier for communities, facility
-owners, and device makers to apply TE. NIST looks to use these agents in
+owners, and device makers to apply TE. For example, NIST looks to use these agents and actors in
 simulations to model TE for regulators and legislators. A complete
 implementation of the Common Transactive Services will be highly visible and
 widely used.
@@ -91,44 +91,39 @@ The project uses standards including
 ---------------------
 
 The NIST-CTS Project is a standards-based implementation of the Common
-Transactive Services and a Market Agent and a Transactive Energy Agent. See the
-project's README files for a closer view.
-The Architecture Drawing shows terminology and relationships.![Architecture Drawing](Architecture.png) 
+Transactive Services using a Transactive Energy User Agenta (TEUA), a Local Market Agent (LMA) that facilitiates interaction between users
+and local markets through a Local Market Engine (LME).
+The Architecture Drawing shows terminology and relationships.![Architecture Drawing](complete/docs/pictures/Architecture20200115.png) 
 
 The project has a number of components and information in a number of subfolders under [../dev](../dev ). We use *ei2j* (Energy Interoperation to Java) as shorthand for the integration function.
 
 -   **Markets** including
 
-    -   The Local Market Engine (LME), the matching engine that coordinates buy and sell tenders
-    
-    -   Markets are connected using the CTS
+    -   The Local Market Engine (LME), the agent that fronts the market implementation including the matching engine that matches buy and sell tenders
     
     -   A bilateral market
     
     -   (future) Additional plug-in markets and documentation
 
 -   **Local Market Agent** (LMA) which interacts with the local market and with Transactive
-    Energy User Agents and External Market Adapters using the CTS including
-    
+    Energy User Agents and External Market Adapters using CTS. Functions include    
     -   Market Position Management (see note)
     
     -   The Ledger, the record of cleared (not pending) transactions (see note)
     
-    -   Price Adjustment hooks, enabling market economics experiments
+    -   Hook points for price Adjustments, enabling market economics experiments
     
-    -   Uses ei2j capabilities for CTS connections
+    -   Uses CTS to connect to the LME and TEUAs
     
-    -   Links to external markets via the External Market Adapter (EMA) which is an extension of the TEUA
+    -   Links to external markets via the External Market Adapter (EMA) which specializes the TEUA
     
--   **External Market Adapter** (EMA), an extension of the TEUA, interacts with the Local Market Agent and a single external market. Functions include
-    
-    -   Market Position Management (see note)
-    
-    -   The Ledger, the record of cleared (not pending) transactions (see note)
-    
+-   **External Market Adapter** (EMA), a specialization of the TEUA, interacts with the Local Market Agent and a single external market. 
+Functions include
+        
     -   Price Adjustment hooks, enabling market economics experiments and presentation of markup on wholesale prices
     
-    -   Uses ei2j capabilities for CTS connections
+    -  Uses CTS to connect to the LMA and indirectly to other actors
+
     
 -   **Transactive Energy [User] Agent** (TEUA) which interacts with the MA and provides
     integration capabilities for device and facility management
@@ -141,36 +136,33 @@ The project has a number of components and information in a number of subfolders
     
     -   Provides information on committed market positions to the SC (see note)
 
--   **Utilities**
-
-    -   Common Transactive Services (CTS) implementation
-
-    -   ei2j-Energy Interoperation to and from Java, includes CTS implementation
+-   **Utilities** include
 
     -   Logging (traces) and input for live and simulation meter and other data
     
-    -   Ledgers keep records of tenders and transactions 
+    -   Programs to build configuration files for the market client and system
     
 Note: 
 A ledger is a list in time order of committed transactions. A position is cumulative committed transactions. A trace of messages includes transactions proposed but never cleared. Ledgers are saved to a file or possibly sent over a network connection as the design matures.
 
-The Market Position Manager is a function that tracks completed (cleared) transactions contained in a ledger to determine committed market positions. Market position information is needed by the TEUA (on behalf of the SC), and is maintained by the LMA as transactions are created and cleared.
+The Position Manager tracks completed (cleared) transactions (also contained in a ledger) to determine committed market positions.
+Market position information is typically needed by the teua (on behalf of the sc).
 
-The TEUA makes information on existing market positions available to the SC, which in turn can use the information to determine the difference between committed position and projected needs. The SC can then transact only for what is needed to align current committed position with projected needs, tendering to buy or sell as appropriate.
+The TEUA in turn can use market position to determine the difference between committed position and projected needs. The SC may then transact only for what is needed to align current committed position with projected needs, tendering to buy or sell as appropriate.
 
-All transactions and clearing flow through the LMA, which through the MPM function will update the Market Position for use by the TEUA.
+All transactions and clearing flow through the LMA which updates the Market Position database for use by the TEUA.
 
 Built With
 ----------
 
 Agile programming and architecture are used.
 
-The project uses Github, Maven, Java 8, JUnit, Apache Log4j2, Spring and Spring Boot.
+Source code and builds are managed using Github, Maven, Java 8, JUnit, Apache Log4j2, Spring and Spring Boot.
 
 Building and Running
 -------
 
-See the [documentation](docs/README.md) directory for the tooling and development environment.
+See the [documentation](docs/README.md) directory and the project wiki (in process) for the tooling and development environment.
 
 <a id="authors"></a>Authors
 -------
