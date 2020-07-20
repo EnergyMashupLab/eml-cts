@@ -51,5 +51,5 @@ Market Integration Services (Payload definition only; sockets used for send and 
 |Receive match/transaction from Market to LME	| Socket	| MarketCreateTransaction	| MarketCreatedTransaction
 |Send tender from LME to Market	| Socket	| MarketCreateTender	| MarketCreatedTender
 
-The [Architecture Diagram](pictures/Architectur20200115.png) shows the relationships of the Actors.
+The [Architecture Diagram](pictures/Architecture20200115.png) shows the relationships of the Actors.
 
