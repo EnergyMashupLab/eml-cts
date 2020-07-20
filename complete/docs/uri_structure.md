@@ -10,40 +10,46 @@ For this project principal authors of the base standards flattened the type hier
 
 We use JSON rather than XML for message payloads with Jackson serialization and deserialization between Java and JSON.\
 
+#### URI and Operation Tables
+Note that the {id} in URI determines the transport end point. ActorId is independent of {id}*.
 
-#### Terminology 
-LMA - Local Market Agent
+Certain payloads are created in the market integration code; in the current release they are in parity-client/CtsBridge.java and associated code files.
 
-LME - Local Market Engine 
+Local Market Agent Services
+| URI	| Operation | RequestBody	| ResponseBody	|
+| ---		| ---		| ---	| --- |
+|/lma/createTender	|	POST|	EiCreateTender|	EiCreatedTender
+|/lma/createTransaction	|	POST|	EiCreateTransaction|	EiCreatedTransaction
+|/lma/cancelTender	|	POST|	EiCancelTender|	EiCanceledTender
+|/lma/party	|GET 		|  |	ActorId
 
-TEUA - Transactive Energy User Agent 
+Local Market Engine Services
+| URI	| Operation | RequestBody	| ResponseBody	|
+| ---		| ---		| ---	| --- |
+|/lme/createTender	| POST	| EiCreateTender	|	EiCreatedTender
+|/lme/cancelTender	| POST	| EiCancelTender	|	EiCanceledTender
+|/lme/party		| GET 	|			|	ActorId
 
+Transactive Energy User Agent Services
+| URI	| Operation | RequestBody	| ResponseBody	|
+| ---		| ---		| ---	| --- |
+|/teua/{id}/createTransaction	| POST	| EiCreateTransaction	| EiCreatedTransaction
+|/teua/{id}/clientCreateTender	| POST	| ClientCreateTender	| ClientCreatedTender
+|/teua/{id}/party	| GET	|	| ActorId
 
+Client Integration Services
+| URI	| Operation | RequestBody	| ResponseBody	|
+| ---		| ---		| ---	| --- |
+|/client/{id}/clientCreateTransaction	| POST	| ClientCreateTransaction	| CientCreatedTransaction
+|/client/{id}/clientCreateTender	| POST	| ClientCreateTender	| ClientCreatedTender
 
-| *URI Base*	| RequestBody	| ResponseBody	|
-/lma
-|	/createTender	POST	EiCreateTender		EiCreatedTender
-|	/createTransaction	POST	EiCreateTransaction	EiCreatedTransaction
-|	/cancelTender	POST	EiCancelTender		EiCanceledTender
-|	/party			GET 								ActorId the actor partyId
+NOTE: */client/{id}/clientCreateTender passes through the client to /teua/{id}/clientCreateTender as a test driver convenience*
 
-/lme
-|	/createTender	POST	EiCreateTender		EiCreatedTender
-|	/cancelTender	POST	EiCancelTender		EiCanceledTender
-|	/party			GET 								ActorId the actor partyId
+Market Integration Services (Payload definition only; sockets used for send and receive)
+| URI	| Operation | RequestBody	| ResponseBody	|
+| ---		| ---		| ---	| --- |
+|Receive match/transaction from Market to LME	| Socket	| MarketCreateTransaction	| MarketCreatedTransaction
+|Send tender from LME to Market	| Socket	| MarketCreateTender	| MarketCreatedTender
 
-/*teua	{id} in URI determines transport end point. ActorId is independent of {id}*
-| 	/{id}/createTransaction	POST	EiCreateTransaction		EiCreatedTransaction
-|	/{id}/clientCreateTender	POST	ClientCreateTender	ClientCreatedTender
-|	/{id}/party	GET		ActorId the actor partyId
+The [Architecture Diagram](pictures/Architectur20200115.png) shows the relationships of the Actors.
 
-/client	? Client Integration services ? {id} in URI determines transport end point.
-|	{id}//clientCreateTransaction	POST	ClientCreateTransaction	CientCreatedTransaction
-|	/{id}/clientCreateTender		POST ClientCreateTender	ClientCreatedTender
-|		NOTE: passes through to /teua/{id}/clientCreateTender as a test driver convenience
-
-
-
-
-
-Refer to the [Architecture Diagram](pictures/Architectur20200115.png) shows the relationships of the Actors.
