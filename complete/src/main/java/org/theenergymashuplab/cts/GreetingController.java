@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 /*
- * Carryover from previous investigatory code. 
+ * NOT USED
  * TODO Candidate for deletion in future release
  */
 @RestController

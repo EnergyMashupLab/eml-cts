@@ -142,7 +142,7 @@ Functions include
     
     -   Programs to build configuration files for the market client and system
     
-Note: 
+Notes: 
 A ledger is a list in time order of committed transactions. A position is cumulative committed transactions. A trace of messages includes transactions proposed but never cleared. Ledgers are saved to a file or possibly sent over a network connection as the design matures.
 
 The Position Manager tracks completed (cleared) transactions (also contained in a ledger) to determine committed market positions.
