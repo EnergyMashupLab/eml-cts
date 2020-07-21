@@ -28,7 +28,7 @@ import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload
 
 
 /*
- * Carryover from previous investigatory code. 
+ * NOT USED
  * TODO Candidate for deletion in future release
  */
 @RestController
