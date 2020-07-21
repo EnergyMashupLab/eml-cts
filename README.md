@@ -93,11 +93,11 @@ The project uses standards including
 The NIST-CTS Project is a standards-based implementation of the Common
 Transactive Services using a Transactive Energy User Agenta (TEUA), a Local Market Agent (LMA) that facilitiates interaction between users
 and local markets through a Local Market Engine (LME).
-The Architecture Drawing shows terminology and relationships within the implementation.![Architecture Drawing](complete/docs/pictures/ArchitectureCts20200720.png) 
+The Implementation Architecture Diagram shows terminology and relationships within the implementation.![Architecture Diagram](complete/docs/pictures/ArchitectureCts20200720.png) 
 
-The client/building/sc view is shown in the ![CLient View drawing](complete/docs/pictures/ClientViewCts20200720.png)
+The client/building/supervisory controller view is ![CLient View drawing](complete/docs/pictures/ClientViewCts20200720.png)
 
-The project has a number of components and information in a number of subfolders under [../dev](../dev ). We use *ei2j* (Energy Interoperation to Java) as shorthand for the integration function.
+The project has a number of components and information in a number of subfolders under [../dev](../dev ).
 
 -   **Markets** including
 
@@ -130,13 +130,13 @@ Functions include
 -   **Transactive Energy [User] Agent** (TEUA) which interacts with the MA and provides
     integration capabilities for device and facility management
     
-    -   Uses ei2j capabilities for CTS connections
+    -   Implements CTS connections
     
-    -   Integrates with the Supervisory Controller (SC)
+    -   Integrates with the Client/Supervisory Controller (SC)
     
-    -   Maintains the Ledger, the record of cleared (not pending) transactions (see note)
+    -   With the LMA maintains the Ledger, the record of cleared (not pending) transactions (see note)
     
-    -   Provides information on committed market positions to the SC (see note)
+    -   Provides information on committed market positions to the Client/SC (see note)
 
 -   **Utilities** include
 
