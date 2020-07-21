@@ -52,3 +52,4 @@ The approach used is to build the requisite 8 ASCII character names from substri
 (e.g.) date.toString() or date formatters.
 
 These timestamps need to be interpreted in clock time or simulation time, as appropriate for the deployment of CTS.
+
