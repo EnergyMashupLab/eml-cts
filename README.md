@@ -93,7 +93,9 @@ The project uses standards including
 The NIST-CTS Project is a standards-based implementation of the Common
 Transactive Services using a Transactive Energy User Agenta (TEUA), a Local Market Agent (LMA) that facilitiates interaction between users
 and local markets through a Local Market Engine (LME).
-The Architecture Drawing shows terminology and relationships.![Architecture Drawing](complete/docs/pictures/Architecture20200115.png) 
+The Architecture Drawing shows terminology and relationships within the implementation.![Architecture Drawing](complete/docs/pictures/ArchitectureCts20200720.png) 
+
+The client/building/sc view is shown in the ![CLient View drawing](complete/docs/pictures/ClientViewCts20200720.png)
 
 The project has a number of components and information in a number of subfolders under [../dev](../dev ). We use *ei2j* (Energy Interoperation to Java) as shorthand for the integration function.
 
