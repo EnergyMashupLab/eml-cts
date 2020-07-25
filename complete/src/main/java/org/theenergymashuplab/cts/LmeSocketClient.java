@@ -1,23 +1,35 @@
+/*
+ * Copyright 2019-2020 The Energy Mashup Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.theenergymashuplab.cts;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.theenergymashuplab.cts.controller.LmeRestController;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.MarketCreateTenderPayload;
 
 /*
  * Start by new LmeSocketClient.startConnection(("127.0.0.1",
@@ -42,7 +54,6 @@ public class LmeSocketClient	extends Thread {
 
 	private Socket clientSocket;
 	private PrintWriter out;
-	private static InputStreamReader inStream;
 	private BufferedReader in;
 	
     // Socket Server in LME for CreateTransaction
@@ -53,14 +64,7 @@ public class LmeSocketClient	extends Thread {
 	private static int port = MARKET_PORT;
 	private static String ip = "127.0.0.1";
 	
-	// queueToMarket is for processed MarketCreateTenderPayload objects
-	private static BlockingQueue<String> queueToMarket = new ArrayBlockingQueue(20);
-	
 	//	TODO better document queues on parity and CTS side
-	
-	private static String driverLine;	// input line to drive to Market - json encoding
-	private static String s;
-	private static int ITERATIONS = 27;
 	
 	public LmeSocketClient()	{
 	}

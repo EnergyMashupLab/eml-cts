@@ -1,55 +1,194 @@
-# RestTestbed
-Testbed for ensuring that CTS RESTful interactions are complete and correct before integrating into the [NIST Common Transactive Services Agents Project](https://github.com/EnergyMashupLab/NIST-CTS-Agents).
+<h1 align="center">
+  <br>
+  <a href="http://www.theenergymashuplab.org/"><img src="http://static1.squarespace.com/static/53dd102ae4b0474fbf8ce365/t/55da1f5de4b07faafab2518c/1440358237526/EML+Logo+20150816+No+Text.png?format=1500w" alt="Energy Mashup Lab" width="200"></a>
+  <br>
+  NIST CTS Agents
+  <br>
+</h1>
 
-Types and type names (Java class declarations and names) do not precisely match those in NIST-CTS-Agents as they were developed in parallel, although both are derived from the standards described below.
-The rationalizing of types is an active task in the NIST-CTS-Agents project.
+<p align="center">
+  <a href="#background">Background</a> •
+  <a href="#tech-desc">Technical Description</a> •
+  <a href="docs/README.md">Documentation</a> •
+  <a href="#authors">Authors</a> •
+  <a href="#license">License</a>
+</p>
 
-The code can be exercised using tools such as cURL and [Postman](https://www.postman.com/). Documentation of the RESTful APIs is pending.
+We invite participation in an open source project to create Actors[<sup>1</sup>](#fn1) for
+edge-based self-optimization of power distribution systems. This project is named
+NIST-CTS-Agents because it is an implementation of an agent-based transactive energy 
+market using the Common Transactive Services defined during the NIST Transactive 
+Energy Challenge. 
 
-Based On
-------------
-
-The code skeleton for a simple Greeting RESTful service was taken from [The Spring Guides Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/) and its [code repository](https://github.com/spring-guides/gs-rest-service). The code is provided under the Apache 2.0 License.
-
-How to Use
+<a id="background"></a>Background
 ----------
-The code builds and runs in Spring Tool Suite 4; it typically would be run on the embedded Tomcat server.
 
-The files in ![URIs-and-payloads](./URIs-and-payloads) describe
+Transactive Resource Management (TRM) enables Actors representing systems that
+use or supply a resource—any commodity whose value is defined by time and
+delivery location— to coordinate behaviors without the need for central control.
+TRM-based systems engage Actors in markets to manage supply and demand of a
+resource over time. Markets enable emergent behavior—new behavior related to
+actors and relationships as actors meet their internal needs.
 
-- POST operations to the actors in [NIST-CTS-Agents](https://github.com/EnergyMashupLab/NIST-CTS-Agents)
-- JSON payloads for the POST operations that exercise the services
-- URIs for the various GET operations that do not require parameters or a RequestBody. 
+TRM systems are highly resilient, as Actors can join or leave the system without
+additional integration. TRM applications include managing power distribution,
+smart power grids, smart water, bandwidth sharing, placement of web and social
+media ads, and wastewater management.
 
-The random payload generating GET operations are in the RestController files **GreetingController.java** 
+When the resource is electric power, TRM is called Transactive Energy (TE).
+Transactive Energy is already used to manage the bulk power grid. TE is
+considered essential to developing new resilient power grids, to transform
+legacy power grids, and to build resource-constrained grids.
 
-Other GET operations (.../party) and POST operations and forwarding are in the LMA, LME, and TEUA RestController Java files.
+Actor-based architectures enable hyper-scalable applications that are easy to
+design, build, and maintain. Actor Interactions are limited to defined messages,
+so they support diversity of participants and technologies. Market transaction
+messages create self-optimizing systems of suppliers, consumers, and
+distribution.
 
-Documentation is pending, but the comments in the LMA, LME, and TEUA RestController files give the RequestBody and ResponseBody types which are also in this repository.
+This project will develop Transactive Energy User Agents (TEUA) interacting through
+Markets. We will define interfaces between an energy system and the Actor (TEUA)
+that represents it. TEUAs will interact with a Market Agent/Actor (MA) that
+encapsulates market behavior. While the project uses a Bilateral Market model,
+the Market Agent will incorporate a Market Modular Interface to support other
+market models.
+
+Bilateral Market is a classification; examples of bilateral markets include Double Auction and Order Book.
+
+To see a description of the components that make up this project, look under the 
+subfolders of the [source directory](complete/src) as well as the project wiki (in progress) and [documentation folder](complete/docs).
+
+Results
+-------
+
+We expect that this project will make it easier for communities, facility
+owners, and device makers to apply TE. For example, NIST looks to use these agents and actors in
+simulations to model TE for regulators and legislators. A complete
+implementation of the Common Transactive Services will be highly visible and
+widely used.
 
 Standards Used
 --------------
 
-The Common Transactive Services Project uses standards including
-
--   The [Common Transactive Services](https://github.com/EnergyMashupLab/TransactiveEnergyChallenge) - See CommonTransactiveServices
-    in that repository. These services were defined in the NIST Transactive Energy Challenge as a universal means of interacting
-    with markets, and specifically markets for energy. The Common Transactive Services are shown in that report to communicate
-    both ways with every known energy market implementation.
+The project uses standards including
 
 -   The TEMIX profile of [OASIS Energy
     Interoperation](https://docs.oasis-open.org/energyinterop/ei/v1.0/os/).
     Energy Interoperation is the profile base of [OpenADR 2] standardized as
-    [IEC 62746-10-1] (https://webstore.iec.ch/publication/26267)
+    [IEC 62746-10-1] (<https://webstore.iec.ch/publication/26267>)
 
 -   Informative UML models for Energy Interoperation/CTS payloads as shown in
     the EI Standard
 
--   [ISO 17800 Facility Smart Grid Information Model](https://www.iso.org/standard/71547.html)
+-   ISO 17800 Facility Smart Grid Information Model
+    (<https://www.iso.org/standard/71547.html> )
 
 -   Adapter methods for integrating with Independent System Operator Wholesale
-    Markets and other energy markets are based on [IEC 62746-10-3:2018](https://webstore.iec.ch/publication/59771)
+    Markets and other energy markets are based on [IEC 62746-10-3:2018]
+    (<https://webstore.iec.ch/publication/59771>)
 
-License
----------
-Provided under the Apache 2.0 License; please see LICENSE in top level for details.
+<a id="tech-desc"></a>Technical Description
+---------------------
+
+The NIST-CTS Project is a standards-based implementation of the Common
+Transactive Services using a Transactive Energy User Agenta (TEUA), a Local Market Agent (LMA) that facilitiates interaction between users
+and local markets through a Local Market Engine (LME).
+The Implementation Architecture Diagram shows terminology and relationships within the implementation.![Architecture Diagram](complete/docs/pictures/ArchitectureCts20200720.png) 
+
+The client/building/supervisory controller view is ![CLient View drawing](complete/docs/pictures/ClientViewCts20200720.png)
+
+The project has a number of components and information in a number of subfolders under [../dev](../dev ).
+
+-   **Markets** including
+
+    -   The Local Market Engine (LME), the agent that fronts the market implementation including the matching engine that matches buy and sell tenders
+    
+    -   A bilateral market
+    
+    -   (future) Additional plug-in markets and documentation
+
+-   **Local Market Agent** (LMA) which interacts with the local market and with Transactive
+    Energy User Agents and External Market Adapters using CTS. Functions include    
+    -   Market Position Management (see note)
+    
+    -   The Ledger, the record of cleared (not pending) transactions (see note)
+    
+    -   Hook points for price Adjustments, enabling market economics experiments
+    
+    -   Uses CTS to connect to the LME and TEUAs
+    
+    -   Links to external markets via the External Market Adapter (EMA) which specializes the TEUA
+    
+-   **External Market Adapter** (EMA), a specialization of the TEUA, interacts with the Local Market Agent and a single external market. 
+Functions include
+        
+    -   Price Adjustment hooks, enabling market economics experiments and presentation of markup on wholesale prices
+    
+    -  Uses CTS to connect to the LMA and indirectly to other actors
+
+    
+-   **Transactive Energy [User] Agent** (TEUA) which interacts with the MA and provides
+    integration capabilities for device and facility management
+    
+    -   Implements CTS connections
+    
+    -   Integrates with the Client/Supervisory Controller (SC)
+    
+    -   With the LMA maintains the Ledger, the record of cleared (not pending) transactions (see note)
+    
+    -   Provides information on committed market positions to the Client/SC (see note)
+
+-   **Utilities** include
+
+    -   Logging (traces) and input for live and simulation meter and other data
+    
+    -   Programs to build configuration files for the market client and system
+    
+Notes: 
+A ledger is a list in time order of committed transactions. A position is cumulative committed transactions. A trace of messages includes transactions proposed but never cleared. Ledgers are saved to a file or possibly sent over a network connection as the design matures.
+
+The Position Manager tracks completed (cleared) transactions (also contained in a ledger) to determine committed market positions.
+Market position information is typically needed by the teua (on behalf of the sc).
+
+The TEUA in turn can use market position to determine the difference between committed position and projected needs. The SC may then transact only for what is needed to align current committed position with projected needs, tendering to buy or sell as appropriate.
+
+All transactions and clearing flow through the LMA which updates the Market Position database for use by the TEUA.
+
+Built With
+----------
+
+Agile programming and architecture are used.
+
+Source code and builds are managed using Github, Maven, Java 8, JUnit, Apache Log4j2, Spring and Spring Boot.
+
+Building and Running
+-------
+
+See the [documentation](docs/README.md) directory and the project wiki (in process) for the tooling and development environment.
+
+<a id="authors"></a>Authors
+-------
+
+-   **William Cox** - *Architecture* - [Cox Software Architects
+    LLC](http://coxsoftwarearchitects.com/)
+
+-   **Toby Considine –** *Architecture* – [TC9 Inc](http://www.tc9.com/)
+
+See also the list of [contributors] who have contributed to this project.
+
+<a id="license"></a>License
+-------
+
+This project is licensed under the Apache 2.0 License, and is Copyright 2019-2020 The Energy Mashup Lab.
+
+For incoming (contributed) licenses see https://github.com/EnergyMashupLab/EML_Licenses
+
+Acknowledgments
+---------------
+
+Footnotes
+---------------
+
+<a class="anchor" id="fn1">1)</a> The difference between Actors and Agents can be a fine one. The actor model of concurrent computation  treats "actor" as the universal primitive of concurrent computation. An actor is an intelligent resource that has the capacity to initiate, manage, and/or control activities of given types. In response to a message it receives, an actor can: make local decisions, create more actors, send more messages, and determine how to respond to the next message received. An Agent *may* be a particular instantiation of an Actor. Some distinguish the two by whether systems can share direct access to external data--to them, an Agent can and an Actor cannot. Perhaps the Market Matching Engine is an Actor and a component of the the Local Market which is an Agent. Similary, the TEUA may be an Actor which with the SC comprises the User Agent. 
+This project does not wish to delve into these semantics, and generally uses the terms interchangeably.
+

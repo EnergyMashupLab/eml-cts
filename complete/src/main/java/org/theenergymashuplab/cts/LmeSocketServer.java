@@ -1,33 +1,36 @@
+/*
+ * Copyright 2019-2020 The Energy Mashup Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.theenergymashuplab.cts;
 
 
 import java.net.*;
 import java.io.*;
-import java.lang.Runnable;
 import java.lang.Thread;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.databind.ser.std.*;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.AbstractQueue;
-import java.util.AbstractCollection;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 // Not in Parity
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.theenergymashuplab.cts.controller.LmeRestController;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
+import org.theenergymashuplab.cts.controller.payloads.MarketCreateTransactionPayload;
 
 
 /*
@@ -143,7 +146,7 @@ public class LmeSocketServer extends Thread	{
             
             //	Get original Tender for this MarketCreateTransaction
             eiCreateTender =
-            	LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.ctsTenderId);
+            	LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.getCtsTenderId());
             
             // LATER TODO clean up and remove entry when tender quantity becomes zero
             if (eiCreateTender == null) {

@@ -14,16 +14,37 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
-public class ActorIdType extends UidType {
+/*
+ * Sent by TEUA to the requesting Client/SC. Includes CtsTenderId
+ */
+
+public class ClientCreatedTenderPayload	{
+	long ctsTenderId;
+	private Boolean success = false;
+	private String info = "ClientCreatedTenderPayload";
 	
-	public long value() {
-		return this.myUidId;
+	ClientCreatedTenderPayload(){
+		success = true;
+	}
+	
+	public ClientCreatedTenderPayload(long id){
+		ctsTenderId = id;
+		this.success = true;
 	}
 	
 	@Override
 	public String toString()	{
-		return (String.valueOf(myUidId));
+		return (info + " success is " + success.toString() +
+				" CtsTenderId " + ctsTenderId);
+	}
+
+	public long getCtsTenderId() {
+		return ctsTenderId;
+	}
+
+	public void setCtsTenderId(long ctsTenderId) {
+		this.ctsTenderId = ctsTenderId;
 	}
 }

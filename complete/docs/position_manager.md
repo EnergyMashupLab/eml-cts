@@ -1,20 +1,17 @@
 Position Manager
 ======================================
 
-## Position Manager Payload
-Stored in org.theenergymashuplab.cts.controller.payloads package, in this class all the rest call to access position manager is stored. 
+## Position Manager 
+See packages org.theenergymashuplab.cts.controller.payloads, .model, .dao, and .repository for details.
 
-Following describes all its api.
-1. createPosition : Will add position into the table.
-2. getPositionHistoryToId : Fetch position from table with respect to the sellerId.
-3. getPositionHistoryFromId : Fetch position from table with respect to the buyerId.
-4. getPositionHistory : Fetch position from table with respect to the count.
-5. getStatus : Fetch status from table given the id of respective position id.
+The Position Manager uses JPA to store its information. The REST API for the PositionManager RestController is
+
+1. POST: /position/{positionParty}/add adds a position for a particular Party and time interval, creating a database row if not present. 
+2. GET: /position/{positionParty}/getPosition retrieves the position for a specific Party and time interval
 
 ## Position Manager Model
-Stored in org.theenergymashuplab.cts.model package, it represents the database table.
+PositionManagerModel represents the database table.
 
 ## Position Repository 
-Stored in org.theenergymashuplab.cts.repository package, in this class all the native queries are stored.
-
+PositionRepository contains all the native SQL queries.
 

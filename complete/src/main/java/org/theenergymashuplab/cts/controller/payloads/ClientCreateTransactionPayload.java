@@ -14,32 +14,41 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
-public class ClientTender {
-	private SideType side;
+import org.theenergymashuplab.cts.SideType;
+
+public class ClientCreateTransactionPayload {
+	String info = "ClientCreateTransactionPayload";
+	SideType side;
 	private long quantity;
-	private long price;	// with multipler for decimal fraction
+	private long price;
+	// external price is multiplied by 10**decimal fraction digits - 3 by convention
+	// ctsTenderId is the CTS ID of the tender made by this SC that cleared
 	
-	public ClientTender()	{
-		side = SideType.BUY;
-		quantity = 0;
-		price = 0;
-	}
+	long ctsTenderId; // matched in Parity
 	
-	// new ClientTender(randSide, randQuantity, randPrice)
-	
-	public ClientTender(SideType side, long quantity, long price)	{
+	public ClientCreateTransactionPayload(SideType side, long quantity,
+										long price, long tenderId)	{
+		// values from EiTransaction that are not implicit (e.g. market, product)
 		this.side = side;
 		this.quantity = quantity;
 		this.price = price;
+		this.ctsTenderId= tenderId;
 	}
 	
-	@Override
 	public String toString()	{
-		return ("ClientTender side " + side.toString() + " quantity " +
+		return (info + " side " + side.toString() + " quantity " +
 				Long.toString(quantity) + " price " +
-				Long.toString((price/1000)));			
+				Long.toString(price) + " ctsTenderId " + ctsTenderId);
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 	public SideType getSide() {
@@ -65,4 +74,13 @@ public class ClientTender {
 	public void setPrice(long price) {
 		this.price = price;
 	}
+
+	public long getCtsTenderId() {
+		return ctsTenderId;
+	}
+
+	public void setCtsTenderId(long ctsTenderId) {
+		this.ctsTenderId = ctsTenderId;
+	}
+	
 }

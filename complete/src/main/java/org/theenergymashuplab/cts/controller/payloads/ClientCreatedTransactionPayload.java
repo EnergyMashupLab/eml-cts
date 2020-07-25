@@ -14,37 +14,29 @@
  * limitations under the License.
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-public class UidType {
-
-	public long myUidId = 0;
-	private static final AtomicLong uidIdCounter = new AtomicLong();
-
-	UidType(long uidId){
-		myUidId = uidIdCounter.addAndGet(uidId);
-	    }
-
-	UidType(){
-		myUidId = uidIdCounter.incrementAndGet();
-	    }
-
-	public long value() {
-		return this.myUidId;
+/*
+ * Response from Client/SC to its TEUA
+ */
+public class ClientCreatedTransactionPayload {
+	private Boolean success = false;
+	
+	public ClientCreatedTransactionPayload()	{
+		success = true;
+	// class may be extended further
 	}
 	
+	@Override
 	public String toString()	{
-		return ("Uid: " + String.valueOf(this.myUidId));
+		return ("ClientCreatedTransactionPayload success is " + success.toString());
 	}
 
-	public long getMyUidId() {
-		return myUidId;
+	public Boolean getSuccess() {
+		return success;
 	}
 
-	public void setMyUidId(long myUidId) {
-		this.myUidId = myUidId;
-	}
-	
+	public void setSuccess(Boolean success) {
+		this.success = success;
+	}	
 }
