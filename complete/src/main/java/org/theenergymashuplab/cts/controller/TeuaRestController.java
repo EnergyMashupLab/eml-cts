@@ -227,21 +227,10 @@ public class TeuaRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTenderPayload postEiCancelTender(
 				@RequestBody EiCancelTenderPayload eiCancelTender)	{
-		List<TenderIdType> tempTenderIDs;
-		EiCancelTenderPayload tempCancel;	
-		EICanceledTenderPayload tempCanceled;
-		
-		tempCancel = eiCancelTender;
-		tempTenderIDs = eiCancelTender.getTenderIDs();
+		final RestTemplate restTemplate = new RestTemplate();
 
-		
-		tempCanceled = new EICanceledTenderPayload(
-				tempCancel.getPartyId(),
-				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"),
-				new EiCanceledResponse());
-		
-		return tempCanceled;
+		return restTemplate.postForObject("http://localhost:8080/lma/cancelTender", eiCancelTender,
+				EICanceledTenderPayload.class);
 	}
 
 	
