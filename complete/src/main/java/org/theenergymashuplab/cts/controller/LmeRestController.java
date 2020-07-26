@@ -33,6 +33,7 @@ import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
+import org.theenergymashuplab.cts.dto.EiCanceledResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -43,6 +44,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/lme")
@@ -193,19 +195,20 @@ public class LmeRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTenderPayload postEiCancelTenderPayload(
 			@RequestBody EiCancelTenderPayload eiCancelTenderPayload)	{
-		TenderIdType tempTenderId;
+		List<TenderIdType> tempTenderIDs;
 		EiCancelTenderPayload tempCancel;	
 		EICanceledTenderPayload tempCanceled;
 		
 		tempCancel = eiCancelTenderPayload;
-		tempTenderId = eiCancelTenderPayload.getTenderId();
+		tempTenderIDs = eiCancelTenderPayload.getTenderIDs();
 
 //		tempCancel.print();	// DEBUG
 		
 		tempCanceled = new EICanceledTenderPayload(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				new EiCanceledResponse());
 		
 		return tempCanceled;
 	}
