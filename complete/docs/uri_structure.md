@@ -15,7 +15,7 @@ Note that the {id} in URI determines the transport end point. ActorId is indepen
 
 Certain payloads are created in the market integration code; in the current release they are in parity-client/CtsBridge.java and associated code files.
 
-Local Market Agent Services
+##### Local Market Agent Services
 | URI	| Operation | RequestBody	| ResponseBody	|
 | ---		| ---		| ---	| --- |
 |/lma/createTender	|	POST|	EiCreateTender|	EiCreatedTender
@@ -23,21 +23,21 @@ Local Market Agent Services
 |/lma/cancelTender	|	POST|	EiCancelTender|	EiCanceledTender
 |/lma/party	|GET 		|  |	ActorId
 
-Local Market Engine Services
+##### Local Market Engine Services
 | URI	| Operation | RequestBody	| ResponseBody	|
 | ---		| ---		| ---	| --- |
 |/lme/createTender	| POST	| EiCreateTender	|	EiCreatedTender
 |/lme/cancelTender	| POST	| EiCancelTender	|	EiCanceledTender
 |/lme/party		| GET 	|			|	ActorId
 
-Transactive Energy User Agent Services
+##### Transactive Energy User Agent Services
 | URI	| Operation | RequestBody	| ResponseBody	|
 | ---		| ---		| ---	| --- |
 |/teua/{id}/createTransaction	| POST	| EiCreateTransaction	| EiCreatedTransaction
 |/teua/{id}/clientCreateTender	| POST	| ClientCreateTender	| ClientCreatedTender
 |/teua/{id}/party	| GET	|	| ActorId
 
-Client Integration Services
+##### Client Integration Services
 | URI	| Operation | RequestBody	| ResponseBody	|
 | ---		| ---		| ---	| --- |
 |/client/{id}/clientCreateTransaction	| POST	| ClientCreateTransaction	| CientCreatedTransaction
