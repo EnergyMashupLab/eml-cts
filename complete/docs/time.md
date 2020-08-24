@@ -27,9 +27,11 @@ These sleep method invocations are clock time based, or based on other activity 
 
 ## Uses of Time in CTS - Time Stamps
 
-At this writing there are no explicit time stamps in CTS. The Parity market engine uses clock time (time stamps) to group and describe
+At this writing there is only one explicit time stamp in CTS, in EiResponseType.java createdDateTime.
+
+The Parity market engine uses clock time (time stamps) to group and describe
 Orders placed in the market, but this can be viewed as ordering. Likewise, the number attached to a Parity message is used to ensure
-in-order delivery and replay.
+in-order delivery and replay. 
 
 It has been proposed for the LMA to add a timestamp when it forwards an EiCreateTender, as the TEUA may be part of the Client address
 space and security perimeter, as a timestamp should be reliable. The reliabiity of a timestamp, however, depends on trust for the stamper
