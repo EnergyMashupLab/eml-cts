@@ -19,17 +19,11 @@ package org.theenergymashuplab.cts;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
-
+import org.theenergymashuplab.cts.controller.LmeRestController;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Set;
 
 public class LmeSendTransactions	extends Thread	{
 	

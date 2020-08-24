@@ -16,20 +16,14 @@
 
 package org.theenergymashuplab.cts;
 
-import java.time.*;
-
 import java.time.Instant;
-import java.time.Duration;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 /*
  * 	Utility routine to generate random CreateClientTenderPayloads
@@ -106,7 +100,6 @@ public class RandomCreateClientTender {
 		
 		startTime = instants[rand.nextInt(24)];
 		price = 10*(rand.nextInt(29) + 1);	//random price from 1..30 cents
-		Instant exp = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
 
 		SideType side = SideType.BUY;
 		if (rand.nextInt(100) > 50)	{

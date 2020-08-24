@@ -16,15 +16,11 @@
 
 package org.theenergymashuplab.cts;
 
-import java.time.*;
-
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
+
+import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /*
@@ -43,7 +39,6 @@ public class GenerateClientCreateTender {
 		ClientCreateTenderPayload payload = null;
 		SideType side;
 		long quantity, price;
-		long randQuantity;
 		String jsonOut = null;
 				
 		for (int i = 0; i<20 ; i++) {

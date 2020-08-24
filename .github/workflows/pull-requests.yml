@@ -1,0 +1,25 @@
+name: Pull-Request CI
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8'
+          java-package: jdk
+          architecture: x64
+
+      - name: Build
+        run: mvn compile --file complete/pom.xml
+
+      - name: Run Tests
+        run: mvn test --file complete/pom.xml
