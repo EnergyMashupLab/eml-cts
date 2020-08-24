@@ -38,10 +38,11 @@ import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
+import org.theenergymashuplab.cts.dto.EiCanceledResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -226,20 +227,10 @@ public class TeuaRestController {
 	@PostMapping("/cancelTender")
 	public EICanceledTenderPayload postEiCancelTender(
 				@RequestBody EiCancelTenderPayload eiCancelTender)	{
-		TenderIdType tempTenderId;
-		EiCancelTenderPayload tempCancel;	
-		EICanceledTenderPayload tempCanceled;
-		
-		tempCancel = eiCancelTender;
-		tempTenderId = eiCancelTender.getTenderId();
+		final RestTemplate restTemplate = new RestTemplate();
 
-		
-		tempCanceled = new EICanceledTenderPayload(
-				tempCancel.getPartyId(),
-				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"));
-		
-		return tempCanceled;
+		return restTemplate.postForObject("http://localhost:8080/lma/cancelTender", eiCancelTender,
+				EICanceledTenderPayload.class);
 	}
 
 	

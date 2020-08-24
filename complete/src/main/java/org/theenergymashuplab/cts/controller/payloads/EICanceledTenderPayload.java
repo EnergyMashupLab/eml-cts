@@ -18,19 +18,22 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.dto.EiCanceledResponse;
 
 public class EICanceledTenderPayload {
 	private final ActorIdType partyId;
 	private final ActorIdType counterPartyId;
 	public EiResponse response;
+	private EiCanceledResponse canceledResponse;
 //	public ArrayofResponses responses; NOT USED
 //	refId is in the EiResponse
 
 	
-	public EICanceledTenderPayload(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response) {
+	public EICanceledTenderPayload(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response, EiCanceledResponse canceledResponse) {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
+		this.canceledResponse = canceledResponse;
 	}
 
 	//Default constructor for JSON serialization
@@ -38,6 +41,7 @@ public class EICanceledTenderPayload {
 		this.partyId = new ActorIdType();
 		this.counterPartyId = new ActorIdType();
 		this.response = new EiResponse(200, "OK");
+		this.canceledResponse = new EiCanceledResponse();
 	}
 	
 	
@@ -57,7 +61,8 @@ public class EICanceledTenderPayload {
 				"PENDING" +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" response " + response.toString();
+				" response " + response.toString() +
+				" canceledResponse " + canceledResponse.toString();
 	}
 
 	public EiResponse getResponse() {

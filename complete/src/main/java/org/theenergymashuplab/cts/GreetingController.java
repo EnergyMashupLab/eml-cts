@@ -97,10 +97,7 @@ public class GreetingController {
 		tempTransaction = new EiTransaction(tempTender);
 		
 		// create a new EiCreateTransaction body using random tender held in tempTender and sequential new ActorIds
-		tempEiCancelTender = new EiCancelTenderPayload(
-				new TenderIdType(),
-				new ActorIdType(), 
-				new ActorIdType());
+		tempEiCancelTender = new EiCancelTenderPayload();
 		/*
 		 * 	public EiCancelTender(TenderId tenderId, ActorId party, ActorId counterParty) {
 		 */
