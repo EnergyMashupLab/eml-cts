@@ -2,7 +2,9 @@
   <br>
   <a href="http://www.theenergymashuplab.org/"><img src="http://static1.squarespace.com/static/53dd102ae4b0474fbf8ce365/t/55da1f5de4b07faafab2518c/1440358237526/EML+Logo+20150816+No+Text.png?format=1500w" alt="Energy Mashup Lab" width="200"></a>
   <br>
-  NIST CTS Agents
+Energy Mashup Lab Common Transactive Services
+    <br>
+    EML-CTS
   <br>
 </h1>
 
@@ -16,7 +18,7 @@
 
 We invite participation in an open source project to create Actors[<sup>1</sup>](#fn1) for
 edge-based self-optimization of power distribution systems. This project is named
-NIST-CTS-Agents because it is an implementation of an agent-based transactive energy 
+EML-CTS because it is an implementation by The Energy Mashup Lab and others of an agent-based transactive energy 
 market using the Common Transactive Services defined during the NIST Transactive 
 Energy Challenge. 
 
@@ -62,7 +64,7 @@ Results
 -------
 
 We expect that this project will make it easier for communities, facility
-owners, and device makers to apply TE. For example, NIST looks to use these agents and actors in
+owners, and device makers to apply TE. For example, this project is being used in
 simulations to model TE for regulators and legislators. A complete
 implementation of the Common Transactive Services will be highly visible and
 widely used.
@@ -90,9 +92,9 @@ The project uses standards including
 <a id="tech-desc"></a>Technical Description
 ---------------------
 
-The NIST-CTS Project is a standards-based implementation of the Common
+The EML-CTS Project is a standards-based implementation of the Common
 Transactive Services using a Transactive Energy User Agenta (TEUA), a Local Market Agent (LMA) that facilitiates interaction between users
-and local markets through a Local Market Engine (LME).
+and local markets through a Local Market Engine (LME) which in turn can connect to a market.
 The Implementation Architecture Diagram shows terminology and relationships within the implementation.![Architecture Diagram](complete/docs/pictures/ArchitectureCts20200720.png) 
 
 The client/building/supervisory controller view is ![CLient View drawing](complete/docs/pictures/ClientViewCts20200720.png)
@@ -185,6 +187,18 @@ For incoming (contributed) licenses see https://github.com/EnergyMashupLab/EML_L
 
 Acknowledgments
 ---------------
+We gratefully acknowledge support from 
+- NIST, the National Institute of Standards and Technology, including David Holmberg and Thomas Roth
+- The New Jersey Institute of Technology and the NJIT Capstone program where we worked with faculty and teams of Seniors and Masters students, specifically
+  - Professor Osama Eljabiri 
+  - Capstone Executive Team members for each term listed below
+  - Team members Fall 2020: Omair Abdul, Omar Janouk, Matthew Molinari
+  - Team members Summer 2020: Indira A. Akkiraju, Josiah Nieves, Alex Shepherd
+  - Team members Spring 2020: Matt Amato, Dhruvinkumar Desai, Anupam Saini, Justin Schuster
+  - Team members Fall 2019: Rajeev Chanchlan, Jasper Sam David, Mounica Gona, Dhrumil Shah, Karan Shah
+- Officers and Members of The Energy Mashup Lab including
+  - Toby Considine, William Cox
+
 
 Footnotes
 ---------------
