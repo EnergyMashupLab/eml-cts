@@ -34,6 +34,8 @@ import org.theenergymashuplab.cts.controller.payloads.MarketCreateTenderPayload;
 /*
  * Start by new LmeSocketClient.startConnection(("127.0.0.1",
  *	port matching server)
+ *
+ *	NOTE changing to non-loopback IP for docker deployment
  *	
  *	Insert into LmeRestController to receive Tender information
  *	and generate EiCreateTransaction with new TransactionId, using the
@@ -62,7 +64,20 @@ public class LmeSocketClient	extends Thread {
     // Socket Server in Market for CreateTender 
 	public static final int MARKET_PORT = 39402;
 	private static int port = MARKET_PORT;
-	private static String ip = "127.0.0.1";
+	
+	
+	// 
+	/*
+	 * 	TODO
+	 * 	Step one - connect to IP address statically
+	 * 	Step two - use a command line argument to get this IP address -
+	 */
+	// wtc laptop in home office is 192.168.1.77
+	// assigned IP for the parity-client docker is 192.168.1.51
+//	private static String ip = "192.168.1.51";
+	// need command entry
+	private static String ip = "192.168.1.77";
+
 	
 	//	TODO better document queues on parity and CTS side
 	
@@ -78,17 +93,21 @@ public class LmeSocketClient	extends Thread {
 		MarketCreateTenderPayload toJson;
 		String jsonString = null;	// for JSON string
 
-		logger.trace("LmeSocketClient.run " + Thread.currentThread().getName() +
+		System.err.println("LmeSocketClient.run " + Thread.currentThread().getName() +
+				" port " + port + " ip " + ip);
+		
+		logger.info("LmeSocketClient.run " + Thread.currentThread().getName() +
 					" port " + port + " ip " + ip);
+
 		
 		try {
 				clientSocket = new Socket(ip, port);
-				logger.debug("clientSocket is " + clientSocket.toString());
+				logger.info("clientSocket is " + clientSocket.toString());
 				out = new PrintWriter(clientSocket.getOutputStream(), true);
-				logger.debug("out constructor " + out.toString());
+				logger.info("out constructor " + out.toString());
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		} catch (IOException e) {
-				logger.debug("SocketClient start IOException: " + e.getMessage());
+				logger.info("SocketClient IOException: " + e.getMessage());
 				e.printStackTrace();
 		}
 		  
@@ -97,7 +116,7 @@ public class LmeSocketClient	extends Thread {
 				LmeRestController.queueFromLme.size());
 			  try {
 				create = LmeRestController.queueFromLme.take();
-				logger.debug("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
+				logger.info("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
 						" " + create.getTender().toString());
 				tender = create.getTender();
 				toJson = new MarketCreateTenderPayload(
@@ -113,6 +132,11 @@ public class LmeSocketClient	extends Thread {
 							
 				// convert to a JSON string and write to socket
 				jsonString = mapper.writeValueAsString(toJson);
+				
+				if (jsonString == null)	{
+					System.err.println("jsonString in LmeSocketClient is NULL!");
+				}
+				
 				logger.trace("run() before send of json string " + jsonString);
 				out.println(jsonString);			
 				logger.trace("LME Socket Client after sending parity json string " + jsonString);
