@@ -24,6 +24,7 @@ import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiTender;
 import org.theenergymashuplab.cts.EiTransaction;
+import org.theenergymashuplab.cts.EnergyApplication;
 import org.theenergymashuplab.cts.LmeSendTransactions;
 import org.theenergymashuplab.cts.LmeSocketClient;
 import org.theenergymashuplab.cts.LmeSocketServer;
@@ -59,6 +60,10 @@ public class LmeRestController {
 	private static Boolean lmeSocketClientNotRunning = true;
 	private static Boolean lmeSocketServerNotRunning = true;
 	
+	// IP address to use for sending tenders to Matching Engine.
+	// Symmetric with Matching Engine connection to send transactions here
+	public static String matchingEngineIpAddress = null;
+	
 	// queueFromLme is used by LmeSocketClient to accept CreateTenderPayload
 	// queue.put here in LME, take in LmeSocketClient which connects to the market
 	// Queue capacity is not an issue
@@ -91,6 +96,10 @@ public class LmeRestController {
 	
 	LmeRestController()	{
 		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
+		
+		//	used in <IP Address, Port> for LmeSocketClient thread startup
+		//	taken directly in LmeSocketClient TODO
+//		this.matchingEngineIpAddress = EnergyApplication.matchingEngineIpAddress;
 		
 		//	Start thread to read createTransactionQ and send
 		lmeSendTransactionsThread.start();

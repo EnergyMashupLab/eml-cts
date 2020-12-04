@@ -75,13 +75,18 @@ public class LmeSocketClient	extends Thread {
 	// wtc laptop in home office is 192.168.1.77
 	// assigned IP for the parity-client docker is 192.168.1.51
 //	private static String ip = "192.168.1.51";
-	// need command entry
-	private static String ip = "192.168.1.77";
+	
+	// from command line or default localhost
+	private String ip = null;
+	
+
 
 	
 	//	TODO better document queues on parity and CTS side
 	
 	public LmeSocketClient()	{
+		ip = EnergyApplication.matchingEngineIpAddress;
+		System.err.println("IP Address '" + ip + "'");
 	}
 
 	

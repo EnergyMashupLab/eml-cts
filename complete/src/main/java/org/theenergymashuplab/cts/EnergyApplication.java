@@ -35,7 +35,7 @@ public class EnergyApplication {
 	 */
 	public final int LME_PORT = 39401;		// for Socket Server in LME takes CreateTransaction
 	public final int MARKET_PORT = 39402;	// for Socket Server in Market takes CreateTender 
-	
+	public static String matchingEngineIpAddress = "127.0.0.1";	// default is localhost
 	
 	private static final Logger logger = LogManager.getLogger(
 			EnergyApplication.class);
@@ -50,7 +50,20 @@ public class EnergyApplication {
 	
 //    	new RandomCreateClientTender();	// on System.out before run
     	
-        SpringApplication.run(EnergyApplication.class, args);
+    	/*
+    	 * Take first command line argument and store in LME.matchingEngineIpAddress
+    	 * for passing to LmeSocketClient for connection to the Matching Engine
+    	 */
+      if (args.length != 1)	{
+    	  System.err.println("eml-cts <IP Address for Matching Engine>. Using localhost");
+      }	else	{
+    	  // use command line argument
+    	  matchingEngineIpAddress = args[0];
+    	  logger.info("Using matchingEngineIpAddress '" +
+    			  matchingEngineIpAddress + "'");
+      }
+    	  	
+      SpringApplication.run(EnergyApplication.class, args);
     }
     
 	@Bean
