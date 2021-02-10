@@ -78,19 +78,17 @@ Standards Used
 The project uses standards including
 
 -   The TEMIX profile of [OASIS Energy
-    Interoperation](https://docs.oasis-open.org/energyinterop/ei/v1.0/os/).
-    Energy Interoperation is the profile base of [OpenADR 2] standardized as
-    [IEC 62746-10-1] (<https://webstore.iec.ch/publication/26267>)
+    Interoperation](https://docs.oasis-open.org/energyinterop/ei/v1.0/os/energyinterop-v1.0-os.html).
+    Energy Interoperation is the profile base of [OpenADR 2](https://www.openadr.org/) standardized as
+    [IEC 62746-10-1](<https://webstore.iec.ch/publication/26267>)
 
 -   Informative UML models for Energy Interoperation/CTS payloads as shown in
     the EI Standard
 
--   ISO 17800 Facility Smart Grid Information Model
-    (<https://www.iso.org/standard/71547.html> )
+-   [ISO 17800 Facility Smart Grid Information Model](https://www.iso.org/standard/71547.html)
 
 -   Adapter methods for integrating with Independent System Operator Wholesale
-    Markets and other energy markets are based on [IEC 62746-10-3:2018]
-    (<https://webstore.iec.ch/publication/59771>)
+    Markets and other energy markets are based on [IEC 62746-10-3:2018](https://webstore.iec.ch/publication/59771)
 
 <a id="tech-desc"></a>Technical Description
 ---------------------
@@ -139,9 +137,9 @@ The project has a number of components under [../dev](../dev ). The major compon
 
 -   **Utility Functions** include
 
-    -   Logging (traces) and input for live and simulation meter and other data
+    -   Logging (traces)
     
-    -   Programs to build configuration files for the market client and system
+    -   Programs to build configuration files for the ParityTrading market client and ParityTrading system
     
 Notes: 
 A ledger is a list in time order of committed transactions. A position is cumulative committed transactions. A trace of messages includes transactions proposed but never cleared. Ledgers are saved to a file or possibly sent over a network connection as the design matures.
