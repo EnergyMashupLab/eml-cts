@@ -1,9 +1,10 @@
 <h1 align="center">
   <br>
-  <a href="http://www.theenergymashuplab.org/"><img src="http://static1.squarespace.com/static/53dd102ae4b0474fbf8ce365/t/55da1f5de4b07faafab2518c/1440358237526/EML+Logo+20150816+No+Text.png?format=1500w" alt="Energy Mashup Lab" width="200"></a>
+  <a href="http://www.theenergymashuplab.org/"><img src=complete/docs/pictures/EML_logo.png alt="Energy Mashup Lab" width="200"></a>
   <br>
 Energy Mashup Lab Common Transactive Services
     <br>
+  <br>
     EML-CTS
   <br>
 </h1>
@@ -16,11 +17,13 @@ Energy Mashup Lab Common Transactive Services
   <a href="#license">License</a>
 </p>
 
-We invite participation in an open source project to create Actors[<sup>1</sup>](#fn1) for
-edge-based self-optimization of power distribution systems. This project is named
+We invite participation in this open source project to create Actors[<sup>1</sup>](#fn1) for
+edge-based self-optimization of power distribution systems.
+
+This project is named
 EML-CTS because it is an implementation by The Energy Mashup Lab and others of an agent-based transactive energy 
 market using the Common Transactive Services defined during the NIST Transactive 
-Energy Challenge. 
+Energy Challenge and refined during this project.
 
 <a id="background"></a>Background
 ----------
@@ -94,53 +97,47 @@ The project uses standards including
 
 The EML-CTS Project is a standards-based implementation of the Common
 Transactive Services using a Transactive Energy User Agenta (TEUA), a Local Market Agent (LMA) that facilitiates interaction between users
-and local markets through a Local Market Engine (LME) which in turn can connect to a market.
-The Implementation Architecture Diagram shows terminology and relationships within the implementation.![Architecture Diagram](complete/docs/pictures/ArchitectureCts20200720.png) 
+and local markets through a Local Market comprised of a Local Market Manager (LMM) which in turn connects with a matching engine (ME).
+The  Architecture Diagram shows terminology and relationships within the implementation.![Architecture Diagram](complete/docs/pictures/ArchitectureCts20201104.png) 
 
-The client/building/supervisory controller view is ![CLient View drawing](complete/docs/pictures/ClientViewCts20200720.png)
+The client/building/supervisory controller/external market/external microgrid, or *user* view is that each user engages with others through a local market by means of its respective Transactive Energy User Agent![CLient View drawing](complete/docs/pictures/LogicalCts20200910.png)
 
-The project has a number of components and information in a number of subfolders under [../dev](../dev ).
+The project has a number of components under [../dev](../dev ). The major components are
 
 -   **Markets** including
 
-    -   The Local Market Engine (LME), the agent that fronts the market implementation including the matching engine that matches buy and sell tenders
+    -   The Local Market Manager (LMM), the agent that fronts the market implementation including the matching engine that matches buy and sell tenders
     
-    -   A bilateral market
+    -   A bilateral market or matching engine (ME), ParityTrading in the current implementation
     
-    -   (future) Additional plug-in markets and documentation
+    -   (future) Additional markets
 
 -   **Local Market Agent** (LMA) which interacts with the local market and with Transactive
-    Energy User Agents and External Market Adapters using CTS. Functions include    
+    Energy User Agents and External Market Adapters using CTS messages. Functions include    
     -   Market Position Management (see note)
     
-    -   The Ledger, the record of cleared (not pending) transactions (see note)
+    -   A logical Ledger, the record of cleared (not pending) transactions (see note)
     
     -   Hook points for price Adjustments, enabling market economics experiments
     
-    -   Uses CTS to connect to the LME and TEUAs
+    -   Uses CTS messages to connect to the LMM and TEUAs
     
-    -   Links to external markets via the External Market Adapter (EMA) which specializes the TEUA
+    -   Links to external markets via the External Market Adapter (EMA)
     
--   **External Market Adapter** (EMA), a specialization of the TEUA, interacts with the Local Market Agent and a single external market. 
-Functions include
-        
-    -   Price Adjustment hooks, enabling market economics experiments and presentation of markup on wholesale prices
+-   **Transactive Energy [User] Agent** (TEUA) which interacts with the LMA and provides
+    integration capabilities for device and facility management as well as external microgrids and/or markets
     
-    -  Uses CTS to connect to the LMA and indirectly to other actors
+    -   Interacts through CTS messages
+    
+    -   Integrates with the Client/Supervisory Controller/User (Energy Manager on the diagram)
+    
+    -   With the LMA maintains the logical Ledger, the record of cleared (not pending) transactions (see note)
+    
+    -   Can provide information on committed market positions to the Client/SC (see note)
+    -   Serves to connect an external market or microgrid, enabling two way communication to buy or sell
+    -   A place for price adjustments or other integration modifications
 
-    
--   **Transactive Energy [User] Agent** (TEUA) which interacts with the MA and provides
-    integration capabilities for device and facility management
-    
-    -   Implements CTS connections
-    
-    -   Integrates with the Client/Supervisory Controller (SC)
-    
-    -   With the LMA maintains the Ledger, the record of cleared (not pending) transactions (see note)
-    
-    -   Provides information on committed market positions to the Client/SC (see note)
-
--   **Utilities** include
+-   **Utility Functions** include
 
     -   Logging (traces) and input for live and simulation meter and other data
     
@@ -149,12 +146,12 @@ Functions include
 Notes: 
 A ledger is a list in time order of committed transactions. A position is cumulative committed transactions. A trace of messages includes transactions proposed but never cleared. Ledgers are saved to a file or possibly sent over a network connection as the design matures.
 
-The Position Manager tracks completed (cleared) transactions (also contained in a ledger) to determine committed market positions.
-Market position information is typically needed by the teua (on behalf of the sc).
+The Position Manager tracks completed (cleared) transactions (also contained in a logical ledger) to record committed market positions.
+Market position information may be needed by a TEUA (on behalf of its user).
 
-The TEUA in turn can use market position to determine the difference between committed position and projected needs. The SC may then transact only for what is needed to align current committed position with projected needs, tendering to buy or sell as appropriate.
+A TEUA can use market position to determine the difference between committed position and projected needs, simplifying the user's job. The TEUA may then transact only for what is needed to align current committed position with projected needs, tendering to buy or sell as appropriate.
 
-All transactions and clearing flow through the LMA which updates the Market Position database for use by the TEUA.
+All transactions and clearing flow through the LMA which updates the Market Position database for use by others.
 
 Built With
 ----------
@@ -166,12 +163,14 @@ Source code and builds are managed using Github, Maven, Java 8, JUnit, Apache Lo
 Building and Running
 -------
 
-See the [documentation](docs/README.md) directory and the project wiki (in process) for the tooling and development environment.
+See the [documentation](docs/README.md) directory and the project Wiki (in the top navigation bar on github) for the tooling and development environments.
+
+There are videos in progress for The Energy Mashup Lab's YouTube channel; links will be provided as those are published.
 
 <a id="authors"></a>Authors
 -------
 
--   **William Cox** - *Architecture* - [Cox Software Architects
+-   **William Cox** - *Architecture and Project Lead* - [Cox Software Architects
     LLC](http://coxsoftwarearchitects.com/)
 
 -   **Toby Considine –** *Architecture* – [TC9 Inc](http://www.tc9.com/)
@@ -181,7 +180,7 @@ See also the list of [contributors] who have contributed to this project.
 <a id="license"></a>License
 -------
 
-This project is licensed under the Apache 2.0 License, and is Copyright 2019-2020 The Energy Mashup Lab.
+This project is licensed under the Apache 2.0 License, and is Copyright 2019-2021 The Energy Mashup Lab.
 
 For incoming (contributed) licenses see https://github.com/EnergyMashupLab/EML_Licenses
 
