@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="http://www.theenergymashuplab.org/"><img src=complete/docs/pictures/EML_logo.png alt="Energy Mashup Lab" width="200"></a>
+  <a href="http://www.theenergymashuplab.org/"><img src=complete/docs/pictures/EML_logo.png alt="Energy Mashup Lab" width="500"></a>
   <br>
 Energy Mashup Lab Common Transactive Services
     <br>
