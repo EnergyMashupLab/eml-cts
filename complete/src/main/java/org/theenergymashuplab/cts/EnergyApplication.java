@@ -80,19 +80,19 @@ public class EnergyApplication {
     
 	public static void WaitForAppReady() {
     	restTemplate = builder.build();
-    	ActorIdType actorId;
- 
-		actorId = restTemplate.getForObject(
-				"https://lma/party", ActorIdType.class);
-		logger.info(actorId.toString());
-		
-		actorId = restTemplate.getForObject(
-				"https://lme/party", ActorIdType.class);
-		logger.info(actorId.toString());
-
-		actorId = restTemplate.getForObject(
-				"https://teua/party", ActorIdType.class);
-		logger.info(actorId.toString());
+//    	ActorIdType actorId;
+// 
+//		actorId = restTemplate.getForObject(
+//				"https://lma/party", ActorIdType.class);
+//		logger.info(actorId.toString());
+//		
+//		actorId = restTemplate.getForObject(
+//				"https://lme/party", ActorIdType.class);
+//		logger.info(actorId.toString());
+//
+//		actorId = restTemplate.getForObject(
+//				"https://teua/party", ActorIdType.class);
+//		logger.info(actorId.toString());
 	}
 	
 }

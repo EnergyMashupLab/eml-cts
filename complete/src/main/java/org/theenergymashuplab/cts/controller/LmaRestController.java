@@ -156,8 +156,8 @@ public class LmaRestController {
 		tempPartyId = tempCreate.getPartyId();
 		positionParty = tempPartyId;
 		positionInterval = tempTender.getInterval();
-		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
-				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
+//		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
+//				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
 		
 		positionUri = "http://localhost:8080/position/" +
 				positionParty.toString() +
@@ -185,8 +185,8 @@ public class LmaRestController {
 		 * 	the EiCreateTransactionPayload
 		 */
 		
-		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
-				tempCreate.toString());
+//		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
+//				tempCreate.toString());
 		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
 		
 		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
