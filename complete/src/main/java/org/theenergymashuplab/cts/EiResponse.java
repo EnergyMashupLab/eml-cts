@@ -22,7 +22,7 @@ public class EiResponse {
 	
 	public long responseCode;
 	public String responseDescription;
-	private RefIdType refId = new RefIdType();
+	private UidType refId = new UidType();
 	private Instant createdDateTime = Instant.now();
 	
 	/*
@@ -33,7 +33,7 @@ public class EiResponse {
 	public EiResponse (long code, String description, long rid)	{
 		responseCode = code;
 		responseDescription = description;
-		refId = new RefIdType();
+		refId = new UidType();
 	}
 	
 	/*
@@ -76,11 +76,11 @@ public class EiResponse {
 		this.responseDescription = responseDescription;
 	}
 
-	public RefIdType getRefId() {
+	public UidType getRefId() {
 		return refId;
 	}
 
-	public void setRefId(RefIdType refId) {
+	public void setRefId(UidType refId) {
 		this.refId = refId;
 	}
 

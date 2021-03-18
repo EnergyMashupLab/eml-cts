@@ -18,12 +18,12 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiTender;
-import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.UidType;
 
 public class EiCreateTenderPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
-	private RefIdType requestId;
+	private UidType requestId;
 	private EiTender tender;
 	
 	/*
@@ -38,7 +38,7 @@ public class EiCreateTenderPayload {
 	public EiCreateTenderPayload()	{		
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
-		this.requestId = new RefIdType();
+		this.requestId = new UidType();
 	}
 
 	/* 
@@ -54,7 +54,7 @@ public class EiCreateTenderPayload {
 		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
-		this.requestId = new RefIdType();
+		this.requestId = new UidType();
 		
 //		System.err.println("EiCreateTender Constructor before this.print()");
 //		this.print();
@@ -88,11 +88,11 @@ public class EiCreateTenderPayload {
 		this.partyId = partyId;
 	}
 
-	public RefIdType getRequestId() {
+	public UidType getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(RefIdType requestId) {
+	public void setRequestId(UidType requestId) {
 		this.requestId = requestId;
 	}
 

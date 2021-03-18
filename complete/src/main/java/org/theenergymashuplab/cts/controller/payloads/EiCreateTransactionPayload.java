@@ -18,12 +18,12 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.UidType;
 
 public class EiCreateTransactionPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
-	private RefIdType requestId;
+	private UidType requestId;
 	private EiTransaction transaction;
 	
 	// Default initializer for JSON serialization
@@ -33,7 +33,7 @@ public class EiCreateTransactionPayload {
 	public EiCreateTransactionPayload(EiTransaction eiTransaction)	{
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
-		this.requestId = new RefIdType();
+		this.requestId = new UidType();
 		this.transaction = eiTransaction;
 	}
 
@@ -49,7 +49,7 @@ public class EiCreateTransactionPayload {
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
-		this.requestId = new RefIdType();
+		this.requestId = new UidType();
 	}
 	
 	@Override
@@ -82,11 +82,11 @@ public class EiCreateTransactionPayload {
 		this.partyId = partyId;
 	}
 
-	public RefIdType getRequestId() {
+	public UidType getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(RefIdType requestId) {
+	public void setRequestId(UidType requestId) {
 		this.requestId = requestId;
 	}
 

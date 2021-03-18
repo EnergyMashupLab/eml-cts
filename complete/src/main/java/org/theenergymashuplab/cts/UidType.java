@@ -28,7 +28,7 @@ public class UidType {
 //		myUidId = uidIdCounter.addAndGet(uidId);
 //	    }
 
-	UidType(){
+	public UidType(){
 		myUidId = UUID.randomUUID().getMostSignificantBits();
 //		myUidId = uidIdCounter.incrementAndGet();
 	    }

@@ -19,13 +19,13 @@ package org.theenergymashuplab.cts.controller.payloads;
 import java.util.ArrayList;
 import java.util.List;
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
+import org.theenergymashuplab.cts.UidType;
 
 public class EiCancelTenderPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
-	private RefIdType requestId;
+	private UidType requestId;
 	// Standard has 1..* TenderIdTypes TODO
 	private List<TenderIdType> tenderIDs;
 	
@@ -36,7 +36,7 @@ public class EiCancelTenderPayload {
 	public EiCancelTenderPayload()	{
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
-		this.requestId = new RefIdType();
+		this.requestId = new UidType();
 		this.tenderIDs = new ArrayList<>();
 	}
 
@@ -50,7 +50,7 @@ public class EiCancelTenderPayload {
 		this.tenderIDs = tenderIDs;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
-		this.requestId = new RefIdType();
+		this.requestId = new UidType();
 	}
 
 	public void print() {
@@ -93,11 +93,11 @@ public class EiCancelTenderPayload {
 		this.partyId = partyId;
 	}
 
-	public RefIdType getRequestId() {
+	public UidType getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(RefIdType requestId) {
+	public void setRequestId(UidType requestId) {
 		this.requestId = requestId;
 	}
 

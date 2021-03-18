@@ -22,9 +22,9 @@ public class EiReplyPosition {
 	private ActorIdType positionParty = null;
 	private ActorIdType requestor = null;
 	private Interval boundingInterval = null;
-	private RefIdType request;
+	private UidType request;
 	private ArrayList<EiPosition> positionList = new ArrayList<EiPosition>();
-	private RefIdType requestId = new RefIdType();
+	private UidType requestId = new UidType();
 	public EiResponse response;
 	
 	// Superceded by updated PositionManager - delete in future release
@@ -81,11 +81,11 @@ public class EiReplyPosition {
 		this.boundingInterval = boundingInterval;
 	}
 
-	public RefIdType getRequest() {
+	public UidType getRequest() {
 		return request;
 	}
 
-	public void setRequest(RefIdType request) {
+	public void setRequest(UidType request) {
 		this.request = request;
 	}
 
@@ -97,11 +97,11 @@ public class EiReplyPosition {
 		this.positionList = positionList;
 	}
 
-	public RefIdType getRequestId() {
+	public UidType getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(RefIdType requestId) {
+	public void setRequestId(UidType requestId) {
 		this.requestId = requestId;
 	}
 

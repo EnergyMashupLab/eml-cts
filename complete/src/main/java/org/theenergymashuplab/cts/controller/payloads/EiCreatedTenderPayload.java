@@ -18,7 +18,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.UidType;
 import org.theenergymashuplab.cts.TenderIdType;
 
 public class EiCreatedTenderPayload {
@@ -27,7 +27,7 @@ public class EiCreatedTenderPayload {
 	private ActorIdType counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
-	private final RefIdType refId = new RefIdType();
+	private final UidType uId = new UidType();
 
 	/*
 	 * Default constructor for JSON deserialization.
@@ -58,7 +58,7 @@ public class EiCreatedTenderPayload {
 				tenderId.toString() +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
+				" uId " + uId.toString() +
 				" response " + response.toString());
 	}
 	
@@ -67,7 +67,7 @@ public class EiCreatedTenderPayload {
 				tenderId.toString() +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
+				" uId " + uId.toString() +
 				" response " + response.toString();
 	}
 	
@@ -91,7 +91,7 @@ public class EiCreatedTenderPayload {
 		return counterPartyId;
 	}
 
-	public RefIdType getRefId() {
-		return refId;
+	public UidType getRefId() {
+		return uId;
 	}
 }

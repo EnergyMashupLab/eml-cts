@@ -23,9 +23,9 @@ package org.theenergymashuplab.cts;
 public class EiRequestPosition {
 	private ActorIdType requestor;
 	private ActorIdType positionParty;	// the party whose position is described
-	private RefIdType request;
+	private UidType request;
 	private Interval boundingInterval;
-	private RefIdType requestId = new RefIdType();
+	private UidType requestId = new UidType();
 
 	/*
 	 * Default constructor for JSON deserialization.
@@ -34,7 +34,7 @@ public class EiRequestPosition {
 		
 		this.requestor = new ActorIdType();
 		this.positionParty = new ActorIdType();
-		this.request = new RefIdType();
+		this.request = new UidType();
 	}
 
 	/* 
@@ -49,7 +49,7 @@ public class EiRequestPosition {
 		this.boundingInterval = boundingInterval;
 		this.positionParty = positionParty;
 		this.requestor = requestorParty;
-		this.request = new RefIdType();
+		this.request = new UidType();
 		
 		System.err.println("EiRequestPosition Constructor before this.print()" + this.toString());	
 	}
@@ -84,11 +84,11 @@ public class EiRequestPosition {
 		this.positionParty = positionParty;
 	}
 
-	public RefIdType getRequest() {
+	public UidType getRequest() {
 		return request;
 	}
 
-	public void setRequest(RefIdType request) {
+	public void setRequest(UidType request) {
 		this.request = request;
 	}
 
@@ -100,11 +100,11 @@ public class EiRequestPosition {
 		this.boundingInterval = boundingInterval;
 	}
 
-	public RefIdType getRequestId() {
+	public UidType getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(RefIdType requestId) {
+	public void setRequestId(UidType requestId) {
 		this.requestId = requestId;
 	}
 	

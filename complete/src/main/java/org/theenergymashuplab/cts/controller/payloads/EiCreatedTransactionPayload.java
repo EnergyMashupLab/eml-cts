@@ -18,7 +18,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.UidType;
 import org.theenergymashuplab.cts.TransactionIdType;
 
 public class EiCreatedTransactionPayload {
@@ -27,7 +27,7 @@ public class EiCreatedTransactionPayload {
 	private ActorIdType counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED YET
-	private final RefIdType refId = new RefIdType();
+	private final UidType uId = new UidType();
 
 	// Default initializer for JSON serialization
 	public EiCreatedTransactionPayload() {
@@ -71,7 +71,7 @@ public class EiCreatedTransactionPayload {
 				transactionId.toString() +
 				" partyId " + partyId.value() +
 				" counterPartyId " + counterPartyId.value() +
-				" refId " + refId.toString());
+				" uId " + uId.toString());
 	}
 	
 	public String toString()	{
@@ -79,7 +79,7 @@ public class EiCreatedTransactionPayload {
 				transactionId.toString() +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString());
+				" uId " + uId.toString());
 	}
 	
 	
@@ -99,7 +99,7 @@ public class EiCreatedTransactionPayload {
 		return counterPartyId;
 	}
 
-	public RefIdType getRefId() {
-		return refId;
+	public UidType getRefId() {
+		return uId;
 	}
 }
