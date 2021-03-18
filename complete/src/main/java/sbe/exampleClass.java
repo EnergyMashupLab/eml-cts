@@ -14,6 +14,8 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
 import static java.nio.file.StandardOpenOption.WRITE;
 
+import baseline.*;
+
 /**
  * Example encode and decode of a complex message using generated stub codecs.
  */
