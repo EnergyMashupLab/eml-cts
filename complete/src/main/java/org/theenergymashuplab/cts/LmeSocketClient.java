@@ -62,7 +62,7 @@ public class LmeSocketClient	extends Thread {
     // Socket Server in Market for CreateTender 
 	public static final int MARKET_PORT = 39402;
 	private static int port = MARKET_PORT;
-	private static String ip = "127.0.0.1";
+	private static String ip = "192.168.1.51";
 	
 	//	TODO better document queues on parity and CTS side
 	
