@@ -1,4 +1,4 @@
-package sbe;
+package org.theenergymashuplab.cts.sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
 
