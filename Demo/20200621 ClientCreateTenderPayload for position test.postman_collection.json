@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "e43a3302-f90f-4d5a-8f18-da87403c0c25",
+		"name": "20200621 ClientCreateTenderPayload for position test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/teua/1/clientCreateTender",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"info\":\"ClientCreateTenderPayload\",\"side\":\"BUY\",\"quantity\":54,\"price\":190,\"ctsTenderId\":0,\"bridgeInterval\":{\"durationInMinutes\":60,\"dtStart\":{\"instantString\":\"2020-06-20T05:00:00Z\"}},\"bridgeExpireTime\":{\"instantString\":\"2020-06-20T16:00:00Z\"}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/teua/1/clientCreateTender",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teua",
+						"1",
+						"clientCreateTender"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/teua/2/clientCreateTender",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"info\":\"ClientCreateTenderPayload\",\"side\":\"BUY\",\"quantity\":77,\"price\":100,\"ctsTenderId\":0,\"bridgeInterval\":{\"durationInMinutes\":60,\"dtStart\":{\"instantString\":\"2020-06-20T21:00:00Z\"}},\"bridgeExpireTime\":{\"instantString\":\"2020-06-21T08:00:00Z\"}}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/teua/2/clientCreateTender",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teua",
+						"2",
+						"clientCreateTender"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/teua/3/clientCreateTender",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"info\":\"ClientCreateTenderPayload\",\"side\":\"SELL\",\"quantity\":53,\"price\":130,\"ctsTenderId\":0,\"bridgeInterval\":{\"durationInMinutes\":60,\"dtStart\":{\"instantString\":\"2020-06-20T06:00:00Z\"}},\"bridgeExpireTime\":{\"instantString\":\"2020-06-20T17:00:00Z\"}}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/teua/3/clientCreateTender",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teua",
+						"3",
+						"clientCreateTender"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/teua/4/clientCreateTender",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"info\":\"ClientCreateTenderPayload\",\"side\":\"BUY\",\"quantity\":79,\"price\":230,\"ctsTenderId\":0,\"bridgeInterval\":{\"durationInMinutes\":60,\"dtStart\":{\"instantString\":\"2020-06-20T20:00:00Z\"}},\"bridgeExpireTime\":{\"instantString\":\"2020-06-21T07:00:00Z\"}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/teua/4/clientCreateTender",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teua",
+						"4",
+						"clientCreateTender"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/teua/1/clientCreateTender",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"info\":\"ClientCreateTenderPayload\",\"side\":\"SELL\",\"quantity\":98,\"price\":130,\"ctsTenderId\":0,\"bridgeInterval\":{\"durationInMinutes\":60,\"dtStart\":{\"instantString\":\"2020-06-20T02:00:00Z\"}},\"bridgeExpireTime\":{\"instantString\":\"2020-06-20T13:00:00Z\"}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/teua/1/clientCreateTender",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teua",
+						"1",
+						"clientCreateTender"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/teua/2/clientCreateTender",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"info\":\"ClientCreateTenderPayload\",\"side\":\"SELL\",\"quantity\":83,\"price\":30,\"ctsTenderId\":0,\"bridgeInterval\":{\"durationInMinutes\":60,\"dtStart\":{\"instantString\":\"2020-06-20T17:00:00Z\"}},\"bridgeExpireTime\":{\"instantString\":\"2020-06-21T04:00:00Z\"}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/teua/2/clientCreateTender",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teua",
+						"2",
+						"clientCreateTender"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/teua/3/clientCreateTender",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"info\": \"ClientCreateTenderPayload\",\n    \"side\": \"SELL\",\n    \"quantity\": 63,\n    \"price\": 100,\n    \"ctsTenderId\": 0,\n    \"bridgeInterval\": {\n        \"durationInMinutes\": 60,\n        \"dtStart\": {\n            \"instantString\": \"2020-06-20T08:00:00Z\"\n        }\n    },\n    \"bridgeExpireTime\": {\n        \"instantString\": \"2020-06-20T19:00:00Z\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/teua/3/clientCreateTender",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"teua",
+						"3",
+						"clientCreateTender"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
