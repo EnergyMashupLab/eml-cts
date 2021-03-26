@@ -20,7 +20,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
@@ -34,9 +33,7 @@ import org.theenergymashuplab.cts.sbe.SBEEncoderDecoder_EML;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import baseline.MarketCreateTenderPayloadEncoder;
-import baseline.MessageHeaderEncoder;
-import baseline.SideType;
+import baseline.*;
 
 /*
  * Start by new LmeSocketClient.startConnection(("127.0.0.1",
@@ -60,7 +57,7 @@ public class LmeSocketClient	extends Thread {
 	final ObjectMapper mapper = new ObjectMapper();
 
 	private Socket clientSocket;
-	private PrintWriter out;
+	//private PrintWriter out;
 	private BufferedReader in;
 	BufferedOutputStream bos;
 	
@@ -99,9 +96,10 @@ public class LmeSocketClient	extends Thread {
 		try {
 				clientSocket = new Socket("localhost", port);
 				logger.debug("clientSocket is " + clientSocket.toString());
-				out = new PrintWriter(clientSocket.getOutputStream(), true);
-				logger.debug("out constructor " + out.toString());
+				//out = new PrintWriter(clientSocket.getOutputStream(), true);
+				//logger.debug("out constructor " + bos.toString());
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				bos = new BufferedOutputStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
 				logger.debug("SocketClient start IOException: " + e.getMessage());
 				e.printStackTrace();
@@ -131,17 +129,15 @@ public class LmeSocketClient	extends Thread {
 				
 				//final MarketCreateTenderPayloadEncoder marketCreateTenderPayloadEncoder = SBEEncoderDecoder.encode(buffer,toJson);
 				
-				
-				
+							
 				/*byte[] data = new byte[marketCreateTenderPayloadEncoder.limit()];
 				  marketCreateTenderPayloadEncoder.buffer().getBytes(0, data); */
 				
 				//DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
 			//ObjectOutputStream dos = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
 				
-				bos = new BufferedOutputStream(clientSocket.getOutputStream());
 				
-				int encodingLengthPlusHeader = encode(buffer,toJson, marketCreateTenderPayloadEncoder);
+				int encodingLengthPlusHeader = SBEEncoderDecoder_EML.encode(marketCreateTenderPayloadEncoder,buffer,messageHeaderEncoder,toJson);
 				
 				bos.write(buffer.byteArray(), 0, encodingLengthPlusHeader);
 				
@@ -165,28 +161,10 @@ public class LmeSocketClient	extends Thread {
 		  
 	}
 	
-	public static int encode(UnsafeBuffer directBuffer, MarketCreateTenderPayload marketCreateTenderPayload, MarketCreateTenderPayloadEncoder marketCreateTenderPayloadEncoder)
-    {
-    	marketCreateTenderPayloadEncoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder)
-                .quantity(marketCreateTenderPayload.getQuantity())
-                .price(marketCreateTenderPayload.getPrice())
-                .ctsTenderId(marketCreateTenderPayload.getCtsTenderId())
-                .side(SideType.S);
-    	marketCreateTenderPayloadEncoder.expireTime()
-                .length(5)
-                .varDataMaxValue();
-    	marketCreateTenderPayloadEncoder.bridgeInterval()
-                .durationInMinutes(30)
-                .length(5)
-                .varDataMaxValue();
-    	return MessageHeaderEncoder.ENCODED_LENGTH + marketCreateTenderPayloadEncoder.encodedLength();
-        //return marketCreateTenderPayloadEncoder;
-
-    }
 
 	public String sendMessage(String msg) {	// not used TODO delete
 		  try {
-				out.println(msg);
+				//out.println(msg);
 				System.err.println("Client sendMessage: " + msg);
 				return in.readLine();
 		  } catch (Exception e) {
@@ -199,7 +177,7 @@ public class LmeSocketClient	extends Thread {
 	public void stopConnection() {	// not used TODO
 		  try {
 			in.close();
-			out.close();
+			//out.close();
 			clientSocket.close();
 	  } catch (IOException e) {
 			logger.debug("SocketClient stop IOException: " + e.getMessage());

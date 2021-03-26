@@ -65,4 +65,15 @@
 		<field name="bridgeInterval" id="7" type="BridgeInterval" />
 	</sbe:message>
 
+	<sbe:message name="MarketCreateTransactionPayload" id="3"
+		description="see MarketCreateTransactionPayload.java">
+		<field name="info" id="1" type="varStringEncoding" />
+		<field name="side" id="2" type="SideType" />
+		<field name="quantity" id="3" type="uint32" />
+		<field name="price" id="4" type="uint32" /> <!--System-wide implied decimal point will be applied -->
+		<field name="ctsTenderId" id="5" type="uint32" />
+		<field name="parityOrderId" id="6" type="varStringEncoding" /> <!--TODO 16 bytes -->
+		<field name="matchNumber" id="7" type="uint32" />
+	</sbe:message>
+
 </sbe:messageSchema>
