@@ -1,20 +1,29 @@
 package org.theenergymashuplab.cts.sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
+//import org.theenergymashuplab.cts.SideType;
+//import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.controller.payloads.MarketCreateTenderPayload;
+
 
 import baseline.*;
 
 
 public class SBEEncoderDecoder_EML {
    
-    public static int encode(MarketCreateTenderPayloadEncoder marketCreateTenderPayloadEncoder, UnsafeBuffer directBuffer, MessageHeaderEncoder messageHeaderEncoder, MarketCreateTenderPayload marketCreateTenderPayload)
+
+	public static int encode(MarketCreateTenderPayloadEncoder marketCreateTenderPayloadEncoder, 
+			UnsafeBuffer directBuffer, MessageHeaderEncoder messageHeaderEncoder, 
+			MarketCreateTenderPayload marketCreateTenderPayload)
     {
-    	marketCreateTenderPayloadEncoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder)
+    	
+    	org.theenergymashuplab.cts.SideType sideT = marketCreateTenderPayload.getSide();
+    	
+		marketCreateTenderPayloadEncoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder)
                 .quantity(marketCreateTenderPayload.getQuantity())
                 .price(marketCreateTenderPayload.getPrice())
                 .ctsTenderId(marketCreateTenderPayload.getCtsTenderId())
-                .side(SideType.S);
+                .side((sideT.name()=="BUY") ? SideType.B : SideType.S);
     	marketCreateTenderPayloadEncoder.expireTime()
                 .length(5)
                 .varDataMaxValue();
@@ -26,9 +35,10 @@ public class SBEEncoderDecoder_EML {
 
     }
 
-    public static long decode(final MarketCreateTransactionPayloadDecoder marketCreateTransactionPayloadDecoder, final UnsafeBuffer directBuffer, final int bufferOffset, final int actingBlockLength, final int actingVersion) throws Exception{
-       // final byte[] buffer = new byte[128];
-        final StringBuilder sb = new StringBuilder();
+    public static long decode( MarketCreateTransactionPayloadDecoder marketCreateTransactionPayloadDecoder, 
+    		 UnsafeBuffer directBuffer, int bufferOffset, int actingBlockLength, int actingVersion) throws Exception{
+
+    	final StringBuilder sb = new StringBuilder();
         marketCreateTransactionPayloadDecoder.wrap(directBuffer, bufferOffset, actingBlockLength, actingVersion);
         sb.append("\nmarketCreateTenderPayload.info=").append(marketCreateTransactionPayloadDecoder.info());
         sb.append("\nmarketCreateTenderPayload.quantity=").append(marketCreateTransactionPayloadDecoder.quantity());
@@ -39,7 +49,6 @@ public class SBEEncoderDecoder_EML {
         sb.append("\nmarketCreateTenderPayload.matchNumber=").append(marketCreateTransactionPayloadDecoder.matchNumber());
         
         System.out.println(sb);
-        
        return marketCreateTransactionPayloadDecoder.matchNumber();
     }
 
