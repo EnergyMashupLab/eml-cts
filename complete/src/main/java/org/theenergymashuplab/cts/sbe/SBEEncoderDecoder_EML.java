@@ -4,7 +4,7 @@ import org.agrona.concurrent.UnsafeBuffer;
 //import org.theenergymashuplab.cts.SideType;
 //import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.controller.payloads.MarketCreateTenderPayload;
-
+import org.theenergymashuplab.cts.controller.payloads.MarketCreateTransactionPayload;
 
 import baseline.*;
 
@@ -35,21 +35,35 @@ public class SBEEncoderDecoder_EML {
 
     }
 
-    public static long decode( MarketCreateTransactionPayloadDecoder marketCreateTransactionPayloadDecoder, 
+    public static MarketCreateTransactionPayload decode( MarketCreateTransactionPayloadDecoder marketCreateTransactionPayloadDecoder, 
     		 UnsafeBuffer directBuffer, int bufferOffset, int actingBlockLength, int actingVersion) throws Exception{
 
     	final StringBuilder sb = new StringBuilder();
-        marketCreateTransactionPayloadDecoder.wrap(directBuffer, bufferOffset, actingBlockLength, actingVersion);
-        sb.append("\nmarketCreateTenderPayload.info=").append(marketCreateTransactionPayloadDecoder.info());
-        sb.append("\nmarketCreateTenderPayload.quantity=").append(marketCreateTransactionPayloadDecoder.quantity());
-        sb.append("\nmarketCreateTenderPayload.price=").append(marketCreateTransactionPayloadDecoder.price());
-        sb.append("\nmarketCreateTenderPayload.ctsTenderId=").append(marketCreateTransactionPayloadDecoder.ctsTenderId());
-        sb.append("\nmarketCreateTenderPayload.encodedLength=").append(marketCreateTransactionPayloadDecoder.encodedLength());
-        sb.append("\nmarketCreateTenderPayload.parityOrderId=").append(marketCreateTransactionPayloadDecoder.parityOrderId());
-        sb.append("\nmarketCreateTenderPayload.matchNumber=").append(marketCreateTransactionPayloadDecoder.matchNumber());
+        marketCreateTransactionPayloadDecoder.wrap(directBuffer, 0, actingBlockLength, actingVersion);
+        sb.append("\nmarketCreateTransactionPayload.info=").append(marketCreateTransactionPayloadDecoder.info());
+        sb.append("\nmarketCreateTransactionPayload.quantity=").append(marketCreateTransactionPayloadDecoder.quantity());
+        sb.append("\nmarketCreateTransactionPayload.price=").append(marketCreateTransactionPayloadDecoder.price());
+        sb.append("\nmarketCreateTransactionPayload.ctsTenderId=").append(marketCreateTransactionPayloadDecoder.ctsTenderId());
+        sb.append("\nmarketCreateTransactionPayload.encodedLength=").append(marketCreateTransactionPayloadDecoder.encodedLength());
+        sb.append("\nmarketCreateTransactionPayload.parityOrderId=").append(marketCreateTransactionPayloadDecoder.parityOrderId());
+        sb.append("\nmarketCreateTransactionPayload.matchNumber=").append(marketCreateTransactionPayloadDecoder.matchNumber());
         
         System.out.println(sb);
-       return marketCreateTransactionPayloadDecoder.matchNumber();
+        
+        MarketCreateTransactionPayload marketCreateTransactionPayload = new MarketCreateTransactionPayload();
+        marketCreateTransactionPayload.setQuantity(marketCreateTransactionPayloadDecoder.quantity());
+        marketCreateTransactionPayload.setPrice(marketCreateTransactionPayloadDecoder.price());
+        marketCreateTransactionPayload.setCtsTenderId(marketCreateTransactionPayloadDecoder.ctsTenderId());
+        marketCreateTransactionPayload.setMatchNumber(marketCreateTransactionPayloadDecoder.matchNumber());
+        
+        if(marketCreateTransactionPayloadDecoder.side() == SideType.B) {
+        	marketCreateTransactionPayload.setSide(org.theenergymashuplab.cts.SideType.BUY);
+		}else {
+			marketCreateTransactionPayload.setSide(org.theenergymashuplab.cts.SideType.SELL);
+		}
+        
+        return marketCreateTransactionPayload;
+       //return marketCreateTransactionPayloadDecoder.matchNumber();
     }
 
 }

@@ -97,11 +97,12 @@ public class LmeSocketServer extends Thread {
 		EiTransaction transaction;
 		EiTender tender;
 		// For lookup and return value in eiCreateTransactionMatchNumberMap
-		Long matchNumberLong; // cannot use long for HashMap key
+		//Long matchNumberLong; // cannot use long for HashMap key
 		EiCreateTransactionPayload matchEiCreateTransaction, tempCreate;
 
 		ByteBuffer bbf = ByteBuffer.allocate(4096);
 		UnsafeBuffer buffer = new UnsafeBuffer(bbf);
+		MarketCreateTransactionPayload marketCreateTransactionPayload;
 
 		/*
 		 * The Map takes (Long)MarketCreateTransactionPayload.getMatchNumber() to the
@@ -145,8 +146,8 @@ public class LmeSocketServer extends Thread {
 				logger.debug("LME received " + jsonReceived);
 
 				// couldn't read from socket TODO have thrown IOException
-				if (jsonReceived == null)
-					continue;
+				//if (jsonReceived == null)
+				//	continue;
 
 				// payload = mapper.readValue(jsonReceived,
 				// MarketCreateTransactionPayload.class);
@@ -171,7 +172,7 @@ public class LmeSocketServer extends Thread {
 				int block_lengthToRead = actingBlockLength;
 				readData(bis, buffer, 0, block_lengthToRead);
 
-				matchNumberLong = SBEEncoderDecoder_EML.decode(marketCreateTransactionPayloadDecoder, buffer, bufferOffset_lengthToRead,
+				marketCreateTransactionPayload = SBEEncoderDecoder_EML.decode(marketCreateTransactionPayloadDecoder, buffer, bufferOffset_lengthToRead,
 						actingBlockLength, actingVersion);
 
 				// Check for non-CTS tenders. If the CtsTenderId is not in
@@ -179,7 +180,7 @@ public class LmeSocketServer extends Thread {
 				// TODO Ignore for now
 
 				// Get original Tender for this MarketCreateTransaction
-				eiCreateTender = LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.getCtsTenderId());
+				eiCreateTender = LmeRestController.ctsTenderIdToCreateTenderMap.get(marketCreateTransactionPayload.getCtsTenderId());
 
 				// LATER TODO clean up and remove entry when tender quantity becomes zero
 				if (eiCreateTender == null) {
@@ -198,8 +199,8 @@ public class LmeSocketServer extends Thread {
 					tender = eiCreateTender.getTender();
 					logger.trace("Original EiCreateTenderPayload " + eiCreateTender.toString());
 
-					tender.setQuantity(payload.getQuantity());
-					tender.setPrice(payload.getPrice());
+					tender.setQuantity(marketCreateTransactionPayload.getQuantity());
+					tender.setPrice(marketCreateTransactionPayload.getPrice());
 					// other fields of tender as in EiCreateTender - tenderId,
 					// interval, expireTime, side
 					logger.debug("Reconstituted tender " + tender.getTenderId().toString());
@@ -219,12 +220,12 @@ public class LmeSocketServer extends Thread {
 					 * this EiCrerateTransactionPayload in Map key value is matchNumber in
 					 * MarketCreateTransactionPayload from Parity
 					 */
-					matchEiCreateTransaction = eiCreateTransactionMatchNumberMap.get(matchNumberLong);
+					matchEiCreateTransaction = eiCreateTransactionMatchNumberMap.get(marketCreateTransactionPayload.getMatchNumber());
 					if (matchEiCreateTransaction == null) {
 						// no value in map for matchNumberLong so this is the first
 						// Insert working EiCreateTransactionPayload into the map with key
 						// Send nothing until this matchNumber matches a future MarketCreateTransaction
-						eiCreateTransactionMatchNumberMap.put(matchNumberLong, eiCreateTransaction);
+						eiCreateTransactionMatchNumberMap.put(marketCreateTransactionPayload.getMatchNumber(), eiCreateTransaction);
 						continue;
 					} else {
 						// matchEiCreateTransaction - a previous EiCreateTransaction in map
@@ -250,7 +251,7 @@ public class LmeSocketServer extends Thread {
 						logger.debug("LmeSocketServer enqueued " + " " + eiCreateTransaction.toString());
 						// safe to remove the previous HashMap entry for this matchNumber as there was
 						// exactly one in the HashMap
-						tempCreate = eiCreateTransactionMatchNumberMap.remove(matchNumberLong);
+						tempCreate = eiCreateTransactionMatchNumberMap.remove(marketCreateTransactionPayload.getMatchNumber());
 						if (tempCreate.equals(matchEiCreateTransaction)) {
 							// correctly removed from map
 							logger.debug("Removed matchEiCreateTransaction from eiCreateTransactionMatchNumberMap");

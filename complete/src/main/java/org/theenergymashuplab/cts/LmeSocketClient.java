@@ -94,7 +94,7 @@ public class LmeSocketClient	extends Thread {
 					" port " + port + " ip " + ip);
 		
 		try {
-				clientSocket = new Socket("localhost", port);
+				clientSocket = new Socket(ip, port);
 				logger.debug("clientSocket is " + clientSocket.toString());
 				//out = new PrintWriter(clientSocket.getOutputStream(), true);
 				//logger.debug("out constructor " + bos.toString());
