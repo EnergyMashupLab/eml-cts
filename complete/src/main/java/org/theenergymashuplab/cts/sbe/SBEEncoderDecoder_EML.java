@@ -31,6 +31,10 @@ public class SBEEncoderDecoder_EML {
                 .durationInMinutes(30)
                 .length(5)
                 .varDataMaxValue();
+    	
+    	System.out.println("Encoded Message :-");
+    	System.out.println(marketCreateTenderPayloadEncoder.toString());
+    	
     	return messageHeaderEncoder.ENCODED_LENGTH + marketCreateTenderPayloadEncoder.encodedLength();
 
     }
@@ -48,6 +52,8 @@ public class SBEEncoderDecoder_EML {
         sb.append("\nmarketCreateTransactionPayload.parityOrderId=").append(marketCreateTransactionPayloadDecoder.parityOrderId());
         sb.append("\nmarketCreateTransactionPayload.matchNumber=").append(marketCreateTransactionPayloadDecoder.matchNumber());
         
+        System.out.println("-------------------------------------------------------------------------");
+        System.out.println("Decoded Message:-");
         System.out.println(sb);
         
         MarketCreateTransactionPayload marketCreateTransactionPayload = new MarketCreateTransactionPayload();
