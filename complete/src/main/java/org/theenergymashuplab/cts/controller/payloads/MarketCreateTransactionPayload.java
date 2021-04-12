@@ -46,7 +46,7 @@ public class MarketCreateTransactionPayload {
 	String parityOrderId = null;	// parity order id for this match from engine
 	long matchNumber = 0;	// parity matchNumber for this match from engine
 		
-	public MarketCreateTransactionPayload()	{	// json
+	MarketCreateTransactionPayload()	{	// json
 	}
 	
 	// Not used on LME end

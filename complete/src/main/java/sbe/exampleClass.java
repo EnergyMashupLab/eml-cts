@@ -1,4 +1,4 @@
-package org.theenergymashuplab.cts.sbe;
+package sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
 
@@ -14,8 +14,6 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
 import static java.nio.file.StandardOpenOption.WRITE;
 
-import baseline.*;
-
 /**
  * Example encode and decode of a complex message using generated stub codecs.
  */
@@ -28,8 +26,8 @@ public class exampleClass {
 
     private static final MessageHeaderDecoder MESSAGE_HEADER_DECODER = new MessageHeaderDecoder();
     private static final MessageHeaderEncoder MESSAGE_HEADER_ENCODER = new MessageHeaderEncoder();
-    //private static final  MarketCreatedTenderPayloadDecoder Market_Created_Tender_Payload_Decoder = new MarketCreatedTenderPayloadDecoder();
-    //private static final MarketCreatedTenderPayloadEncoder Market_Created_Tender_Payload_ENCODER = new MarketCreatedTenderPayloadEncoder();
+    private static final  MarketCreatedTenderPayloadDecoder Market_Created_Tender_Payload_Decoder = new MarketCreatedTenderPayloadDecoder();
+    private static final MarketCreatedTenderPayloadEncoder Market_Created_Tender_Payload_ENCODER = new MarketCreatedTenderPayloadEncoder();
     private static final  MarketCreateTenderPayloadDecoder Market_Create_Tender_Payload_Decoder = new MarketCreateTenderPayloadDecoder();
     private static final MarketCreateTenderPayloadEncoder Market_Create_Tender_Payload_ENCODER = new MarketCreateTenderPayloadEncoder();
 

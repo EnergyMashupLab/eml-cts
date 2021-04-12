@@ -16,24 +16,20 @@
 
 package org.theenergymashuplab.cts;
 
-import java.io.BufferedOutputStream;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
-import org.agrona.concurrent.UnsafeBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.theenergymashuplab.cts.controller.LmeRestController;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.MarketCreateTenderPayload;
-import org.theenergymashuplab.cts.sbe.SBEEncoderDecoder_EML;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import baseline.*;
 
 /*
  * Start by new LmeSocketClient.startConnection(("127.0.0.1",
@@ -57,9 +53,8 @@ public class LmeSocketClient	extends Thread {
 	final ObjectMapper mapper = new ObjectMapper();
 
 	private Socket clientSocket;
-	//private PrintWriter out;
+	private PrintWriter out;
 	private BufferedReader in;
-	BufferedOutputStream bos;
 	
     // Socket Server in LME for CreateTransaction
     public static final int LME_PORT = 39401;
@@ -69,13 +64,6 @@ public class LmeSocketClient	extends Thread {
 	private static int port = MARKET_PORT;
 	private static String ip = "127.0.0.1";
 	
-	 private static final MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
-	 private static final MarketCreateTenderPayloadEncoder marketCreateTenderPayloadEncoder = new MarketCreateTenderPayloadEncoder();
-	 ByteBuffer bbf = ByteBuffer.allocate(4096);
-	 UnsafeBuffer buffer = new UnsafeBuffer(bbf);
-    
-    private static final String ENCODING_FILENAME = "sbe.encoding.filename";
-    
 	//	TODO better document queues on parity and CTS side
 	
 	public LmeSocketClient()	{
@@ -96,10 +84,9 @@ public class LmeSocketClient	extends Thread {
 		try {
 				clientSocket = new Socket(ip, port);
 				logger.debug("clientSocket is " + clientSocket.toString());
-				//out = new PrintWriter(clientSocket.getOutputStream(), true);
-				//logger.debug("out constructor " + bos.toString());
+				out = new PrintWriter(clientSocket.getOutputStream(), true);
+				logger.debug("out constructor " + out.toString());
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				bos = new BufferedOutputStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
 				logger.debug("SocketClient start IOException: " + e.getMessage());
 				e.printStackTrace();
@@ -125,46 +112,25 @@ public class LmeSocketClient	extends Thread {
 				// retrieval when the MarketCreateTransaction is received by CtsSocketServer			
 							
 				// convert to a JSON string and write to socket
-				//jsonString = mapper.writeValueAsString(toJson);
-				
-				//final MarketCreateTenderPayloadEncoder marketCreateTenderPayloadEncoder = SBEEncoderDecoder.encode(buffer,toJson);
-				
-							
-				/*byte[] data = new byte[marketCreateTenderPayloadEncoder.limit()];
-				  marketCreateTenderPayloadEncoder.buffer().getBytes(0, data); */
-				
-				//DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
-			//ObjectOutputStream dos = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
-				
-				
-				int encodingLengthPlusHeader = SBEEncoderDecoder_EML.encode(marketCreateTenderPayloadEncoder,buffer,messageHeaderEncoder,toJson);
-				
-				bos.write(buffer.byteArray(), 0, encodingLengthPlusHeader);
-				
-				bos.flush();
-				
+				jsonString = mapper.writeValueAsString(toJson);
 				logger.trace("run() before send of json string " + jsonString);
-				//fos.write(data);
-				//dos.writeObject(marketCreateTenderPayloadEncoder);
-				//out.println(jsonString);			
+				out.println(jsonString);			
 				logger.trace("LME Socket Client after sending parity json string " + jsonString);
 				
-			} catch (InterruptedException | IOException e) {
+			} catch (InterruptedException e) {
 				System.err.println("queueFromLme.take interrupted" + e.getMessage());
 				e.printStackTrace();
-			} /*
-			  catch (JsonProcessingException e1) {
+			} catch (JsonProcessingException e1) {
 				System.err.println("JsonProcessingException: Input MarketCreateTenderPayload " + e1.getMessage());
 				e1.printStackTrace();
-			}*/
+			}
 		}
 		  
 	}
-	
 
 	public String sendMessage(String msg) {	// not used TODO delete
 		  try {
-				//out.println(msg);
+				out.println(msg);
 				System.err.println("Client sendMessage: " + msg);
 				return in.readLine();
 		  } catch (Exception e) {
@@ -177,7 +143,7 @@ public class LmeSocketClient	extends Thread {
 	public void stopConnection() {	// not used TODO
 		  try {
 			in.close();
-			//out.close();
+			out.close();
 			clientSocket.close();
 	  } catch (IOException e) {
 			logger.debug("SocketClient stop IOException: " + e.getMessage());
