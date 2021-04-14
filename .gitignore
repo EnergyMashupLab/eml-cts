@@ -27,3 +27,5 @@ hs_err_pid*
 
 # Apple Mac OS X desktop information files
 .DS_Store
+.idea
+*.iml
