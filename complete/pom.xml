@@ -51,20 +51,10 @@ limitations under the License.
 		<!-- jpa, crud repository -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
-		</dependency>
 		<!--Spring boot starter web-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -103,20 +93,20 @@ limitations under the License.
 </dependency>
 
 Exclude Spring Boot's Default Logging -->
-<dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter</artifactId>
-	<exclusions>
-		<exclusion>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-logging</artifactId>
-		</exclusion>
-	</exclusions>
-</dependency>
-		 <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		          <groupId>org.springframework.boot</groupId>
+		          <artifactId>spring-boot-starter-log4j2</artifactId>
+		      </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -125,7 +115,7 @@ Exclude Spring Boot's Default Logging -->
 
 	</dependencies>
 
-	<build>
+	<!-- <build>
 		<finalName>eml-cts</finalName>
 		<plugins>
 			<plugin>
@@ -133,6 +123,115 @@ Exclude Spring Boot's Default Logging -->
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-	</build>
-
+	</build>  -->
+	
+	<profiles>
+	  <profile>
+	    <id>eml-cts</id>
+	    <properties>
+        	<activatedProperties>eml-cts</activatedProperties>
+    	</properties>
+	    <dependencies>
+	    	<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-jpa</artifactId>
+			</dependency>
+		
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<scope>runtime</scope>
+			</dependency>
+	    </dependencies>
+	    <activation>
+        	<activeByDefault>true</activeByDefault>
+    	</activation>
+	    <build>
+	    <finalName>eml-cts</finalName>
+	      <plugins>
+	        <plugin>
+	        	<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+	        </plugin>
+	      </plugins>
+	    </build>
+	  </profile>
+	  <profile>
+	    <id>lma</id>
+	    <properties>
+        	<activatedProperties>lma</activatedProperties>
+    	</properties>
+	    <dependencies>
+	    	<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-jpa</artifactId>
+			</dependency>
+		
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<scope>runtime</scope>
+			</dependency>
+	    </dependencies>
+	    <build>
+	    <finalName>lmma</finalName>
+	      <plugins>
+		     <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <excludes>
+		            <exclude>**/ClientTender.java</exclude>
+              		<exclude>**/ClientRestController.java</exclude>
+              		<exclude>**/TeuaRestController.java</exclude>
+              		<exclude>**/ClientCreatedTenderPayload.java</exclude>
+              		<exclude>**/ClientCreatedTransactionPayload.java</exclude>
+              		<exclude>**/ClientCreateTenderPayload.java</exclude>
+              		<exclude>**/ClientCreateTransactionPayload.java</exclude>
+              		<exclude>**/ClientTender.java</exclude>
+		          </excludes>
+		        </configuration>
+		      </plugin>
+	        <plugin>
+	        	<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+	        </plugin>
+	      </plugins>
+	    </build>
+	  </profile>
+	  <profile>
+	    <id>teua</id>
+	    <properties>
+        	<activatedProperties>teua</activatedProperties>
+    	</properties>
+	    <build>
+	    <finalName>teua</finalName>
+	      <plugins>
+	        <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <excludes>
+		            <exclude>**/LmeSendTransactions.java</exclude>
+              		<exclude>**/LmeSocketClient.java</exclude>
+              		<exclude>**/LmeSocketServer.java</exclude>
+              		<exclude>**/LmaRestController.java</exclude>
+              		<exclude>**/LmeRestController.java</exclude>
+              		<exclude>**/MarketCreateTenderPayload.java</exclude>
+              		<exclude>**/MarketCreateTransactionPayload.java</exclude>
+              		<exclude>**/PositionManager.java</exclude>
+              		<exclude>**/dao/*</exclude>
+              		<exclude>**/PositionManagerModel.java</exclude>
+              		<exclude>**/PositionRepository.java</exclude>
+		          </excludes>
+		        </configuration>
+		    </plugin>
+	        <plugin>
+	        	<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+	        </plugin>
+	      </plugins>
+	    </build>
+	  </profile>
+	</profiles>
 </project>

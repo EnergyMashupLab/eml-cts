@@ -103,9 +103,9 @@ public class TeuaRestController {
 		String clientUri, teuaUri;
 
 	    //	HOOK for SC/Client IP address/port - default is localhost
-	    String clientUriPrefix = "http://localhost:8080/client/";
+	    String clientUriPrefix = "http://192.168.1.55:8080/client/";
 	    String clientUriSuffix = "/clientCreateTransaction";
-	    String teuaUriPrefix = "http://localhost:8080/teua/";
+	    String teuaUriPrefix = "http://192.168.1.55:8080/teua/";
 	    String teuaUriSuffix = "/createTransaction";
 	    ActorIdType tempActorId;
 	    String mapReturns;
@@ -229,7 +229,7 @@ public class TeuaRestController {
 				@RequestBody EiCancelTenderPayload eiCancelTender)	{
 		final RestTemplate restTemplate = new RestTemplate();
 
-		return restTemplate.postForObject("http://localhost:8080/lma/cancelTender", eiCancelTender,
+		return restTemplate.postForObject("http://192.168.1.54:8080/lma/cancelTender", eiCancelTender,
 				EICanceledTenderPayload.class);
 	}
 
@@ -272,7 +272,7 @@ public class TeuaRestController {
 			// builder = new RestTemplateBuilder();
 			restTemplate = builder.build();
 			lmePartyId = restTemplate.getForObject(
-					"http://localhost:8080/lme/party",
+					"http://192.168.1.54:8080/lme/party",
 					ActorIdType.class);
 		}
 		
@@ -323,7 +323,7 @@ public class TeuaRestController {
 		//	And forward to the LMA
 		restTemplate = builder.build();
 		EiCreatedTenderPayload result = restTemplate.postForObject
-			("http://localhost:8080/lma/createTender", eiCreateTender,
+			("http://192.168.1.54:8080/lma/createTender", eiCreateTender,
 					EiCreatedTenderPayload.class);
 		
 		// and put CtsTenderId in ClientCreatedTenderPayload

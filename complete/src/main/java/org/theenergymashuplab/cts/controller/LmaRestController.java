@@ -53,7 +53,7 @@ public class LmaRestController {
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	private static final ActorIdType partyId  = new ActorIdType();
-	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
+	private static String tempTeuaUri = "http://192.168.1.55:8080/teua/1/createTransaction";
 	
 	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
 	//	pushed here by TEUA which has the ActorId and {id} information
@@ -102,7 +102,7 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
+		tempPostResponse = restTemplate.postForObject("http://192.168.1.54:8080/lme/createTender", 
 				tempCreate, 
 				EiCreatedTenderPayload.class);
 		
@@ -159,7 +159,7 @@ public class LmaRestController {
 //		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
 //				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
 		
-		positionUri = "http://localhost:8080/position/" +
+		positionUri = "http://192.168.1.54:8080/position/" +
 				positionParty.toString() +
 				"/add";
 		
@@ -197,7 +197,7 @@ public class LmaRestController {
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
 
-			tempTeuaUri = "http://localhost:8080/teua/1/createTransaction"; // default if error
+			tempTeuaUri = "http://192.168.1.55:8080/teua/1/createTransaction"; // default if error
 			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
 
 //			if (dumpMap)	{
@@ -259,7 +259,7 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody EiCanceledTender in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelTender",			
+		tempPostResponse = restTemplate.postForObject("http://192.168.1.54:8080/lme/cancelTender",			
 				tempCancel, 		
 				EICanceledTenderPayload.class);
 		
