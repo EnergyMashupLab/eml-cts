@@ -65,7 +65,7 @@ public class ClientRestController {
     //	Array uses teua/number/... and matching client/number
 	//	to give the URI string to which to post
     String[] postClientCreateTenderUri;
-    String uriPrefix = "http://localhost:8080/teua/";
+    String uriPrefix = "http://192.168.1.55:8080/teua/";
     String uriSuffix = "/clientCreateTender";
     String idString = null;
     int workingId = 0;
@@ -220,7 +220,7 @@ public class ClientRestController {
 		//	And forward to the TEUA
 		restTemplate = builder.build();
 		ClientCreatedTenderPayload result = restTemplate.postForObject
-			("http://localhost:8080/teua/clientCreateTender", tempCreate,
+			("http://192.168.1.55:8080/teua/clientCreateTender", tempCreate,
 					ClientCreatedTenderPayload.class);		
 		
 		logger.debug("Result is " + result.toString());
