@@ -146,7 +146,7 @@
 						</systemProperty>
 					</systemProperties>
 					<arguments>
-						<argument>${project.build.resources[0].directory}/MarketPayloads-sbe.xml
+						<argument>${project.build.resources[0].directory}/EiTenderTransaction-sbe.xml
 						</argument>
 					</arguments>
 					<workingDirectory>${project.build.directory}/generated-sources/java
