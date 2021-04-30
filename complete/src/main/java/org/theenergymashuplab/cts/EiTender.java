@@ -22,7 +22,7 @@ import java.time.*;
 
 public class EiTender {
 	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
-	private final Interval interval;
+	private Interval interval;
 	private Instant expirationTime;
 	private long quantity = 0;
 	private long price = 0;	// cents initially. Parity uses long with number of fractional digits
@@ -30,6 +30,10 @@ public class EiTender {
 	private final boolean integralOnly = false;	// TODO not set, not serialized but comes through as false. Verify behavior.
 	private TransactiveState transactiveState = TransactiveState.TENDER;
 	
+	
+	public EiTender() {
+		// TODO Auto-generated constructor stub
+	}
 	/* 
 		Attributes OMITTED from the UML Model at 
 			currency
@@ -57,7 +61,8 @@ public class EiTender {
 		 */
 		
 	}
-	
+
+
 	@Override
 	public String toString()	{
 		// TODO replace with concatenated strings and toStrings
@@ -96,6 +101,10 @@ public class EiTender {
 		this.transactiveState = transactiveState;
 	}
 
+	public void setInterval(Interval interval) {
+		this.interval =  interval;
+	}
+	
 	public Interval getInterval() {
 		return interval;
 	}

@@ -20,6 +20,8 @@ package org.theenergymashuplab.cts.controller;
 //import java.util.Random;
 //import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,12 +44,19 @@ import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
 import org.theenergymashuplab.cts.dto.EiCanceledResponse;
+import org.theenergymashuplab.cts.sbe.EiTenderEncoderDEcoder;
+
+import baseline.*;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.agrona.concurrent.UnsafeBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -84,6 +93,17 @@ public class TeuaRestController {
 
 	private static final Logger logger = LogManager.getLogger(
 			TeuaRestController.class);
+	
+   	 MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+   	 EiCreateTenderPayloadEncoder eiCreateTenderPayloadEncoder = new EiCreateTenderPayloadEncoder();
+	 ByteBuffer bbf = ByteBuffer.allocate(4096);
+	 UnsafeBuffer buffer = new UnsafeBuffer(bbf);
+	 
+	 MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+	 EiCreatedTenderPayloadDecoder eiCreatedTenderPayloadDecoder = new EiCreatedTenderPayloadDecoder();
+	 
+	// MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+	 //EmployeeDecoder employeeDecoder = new EmployeeDecoder();
 	
     /*
 	 *	Two arrays use teua/{id}/... and matching client/{id} to give the
@@ -349,19 +369,18 @@ public class TeuaRestController {
 	 * NOTE that the quantity in a ClientCreateTender is FULL REQUIREMENTS for the
 	 * Interval. The User Agent will adjust that request by energy already bought or sold
 	 * on behalf of this client for the Interval, to get a net amount to go from the client's position
-	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
+	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.  ClientCreatedTenderPayload
 	 */
 	@PostMapping("{teuaId}/clientCreateTender")
-	public ClientCreatedTenderPayload postClientCreateTender(
+	public EiCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
-			@RequestBody ClientCreateTenderPayload clientCreateTender)	{
+			@RequestBody ClientCreateTenderPayload clientCreateTender) throws Exception{
 		ClientCreateTenderPayload tempClientCreateTender;	
 		ClientCreatedTenderPayload tempReturn;
 		EiTender tender;
 		EiCreateTenderPayload eiCreateTender;	
 		Integer numericTeuaId = -1;
 		String positionUri;
-		
 		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
@@ -418,19 +437,46 @@ public class TeuaRestController {
 		
 		logger.trace("TEUA sending EiCreateTender to LMA " +
 				eiCreateTender.toString());
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/octet-stream");
+		
+		int encodingLengthPlusHeader = EiTenderEncoderDEcoder.eiCreateTenderEncode(eiCreateTenderPayloadEncoder, buffer, messageHeaderEncoder, eiCreateTender);
+		
+		HttpEntity<byte[]> eiCreateTenderByteArray = new HttpEntity<>(buffer.byteArray(), headers);
 			
 		//	And forward to the LMA DOCKER CHECK
 		restTemplate = builder.build();
-		EiCreatedTenderPayload result = restTemplate.postForObject
-			("http://localhost:8080/lma/createTender", eiCreateTender,
-					EiCreatedTenderPayload.class);
+		byte[] eiCreatedTenderByteArray = restTemplate.postForObject
+			("http://localhost:8080/lma/createTender", eiCreateTenderByteArray,
+					byte[].class);
 		
+		
+		//Decode EiCreatedTenderPayload
+		int bufferOffset_lengthToRead = messageHeaderDecoder.encodedLength();
+		buffer.putBytes(0, eiCreatedTenderByteArray, 0, bufferOffset_lengthToRead);
+		messageHeaderDecoder.wrap(buffer, 0);
+
+		//We have got the id, Now based on ID we will use correct decoder
+		int templateId = messageHeaderDecoder.templateId();
+
+		//Length encoded message
+		int actingBlockLength = messageHeaderDecoder.blockLength();
+
+
+		//Length encoded message
+		int actingVersion = messageHeaderDecoder.version();
+
+
+		buffer.putBytes(0, eiCreatedTenderByteArray, bufferOffset_lengthToRead, actingBlockLength);
+
+		EiCreatedTenderPayload eiCreatedTenderResponse = EiTenderEncoderDEcoder.eiCreatedTenderPayloadDecoder(eiCreatedTenderPayloadDecoder, buffer, bufferOffset_lengthToRead, actingBlockLength, actingVersion);
 		// and put CtsTenderId in ClientCreatedTenderPayload
-		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
-				tempReturn.toString());
 		
-		return tempReturn;
+		//tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
+		//logger.trace("TEUA before return ClientCreatedTender to Client/SC " + tempReturn.toString());
+		
+		return eiCreatedTenderResponse;
 	}
 	
 }

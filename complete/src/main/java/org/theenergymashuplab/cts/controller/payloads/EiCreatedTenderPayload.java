@@ -94,4 +94,18 @@ public class EiCreatedTenderPayload {
 	public RefIdType getRefId() {
 		return refId;
 	}
+
+	public void setTenderId(TenderIdType tenderId) {
+		this.tenderId = tenderId;
+	}
+
+	public void setPartyId(ActorIdType partyId) {
+		this.partyId = partyId;
+	}
+
+	public void setCounterPartyId(ActorIdType counterPartyId) {
+		this.counterPartyId = counterPartyId;
+	}
+	
+	
 }

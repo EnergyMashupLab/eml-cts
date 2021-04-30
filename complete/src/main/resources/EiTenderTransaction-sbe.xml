@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:xi="http://www.w3.org/2001/XInclude" 
+	package="baseline" id="1" version="0" semanticVersion="5.2"
+	description="Draft 1 MarketCreateTender and MarketCreatedTender payloads."
+	byteOrder="littleEndian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sbe/sbe.xsd">
+	
+	<!--Edited by WTCox 20201109 1420-->
+	<!--Edited by WTCox 20210426 2200 using material from Vishnu Nandan Chinta. Added
+		EiCreateTender and EiCreatedTender
+		EiCreateTransaction and EiCreatedTransaction
+	-->
+
+<types> <!--pasted from common-types.xml - XInclude not working for me-->
+    <composite name="messageHeader" description="Message identifiers and length of message root.">
+        <type name="blockLength" primitiveType="uint16"/>
+        <type name="templateId" primitiveType="uint16"/>
+        <type name="schemaId" primitiveType="uint16"/>
+        <type name="version" primitiveType="uint16"/>
+    </composite>
+    <composite name="groupSizeEncoding" description="Repeating group dimensions.">
+        <type name="blockLength" primitiveType="uint16"/>
+        <type name="numInGroup" primitiveType="uint16"/>
+    </composite>
+    <composite name="varStringEncoding" description="Variable length UTF-8 String.">
+        <type name="length" primitiveType="uint32" maxValue="1073741824"/>
+        <type name="varData" primitiveType="uint8" length="0" characterEncoding="UTF-8"/>
+    </composite>
+    <composite name="varAsciiEncoding" description="Variable length ASCII String.">
+        <type name="length" primitiveType="uint32" maxValue="1073741824"/>
+        <type name="varData" primitiveType="uint8" length="0" characterEncoding="ASCII"/>
+    </composite>
+    <composite name="varDataEncoding" description="Variable length binary blob.">
+        <type name="length" primitiveType="uint32" maxValue="1073741824"/>
+        <type name="varData" primitiveType="uint8" length="0"/>
+    </composite>
+</types>
+
+<types>	
+	<enum name="BooleanType" encodingType="uint8" description="Boolean Type">
+		<validValue name="F" description="False value representation.">0</validValue>
+		<validValue name="T" description="True value representation.">1</validValue>
+	</enum>
+	
+	<enum name="SideType" encodingType="char" description="see SideType.java">
+		<validValue name="B" description="Buy side">B</validValue>
+		<validValue name="S" description="Sell side">S</validValue>
+	</enum>
+	
+	<enum name="TransactiveState" encodingType="char" description="see TransactiveState.java">
+		<validValue name="TENDER" description="Tender">E</validValue>
+		<validValue name="TRANSACTION" description="Transaction">R</validValue>
+		<validValue name="PUBLICATION" description="Publication">P</validValue>
+		<!--Respectively the second, third, and 7th values of the TransactiveState enum-->
+	</enum>	
+	
+	<!--In the following maxValue="1073741824" seems small; these are java long which is 2**63 - 1 (signed)
+		Encoding works as uint because in the implementation IDs are > 0
+	-->
+	
+	<composite name="ActorIdType"
+		description="See ActorIdType.java">
+		<type name="value" primitiveType="uint64" maxValue="1073741824" />      <!-- check primitive type -->
+	</composite>
+
+	<composite name="RefIdType"
+		description="See RefIdType.java">
+		<type name="value" primitiveType="uint64" maxValue="1073741824" />      <!-- check primitive type -->
+	</composite>
+
+	<composite name="TenderIdType"
+		description="See TenderIdType.java">
+		<type name="value" primitiveType="uint64" maxValue="1073741824" />      <!-- check primitive type -->
+	</composite>
+	
+	<composite name="TransactionIdType"
+		description="See TransactionIdType.java">
+		<type name="value" primitiveType="uint64" maxValue="1073741824" />      <!-- check primitive type -->
+	</composite>
+
+	<composite name="Instant" description="See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)">
+		<type name="seconds" primitiveType="int64"></type>
+		<type name="nano" primitiveType="uint32"></type>
+	</composite>
+	
+	<composite name="Duration" description="See java.time.Duration. In seconds (signed) and nanoseconds (unsiqned)">
+		<type name="seconds" primitiveType="int64"></type>
+		<type name="nano" primitiveType="uint32"></type>
+	</composite>
+	
+	<composite name="Interval" description="See Interval.java">
+		<ref name="duration" type="Duration" />
+		<ref name="dtStart" type="Instant" />
+	</composite>
+	
+	<composite name="BridgeInstant" description="String-formatted ISO 8601 timestamp. See BridgeInstant.java">
+		<type name="length" primitiveType="uint32" maxValue="1073741824"/>
+		<type name="varData" primitiveType="uint8" length="0" characterEncoding="UTF-8"/>
+	</composite>
+	
+	<composite name="BridgeInterval" description="see BridgeInterval.java">
+		<type name="durationInMinutes" primitiveType="uint32" maxValue="1073741824"/>
+		<!--duplicates BridgeInstant attributes - can't seem to assemble user-defined types except in messages	-->
+		<!--todo: use fixed length string?-->
+		<type name="length" primitiveType="uint32" maxValue="1073741824"/>
+		<type name="varData" primitiveType="uint8" length="0" characterEncoding="UTF-8"/>
+	</composite>
+	
+	<composite name="EiTender" description="See EiTender.java">
+			<ref name="tenderId" type="TenderIdType" />   <!--  primitive type have to change  -->
+			<ref name="interval" type="Interval"/>       <!--  primitive type have to change  -->
+			<ref name="expirationTime" type="Instant" />   <!--  primitive type have to change, check instant pritivetive format  -->
+			<type name="quantity" primitiveType="uint64" />
+			<type name="price" primitiveType="uint64" />
+			<ref name="side" type="SideType" />   				<!--  primitive type have to change  -->
+			<ref name="integralOnly" type="BooleanType" />			<!--  boolean primitive type have to change  -->
+			<ref name="transactiveState" type="TransactiveState" />   <!--primitive type have to change  -->
+	</composite>
+	
+	<composite name="EiResponse" description="See EiResponse.java">
+		<type name="responseCode" primitiveType="uint32" />   <!--  EiResponse.java responseCode should be int  -->
+		<ref name="refId" type="RefIdType" />       <!--  primitive type have to change  -->
+		<ref name="createdDateTime" type="Instant" />   <!--  primitive type have to change, check instant pritivetive format  -->
+		<ref name="responseDescription" type="varStringEncoding"/>
+	</composite>
+	
+	<composite name="EiTransaction"	description="See EiTransaction.java">
+		<ref name="transactionId" type="TransactionIdType" />
+		<ref name="tender" type="EiTender" />
+		<ref name="transactiveState" type="TransactiveState" />
+	</composite>
+	
+</types>
+	
+<sbe:message name="MarketCreateTenderPayload" id="1" description="see MarketCreateTenderPayload.java">
+	<field name="info" id="1" type="varStringEncoding"/>
+	<field name="side" id="2" type="SideType"/>
+	<field name="quantity" id="3" type="uint32"/>
+	<field name="price" id="4" type="uint32"/>
+	<field name="ctsTenderId" id="5" type="uint32"/>
+	<field name="expireTime" id="6" type="BridgeInstant"/>
+	<field name="bridgeInterval" id="7" type="BridgeInterval"/>
+</sbe:message>
+
+<sbe:message name="MarketCreatedTenderPayload" id="2" description="see MarketCreatedTenderPayload.java">
+	<field name="info" id="1" type="varStringEncoding"/>
+	<field name="success" id="2" type="BooleanType"/>
+	<field name="ctsTenderId" id="3" type="uint32"/>
+	<field name="parityOrderId" id="4" type="varStringEncoding"/>
+</sbe:message>
+
+<sbe:message name="MarketCreateTransactionPayload" id="3" description="see MarketCreateTransactionPayload.java">
+	<field name="info" id="1" type="varStringEncoding"/>
+	<field name="side" id="2" type="SideType"/>
+	<field name="quantity" id="3" type="uint32"/>
+	<field name="price" id="4" type="uint32"/> <!--System-wide implied decimal point will be applied-->
+	<field name="ctsTenderId" id="5" type="uint32"/>
+	<field name="parityOrderId" id="6" type="varStringEncoding"/> <!--TODO  16 bytes -->
+	<field name="matchNumber" id="7" type="uint32"/>	
+</sbe:message>
+
+<sbe:message name="MarketCreatedTransactionPayload" id="4" description="see MarketCreatedTransactionPayload.java">
+	<field name="info" id="1" type="varStringEncoding"/>
+	<field name="success" id="2" type="BooleanType"/>
+</sbe:message>
+
+<sbe:message name="EiCreateTenderPayload" id="5"	description="See EiCreateTenderPayload.java">
+	<!--Note that attribute order varies - clean up in eml-cts source-->
+	<field name="counterPartyId" id="1" type="ActorIdType"/>
+	<field name="partyId" id="2" type="ActorIdType"/>
+	<field name="requestId" id="3" type="RefIdType"/>
+	<field name="tender" id="4" type="EiTender"/>
+</sbe:message>
+
+<sbe:message name="EiCreatedTenderPayload" id="6"	description="See EiCreatedTenderPayload.java">
+	<!--Note that attribute order varies - clean up in eml-cts source-->
+	<field name="tenderId" id="1" type="TenderIdType"/>
+	<field name="partyId" id="2" type="ActorIdType"/>
+	<field name="counterPartyId" id="3" type="ActorIdType"/>
+	<field name="response" id="4" type="EiResponse"/>
+	<field name="refId" id="5" type="RefIdType"/>
+</sbe:message>
+
+<sbe:message name="EiCreateTransactionPayload" id="7"	description="See EiCreateTransactionPayload">
+	<!--Note that attribute order varies - clean up in eml-cts source-->
+	<field name="counterPartyId" id="1" type="ActorIdType"/>
+	<field name="partyId" id="2" type="ActorIdType"/>
+	<field name="requestId" id="3" type="RefIdType"/>
+	<field name="transaction" id="4" type="EiTransaction"/>
+</sbe:message>
+
+<sbe:message name="EiCreatedTransactionPayload" id="8"	description="See EiCreatedTransactionPayload">
+	<!--Note that attribute order varies - clean up in eml-cts source-->
+	<field name="transactionId" id="1" type="TransactionIdType"/>
+	<field name="partyId" id="2" type="ActorIdType"/>
+	<field name="counterPartyId" id="3" type="ActorIdType"/>
+	<field name="response" id="4" type="EiResponse"/>
+	<field name="refId" id="5" type="RefIdType"/>
+</sbe:message>
+
+</sbe:messageSchema>

@@ -32,7 +32,9 @@ public class SBEEncoderDecoder_EML {
                 .length(5)
                 .varDataMaxValue();
     	
-    	System.out.println("Encoded Message :-");
+    	System.out.println("");
+    	System.out.println("-------------------------------------------------------------------------");
+    	System.out.println("MarketCreateTenderPayload Encoded  :-");
     	System.out.println(marketCreateTenderPayloadEncoder.toString());
     	
     	return messageHeaderEncoder.ENCODED_LENGTH + marketCreateTenderPayloadEncoder.encodedLength();
@@ -44,6 +46,8 @@ public class SBEEncoderDecoder_EML {
 
     	final StringBuilder sb = new StringBuilder();
         marketCreateTransactionPayloadDecoder.wrap(directBuffer, 0, actingBlockLength, actingVersion);
+        
+       /*
         sb.append("\nmarketCreateTransactionPayload.info=").append(marketCreateTransactionPayloadDecoder.info());
         sb.append("\nmarketCreateTransactionPayload.quantity=").append(marketCreateTransactionPayloadDecoder.quantity());
         sb.append("\nmarketCreateTransactionPayload.price=").append(marketCreateTransactionPayloadDecoder.price());
@@ -51,10 +55,12 @@ public class SBEEncoderDecoder_EML {
         sb.append("\nmarketCreateTransactionPayload.encodedLength=").append(marketCreateTransactionPayloadDecoder.encodedLength());
         sb.append("\nmarketCreateTransactionPayload.parityOrderId=").append(marketCreateTransactionPayloadDecoder.parityOrderId());
         sb.append("\nmarketCreateTransactionPayload.matchNumber=").append(marketCreateTransactionPayloadDecoder.matchNumber());
+        */
         
+        System.out.println("");
         System.out.println("-------------------------------------------------------------------------");
-        System.out.println("Decoded Message:-");
-        System.out.println(sb);
+        System.out.println("MarketCreateTransactionPayload Decoded :-");
+        System.out.println(marketCreateTransactionPayloadDecoder.toString());
         
         MarketCreateTransactionPayload marketCreateTransactionPayload = new MarketCreateTransactionPayload();
         marketCreateTransactionPayload.setQuantity(marketCreateTransactionPayloadDecoder.quantity());
