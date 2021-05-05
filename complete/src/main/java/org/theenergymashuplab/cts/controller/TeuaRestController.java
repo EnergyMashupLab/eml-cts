@@ -60,7 +60,24 @@ import org.agrona.concurrent.UnsafeBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/*
+ *	SBE next steps
 
+This code shows an intermediate step between the default Spring JSON serialization
+and an implementation where SBE or JSON is chosen on a link-by-link basis.
+
+At present, we use the Spring default serialization for content type application/octet-stream,
+serialize the message into a byte array (see additional comments in RestTemplate invocations
+below).
+
+In the future, we plan that the SBE encoders and decoders will be integrated as Spring
+HttpMessageConverters so setting the content type in the HttpHeader will indicate to Spring
+which serialization to use.
+
+That has the additional advantage that the choice between SBE and JSON can be made link-by-link
+or message-by-message, but we anticipate  link-by-link.
+
+*/
 /*
 
 Issues in separating the TEUA and LMA in different dockers. Tags are in comments below.
@@ -438,6 +455,7 @@ public class TeuaRestController {
 		logger.trace("TEUA sending EiCreateTender to LMA " +
 				eiCreateTender.toString());
 		
+		/* See Comment on SBE next steps at the head of this source file */
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Type", "application/octet-stream");
 		
@@ -447,6 +465,8 @@ public class TeuaRestController {
 			
 		//	And forward to the LMA DOCKER CHECK
 		restTemplate = builder.build();
+		
+		/* Default Spring serialization is JSON; the default code is commented out below */
 		byte[] eiCreatedTenderByteArray = restTemplate.postForObject
 			("http://localhost:8080/lma/createTender", eiCreateTenderByteArray,
 					byte[].class);

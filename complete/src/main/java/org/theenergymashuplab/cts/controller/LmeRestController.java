@@ -52,6 +52,47 @@ import java.util.List;
 
 import baseline.*;
 
+/*
+ *	SBE next steps
+
+This code shows an intermediate step between the default Spring JSON serialization
+and an implementation where SBE or JSON is chosen on a link-by-link basis.
+
+At present, we use the Spring default serialization for content type application/octet-stream,
+serialize the message into a byte array (see additional comments in RestTemplate invocations
+below).
+
+In the future, we plan that the SBE encoders and decoders will be integrated as Spring
+HttpMessageConverters so setting the content type in the HttpHeader will indicate to Spring
+which serialization to use.
+
+That has the additional advantage that the choice between SBE and JSON can be made link-by-link
+or message-by-message, but we anticipate  link-by-link.
+
+*/
+/*
+
+Issues in separating the TEUA and LMA in different dockers. Tags are in comments below.
+
+(1) Addressing of TEUAs, LMA Tag: DOCKER ADDRESSING
+
+(1.5) Multiplicity >> available IP addresses	Tag: DOCKER MULTIPLICITY
+
+(2) Reference to attributes/methods of another class Static references	Tag: DOCKER STATIC
+
+(3) Hidden shared values	Tag: DOCKER SHARED
+
+(4) Determine IP address to send to EML-CTS LMA	Tag: DOCKER LMA-IP
+
+(5) ClientRestController or direct POST to TEUA?	Tag: None; see separate notes
+
+*/
+
+/*
+ *	DOCKER ADDRESSING
+ *	The URI localhost:8080/teua/{teuaId}/createTransaction doesn't work when the
+ * TEUA is not in the same JVM as the sender
+ */
 @RestController
 @RequestMapping("/lme")
 public class LmeRestController {
