@@ -47,7 +47,7 @@ public class SBEEncoderDecoder_EML {
     	final StringBuilder sb = new StringBuilder();
         marketCreateTransactionPayloadDecoder.wrap(directBuffer, 0, actingBlockLength, actingVersion);
         
-       /*
+       
         sb.append("\nmarketCreateTransactionPayload.info=").append(marketCreateTransactionPayloadDecoder.info());
         sb.append("\nmarketCreateTransactionPayload.quantity=").append(marketCreateTransactionPayloadDecoder.quantity());
         sb.append("\nmarketCreateTransactionPayload.price=").append(marketCreateTransactionPayloadDecoder.price());
@@ -55,12 +55,12 @@ public class SBEEncoderDecoder_EML {
         sb.append("\nmarketCreateTransactionPayload.encodedLength=").append(marketCreateTransactionPayloadDecoder.encodedLength());
         sb.append("\nmarketCreateTransactionPayload.parityOrderId=").append(marketCreateTransactionPayloadDecoder.parityOrderId());
         sb.append("\nmarketCreateTransactionPayload.matchNumber=").append(marketCreateTransactionPayloadDecoder.matchNumber());
-        */
+        
         
         System.out.println("");
         System.out.println("-------------------------------------------------------------------------");
         System.out.println("MarketCreateTransactionPayload Decoded :-");
-        System.out.println(marketCreateTransactionPayloadDecoder.toString());
+        System.out.println(sb);
         
         MarketCreateTransactionPayload marketCreateTransactionPayload = new MarketCreateTransactionPayload();
         marketCreateTransactionPayload.setQuantity(marketCreateTransactionPayloadDecoder.quantity());
