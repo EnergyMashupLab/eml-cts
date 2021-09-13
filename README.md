@@ -189,10 +189,11 @@ We gratefully acknowledge support from
 - The New Jersey Institute of Technology and the NJIT Capstone program where we worked with faculty and teams of Seniors and Masters students, specifically
   - Professor Osama Eljabiri 
   - Capstone Executive Team members for each term listed below
-  - Team members Fall 2020: Omair Abdul, Omar Janouk, Matthew Molinari
-  - Team members Summer 2020: Indira A. Akkiraju, Josiah Nieves, Alex Shepherd
-  - Team members Spring 2020: Matt Amato, Dhruvinkumar Desai, Anupam Saini, Justin Schuster
-  - Team members Fall 2019: Rajeev Chanchlan, Jasper Sam David, Mounica Gona, Dhrumil Shah, Karan Shah
+  - Team members Spring 2021 (listed alphabetically): Vishnu Nandan Chinta, Neha Jagtap, Krina Patel, Suvarna Patil, Devam Shah 
+  - Team members Fall 2020 (listed alphabetically): Omair Abdul, Omar Janouk, Matthew Molinari
+  - Team members Summer 2020 (listed alphabetically): Indira A. Akkiraju, Josiah Nieves, Alex Shepherd
+  - Team members Spring 2020 (listed alphabetically): Matt Amato, Dhruvinkumar Desai, Anupam Saini, Justin Schuster
+  - Team members Fall 2019 (listed alphabetically): Rajeev Chanchlan, Jasper Sam David, Mounica Gona, Dhrumil Shah, Karan Shah
 - Officers and Members of The Energy Mashup Lab including
   - Toby Considine, William Cox
 
