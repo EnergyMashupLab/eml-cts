@@ -1,5 +1,5 @@
-FROM java:8
-WORKDIR .
+FROM openjdk:11
+WORKDIR /home/stc3/Desktop/DockerParity/client-run/
 ADD parity-client.jar parity-client.jar
 ADD client0620.conf client0620.conf
 EXPOSE 39401
