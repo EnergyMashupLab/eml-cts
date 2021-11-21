@@ -16,9 +16,10 @@
 
 package org.theenergymashuplab.cts;
 
+import java.io.Serializable;
 import java.time.*;
 
-public class Interval {
+public class Interval implements Serializable{
 	public Duration duration = Duration.ZERO;
 	public Instant dtStart;
 	

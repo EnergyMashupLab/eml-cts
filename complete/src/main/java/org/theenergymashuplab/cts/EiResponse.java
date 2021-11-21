@@ -16,9 +16,10 @@
 
 package org.theenergymashuplab.cts;
 
+import java.io.Serializable;
 import java.time.*;
 
-public class EiResponse {
+public class EiResponse implements Serializable{
 	
 	public long responseCode;
 	public String responseDescription;

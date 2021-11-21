@@ -16,11 +16,13 @@
 
 package org.theenergymashuplab.cts;
 
+import java.io.Serializable;
+
 // TYPES updated not used - see dao/EiTenderType.java
 
 import java.time.*;
 
-public class EiTender {
+public class EiTender implements Serializable{
 	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
 	private final Interval interval;
 	private Instant expirationTime;

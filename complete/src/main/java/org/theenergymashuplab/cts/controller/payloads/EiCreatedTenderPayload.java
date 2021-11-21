@@ -16,12 +16,14 @@
 
 package org.theenergymashuplab.cts.controller.payloads;
 
+import java.io.Serializable;
+
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 
-public class EiCreatedTenderPayload {
+public class EiCreatedTenderPayload implements Serializable{
 	private TenderIdType tenderId;
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;

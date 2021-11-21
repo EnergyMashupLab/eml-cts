@@ -23,11 +23,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.utils.SerializationUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
@@ -38,22 +47,34 @@ import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
+
+import org.theenergymashuplab.cts.rabbitmq.*;
+
+import com.rabbitmq.client.ConnectionFactory;
+
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.EiTender;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiResponse;
+
 
 @RestController
 @RequestMapping("/lma")
-public class LmaRestController {
+public class LmaRestController implements Serializable {
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTender currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	private static final ActorIdType partyId  = new ActorIdType();
 	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
+	
+	private RabbitTemplate rabbitTemplate = new RabbitTemplate(new CachingConnectionFactory());
+	
+	@Autowired
+	private TopicExchange exchange; 
 	
 	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
 	//	pushed here by TEUA which has the ActorId and {id} information
@@ -83,7 +104,7 @@ public class LmaRestController {
 	 */
 	@PostMapping("/createTender")
 	public EiCreatedTenderPayload 	postEiCreateTender(
-			@RequestBody EiCreateTenderPayload eiCreateTender)	{
+			@RequestBody EiCreateTenderPayload eiCreateTender) {
 
 		EiCreateTenderPayload tempCreate;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
@@ -102,18 +123,20 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
+		
+		rabbitTemplate.convertAndSend(exchange.getName(), "foo.bar.baz", tempCreate.toString());
+	    
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
 				tempCreate, 
 				EiCreatedTenderPayload.class);
 		
-		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+		//logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
-		/*
-		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
+		
+		/*EiCreatedTenderPayload tempCreated = new EiCreatedTenderPayload(tempCreate.getTender().getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
-		*/
+				new EiResponse(200, "OK"));*/
 		
 		return tempPostResponse;
 	}

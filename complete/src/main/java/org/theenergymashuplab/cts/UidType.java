@@ -16,9 +16,10 @@
 
 package org.theenergymashuplab.cts;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class UidType {
+public class UidType implements Serializable{
 
 	public long myUidId = 0;
 	private static final AtomicLong uidIdCounter = new AtomicLong();

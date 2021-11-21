@@ -16,6 +16,8 @@
 
 package org.theenergymashuplab.cts;
 
+import java.io.Serializable;
+
 public class ClientTender {
 	private SideType side;
 	private long quantity;
