@@ -83,21 +83,21 @@ public class LmeSocketClient	extends Thread {
 		
 		try {
 				clientSocket = new Socket(ip, port);
-				logger.debug("clientSocket is " + clientSocket.toString());
+				logger.info("clientSocket is " + clientSocket.toString());
 				out = new PrintWriter(clientSocket.getOutputStream(), true);
-				logger.debug("out constructor " + out.toString());
+				logger.info("out constructor " + out.toString());
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		} catch (IOException e) {
-				logger.debug("SocketClient start IOException: " + e.getMessage());
+				logger.info("SocketClient start IOException: " + e.getMessage());
 				e.printStackTrace();
 		}
 		  
 		while(true) {
-			  logger.debug("SocketClient while loop head. queueFromLme size " +
+			  logger.info("SocketClient while loop head. queueFromLme size " +
 				LmeRestController.queueFromLme.size());
 			  try {
 				create = LmeRestController.queueFromLme.take();
-				logger.debug("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
+				logger.info("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
 						" " + create.getTender().toString());
 				tender = create.getTender();
 				toJson = new MarketCreateTenderPayload(
@@ -134,7 +134,7 @@ public class LmeSocketClient	extends Thread {
 				System.err.println("Client sendMessage: " + msg);
 				return in.readLine();
 		  } catch (Exception e) {
-				logger.debug("SocketClient sendMessage: " + e.getMessage());
+				logger.info("SocketClient sendMessage: " + e.getMessage());
 
 				return null;
 		  }
@@ -146,7 +146,7 @@ public class LmeSocketClient	extends Thread {
 			out.close();
 			clientSocket.close();
 	  } catch (IOException e) {
-			logger.debug("SocketClient stop IOException: " + e.getMessage());
+			logger.info("SocketClient stop IOException: " + e.getMessage());
 	  }
 	}
 }

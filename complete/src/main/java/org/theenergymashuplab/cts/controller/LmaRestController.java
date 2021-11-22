@@ -43,13 +43,13 @@ import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayloadRabbit;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
 
-import org.theenergymashuplab.cts.rabbitmq.*;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.ConnectionFactory;
 
 import org.theenergymashuplab.cts.TenderIdType;
@@ -57,7 +57,10 @@ import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderRabbit;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.BridgeInstant;
+import org.theenergymashuplab.cts.BridgeInterval;
 import org.theenergymashuplab.cts.EiResponse;
 
 
@@ -109,36 +112,52 @@ public class LmaRestController implements Serializable {
 		EiCreateTenderPayload tempCreate;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
 		EiCreatedTenderPayload tempPostResponse; 
-
-		// Is class scope OK for builder?
-		final RestTemplateBuilder builder = new RestTemplateBuilder();
-		RestTemplate restTemplate;	// scope is function postEiCreateTender	
-    	restTemplate = builder.build();
     	
 		// save CreateTender message as sent by TEUA
-		tempCreate = eiCreateTender;	
+		EiTender receivedTender = eiCreateTender.getTender();
+		EiTenderRabbit rabbitTender = new EiTenderRabbit(receivedTender.getTenderId(), new BridgeInterval(receivedTender.getInterval()),
+				receivedTender.getQuantity(), receivedTender.getPrice(), new BridgeInstant(receivedTender.getExpirationTime()), receivedTender.getSide());
 		
-		logger.debug("postEiCreateTender to LME. TenderId " +
-				tempCreate.getTender().getTenderId().toString());
+    	
+    	tempCreate = eiCreateTender;
+    	EiCreateTenderPayloadRabbit rabbitCreate = new EiCreateTenderPayloadRabbit(rabbitTender, tempCreate.getPartyId(), tempCreate.getCounterPartyId(), tempCreate.getRequestId());
+		//tempCreate = new EiCreateTenderPayloadRabbit(eiCreateTender);	
+		
+		logger.info("postEiCreateTender to LME. TenderId " +
+				rabbitTender.getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
 		
-		rabbitTemplate.convertAndSend(exchange.getName(), "foo.bar.baz", tempCreate.toString());
-	    
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
-				tempCreate, 
-				EiCreatedTenderPayload.class);
+		String jsonStr = "";
+		ObjectMapper Obj = new ObjectMapper();
+		
+        try {  
+            // Converting the Java object into a JSON string  
+            jsonStr = Obj.writeValueAsString(rabbitCreate);  
+            // Displaying Java object into a JSON string   
+        }  
+        catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+        
+		 
+		rabbitTemplate.convertAndSend(exchange.getName(), "foo.bar.baz", jsonStr);
 		
 		//logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 		
-		
-		/*EiCreatedTenderPayload tempCreated = new EiCreatedTenderPayload(tempCreate.getTender().getTenderId(),
+		/*IMPORTANT:
+		 * This return has shortcutted the origional architecture. The LME is supposed to return this 
+		 * response to the LMA. The LMA is creating and returning because it was easier than setting up another
+		 * RabbitMQ send/recieve to handle it. That is what will need to be done in the future, but this
+		 * is just a proof of concept so the shortcut was implemented for ease.
+		 */
+		EiCreatedTenderPayload tempCreated = new EiCreatedTenderPayload(tempCreate.getTender().getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));*/
+				new EiResponse(200, "OK"));
 		
-		return tempPostResponse;
+		return tempCreated;
 	}
 	
 	/*
@@ -167,7 +186,7 @@ public class LmaRestController implements Serializable {
 		String positionResponse;
 		PositionAddPayload positionAddPayload;
 
-		logger.debug("Start of EiCreateTransaction in LMA");
+		logger.info("Start of EiCreateTransaction in LMA");
 		/*
 		 * Originated by LME and forwarded by LMA to TEUA based on market match
 		 * and party. Rewrite messages so party and counterpary are counter-symmetric
@@ -179,7 +198,7 @@ public class LmaRestController implements Serializable {
 		tempPartyId = tempCreate.getPartyId();
 		positionParty = tempPartyId;
 		positionInterval = tempTender.getInterval();
-		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
+		logger.info("positionParty.toString is " + positionParty + " positionInterval " +
 				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
 		
 		positionUri = "http://localhost:8080/position/" +
@@ -199,7 +218,7 @@ public class LmaRestController implements Serializable {
 				positionUri,
 				positionAddPayload,
 				String.class);
-		logger.debug("return from " + positionUri +
+		logger.info("return from " + positionUri +
 				" result " + positionResponse);
 
 
@@ -212,7 +231,7 @@ public class LmaRestController implements Serializable {
 				tempCreate.toString());
 		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
 		
-		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
+		logger.info("tempTeuaUri is '" + tempTeuaUri + "'");
 		
 		if (tempTeuaUri == null) {
 			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +

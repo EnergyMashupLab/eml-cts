@@ -1,5 +1,4 @@
-package org.theenergymashuplab.cts.rabbitmq;
-
+package org.theenergymashuplab.cts.controller;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;

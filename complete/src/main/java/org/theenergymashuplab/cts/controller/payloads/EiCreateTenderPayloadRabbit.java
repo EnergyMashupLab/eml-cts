@@ -16,15 +16,17 @@
 
 package org.theenergymashuplab.cts.controller.payloads;
 
+import java.io.Serializable;
+
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderRabbit;
 import org.theenergymashuplab.cts.RefIdType;
 
-public class EiCreateTenderPayload {
+public class EiCreateTenderPayloadRabbit implements Serializable{
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
-	private EiTender tender;
+	private EiTenderRabbit tender;
 	
 	/*
 	@JsonIgnore
@@ -35,11 +37,12 @@ public class EiCreateTenderPayload {
 	 * Default constructor for JSON deserialization.
 	 * TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCreateTenderPayload()	{		
+	public EiCreateTenderPayloadRabbit()	{		
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
 	}
+	
 
 	/* 
 	 * Parallel for EiCreateTransaction, EiCreateTender:
@@ -49,12 +52,12 @@ public class EiCreateTenderPayload {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 
-	public EiCreateTenderPayload(EiTender tender, ActorIdType party, ActorIdType counterParty) {
+	public EiCreateTenderPayloadRabbit(EiTenderRabbit tender, ActorIdType party, ActorIdType counterParty, RefIdType rid) {
 
 		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
-		this.requestId = new RefIdType();
+		this.requestId = rid;
 		
 //		System.err.println("EiCreateTender Constructor before this.print()");
 //		this.print();
@@ -96,11 +99,11 @@ public class EiCreateTenderPayload {
 		this.requestId = requestId;
 	}
 
-	public EiTender getTender() {
+	public EiTenderRabbit getTender() {
 		return tender;
 	}
 
-	public void setTender(EiTender tender) {
+	public void setTender(EiTenderRabbit tender) {
 		this.tender = tender;
 	}
 }
