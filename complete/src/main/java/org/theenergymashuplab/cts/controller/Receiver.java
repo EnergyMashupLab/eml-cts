@@ -21,6 +21,8 @@ public class Receiver {
 
   public void receiveMessage(String message) {
 	  
+	  System.out.println("Hello From Rabbit Receiver");
+	  
 	  EiCreateTenderPayloadRabbit tempTender = null;	 
 	  Boolean addQSuccess = false;
 	  
@@ -41,20 +43,4 @@ public class Receiver {
 	  addQSuccess = LmeRestController.queueFromLme.add(convertedPayload);
   }
     
-    /*Boolean addQsuccess = false;
-    
-	addQsuccess = queueFromLme.add(tempCreate);
-	logger.debug("queueFomLme addQsuccess " + addQsuccess +
-			" TenderId " + tempTender.getTenderId());
-	
-	// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
-	// from MarketCreateTransaction
-	mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
-			tempCreate);	
-	
-	if (mapPutReturnValue == null) {
-		logger.debug("mapPutReturnValue is null - new entry");
-	}	else	{
-		logger.debug("mapPutReturnValue non-null - previous entry " + mapPutReturnValue.toString());
-	}*/
 }

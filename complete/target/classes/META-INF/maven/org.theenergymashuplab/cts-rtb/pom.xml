@@ -34,7 +34,7 @@ limitations under the License.
 	<description>EML project for Spring Boot</description>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<start-class>org.theenergymashuplab.cts.EnergyApplication</start-class>
 	</properties>
 
