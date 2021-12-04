@@ -134,8 +134,6 @@ public class LmeRestController {
 		EiCreatedTenderPayload tempCreated;
 		Boolean addQsuccess = false;
 		
-		System.out.println("Hello From LME");
-		
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
