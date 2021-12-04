@@ -21,8 +21,6 @@ public class Receiver {
 
   public void receiveMessage(String message) {
 	  
-	  System.out.println("Hello From Rabbit Receiver");
-	  
 	  EiCreateTenderPayloadRabbit tempTender = null;	 
 	  Boolean addQSuccess = false;
 	  
