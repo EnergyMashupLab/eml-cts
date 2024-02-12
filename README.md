@@ -12,7 +12,7 @@ Energy Mashup Lab Common Transactive Services
 <p align="center">
   <a href="#background">Background</a> •
   <a href="#tech-desc">Technical Description</a> •
-  <a href="docs/README.md">Documentation</a> •
+  <a href="https://github.com/EnergyMashupLab/eml-cts/wiki">Documentation</a> •
   <a href="#authors">Authors</a> •
   <a href="#license">License</a>
 </p>
