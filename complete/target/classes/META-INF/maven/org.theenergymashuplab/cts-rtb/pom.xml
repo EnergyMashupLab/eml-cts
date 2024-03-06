@@ -20,7 +20,7 @@ limitations under the License.
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.18</version>
+		<version>3.0.13</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.theenergymashuplab</groupId>
@@ -34,7 +34,7 @@ limitations under the License.
 	<description>EML project for Spring Boot</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>21</java.version>
 		<start-class>org.theenergymashuplab.cts.EnergyApplication</start-class>
 	</properties>
 
