@@ -13,18 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+//TODO: Add set & get functions, create MarketIdType class, look into IntervalType to find suitable default for default constructor
  package org.theenergymashuplab.cts.controller.payloads;
- 
- public class EiRequestPositionPayload {
+
+import org.hibernate.query.sqm.IntervalType;
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.RefIdType;
+
+public class EiRequestPositionPayload {
+    private IntervalType boundingInterval;
+    private MarketIdType marketId;
+    private ActorIdType positionParty;
+    private RefIdType requestId;
+    private ActorIdType requestor;
+    private ResourceDesignator resourceDesignator;
      
      // Default initializer for JSON serialization
-     public EiRequestPositionPayload() {
-     }
+    public EiRequestPositionPayload() {
+        this.boundingInterval = new IntervalType();
+        this.marketId = new MarketIdType();
+        this.positionParty = new ActorIdType();
+        this.requestId = new RefIdType();
+        this.requestor = new ActorIdType();
+        this.resourceDesignator = new ResourceDesignator();
+    }
  
-     public EiRequestPositionPayload()	{
-     }
- 
+    public EiRequestPositionPayload(IntervalType boundingInterval, MarketIdType marketId, ActorIdType positionParty, RefIdType requestId, ActorIdType requestor, ResourceDesignator resourceDesignator)	{
+        this.boundingInterval = boundingInterval;
+        this.marketId = marketId;
+        this.positionParty = positionParty;
+        this.requestId = requestId;
+        this.requestor = requestor;
+        this.resourceDesignator = resourceDesignator;
+    }
+
+    @Override
+    public String toString() {
+        return("EiRequestPosition boundingInterval " +
+        boundingInterval.values() +
+        " marketId " +
+        marketId.value() +
+        " positionParty " +
+        positionParty.value() + 
+        " requestId " +
+        requestId.toString() +
+        " requestor " +
+        requestor.value() +
+        " resourceDesignator " +
+        resourceDesignator.toString());
+    }
      /* 
       * 
       * 
