@@ -74,7 +74,7 @@ public class LmeSocketClient	extends Thread {
 	@Override
 	public void run() {
 		EiCreateTenderPayload create;
-		EiTender tender;
+		EiTenderType tender;
 		MarketCreateTenderPayload toJson;
 		String jsonString = null;	// for JSON string
 

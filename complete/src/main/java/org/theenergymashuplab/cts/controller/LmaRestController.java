@@ -42,14 +42,14 @@ import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.ActorIdType;
 
 @RestController
 @RequestMapping("/lma")
 public class LmaRestController {
 	private static final AtomicLong counter = new AtomicLong();
-	private static EiTender currentTender;
+	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	private static final ActorIdType partyId  = new ActorIdType();
@@ -128,7 +128,7 @@ public class LmaRestController {
 	public EiCreatedTransactionPayload postEiCreateTransactionPayload(
 			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
 
-		EiTender tempTender;
+		EiTenderType tempTender;
 		ActorIdType tempPartyId;
 		EiCreateTransactionPayload tempCreate;
 		EiCreatedTransactionPayload tempPostResponse;
@@ -268,11 +268,11 @@ public class LmaRestController {
 		return tempPostResponse;
 	}
 
-	public static EiTender getCurrentTender() {
+	public static EiTenderType getCurrentTender() {
 		return currentTender;
 	}
 
-	public static void setCurrentTender(EiTender currentTender) {
+	public static void setCurrentTender(EiTenderType currentTender) {
 		LmaRestController.currentTender = currentTender;
 	}
 

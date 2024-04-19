@@ -55,7 +55,7 @@ public class GreetingController {
 	 */
 	@GetMapping("/CreateTender")
 	public EiCreateTenderPayload eiCreateTenderPayload(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();
+		EiTenderType tempTender = new RandomEiTender().randomTender();
 		
 		// actor Ids will come from POST RequestBody
 		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType());		
@@ -69,7 +69,7 @@ public class GreetingController {
 	@GetMapping("/CreateTransaction")
 	public EiCreateTransactionPayload eiCreateTransactionPayload(@RequestParam(name = "number", 
 							defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();
+		EiTenderType tempTender = new RandomEiTender().randomTender();
 		EiCreateTransactionPayload tempEiCreateTransactionPayload;
 		EiTransaction tempTransaction;
 
@@ -90,7 +90,7 @@ public class GreetingController {
 	 */
 	@GetMapping("/CancelTender")
 	public EiCancelTenderPayload eiCancelTender(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();
+		EiTenderType tempTender = new RandomEiTender().randomTender();
 		EiCancelTenderPayload tempEiCancelTender;
 		EiTransaction tempTransaction;
 
@@ -117,7 +117,7 @@ public class GreetingController {
 	@GetMapping("/clientCreateTender")
 	public ClientCreateTenderPayload clientCreateTenderPayload(
 					@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();		
+		EiTenderType tempTender = new RandomEiTender().randomTender();		
 		
 		// assign fields for random tender and fill in missing values
 		// tempClientCreateTenderPayload.

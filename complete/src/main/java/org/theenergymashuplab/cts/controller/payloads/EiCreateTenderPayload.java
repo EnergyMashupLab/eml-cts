@@ -17,14 +17,14 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.RefIdType;
 
 public class EiCreateTenderPayload {
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
-	private EiTender tender;
+	private EiTenderType tender;
 	
 	/*
 	@JsonIgnore
@@ -49,7 +49,7 @@ public class EiCreateTenderPayload {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 
-	public EiCreateTenderPayload(EiTender tender, ActorIdType party, ActorIdType counterParty) {
+	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty) {
 
 		this.tender = tender;
 		this.partyId = party;
@@ -96,11 +96,11 @@ public class EiCreateTenderPayload {
 		this.requestId = requestId;
 	}
 
-	public EiTender getTender() {
+	public EiTenderType getTender() {
 		return tender;
 	}
 
-	public void setTender(EiTender tender) {
+	public void setTender(EiTenderType tender) {
 		this.tender = tender;
 	}
 }

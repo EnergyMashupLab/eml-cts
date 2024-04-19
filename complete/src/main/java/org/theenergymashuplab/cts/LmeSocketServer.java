@@ -89,7 +89,7 @@ public class LmeSocketServer extends Thread	{
     	EiCreateTransactionPayload eiCreateTransaction;
     	EiCreateTenderPayload eiCreateTender;
     	EiTransaction transaction;
-    	EiTender tender;
+    	EiTenderType tender;
     	//	For lookup and return value in eiCreateTransactionMatchNumberMap
     	Long matchNumberLong; // cannot use long for HashMap key
     	EiCreateTransactionPayload matchEiCreateTransaction, tempCreate;

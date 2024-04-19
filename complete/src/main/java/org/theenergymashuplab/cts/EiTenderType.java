@@ -20,7 +20,7 @@ package org.theenergymashuplab.cts;
 
 import java.time.*;
 
-public class EiTender {
+public class EiTenderType {
 	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
 	private final Interval interval;
 	private Instant expirationTime;
@@ -43,7 +43,7 @@ public class EiTender {
 			time interval
 	*/
 
-	public EiTender(Interval interval, long quantity, long price, Instant expirationTime, SideType side) {
+	public EiTenderType(Interval interval, long quantity, long price, Instant expirationTime, SideType side) {
 		this.interval = interval;
 		this.quantity = quantity;
 		this.price = price;

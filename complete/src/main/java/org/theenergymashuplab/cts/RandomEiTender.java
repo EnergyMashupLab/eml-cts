@@ -58,7 +58,7 @@ public class RandomEiTender {
 		public  Instant dtStart = Instant.parse("2020-03-15T10:00:00.00Z");
 		public static Duration duration = Duration.ZERO;
 
-		private EiTender randTender;
+		private EiTenderType randTender;
 		Interval interval = new Interval(60, dtStart);	//	60 minute interval at dtStart
 		
 		RandomEiTender()	{
@@ -67,7 +67,7 @@ public class RandomEiTender {
 			// after the constructor is invoked
 		}
 		
-		public EiTender randomTender()	{
+		public EiTenderType randomTender()	{
 			int randQuantity = 50 + rand.nextInt(50); // random quantity from 50 to 100
 			Interval interval = new Interval(60, dtStart);	//	60 minute interval at dtStart
 			long price = 12; // cents
@@ -80,7 +80,7 @@ public class RandomEiTender {
 				side = SideType.SELL;
 			}
 			
-			randTender = new EiTender(interval, randQuantity, price, exp, side);	
+			randTender = new EiTenderType(interval, randQuantity, price, exp, side);	
 			return randTender;
 		}
 		
@@ -104,12 +104,12 @@ public class RandomEiTender {
 		}
 
 
-		public EiTender getRandTender() {
+		public EiTenderType getRandTender() {
 			return randTender;
 		}
 
 
-		public void setRandTender(EiTender randTender) {
+		public void setRandTender(EiTenderType randTender) {
 			this.randTender = randTender;
 		}
 

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
@@ -155,7 +155,7 @@ public class TeuaRestController {
 			@PathVariable String teuaId,
 			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload
 			)	{
-		EiTender tempTender;
+		EiTenderType tempTender;
 		EiTransaction tempTransaction;
 		// tempPostReponse responds to POST to /sc
 		EiCreateTransactionPayload tempCreate;
@@ -267,7 +267,7 @@ public class TeuaRestController {
 			@RequestBody ClientCreateTenderPayload clientCreateTender)	{
 		ClientCreateTenderPayload tempClientCreateTender;	
 		ClientCreatedTenderPayload tempReturn;
-		EiTender tender;
+		EiTenderType tender;
 		EiCreateTenderPayload eiCreateTender;	
 		Integer numericTeuaId = -1;
 		String positionUri;
@@ -312,7 +312,7 @@ public class TeuaRestController {
 		 * 
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
-		tender = new EiTender(
+		tender = new EiTenderType(
 				tempClientCreateTender.getInterval(),
 				tempClientCreateTender.getQuantity(),
 				tempClientCreateTender.getPrice(),

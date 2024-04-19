@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.LmeSendTransactions;
 import org.theenergymashuplab.cts.LmeSocketClient;
@@ -48,7 +48,7 @@ import java.util.HashMap;
 @RequestMapping("/lme")
 public class LmeRestController {
 	private static final AtomicLong counter = new AtomicLong();
-	private static EiTender currentTender;
+	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
@@ -128,7 +128,7 @@ public class LmeRestController {
 	@PostMapping("/createTender")
 	public EiCreatedTenderPayload 	postEiCreateTender(
 			@RequestBody EiCreateTenderPayload eiCreateTender)	{
-		EiTender tempTender;
+		EiTenderType tempTender;
 		EiCreateTenderPayload tempCreate = null;
 		EiCreateTenderPayload mapPutReturnValue = null;
 		EiCreatedTenderPayload tempCreated;
@@ -220,12 +220,12 @@ public class LmeRestController {
 	}
 
 
-	public static EiTender getCurrentTender() {
+	public static EiTenderType getCurrentTender() {
 		return currentTender;
 	}
 
 
-	public static void setCurrentTender(EiTender currentTender) {
+	public static void setCurrentTender(EiTenderType currentTender) {
 		LmeRestController.currentTender = currentTender;
 	}
 
