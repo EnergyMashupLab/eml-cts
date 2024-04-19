@@ -27,7 +27,9 @@ import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.EiTransaction;
+import org.theenergymashuplab.cts.TenderDetail;
 import org.theenergymashuplab.cts.TenderIdType;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
@@ -179,11 +181,21 @@ public class TeuaRestController {
 		
 		/*
 		 * Build ClientCreateTransactionPayload to POST to client with same id
-		 */	
+		 */
+		
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+		TenderDetail tenderDetail = tempTender.getTenderDetail();
+		if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+		}
+		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+		
 		clientCreate = new ClientCreateTransactionPayload(
 				/* side 	*/	tempTender.getSide(),
-				/* quantity	*/	tempTender.getQuantity(),
-				/* price	*/	tempTender.getPrice(),
+				/* quantity	*/	tenderIntervalDetail.getQuantity(),
+				/* price	*/	tenderIntervalDetail.getPrice(),
 				/* tenderId	*/	tempTender.getTenderId().value()
 				);
 		
@@ -312,12 +324,18 @@ public class TeuaRestController {
 		 * 
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
-		tender = new EiTenderType(
+		
+		// TODO This will need to be changed when clients become capable of sending stream tenders
+		TenderDetail tenderDetail = new TenderIntervalDetail(
 				tempClientCreateTender.getInterval(),
-				tempClientCreateTender.getQuantity(),
 				tempClientCreateTender.getPrice(),
+				tempClientCreateTender.getQuantity()
+		);
+		tender = new EiTenderType(
 				tempClientCreateTender.getBridgeExpireTime().asInstant(),
-				tempClientCreateTender.getSide());
+				tempClientCreateTender.getSide(),
+				tenderDetail
+		);
 		
 		// 	Construct the EiCreateTender payload to be forwarded to LMA
 		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId],

@@ -80,7 +80,8 @@ public class RandomEiTender {
 				side = SideType.SELL;
 			}
 			
-			randTender = new EiTenderType(interval, randQuantity, price, exp, side);	
+			TenderDetail tenderDetail = new TenderIntervalDetail(interval, price, randQuantity);
+			randTender = new EiTenderType(Instant.now(), side, tenderDetail);
 			return randTender;
 		}
 		

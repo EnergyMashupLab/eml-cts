@@ -19,6 +19,8 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.TenderDetail;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
 
 public class EiCreateTransactionPayload {
 	private ActorIdType counterPartyId;
@@ -57,13 +59,22 @@ public class EiCreateTransactionPayload {
 //		String printStringFormat = 
 //			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 		
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+		TenderDetail tenderDetail = transaction.getTender().getTenderDetail();
+		if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+		}
+		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+		
 		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
 				" partyid " + partyId.toString() +
 				" counterPartyid " + counterPartyId.toString() +			
 				" requestId " + requestId.value() + " TenderId " +
 				transaction.getTender().getTenderId().value() +
-				" quantity " + transaction.getTender().getQuantity() +
-				" price " + transaction.getTender().getPrice());
+				" quantity " + tenderIntervalDetail.getQuantity() +
+				" price " + tenderIntervalDetail.getPrice());
 	}
 
 	public ActorIdType getCounterPartyId() {

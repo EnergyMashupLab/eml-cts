@@ -20,111 +20,61 @@ package org.theenergymashuplab.cts;
 
 import java.time.*;
 
-public class EiTenderType {
+public class EiTenderType extends TenderBase {
 	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
-	private final Interval interval;
-	private Instant expirationTime;
-	private long quantity = 0;
-	private long price = 0;	// cents initially. Parity uses long with number of fractional digits
-	private SideType side;
-	private final boolean integralOnly = false;	// TODO not set, not serialized but comes through as false. Verify behavior.
-	private TransactiveState transactiveState = TransactiveState.TENDER;
+	private MarketOrderIdType referencedQuoteId = null;  // Will be unused until development of Negotiation Facet
+	private MarketOrderIdType marketOrderId = null;
 	
-	/* 
-		Attributes OMITTED from the UML Model at 
-			currency
-			marketContext
-			terms
-			emixUid
-			envelopeContents
-			
-		Attributes ADDED to the visible UML model (from StreamPayloadBaseType) 
-			price
-			time interval
-	*/
-
-	public EiTenderType(Interval interval, long quantity, long price, Instant expirationTime, SideType side) {
-		this.interval = interval;
-		this.quantity = quantity;
-		this.price = price;
-		this.expirationTime = expirationTime;
-		this.side = side;	// side.BUY or side.SELL
-		/*
-		 * other attributes are set to defaults
-		 * 
-		 * TODO reorder constructor parameters to mimic parity terminal client -
-		 * 		side, quantity, instrument, price
-		 */
-		
+	// Needed for JSON deserialization by Jackson
+	public EiTenderType() {
+		super(null, null, null);
 	}
 	
-	@Override
-	public String toString()	{
-		// TODO replace with concatenated strings and toStrings
-		String printStringFormat = 
-				"EiTender tenderId %d quantity %d price cents %d side %s integralOnly %s expirationTime %s dtStart %s duration %s";
+	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail) {
+		super(expirationTime, side, tenderDetail);
+	}
 
-		return (String.format(printStringFormat, tenderId.value(),quantity, price, side,integralOnly,
-				expirationTime.toString(),interval.dtStart.toString(),interval.duration.toString()));
-	}	
+	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail,
+			MarketOrderIdType marketOrderId) {
+		super(expirationTime, side, tenderDetail);
+		this.marketOrderId = marketOrderId;
+	}
 	
+	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail,
+			MarketOrderIdType referencedQuoteId, MarketOrderIdType marketOrderId) {
+		super(expirationTime, side, tenderDetail);
+		this.referencedQuoteId = referencedQuoteId;
+		this.marketOrderId = marketOrderId;
+	}
+
+	@Override
+	public String toString() {
+		return "EiTenderType [tenderId=" + tenderId + ", referencedQuoteId=" + referencedQuoteId + ", marketOrderId="
+				+ marketOrderId + ", allOrNone=" + isAllOrNone() + ", executionInstructions="
+				+ getExecutionInstructions() + ", marketId=" + getMarketId() + ", priceScale="
+				+ getPriceScale() + ", quantityScale=" + getQuantityScale() + ", resourceDesignator="
+				+ getResourceDesignator() + ", tnderDetail=" + getTenderDetail() + ", warrants="
+				+ getWarrants() + "]";
+	}
+
 	public TenderIdType getTenderId() {
 		return tenderId;
 	}
 
-	public Instant getExpireTime() {
-		return expirationTime;
+	public MarketOrderIdType getReferencedQuoteId() {
+		return referencedQuoteId;
 	}
 
-	public void setExpireTime(Instant expirationTime) {
-		this.expirationTime = expirationTime;
+	public void setReferencedQuoteId(MarketOrderIdType referencedQuoteId) {
+		this.referencedQuoteId = referencedQuoteId;
 	}
 
-	public long getQuantity() {
-		return quantity;
+	public MarketOrderIdType getMarketOrderId() {
+		return marketOrderId;
 	}
 
-	public void setQuantity(long quantity) {
-		this.quantity = quantity;
-	}
-
-	public TransactiveState getTransactiveState() {
-		return transactiveState;
-	}
-
-	public void setTransactiveState(TransactiveState transactiveState) {
-		this.transactiveState = transactiveState;
-	}
-
-	public Interval getInterval() {
-		return interval;
-	}
-
-	public SideType getSide() {
-		return side;
-	}
-
-	public void setSide(SideType side) {
-		this.side = side;
-	}
-
-	public boolean isIntegralOnly() {
-		return integralOnly;
+	public void setMarketOrderId(MarketOrderIdType marketOrderId) {
+		this.marketOrderId = marketOrderId;
 	}
 	
-	public Instant getExpirationTime() {
-		return expirationTime;
-	}
-
-	public void setExpirationTime(Instant expirationTime) {
-		this.expirationTime = expirationTime;
-	}
-
-	public long getPrice() {
-		return price;
-	}
-
-	public void setPrice(long price) {
-		this.price = price;
-	}
 }

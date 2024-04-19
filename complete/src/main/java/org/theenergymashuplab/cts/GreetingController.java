@@ -123,7 +123,16 @@ public class GreetingController {
 		// tempClientCreateTenderPayload.
 		
 		// actor Ids will come from POST RequestBody
-		return new ClientCreateTenderPayload(tempTender.getSide(),tempTender.getQuantity(), tempTender.getPrice());		
+		
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+		TenderDetail tenderDetail = tempTender.getTenderDetail();
+		if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+		}
+		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+		return new ClientCreateTenderPayload(tempTender.getSide(),tenderIntervalDetail.getQuantity(), tenderIntervalDetail.getPrice());		
 	}
 
 	/*

@@ -39,7 +39,9 @@ import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
 import org.theenergymashuplab.cts.TenderIdType;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
 import org.theenergymashuplab.cts.SideType;
+import org.theenergymashuplab.cts.TenderDetail;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.EiTenderType;
@@ -152,10 +154,19 @@ public class LmaRestController {
 		//	local temporary variables
 		tempCreate = eiCreateTransactionPayload;
 		tempTender = tempCreate.getTransaction().getTender();
+		
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+		TenderDetail tenderDetail = tempTender.getTenderDetail();
+		if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+		}
+		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
 
 		tempPartyId = tempCreate.getPartyId();
 		positionParty = tempPartyId;
-		positionInterval = tempTender.getInterval();
+		positionInterval = tenderIntervalDetail.getInterval();
 		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
 				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
 		
@@ -163,8 +174,8 @@ public class LmaRestController {
 				positionParty.toString() +
 				"/add";
 		
-		positionQuantity = (tempTender.getSide() == SideType.BUY ? tempTender.getQuantity() :
-				-tempTender.getQuantity());
+		positionQuantity = (tempTender.getSide() == SideType.BUY ? tenderIntervalDetail.getQuantity() :
+				-tenderIntervalDetail.getQuantity());
 		
 		logger.info("positionUri '" + positionUri + " positionQuantity " + positionQuantity);
 
