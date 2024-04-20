@@ -18,12 +18,19 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiTenderType;
+import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.RefIdType;
 
 public class EiCreateTenderPayload {
+	private boolean atMostOne = false;
+	private String executionInstructions = "";
+	private MarketIdType marketId = new MarketIdType();
+	private int segmentId = 1;
+	
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
+	// The standard specifies that EiCreateTenderPayload should have a list of one or more tenders
 	private EiTenderType tender;
 	
 	/*
@@ -50,26 +57,17 @@ public class EiCreateTenderPayload {
 	 */
 
 	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty) {
-
 		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
-		
-//		System.err.println("EiCreateTender Constructor before this.print()");
-//		this.print();
 	}
 
 	@Override
 	public String toString() {
-		return ("EiCreateTenderPayload party " +
-				partyId.value() +
-				" counterParty " +
-				counterPartyId.value() +
-				" requestId " +
-				requestId.toString() +
-				" " +
-				tender.toString());
+		return "EiCreateTenderPayload [atMostOne=" + atMostOne + ", executionInstructions=" + executionInstructions
+				+ ", marketId=" + marketId + ", segmentId=" + segmentId + ", counterPartyId=" + counterPartyId
+				+ ", partyId=" + partyId + ", requestId=" + requestId + ", tender=" + tender + "]";
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -102,5 +100,37 @@ public class EiCreateTenderPayload {
 
 	public void setTender(EiTenderType tender) {
 		this.tender = tender;
+	}
+
+	public boolean isAtMostOne() {
+		return atMostOne;
+	}
+
+	public void setAtMostOne(boolean atMostOne) {
+		this.atMostOne = atMostOne;
+	}
+
+	public String getExecutionInstructions() {
+		return executionInstructions;
+	}
+
+	public void setExecutionInstructions(String executionInstructions) {
+		this.executionInstructions = executionInstructions;
+	}
+
+	public MarketIdType getMarketId() {
+		return marketId;
+	}
+
+	public void setMarketId(MarketIdType marketId) {
+		this.marketId = marketId;
+	}
+
+	public int getSegmentId() {
+		return segmentId;
+	}
+
+	public void setSegmentId(int segmentId) {
+		this.segmentId = segmentId;
 	}
 }
