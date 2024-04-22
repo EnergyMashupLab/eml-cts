@@ -16,12 +16,13 @@
 //TODO: Create MarketIdType class, add comments
  package org.theenergymashuplab.cts.controller.payloads;
 
-import org.hibernate.query.sqm.IntervalType;
+import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.MarketIdType;
 
 public class EiRequestPositionPayload {
-    private IntervalType boundingInterval;
+    private Interval boundingInterval;
     private MarketIdType marketId;
     private ActorIdType positionParty;
     private RefIdType requestId;
@@ -30,15 +31,12 @@ public class EiRequestPositionPayload {
      
      // Default initializer for JSON serialization
     public EiRequestPositionPayload() {
-        this.boundingInterval = IntervalType.SECOND;
         this.marketId = new MarketIdType();
         this.positionParty = new ActorIdType();
-        this.requestId = new RefIdType();
         this.requestor = new ActorIdType();
-        this.resourceDesignator = new ResourceDesignator();
     }
  
-    public EiRequestPositionPayload(IntervalType boundingInterval, MarketIdType marketId, ActorIdType positionParty, RefIdType requestId, ActorIdType requestor, ResourceDesignator resourceDesignator)	{
+    public EiRequestPositionPayload(Interval boundingInterval, MarketIdType marketId, ActorIdType positionParty, RefIdType requestId, ActorIdType requestor, ResourceDesignator resourceDesignator)	{
         this.boundingInterval = boundingInterval;
         this.marketId = marketId;
         this.positionParty = positionParty;
@@ -50,7 +48,7 @@ public class EiRequestPositionPayload {
     @Override
     public String toString() {
         return("EiRequestPosition boundingInterval " +
-        boundingInterval.values() +
+        boundingInterval.toString() +
         " marketId " +
         marketId.value() +
         " positionParty " +
@@ -69,11 +67,11 @@ public class EiRequestPositionPayload {
       * 
       * 
       */
-    public void setBoundingInterval(IntervalType boundingInterval) {
+    public void setBoundingInterval(Interval boundingInterval) {
         this.boundingInterval = boundingInterval;
     }
     
-    public IntervalType getBoundingInterval() {
+    public Interval getBoundingInterval() {
         return boundingInterval;
     }
 

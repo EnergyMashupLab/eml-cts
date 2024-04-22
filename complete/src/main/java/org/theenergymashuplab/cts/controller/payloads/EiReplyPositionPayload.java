@@ -17,12 +17,12 @@
 //TODO: Add comments, create CtsStream class
 package org.theenergymashuplab.cts.controller.payloads;
 
-import org.hibernate.query.sqm.IntervalType;
+import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponseType;
 
 public class EiReplyPositionPayload {
-    private IntervalType boundingInterval;
+    private Interval boundingInterval;
     private ActorIdType positionParty;
     private CtsStream positions;
     private ActorIdType requestor;
@@ -31,14 +31,13 @@ public class EiReplyPositionPayload {
 
     // Default initializer for JSON serialization
     public EiReplyPositionPayload() {
-        this.boundingInterval = IntervalType.SECOND;
         this.positionParty = new ActorIdType();
-        this.positions = CtsStream positions;
+        this.positions = new positions;
         this.requestor = new ActorIdType();
         this.response = new EiResponseType();
     }
 
-    public EiReplyPositionPayload(IntervalType boundingInterval, ActorIdType positionParty, CtsStream positions, ActorIdType requestor, EiResponseType response) {
+    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStream positions, ActorIdType requestor, EiResponseType response) {
         this.boundingInterval = boundingInterval;
         this.positionParty = positionParty;
         this.positions = positions;
@@ -46,11 +45,11 @@ public class EiReplyPositionPayload {
         this.response = response;
     }
 
-    public void setBoundingInterval(IntervalType boundingInterval) {
+    public void setBoundingInterval(Interval boundingInterval) {
         this.boundingInterval = boundingInterval;
     }
     
-    public IntervalType getBoundingInterval() {
+    public Interval getBoundingInterval() {
         return boundingInterval;
     }
 
