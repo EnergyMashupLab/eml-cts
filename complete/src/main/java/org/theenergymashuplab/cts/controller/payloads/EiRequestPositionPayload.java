@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//TODO: Add set & get functions, create MarketIdType class, look into IntervalType to find suitable default for default constructor
+//TODO: Create MarketIdType class, add comments
  package org.theenergymashuplab.cts.controller.payloads;
 
 import org.hibernate.query.sqm.IntervalType;
@@ -30,7 +30,7 @@ public class EiRequestPositionPayload {
      
      // Default initializer for JSON serialization
     public EiRequestPositionPayload() {
-        this.boundingInterval = new IntervalType();
+        this.boundingInterval = IntervalType.SECOND;
         this.marketId = new MarketIdType();
         this.positionParty = new ActorIdType();
         this.requestId = new RefIdType();
@@ -69,7 +69,52 @@ public class EiRequestPositionPayload {
       * 
       * 
       */
+    public void setBoundingInterval(IntervalType boundingInterval) {
+        this.boundingInterval = boundingInterval;
+    }
     
-     
+    public IntervalType getBoundingInterval() {
+        return boundingInterval;
+    }
+
+    public void setMarketId(MarketIdType marketId) {
+        this.marketId = marketId;
+    }
+
+    public MarketIdType getMarketId() {
+        return marketId;
+    }
+
+    public void setPositionParty(ActorIdType positionParty) {
+        this.positionParty = positionParty;
+    }
+
+    public ActorIdType getPositionParty() {
+        return positionParty;
+    }
+
+    public void setRequestId(RefIdType requestId) {
+        this.requestId = requestId;
+    }
+
+    public RefIdType getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestor(ActorIdType requestor) {
+        this.requestor = requestor;
+    }
+
+    public ActorIdType getRequestor() {
+        return requestor;
+    }
+
+    public void setResourceDesignator(ResourceDesignator resourceDesignator) {
+        this.resourceDesignator = resourceDesignator;
+    }
+
+    public ResourceDesignator getResourceDesignator() {
+        return resourceDesignator;
+    } 
  }
  

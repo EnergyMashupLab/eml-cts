@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-//TODO: Add comments, set & get functions, EiRequestPositionPayload TODOs
+//TODO: Add comments, create CtsStream class
 package org.theenergymashuplab.cts.controller.payloads;
 
+import org.hibernate.query.sqm.IntervalType;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponseType;
 
@@ -27,8 +28,10 @@ public class EiReplyPositionPayload {
     private ActorIdType requestor;
     private EiResponseType response;
 
+
+    // Default initializer for JSON serialization
     public EiReplyPositionPayload() {
-        this.boundingInterval = new IntervalType();
+        this.boundingInterval = IntervalType.SECOND;
         this.positionParty = new ActorIdType();
         this.positions = CtsStream positions;
         this.requestor = new ActorIdType();
@@ -41,5 +44,45 @@ public class EiReplyPositionPayload {
         this.positions = positions;
         this.requestor = requestor;
         this.response = response;
+    }
+
+    public void setBoundingInterval(IntervalType boundingInterval) {
+        this.boundingInterval = boundingInterval;
+    }
+    
+    public IntervalType getBoundingInterval() {
+        return boundingInterval;
+    }
+
+    public void setPositionParty(ActorIdType positionParty) {
+        this.positionParty = positionParty;
+    }
+
+    public ActorIdType getPositionParty() {
+        return positionParty;
+    }
+
+    public void setPositions(CtsStream positions) {
+        this.positions = positions;
+    }
+    
+    public void getPositions() {
+        return positions;
+    }
+
+    public void setRequestor(ActorIdType requestor) {
+        this.requestor = requestor;
+    }
+
+    public ActorIdType getRequestor() {
+        return requestor;
+    }
+
+    public void setResponse(EiResponseType response) {
+        this.response = response;
+    }
+    
+    public EiResponseType getResponse() {
+        return response;
     }
 }
