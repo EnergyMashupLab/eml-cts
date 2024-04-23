@@ -82,7 +82,7 @@ public class LmeRestController {
 	// 	TODO count down original quantity from Transactions against the Tender;
 	//	remove from map when zero
 	// 	Need wrapper class Long to use the long ctsTenderId as returned
-	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap =
+	public static HashMap<Long, EiCreateTenderPayload> ctsMarketOrderIdToCreateTenderMap =
 			new HashMap<Long, EiCreateTenderPayload>();
 
 	
@@ -161,14 +161,8 @@ public class LmeRestController {
 		
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
-		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
-				tempCreate);	
-		
-		if (mapPutReturnValue == null) {
-			logger.debug("mapPutReturnValue is null - new entry");
-		}	else	{
-			logger.debug("mapPutReturnValue non-null - previous entry " + mapPutReturnValue.toString());
-		}
+		mapPutReturnValue = ctsMarketOrderIdToCreateTenderMap.put(tempCreate.getTender().getMarketOrderId().value(),
+				tempCreate);
 		
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		//	TODO consider return value if value already in map

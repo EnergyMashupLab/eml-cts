@@ -286,7 +286,7 @@ public class TeuaRestController {
 	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
 	 */
 	@PostMapping("{teuaId}/clientCreateTender")
-	public ClientCreatedTenderPayload postClientCreateTender(
+	public EiCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateTenderPayload clientCreateTender)	{
 		ClientCreateTenderPayload tempClientCreateTender;	
@@ -370,7 +370,7 @@ public class TeuaRestController {
 		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());
 		
-		return tempReturn;
+		return result;
 	}
 	
 }

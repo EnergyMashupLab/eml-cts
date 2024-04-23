@@ -53,6 +53,7 @@ public class EiCreatedTenderPayload {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
+		this.inResponseTo = inResponseTo;
 	}
 
 	public long getId() {

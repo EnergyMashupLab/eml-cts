@@ -23,7 +23,7 @@ import java.time.*;
 public class EiTenderType extends TenderBase {
 	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
 	private MarketOrderIdType referencedQuoteId = null;  // Will be unused until development of Negotiation Facet
-	private MarketOrderIdType marketOrderId = null;
+	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
 	
 	// Needed for JSON deserialization by Jackson
 	public EiTenderType() {

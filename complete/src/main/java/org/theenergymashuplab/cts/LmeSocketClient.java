@@ -113,7 +113,7 @@ public class LmeSocketClient	extends Thread {
 							tender.getSide(),
 							tenderIntervalDetail.getQuantity(),
 							tenderIntervalDetail.getPrice(),
-							tender.getTenderId().value(),
+							tender.getMarketOrderId().value(),
 							tenderIntervalDetail.getInterval(),
 							tender.getExpirationTime());
 				
