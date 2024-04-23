@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.CancelReasonType;
+import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.EiTransaction;
@@ -244,12 +246,22 @@ public class TeuaRestController {
 		
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
+		
+		EiCanceledResponseType eiCanceledResponse = new EiCanceledResponseType(
+				CancelReasonType.REQUESTED,
+				eiCancelTender.getMarketOrderId(),
+				0,  // TODO Retrieve remaining quantity left once canceling tenders is implemented
+				false  // TODO Change to true once canceling tenders has been implemented
+		);
 
 		
 		tempCanceled = new EICanceledTenderPayload(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				eiCanceledResponse,
+				eiCancelTender.getRequestId()
+			);
 		
 		return tempCanceled;
 	}
