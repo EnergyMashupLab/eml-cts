@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//TODO: Create MarketIdType class, add comments
+//TODO: Add comments
  package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.Interval;
