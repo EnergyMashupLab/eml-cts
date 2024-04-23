@@ -173,7 +173,8 @@ public class LmeRestController {
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				tempCreate.getRequestId());
 		
 		return tempCreated;
 	}

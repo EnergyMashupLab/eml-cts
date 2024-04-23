@@ -18,16 +18,22 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 
 public class EiCreatedTenderPayload {
+	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
+	
 	private TenderIdType tenderId;
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED
+	
+	// Need clarification as to what this attribute refers to before changing or deleting
 	private final RefIdType refId = new RefIdType();
+	private RefIdType inResponseTo;  // May be more prudent to rename and use refID instead of this new attribute 
 
 	/*
 	 * Default constructor for JSON deserialization.
@@ -40,7 +46,8 @@ public class EiCreatedTenderPayload {
 			TenderIdType tenderId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,
-			EiResponse response) {
+			EiResponse response,
+			RefIdType inResponseTo) {
 
 		this.tenderId = tenderId;
 		this.partyId = partyId;
@@ -53,22 +60,14 @@ public class EiCreatedTenderPayload {
 	}
 
 	public void print() {		
-		System.err.println(
-				"EiCreatedTender tenderId " +
-				tenderId.toString() +
-				" partyId " + partyId.toString() +
-				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
-				" response " + response.toString());
+		System.err.println(this);
 	}
 	
+	@Override
 	public String toString() {
-		return "EiCreatedTender tenderId " +
-				tenderId.toString() +
-				" partyId " + partyId.toString() +
-				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
-				" response " + response.toString();
+		return "EiCreatedTenderPayload [marketOrderId=" + marketOrderId + ", tenderId=" + tenderId + ", partyId="
+				+ partyId + ", counterPartyId=" + counterPartyId + ", response=" + response + ", refId=" + refId
+				+ ", inResponseTo=" + inResponseTo + "]";
 	}
 	
 	public EiResponse getResponse() {
@@ -93,5 +92,33 @@ public class EiCreatedTenderPayload {
 
 	public RefIdType getRefId() {
 		return refId;
+	}
+
+	public MarketOrderIdType getMarketOrderId() {
+		return marketOrderId;
+	}
+
+	public void setMarketOrderId(MarketOrderIdType marketOrderId) {
+		this.marketOrderId = marketOrderId;
+	}
+
+	public RefIdType getInResponseTo() {
+		return inResponseTo;
+	}
+
+	public void setInResponseTo(RefIdType inResponseTo) {
+		this.inResponseTo = inResponseTo;
+	}
+
+	public void setTenderId(TenderIdType tenderId) {
+		this.tenderId = tenderId;
+	}
+
+	public void setPartyId(ActorIdType partyId) {
+		this.partyId = partyId;
+	}
+
+	public void setCounterPartyId(ActorIdType counterPartyId) {
+		this.counterPartyId = counterPartyId;
 	}
 }
