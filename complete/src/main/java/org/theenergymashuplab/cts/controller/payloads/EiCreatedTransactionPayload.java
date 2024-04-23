@@ -54,12 +54,14 @@ public class EiCreatedTransactionPayload {
 			TransactionIdType transactionId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,
-			EiResponse response) {
+			EiResponse response,
+			TransactionIdType receiptTransactionId) {
 
 		this.transactionId = transactionId;
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
+		this.receiptTransactionId = receiptTransactionId;
 	}
 
 	public long getId() {
