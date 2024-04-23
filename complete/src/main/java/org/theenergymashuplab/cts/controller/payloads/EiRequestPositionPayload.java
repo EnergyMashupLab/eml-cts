@@ -20,6 +20,7 @@ import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.MarketIdType;
+import org.theenergymashuplab.cts.ResourceDesignator;
 
 public class EiRequestPositionPayload {
     private Interval boundingInterval;
