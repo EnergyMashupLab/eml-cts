@@ -100,7 +100,8 @@ public class GreetingController {
 		tempEiCancelTender = new EiCancelTenderPayload(
 				new TenderIdType(),
 				new ActorIdType(), 
-				new ActorIdType());
+				new ActorIdType(),
+				tempTender.getMarketOrderId());
 		/*
 		 * 	public EiCancelTender(TenderId tenderId, ActorId party, ActorId counterParty) {
 		 */

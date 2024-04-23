@@ -17,6 +17,7 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 
@@ -26,6 +27,7 @@ public class EiCancelTenderPayload {
 	private RefIdType requestId;
 	// Standard has 1..* TenderIdTypes TODO
 	private TenderIdType tenderId;
+	private MarketOrderIdType marketOrderId;
 	
 	/*
 	 * Default constructor for JSON deserialization.
@@ -44,35 +46,22 @@ public class EiCancelTenderPayload {
 	 * 		interval, quantity, price, or for EiCancelTender only the TenderIdType.
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCancelTenderPayload(TenderIdType tenderId, ActorIdType party, ActorIdType counterParty) {
+	public EiCancelTenderPayload(TenderIdType tenderId, ActorIdType party, ActorIdType counterParty, MarketOrderIdType marketOrderId) {
 		this.tenderId = tenderId;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
+		this.marketOrderId = marketOrderId;
 	}
 
 	public void print() {
-		String printStringFormat = "EiCancelTenderPayload.print() tenderId %d partyId %d counterPartyId %d requestId %d ";
-			
-		System.err.println(String.format(printStringFormat,
-				tenderId.toString(),
-				partyId.value(), 
-				counterPartyId.value(),
-				requestId.value()));
+		System.err.println(this);
 	}
 	
+	@Override
 	public String toString() {
-		String printStringFormat = "EiCancelTenderPayload: tenderId %d partyId %d counterPartyId %d requestId %d ";
-			
-		System.err.println(String.format(printStringFormat,
-				tenderId.toString(),
-				partyId.value(), 
-				counterPartyId.value(),
-				requestId.value()));
-		return ("EiCancelTenderPayload tenderId " + tenderId.toString() +
-				" party " + partyId.toString() +
-				" counterParty " + counterPartyId.toString() +
-				"requestId " + requestId.toString());
+		return "EiCancelTenderPayload [counterPartyId=" + counterPartyId + ", partyId=" + partyId + ", requestId="
+				+ requestId + ", tenderId=" + tenderId + ", marketOrderId=" + marketOrderId + "]";
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -106,7 +95,17 @@ public class EiCancelTenderPayload {
 	public void setTenderIdType(TenderIdType tenderId) {
 		this.tenderId = tenderId;
 	}
-	
-	
+
+	public MarketOrderIdType getMarketOrderId() {
+		return marketOrderId;
+	}
+
+	public void setMarketOrderId(MarketOrderIdType marketOrderId) {
+		this.marketOrderId = marketOrderId;
+	}
+
+	public void setTenderId(TenderIdType tenderId) {
+		this.tenderId = tenderId;
+	}
 	
 }
