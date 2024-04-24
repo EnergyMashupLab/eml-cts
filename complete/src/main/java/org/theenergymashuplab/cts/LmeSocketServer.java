@@ -187,7 +187,8 @@ public class LmeSocketServer extends Thread	{
                 eiCreateTransaction = new EiCreateTransactionPayload(
                 		transaction,
                 		eiCreateTender.getPartyId(),
-                		eiCreateTender.getCounterPartyId());
+                		eiCreateTender.getCounterPartyId(),
+						new TransactionIdType());
                 
             	logger.trace("LmeSocketServer EiCreateTransaction " +
                 		eiCreateTransaction.toString());

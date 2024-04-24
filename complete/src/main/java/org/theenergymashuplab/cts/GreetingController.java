@@ -79,7 +79,8 @@ public class GreetingController {
 		tempEiCreateTransactionPayload = new EiCreateTransactionPayload(
 				tempTransaction,
 				new ActorIdType(), 
-				new ActorIdType());
+				new ActorIdType(),
+				new TransactionIdType());
 		
 		return tempEiCreateTransactionPayload;
 	}
