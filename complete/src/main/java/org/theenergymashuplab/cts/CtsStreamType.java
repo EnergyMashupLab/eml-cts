@@ -16,19 +16,49 @@
 
 
 package org.theenergymashuplab.cts;
+import java.util.*;
 
 public class CtsStreamType {
     /**
 	 * The duration of each StreamInterval
 	 */
-	private DurationType streamIntervalDuration;
+	private Interval streamIntervalDuration;
 	/**
 	 * Array of StreamIntervals.
 	 */
-	private CtsStreamIntervalType streamIntervals;
+	private ArrayList<CtsStreamIntervalType> streamIntervals;
 	private InstantType streamStart;
 
 	public CtsStreamType(){
+	}
 
+	public CtsStreamType(Interval streamIntervalDuration, ArrayList<CtsStreamIntervalType> streamIntervals, InstantType streamStart) {
+		this.streamIntervalDuration = streamIntervalDuration;
+		this.streamIntervals = streamIntervals;
+		this.streamStart = streamStart;
+	}
+
+	public Interval getStreamIntervalDuration() {
+		return streamIntervalDuration;
+	}
+	
+	public void setStreamIntervalDuration(Interval streamIntervalDuration) {
+		this.streamIntervalDuration = streamIntervalDuration;
+	}
+
+	public ArrayList<CtsStreamIntervalType> getStreamIntervals() {
+		return streamIntervals;
+	}
+
+	public void setStreamIntervals(ArrayList<CtsStreamIntervalType> streamIntervals) {
+		this.streamIntervals = streamIntervals;
+	}
+
+	public InstantType getStreamStart() {
+		return streamStart;
+	}
+
+	public void setStreamStart(InstantType streamStart) {
+		this.streamStart = streamStart;
 	}
 }
