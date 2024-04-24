@@ -17,6 +17,7 @@
 
 package org.theenergymashuplab.cts;
 import java.util.*;
+import java.time.Instant;
 
 public class CtsStreamType {
     /**
@@ -27,12 +28,12 @@ public class CtsStreamType {
 	 * Array of StreamIntervals.
 	 */
 	private ArrayList<CtsStreamIntervalType> streamIntervals;
-	private InstantType streamStart;
+	private Instant streamStart;
 
 	public CtsStreamType(){
 	}
 
-	public CtsStreamType(Interval streamIntervalDuration, ArrayList<CtsStreamIntervalType> streamIntervals, InstantType streamStart) {
+	public CtsStreamType(Interval streamIntervalDuration, ArrayList<CtsStreamIntervalType> streamIntervals, Instant streamStart) {
 		this.streamIntervalDuration = streamIntervalDuration;
 		this.streamIntervals = streamIntervals;
 		this.streamStart = streamStart;
@@ -54,11 +55,11 @@ public class CtsStreamType {
 		this.streamIntervals = streamIntervals;
 	}
 
-	public InstantType getStreamStart() {
+	public Instant getStreamStart() {
 		return streamStart;
 	}
 
-	public void setStreamStart(InstantType streamStart) {
+	public void setStreamStart(Instant streamStart) {
 		this.streamStart = streamStart;
 	}
 }
