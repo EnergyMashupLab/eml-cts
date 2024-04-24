@@ -23,7 +23,36 @@ public class CtsStreamIntervalType {
     private int streamUid;
 
     public CtsStreamIntervalType() {
+    }
 
+    public CtsStreamIntervalType(long streamIntervalPrice, long streamIntervalQuantity, int streamUid) {
+        this.streamIntervalPrice = streamIntervalPrice;
+        this.streamIntervalQuantity = streamIntervalQuantity;
+        this.streamUid = streamUid;
+    }
+
+    public long getStreamIntervalPrice() {
+        return streamIntervalPrice;
+    }
+
+    public void setStreamIntervalPrice(long streamIntervalPrice) {
+        this.streamIntervalPrice = streamIntervalPrice;
+    }
+
+    public long getStreamIntervalQuantity() {
+        return streamIntervalQuantity;
+    }
+
+    public void setStreamIntervalQuantity(long streamIntervalQuantity) {
+        this.streamIntervalQuantity = streamIntervalQuantity;
+    }
+
+    public int getStreamUid() {
+        return streamUid;
+    }
+
+    public void setStreamUid(int streamUid) {
+        this.streamUid = streamUid;
     }
 
 }
