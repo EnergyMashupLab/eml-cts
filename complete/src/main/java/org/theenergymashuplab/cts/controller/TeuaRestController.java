@@ -30,6 +30,7 @@ import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.TenderDetail;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
+import org.theenergymashuplab.cts.TransactionIdType;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
@@ -221,7 +222,8 @@ public class TeuaRestController {
 				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				new TransactionIdType());
 		
 		logger.debug("tempCreated constructed before return " + tempCreated.toString());
 		
