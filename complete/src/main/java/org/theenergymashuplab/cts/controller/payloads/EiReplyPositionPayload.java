@@ -19,12 +19,13 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiResponseType;
 
 public class EiReplyPositionPayload {
     private Interval boundingInterval;
     private ActorIdType positionParty;
-    private CtsStream positions;
+    private CtsStreamType positions;
     private ActorIdType requestor;
     private EiResponseType response;
 
@@ -37,7 +38,7 @@ public class EiReplyPositionPayload {
         this.response = new EiResponseType();
     }
 
-    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStream positions, ActorIdType requestor, EiResponseType response) {
+    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStreamType positions, ActorIdType requestor, EiResponseType response) {
         this.boundingInterval = boundingInterval;
         this.positionParty = positionParty;
         this.positions = positions;
@@ -61,7 +62,7 @@ public class EiReplyPositionPayload {
         return positionParty;
     }
 
-    public void setPositions(CtsStream positions) {
+    public void setPositions(CtsStreamType positions) {
         this.positions = positions;
     }
     
