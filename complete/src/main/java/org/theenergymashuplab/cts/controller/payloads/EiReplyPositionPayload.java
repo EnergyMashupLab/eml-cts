@@ -21,7 +21,6 @@ import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiResponseType;
-import org.theenergymashuplab.cts.CtsStreamType;
 
 public class EiReplyPositionPayload {
     private Interval boundingInterval;
