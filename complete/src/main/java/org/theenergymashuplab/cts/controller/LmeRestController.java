@@ -202,8 +202,8 @@ public class LmeRestController {
 		EiCanceledResponseType eiCanceledResponse = new EiCanceledResponseType(
 				CancelReasonType.REQUESTED,
 				tempCancel.getMarketOrderId(),
-				0,  // TODO Retrieve remaining quantity left once canceling tenders is implemented
-				false  // TODO Change to true once canceling tenders has been implemented
+				0,  // TODO Not up to March 2024 spec: Retrieve remaining quantity left once canceling tenders is implemented
+				false  // TODO Not up to March 2024 spec: Change to true once canceling tenders has been implemented
 		);
 		
 		tempCanceled = new EICanceledTenderPayload(

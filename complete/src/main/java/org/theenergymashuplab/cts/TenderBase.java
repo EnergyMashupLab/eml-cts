@@ -4,16 +4,16 @@ import java.time.Instant;
 import java.util.List;
 
 public abstract class TenderBase {
-	private boolean allOrNone = false;
-	private String executionInstructions = "";
+	private boolean allOrNone = false;  // TODO Added due to being a part of the March 2024 spec. All or none behavior has not be implemented yet
+	private String executionInstructions = "";  // TODO Added due to being a part of the March 2024 spec. execution instruction behavior has not be implemented yet
 	private Instant expirationTime = null;
-	private MarketIdType marketId = new MarketIdType();
-	private int priceScale = 1;
-	private int quantityScale = 1;
+	private MarketIdType marketId = new MarketIdType();  // TODO Added due to being a part of the March 2024 spec. eml-cts can only handle one market at the moment
+	private int priceScale = 1;  // TODO Added due to being a part of the March 2024 spec. Variable price scales have not been implemented, so its always assumed to be 1 at the moment
+	private int quantityScale = 1;  // TODO Added due to being a part of the March 2024 spec. Variable quantity scales have not been implemented, so its always assumed to be 1 at the moment
 	private ResourceDesignatorType resourceDesignator = ResourceDesignatorType.ENERGY;
 	private SideType side;
 	private TenderDetail tenderDetail;
-	private List<Integer> warrants = null;
+	private List<Integer> warrants = null;  // TODO Added due to being a part of the March 2024 spec. warrant behavior has not be implemented yet
 	
 	public TenderBase(Instant expirationTime, SideType side, TenderDetail tenderDetail) {
 		this.expirationTime = expirationTime;

@@ -1,5 +1,7 @@
 package org.theenergymashuplab.cts;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /* The UML spec assumes that the implementing language can create and use
@@ -11,11 +13,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 /* @JsonTypeInfo is needed to ensure that Jackson can deserialize TenderDetail
  * TenderDetail is an abstract class, so Jackson needs to include type info in the
  * JSON serialization to ensure that it will be able to correctly deserialize it to the
- * correct concrete class (either TenderIntervalDetail or not-as-of-writing-this included TenderStreamDetail
+ * correct concrete class (either TenderIntervalDetail or TenderStreamDetail (which has not been added yet))
  * 
- *  Note, I copied and paste this from the official Jackson Wiki (https://github.com/FasterXML/jackson-docs/wiki/JacksonPolymorphicDeserialization#12-per-class-annotations)
- *  so future adjustments could be made */
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
+ *  You can learn more about it from the official Jackson Wiki (https://github.com/FasterXML/jackson-docs/wiki/JacksonPolymorphicDeserialization#12-per-class-annotations)
+ *  As well as from here: https://www.baeldung.com/jackson-inheritance */
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
+@JsonSubTypes({
+    @Type(value = TenderIntervalDetail.class, name = "interval")  // TODO Once TenderStreamInterval has been added, add its type here
+})
 public abstract class TenderDetail {
 
 }

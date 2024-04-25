@@ -31,7 +31,7 @@ public class EiCancelTenderPayload {
 	
 	/*
 	 * Default constructor for JSON deserialization.
-	 * TO DO change to zero Id values in ActorId and RefId constructors
+	 * TODO change to zero Id values in ActorId and RefId constructors
 	 */
 	public EiCancelTenderPayload()	{
 		this.counterPartyId = new ActorIdType();

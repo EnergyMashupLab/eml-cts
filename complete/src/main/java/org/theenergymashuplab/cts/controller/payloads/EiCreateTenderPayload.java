@@ -22,15 +22,15 @@ import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.RefIdType;
 
 public class EiCreateTenderPayload {
-	private boolean atMostOne = false;
-	private String executionInstructions = "";
-	private MarketIdType marketId = new MarketIdType();
-	private int segmentId = 1;
+	private boolean atMostOne = false;  // EiCreateTenderPayload only carry one tender at a time at the moment, so this isn't actually used
+	private String executionInstructions = "";  // Is not up to the March 2024 spec; executionInstructions behavior not implemented
+	private MarketIdType marketId = new MarketIdType();  // Should be provided externally
+	private int segmentId = 1;  // Assumed to always be one segment, so it's always one at the moment
 	
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
-	// The standard specifies that EiCreateTenderPayload should have a list of one or more tenders
+	// TODO The March 2024 standard specifies that EiCreateTenderPayload should have a list of one or more tenders
 	private EiTenderType tender;
 	
 	/*

@@ -23,6 +23,9 @@ import java.time.*;
 public class EiTenderType extends TenderBase {
 	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
 	private MarketOrderIdType referencedQuoteId = null;  // Will be unused until development of Negotiation Facet
+	/* TODO Not up to March 2024 spec. This ought to be provided by the market (parity)
+	but parity does not provide its parity order id at this moment. Thus a new cts-generated id is used
+	in the time being */ 
 	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
 	
 	// Needed for JSON deserialization by Jackson
