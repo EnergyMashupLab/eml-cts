@@ -113,9 +113,13 @@ public class LmeSocketClient	extends Thread {
 							tender.getSide(),
 							tenderIntervalDetail.getQuantity(),
 							tenderIntervalDetail.getPrice(),
-							tender.getMarketOrderId().value(),
+							tender.getTenderId().value(),
 							tenderIntervalDetail.getInterval(),
 							tender.getExpirationTime());
+
+				/* TODO Retrieve the parity order id after the tender has been submitted and processed
+				 * The parity order id should become the tender's market order id, as soon as it's known
+				 */
 				
 				// TODO save EiCreateTenderPayload in Map <long, EiCreateTenderPayload> for 
 				// retrieval when the MarketCreateTransaction is received by CtsSocketServer			

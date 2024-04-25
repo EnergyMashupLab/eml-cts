@@ -146,7 +146,7 @@ public class LmeSocketServer extends Thread	{
             
             //	Get original Tender for this MarketCreateTransaction
             eiCreateTender =
-            	LmeRestController.ctsMarketOrderIdToCreateTenderMap.get(payload.getCtsTenderId());
+            	LmeRestController.ctsTenderIdToCreateTenderMap.get(payload.getCtsTenderId());
             
             // LATER TODO clean up and remove entry when tender quantity becomes zero
             if (eiCreateTender == null) {
