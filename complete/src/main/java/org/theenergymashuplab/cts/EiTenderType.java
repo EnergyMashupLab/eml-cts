@@ -27,14 +27,17 @@ public class EiTenderType extends TenderBase {
 	but parity does not provide its parity order id at this moment. Thus a new cts-generated id is used
 	in the time being */ 
 	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
+	public static final long EMPTY_MARKET_ORDER_ID = -1;  // Market orders ids need to be filled in by parity, so this will be the default value until it's filled by parity
 	
 	// Needed for JSON deserialization by Jackson
 	public EiTenderType() {
 		super(null, null, null);
+		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
 	}
 	
 	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail) {
 		super(expirationTime, side, tenderDetail);
+		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
 	}
 
 	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail,

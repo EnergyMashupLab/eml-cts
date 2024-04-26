@@ -29,6 +29,7 @@ import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.LmeSendTransactions;
 import org.theenergymashuplab.cts.LmeSocketClient;
 import org.theenergymashuplab.cts.LmeSocketServer;
+import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
@@ -158,6 +159,14 @@ public class LmeRestController {
 		addQsuccess = queueFromLme.add(tempCreate);
 		logger.debug("queueFomLme addQsuccess " + addQsuccess +
 				" TenderId " + tempTender.getTenderId());
+
+		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
+		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
+		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
+		 * with a different tender, leading to a transaction
+		 * 
+		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
+		tempTender.setMarketOrderId(new MarketOrderIdType());
 		
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
