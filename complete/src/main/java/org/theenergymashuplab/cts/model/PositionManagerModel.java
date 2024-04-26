@@ -24,10 +24,14 @@ package org.theenergymashuplab.cts.model;
 
 import java.time.Instant;
 
+import org.theenergymashuplab.cts.ResourceDesignator;
+
 // TODO extend columns here
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -50,6 +54,9 @@ public class PositionManagerModel {
 	
 	@Column(name = "Quantity")
 	private long quantity;
+
+	@Column(name = "Market_id")
+	private long marketId;
 	
 	@Column(name = "Start_Time")
 	@NotNull
@@ -59,18 +66,27 @@ public class PositionManagerModel {
 	@NotNull
 	private Instant endTime;
 
+	@Column(name = "Resource_Designator")
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private ResourceDesignator resourceDesignator;
+
 	// Class Constructor
 	public PositionManagerModel(
 			long positionParty,
 			long transaction_id,
 			long quantity,
+			long marketId,
 			Instant startTime,
-			long durationinSeconds) {
+			long durationinSeconds,
+			ResourceDesignator resourceDesignator) {
 		this.positionParty = positionParty;
 		this.transactionId = transaction_id; // Always 0 at this point of time.(Future updated)
 		this.quantity = quantity;
+		this.marketId = marketId;
 		this.startTime = startTime;
 		this.endTime = startTime.plusSeconds(durationinSeconds);
+		this.resourceDesignator = resourceDesignator;
 	}
 	
 	//Default Constructor.
@@ -78,8 +94,10 @@ public class PositionManagerModel {
 		this.positionParty = 0;
 		this.transactionId = 0;
 		this.quantity = 0;
+		this.marketId = 1;
 		this.startTime = null;
 		this.endTime = null;
+		this.resourceDesignator = ResourceDesignator.ENERGY;
 	}
 	
 	@Override

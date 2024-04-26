@@ -89,7 +89,7 @@ public class LmeSocketServer extends Thread	{
     	EiCreateTransactionPayload eiCreateTransaction;
     	EiCreateTenderPayload eiCreateTender;
     	EiTransaction transaction;
-    	EiTender tender;
+    	EiTenderType tender;
     	//	For lookup and return value in eiCreateTransactionMatchNumberMap
     	Long matchNumberLong; // cannot use long for HashMap key
     	EiCreateTransactionPayload matchEiCreateTransaction, tempCreate;
@@ -162,11 +162,21 @@ public class LmeSocketServer extends Thread	{
             	 */
             	
             	// recover original tender for attributes. CounterParty rewritten below
-                tender = eiCreateTender.getTender();	
+                tender = eiCreateTender.getTender();
+                
+                // CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+				// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+				// WORKS WITH INTERVAL TENDERS
+				TenderDetail tenderDetail = tender.getTenderDetail();
+				if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+					throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+				}
+				TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+                
             	logger.trace("Original EiCreateTenderPayload " + eiCreateTender.toString());
                 
-                tender.setQuantity(payload.getQuantity());
-                tender.setPrice(payload.getPrice());
+            	tenderIntervalDetail.setQuantity(payload.getQuantity());
+            	tenderIntervalDetail.setPrice(payload.getPrice());
                 //	other fields of tender as in EiCreateTender - tenderId,
                 //	interval, expireTime, side
             	logger.debug("Reconstituted tender " + tender.getTenderId().toString());

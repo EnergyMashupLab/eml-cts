@@ -20,6 +20,7 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.Interval;
+import org.theenergymashuplab.cts.ResourceDesignator;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -56,8 +57,12 @@ public class PositionManager {
 				positionParty,
 				0,
 				posPayload.getQuantity(),
+				1, //TODO: In future versions, marketId will not default to 1, this will instead have to match the marketId of the payload
 				posPayload.getInterval().getDtStart(),
-				posPayload.getInterval().getDuration().getSeconds());
+				posPayload.getInterval().getDuration().getSeconds(),
+				ResourceDesignator.ENERGY);
+		//TODO: In future versions, change this to have the resource designator match the position payload.
+		//As of this commit, energy is the only intended resource designator
 
 		List<PositionManagerModel> queryresult = posDao.getPositionforUpdate(
 				positionParty,
