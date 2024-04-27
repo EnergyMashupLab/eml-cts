@@ -20,14 +20,14 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.CtsStreamType;
-import org.theenergymashuplab.cts.EiResponseType;
+import org.theenergymashuplab.cts.EiResponse;
 
 public class EiReplyPositionPayload {
     private Interval boundingInterval;
     private ActorIdType positionParty;
     private CtsStreamType positions;
     private ActorIdType requestor;
-    private EiResponseType response;
+    private EiResponse response;
 
 
     // Default initializer for JSON serialization
@@ -35,10 +35,10 @@ public class EiReplyPositionPayload {
         this.positionParty = new ActorIdType();
         this.positions = new CtsStreamType();
         this.requestor = new ActorIdType();
-        this.response = new EiResponseType();
+        this.response = new EiResponse();
     }
 
-    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStreamType positions, ActorIdType requestor, EiResponseType response) {
+    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStreamType positions, ActorIdType requestor, EiResponse response) {
         this.boundingInterval = boundingInterval;
         this.positionParty = positionParty;
         this.positions = positions;
@@ -78,11 +78,11 @@ public class EiReplyPositionPayload {
         return requestor;
     }
 
-    public void setResponse(EiResponseType response) {
+    public void setResponse(EiResponse response) {
         this.response = response;
     }
     
-    public EiResponseType getResponse() {
+    public EiResponse getResponse() {
         return response;
     }
 }
