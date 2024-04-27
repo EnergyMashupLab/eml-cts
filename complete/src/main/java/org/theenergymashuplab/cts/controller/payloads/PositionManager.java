@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.theenergymashuplab.cts.dao.PositionService;
 import org.theenergymashuplab.cts.model.PositionManagerModel;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 public class PositionManager {
@@ -138,5 +140,20 @@ public class PositionManager {
 		}
 		return dataList;
 	}
+
+	@GetMapping("/position/requestPosition")
+	public EiReplyPositionPayload requestPosition(@RequestBody EiRequestPositionPayload requestPositionPayload) {
+		Interval interval = requestPositionPayload.getBoundingInterval();
+		Long positionParty = requestPositionPayload.getPositionParty().value();
+		//Long requestor = requestPositionPayload.getRequestor().value(); Not used currently as there is no use for the requestor's ActorIdType as of this commit
+		Long marketId = requestPositionPayload.getMarketId().value();
+		Long requestId = requestPositionPayload.getRequestId().value();
+		String resourceDesignator = requestPositionPayload.getResourceDesignator().name();
+		
+
+		return new EiReplyPositionPayload();
+	}
+	
+	
 
 }
