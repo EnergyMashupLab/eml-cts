@@ -21,7 +21,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.CtsStreamIntervalType;
 import org.theenergymashuplab.cts.CtsStreamType;
-import org.theenergymashuplab.cts.EiResponseType;
+import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ResourceDesignator;
 
@@ -42,6 +42,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.theenergymashuplab.cts.dao.PositionService;
 import org.theenergymashuplab.cts.model.PositionManagerModel;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 public class PositionManager {
@@ -61,9 +63,12 @@ public class PositionManager {
 				positionParty,
 				0,
 				posPayload.getQuantity(),
+				1, //TODO: In future versions, marketId will not default to 1, this will instead have to match the marketId of the payload
 				posPayload.getInterval().getDtStart(),
 				posPayload.getInterval().getDuration().getSeconds(),
 				ResourceDesignator.ENERGY);
+		//TODO: In future versions, change this to have the resource designator match the position payload.
+		//As of this commit, energy is the only intended resource designator
 
 		List<PositionManagerModel> queryresult = posDao.getPositionforUpdate(
 				positionParty,
@@ -140,47 +145,44 @@ public class PositionManager {
 		return dataList;
 	}
 
-	@PostMapping("/position/requestPosition2")
-	public EiReplyPositionPayload requestPosition2(@RequestBody EiRequestPositionPayload requestPayload) {
-		List<PositionManagerModel> positions = posDao.getPositionforDuration(
-			requestPayload.getPositionParty().value(),
-			requestPayload.getBoundingInterval().getDtStart(),
-			requestPayload.getBoundingInterval().getDuration().getSeconds()
-		);
+	@GetMapping("/position/requestPosition")
+	public EiReplyPositionPayload requestPosition(@RequestBody EiRequestPositionPayload requestPositionPayload) {
+		Interval interval = requestPositionPayload.getBoundingInterval();
+		Long positionParty = requestPositionPayload.getPositionParty().value();
+		Long requestor = requestPositionPayload.getRequestor().value();
+		Long marketId = requestPositionPayload.getMarketId().value();
+		Long requestId = requestPositionPayload.getRequestId().value();
+		String resourceDesignator = requestPositionPayload.getResourceDesignator().name();
 
-		List<CtsStreamType> streams = new ArrayList<>();
-		for (PositionManagerModel position: positions) {
-			Instant posStartTime = position.getStartTime();
-			int numIntervals = (int) Duration.between(posStartTime, position.getEndTime()).toHours();
-			CtsStreamType posStream = new CtsStreamType(
-				new Interval(60, posStartTime),
-				new ArrayList<>(),
-				posStartTime
-			);
+		List<PositionManagerModel> queryresult = posDao.getPositionforDuration(positionParty, interval.getDtStart(),
+				interval.getDuration().getSeconds());
+		
+		logger.info("/position/requestPosition " +
+				"Interval " + interval.toString());
 
-			for (int i = 0; i < numIntervals; i++) {
-				CtsStreamIntervalType posInterval = new CtsStreamIntervalType(
-					0,
-					position.getQuantity(),
-					i
-				);
+		// Generating response list.
+		PositionGetPayload tpayload = null;
+		Interval tinterval = null;
+		ArrayList<CtsStreamIntervalType> streamIntervals = new ArrayList<>();
+		CtsStreamType ctsStreamType = new CtsStreamType(interval, streamIntervals, interval.getDtStart());
+		int streamUid = 0;
+		for (PositionManagerModel tposmod : queryresult) {
+			tinterval = new Interval(Duration.between(tposmod.getStartTime(), tposmod.getEndTime()).toMinutes(),
+					tposmod.getStartTime());
+			tpayload = new PositionGetPayload(tinterval, tposmod.getQuantity());
 
-				posStream.getStreamIntervals().add(posInterval);
-			}
-
-			streams.add(posStream);
+			// Adding to the dataList.
+			CtsStreamIntervalType tempStreamInterval = new CtsStreamIntervalType(0, tpayload.getQuantity(), streamUid);
+			streamUid++;
+			streamIntervals.add(tempStreamInterval);
 		}
-		
-		EiReplyPositionPayload reply = new EiReplyPositionPayload(
-			requestPayload.getBoundingInterval(),
-			requestPayload.getPositionParty(),
-			streams,
-			requestPayload.getRequestor(),
-			new EiResponseType()
-		);
-		
-		return reply;
+
+		//TODO: Update EiResponse if there are any errors
+		EiReplyPositionPayload replyPositionPayload = new EiReplyPositionPayload(interval, requestPositionPayload.getPositionParty(), ctsStreamType, requestPositionPayload.getRequestor(), new EiResponse(200, "OK"));
+
+		return replyPositionPayload;
 	}
+	
 	
 
 }

@@ -74,7 +74,7 @@ public class LmeSocketClient	extends Thread {
 	@Override
 	public void run() {
 		EiCreateTenderPayload create;
-		EiTender tender;
+		EiTenderType tender;
 		MarketCreateTenderPayload toJson;
 		String jsonString = null;	// for JSON string
 
@@ -100,13 +100,26 @@ public class LmeSocketClient	extends Thread {
 				logger.debug("run() took from queueFromLme: size now " + LmeRestController.queueFromLme.size() +
 						" " + create.getTender().toString());
 				tender = create.getTender();
+				// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+				// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+				// WORKS WITH INTERVAL TENDERS
+				TenderDetail tenderDetail = tender.getTenderDetail();
+				if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+					throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+				}
+				TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+				
 				toJson = new MarketCreateTenderPayload(
 							tender.getSide(),
-							tender.getQuantity(),
-							tender.getPrice(),
+							tenderIntervalDetail.getQuantity(),
+							tenderIntervalDetail.getPrice(),
 							tender.getTenderId().value(),
-							tender.getInterval(),
-							tender.getExpireTime());
+							tenderIntervalDetail.getInterval(),
+							tender.getExpirationTime());
+
+				/* TODO Retrieve the parity order id after the tender has been submitted and processed
+				 * The parity order id should become the tender's market order id, as soon as it's known
+				 */
 				
 				// TODO save EiCreateTenderPayload in Map <long, EiCreateTenderPayload> for 
 				// retrieval when the MarketCreateTransaction is received by CtsSocketServer			

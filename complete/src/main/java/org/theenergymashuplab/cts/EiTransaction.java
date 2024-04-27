@@ -24,7 +24,7 @@ package org.theenergymashuplab.cts;
 
 public class EiTransaction {
 	private final TransactionIdType transactionId = new TransactionIdType();	// will be passed to constructor
-	private EiTender tender;
+	private EiTenderType tender;
 	private TransactiveState transactiveState = TransactiveState.TRANSACTION;
 	
 	/*
@@ -33,7 +33,7 @@ public class EiTransaction {
 	public EiTransaction()	{		
 	}
 
-	public EiTransaction(EiTender tender) {
+	public EiTransaction(EiTenderType tender) {
 //		System.err.println("in EiTransaction Constructor tenderId " + tender.getTenderId().getTenderId());
 		this.tender = tender;
 //		this.print();
@@ -43,7 +43,7 @@ public class EiTransaction {
 		return this.transactionId;
 	}
 	
-	public EiTender getTender()	{
+	public EiTenderType getTender()	{
 		return tender;
 	}
 	
