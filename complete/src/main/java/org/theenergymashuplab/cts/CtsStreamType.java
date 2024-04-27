@@ -27,13 +27,13 @@ public class CtsStreamType {
 	/**
 	 * Array of StreamIntervals.
 	 */
-	private ArrayList<CtsStreamIntervalType> streamIntervals;
+	private List<CtsStreamIntervalType> streamIntervals;
 	private Instant streamStart;
 
 	public CtsStreamType(){
 	}
 
-	public CtsStreamType(Interval streamIntervalDuration, ArrayList<CtsStreamIntervalType> streamIntervals, Instant streamStart) {
+	public CtsStreamType(Interval streamIntervalDuration, List<CtsStreamIntervalType> streamIntervals, Instant streamStart) {
 		this.streamIntervalDuration = streamIntervalDuration;
 		this.streamIntervals = streamIntervals;
 		this.streamStart = streamStart;
@@ -47,7 +47,7 @@ public class CtsStreamType {
 		this.streamIntervalDuration = streamIntervalDuration;
 	}
 
-	public ArrayList<CtsStreamIntervalType> getStreamIntervals() {
+	public List<CtsStreamIntervalType> getStreamIntervals() {
 		return streamIntervals;
 	}
 

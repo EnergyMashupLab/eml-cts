@@ -19,9 +19,14 @@
  */
 package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.CtsStreamIntervalType;
+import org.theenergymashuplab.cts.CtsStreamType;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.Interval;
+import org.theenergymashuplab.cts.ResourceDesignator;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +62,8 @@ public class PositionManager {
 				0,
 				posPayload.getQuantity(),
 				posPayload.getInterval().getDtStart(),
-				posPayload.getInterval().getDuration().getSeconds());
+				posPayload.getInterval().getDuration().getSeconds(),
+				ResourceDesignator.ENERGY);
 
 		List<PositionManagerModel> queryresult = posDao.getPositionforUpdate(
 				positionParty,
@@ -133,5 +139,48 @@ public class PositionManager {
 		}
 		return dataList;
 	}
+
+	@PostMapping("/position/requestPosition2")
+	public EiReplyPositionPayload requestPosition2(@RequestBody EiRequestPositionPayload requestPayload) {
+		List<PositionManagerModel> positions = posDao.getPositionforDuration(
+			requestPayload.getPositionParty().value(),
+			requestPayload.getBoundingInterval().getDtStart(),
+			requestPayload.getBoundingInterval().getDuration().getSeconds()
+		);
+
+		List<CtsStreamType> streams = new ArrayList<>();
+		for (PositionManagerModel position: positions) {
+			Instant posStartTime = position.getStartTime();
+			int numIntervals = (int) Duration.between(posStartTime, position.getEndTime()).toHours();
+			CtsStreamType posStream = new CtsStreamType(
+				new Interval(60, posStartTime),
+				new ArrayList<>(),
+				posStartTime
+			);
+
+			for (int i = 0; i < numIntervals; i++) {
+				CtsStreamIntervalType posInterval = new CtsStreamIntervalType(
+					0,
+					position.getQuantity(),
+					i
+				);
+
+				posStream.getStreamIntervals().add(posInterval);
+			}
+
+			streams.add(posStream);
+		}
+		
+		EiReplyPositionPayload reply = new EiReplyPositionPayload(
+			requestPayload.getBoundingInterval(),
+			requestPayload.getPositionParty(),
+			streams,
+			requestPayload.getRequestor(),
+			new EiResponseType()
+		);
+		
+		return reply;
+	}
+	
 
 }

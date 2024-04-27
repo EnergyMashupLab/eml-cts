@@ -32,7 +32,7 @@ public interface PositionRepository extends JpaRepository<PositionManagerModel, 
 	public PositionManagerModel getStatus(@Param("id") long id);
 	
 	// New updated queries.
-	@Query(nativeQuery = true, value = "select * from position p where (p.position_Party = :positionParty) AND ((p.start_time <= :sTime AND p.end_time > :sTime) OR (p.start_time < :sTime_plus_dur AND p.start_time > :sTime))")
+	@Query(nativeQuery = true, value = "select * from position p where (p.position_Party = :positionParty) AND ((p.start_time <= :sTime AND p.end_time > :sTime) OR (p.start_time < :sTime_plus_dur AND p.start_time > :sTime)) ORDER BY p.start_time")
 	public List<PositionManagerModel> getPositionforDuration(@Param("positionParty") long positionParty,
 			@Param("sTime") Instant sTime,
 			@Param("sTime_plus_dur") Instant sTime_plus_dur);

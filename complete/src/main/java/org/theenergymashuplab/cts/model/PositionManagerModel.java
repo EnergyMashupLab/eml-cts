@@ -24,6 +24,8 @@ package org.theenergymashuplab.cts.model;
 
 import java.time.Instant;
 
+import org.theenergymashuplab.cts.ResourceDesignator;
+
 // TODO extend columns here
 
 import jakarta.persistence.Column;
@@ -59,18 +61,24 @@ public class PositionManagerModel {
 	@NotNull
 	private Instant endTime;
 
+	@Column(name = "Resource_Designator")
+	@NotNull
+	private ResourceDesignator resourceDesignator;
+
 	// Class Constructor
 	public PositionManagerModel(
 			long positionParty,
 			long transaction_id,
 			long quantity,
 			Instant startTime,
-			long durationinSeconds) {
+			long durationinSeconds,
+			ResourceDesignator resourceDesignator) {
 		this.positionParty = positionParty;
 		this.transactionId = transaction_id; // Always 0 at this point of time.(Future updated)
 		this.quantity = quantity;
 		this.startTime = startTime;
 		this.endTime = startTime.plusSeconds(durationinSeconds);
+		this.resourceDesignator = resourceDesignator;
 	}
 	
 	//Default Constructor.
@@ -89,7 +97,8 @@ public class PositionManagerModel {
 				" transactionId " + transactionId +
 				" quantity " + quantity +
 				" startTime " + startTime.toString() +
-				" endTime " + endTime.toString();
+				" endTime " + endTime.toString() +
+				" resourceDesignator " + resourceDesignator;
 	}
 	
 	/**
@@ -176,4 +185,11 @@ public class PositionManagerModel {
 		this.quantity = quantity;
 	}
 	
+	public ResourceDesignator getResourceDesignator() {
+		return this.resourceDesignator;
+	}
+
+	public void setResourceDesignator(ResourceDesignator resourceDesignator) {
+		this.resourceDesignator = resourceDesignator;
+	}
 }

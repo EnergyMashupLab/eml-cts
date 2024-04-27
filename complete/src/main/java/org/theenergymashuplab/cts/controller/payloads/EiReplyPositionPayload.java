@@ -18,6 +18,10 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.Interval;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiResponseType;
@@ -25,7 +29,7 @@ import org.theenergymashuplab.cts.EiResponseType;
 public class EiReplyPositionPayload {
     private Interval boundingInterval;
     private ActorIdType positionParty;
-    private CtsStreamType positions;
+    private List<CtsStreamType> positions;
     private ActorIdType requestor;
     private EiResponseType response;
 
@@ -33,12 +37,12 @@ public class EiReplyPositionPayload {
     // Default initializer for JSON serialization
     public EiReplyPositionPayload() {
         this.positionParty = new ActorIdType();
-        this.positions = new CtsStreamType();
+        this.positions = new ArrayList<>();
         this.requestor = new ActorIdType();
         this.response = new EiResponseType();
     }
 
-    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStreamType positions, ActorIdType requestor, EiResponseType response) {
+    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, List<CtsStreamType> positions, ActorIdType requestor, EiResponseType response) {
         this.boundingInterval = boundingInterval;
         this.positionParty = positionParty;
         this.positions = positions;
@@ -62,11 +66,11 @@ public class EiReplyPositionPayload {
         return positionParty;
     }
 
-    public void setPositions(CtsStreamType positions) {
+    public void setPositions(List<CtsStreamType> positions) {
         this.positions = positions;
     }
     
-    public CtsStreamType getPositions() {
+    public List<CtsStreamType> getPositions() {
         return positions;
     }
 
