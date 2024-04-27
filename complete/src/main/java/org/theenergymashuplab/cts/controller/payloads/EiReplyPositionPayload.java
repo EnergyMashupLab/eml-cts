@@ -19,9 +19,6 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.Interval;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiResponse;

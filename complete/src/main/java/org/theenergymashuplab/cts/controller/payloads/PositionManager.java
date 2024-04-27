@@ -145,7 +145,7 @@ public class PositionManager {
 		return dataList;
 	}
 
-	@GetMapping("/position/requestPosition")
+	@PostMapping("/position/requestPosition")
 	public EiReplyPositionPayload requestPosition(@RequestBody EiRequestPositionPayload requestPositionPayload) {
 		Interval interval = requestPositionPayload.getBoundingInterval();
 		Long positionParty = requestPositionPayload.getPositionParty().value();
