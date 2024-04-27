@@ -51,6 +51,10 @@ public class CtsStreamType {
 		return streamIntervals;
 	}
 
+	public void addStreamInterval(CtsStreamIntervalType streamInterval) {
+		this.streamIntervals.add(streamInterval);
+	}
+
 	public void setStreamIntervals(ArrayList<CtsStreamIntervalType> streamIntervals) {
 		this.streamIntervals = streamIntervals;
 	}
