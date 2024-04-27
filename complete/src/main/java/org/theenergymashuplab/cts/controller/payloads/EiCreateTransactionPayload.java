@@ -21,9 +21,11 @@ import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderDetail;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
+import org.theenergymashuplab.cts.TransactionIdType;
 
 public class EiCreateTransactionPayload {
 	private ActorIdType counterPartyId;
+	private TransactionIdType marketTransactionId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
 	private EiTransaction transaction;
@@ -37,6 +39,7 @@ public class EiCreateTransactionPayload {
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
 		this.transaction = eiTransaction;
+		this.marketTransactionId = new TransactionIdType();
 	}
 
 	/* 
@@ -47,10 +50,11 @@ public class EiCreateTransactionPayload {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party,
-				ActorIdType counterParty) {
+				ActorIdType counterParty, TransactionIdType marketTransactionId) {
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
+		this.marketTransactionId = marketTransactionId;
 		this.requestId = new RefIdType();
 	}
 	
@@ -70,7 +74,8 @@ public class EiCreateTransactionPayload {
 		
 		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
 				" partyid " + partyId.toString() +
-				" counterPartyid " + counterPartyId.toString() +			
+				" counterPartyid " + counterPartyId.toString() +
+				" marketTransactionid " + marketTransactionId.toString() +			
 				" requestId " + requestId.value() + " TenderId " +
 				transaction.getTender().getTenderId().value() +
 				" quantity " + tenderIntervalDetail.getQuantity() +
@@ -107,6 +112,14 @@ public class EiCreateTransactionPayload {
 
 	public void setTransaction(EiTransaction transaction) {
 		this.transaction = transaction;
+	}
+
+	public TransactionIdType getMarketTransactionId() {
+		return marketTransactionId;
+	}
+
+	public void setMarketTransactionId(TransactionIdType marketTransactionId) {
+		this.marketTransactionId = marketTransactionId;
 	}
 	
 }
