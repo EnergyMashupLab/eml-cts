@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-EnergyApplication<cts-rtb>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.theenergymashuplab.cts.EnergyApplication",
+            "projectName": "cts-rtb",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

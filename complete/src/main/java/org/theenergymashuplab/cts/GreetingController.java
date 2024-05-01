@@ -55,7 +55,7 @@ public class GreetingController {
 	 */
 	@GetMapping("/CreateTender")
 	public EiCreateTenderPayload eiCreateTenderPayload(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();
+		EiTenderType tempTender = new RandomEiTender().randomTender();
 		
 		// actor Ids will come from POST RequestBody
 		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType());		
@@ -69,7 +69,7 @@ public class GreetingController {
 	@GetMapping("/CreateTransaction")
 	public EiCreateTransactionPayload eiCreateTransactionPayload(@RequestParam(name = "number", 
 							defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();
+		EiTenderType tempTender = new RandomEiTender().randomTender();
 		EiCreateTransactionPayload tempEiCreateTransactionPayload;
 		EiTransaction tempTransaction;
 
@@ -79,7 +79,8 @@ public class GreetingController {
 		tempEiCreateTransactionPayload = new EiCreateTransactionPayload(
 				tempTransaction,
 				new ActorIdType(), 
-				new ActorIdType());
+				new ActorIdType(),
+				new TransactionIdType());
 		
 		return tempEiCreateTransactionPayload;
 	}
@@ -90,7 +91,7 @@ public class GreetingController {
 	 */
 	@GetMapping("/CancelTender")
 	public EiCancelTenderPayload eiCancelTender(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();
+		EiTenderType tempTender = new RandomEiTender().randomTender();
 		EiCancelTenderPayload tempEiCancelTender;
 		EiTransaction tempTransaction;
 
@@ -100,7 +101,8 @@ public class GreetingController {
 		tempEiCancelTender = new EiCancelTenderPayload(
 				new TenderIdType(),
 				new ActorIdType(), 
-				new ActorIdType());
+				new ActorIdType(),
+				tempTender.getMarketOrderId());
 		/*
 		 * 	public EiCancelTender(TenderId tenderId, ActorId party, ActorId counterParty) {
 		 */
@@ -117,13 +119,22 @@ public class GreetingController {
 	@GetMapping("/clientCreateTender")
 	public ClientCreateTenderPayload clientCreateTenderPayload(
 					@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
-		EiTender tempTender = new RandomEiTender().randomTender();		
+		EiTenderType tempTender = new RandomEiTender().randomTender();		
 		
 		// assign fields for random tender and fill in missing values
 		// tempClientCreateTenderPayload.
 		
 		// actor Ids will come from POST RequestBody
-		return new ClientCreateTenderPayload(tempTender.getSide(),tempTender.getQuantity(), tempTender.getPrice());		
+		
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+		TenderDetail tenderDetail = tempTender.getTenderDetail();
+		if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+		}
+		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+		return new ClientCreateTenderPayload(tempTender.getSide(),tenderIntervalDetail.getQuantity(), tenderIntervalDetail.getPrice());		
 	}
 
 	/*

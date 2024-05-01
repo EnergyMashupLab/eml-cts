@@ -21,12 +21,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.CancelReasonType;
+import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.LmeSendTransactions;
 import org.theenergymashuplab.cts.LmeSocketClient;
 import org.theenergymashuplab.cts.LmeSocketServer;
+import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
@@ -48,7 +51,7 @@ import java.util.HashMap;
 @RequestMapping("/lme")
 public class LmeRestController {
 	private static final AtomicLong counter = new AtomicLong();
-	private static EiTender currentTender;
+	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	// TODO assign in constructor?
@@ -128,7 +131,7 @@ public class LmeRestController {
 	@PostMapping("/createTender")
 	public EiCreatedTenderPayload 	postEiCreateTender(
 			@RequestBody EiCreateTenderPayload eiCreateTender)	{
-		EiTender tempTender;
+		EiTenderType tempTender;
 		EiCreateTenderPayload tempCreate = null;
 		EiCreateTenderPayload mapPutReturnValue = null;
 		EiCreatedTenderPayload tempCreated;
@@ -156,24 +159,27 @@ public class LmeRestController {
 		addQsuccess = queueFromLme.add(tempCreate);
 		logger.debug("queueFomLme addQsuccess " + addQsuccess +
 				" TenderId " + tempTender.getTenderId());
+
+		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
+		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
+		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
+		 * with a different tender, leading to a transaction
+		 * 
+		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
+		tempTender.setMarketOrderId(new MarketOrderIdType());
 		
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
 		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
-				tempCreate);	
-		
-		if (mapPutReturnValue == null) {
-			logger.debug("mapPutReturnValue is null - new entry");
-		}	else	{
-			logger.debug("mapPutReturnValue non-null - previous entry " + mapPutReturnValue.toString());
-		}
+				tempCreate);
 		
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		//	TODO consider return value if value already in map
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				tempCreate.getRequestId());
 		
 		return tempCreated;
 	}
@@ -202,10 +208,19 @@ public class LmeRestController {
 
 //		tempCancel.print();	// DEBUG
 		
+		EiCanceledResponseType eiCanceledResponse = new EiCanceledResponseType(
+				CancelReasonType.REQUESTED,
+				tempCancel.getMarketOrderId(),
+				0,  // TODO Not up to March 2024 spec: Retrieve remaining quantity left once canceling tenders is implemented
+				false  // TODO Not up to March 2024 spec: Change to true once canceling tenders has been implemented
+		);
+		
 		tempCanceled = new EICanceledTenderPayload(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				eiCanceledResponse,
+				tempCancel.getRequestId());
 		
 		return tempCanceled;
 	}
@@ -220,12 +235,12 @@ public class LmeRestController {
 	}
 
 
-	public static EiTender getCurrentTender() {
+	public static EiTenderType getCurrentTender() {
 		return currentTender;
 	}
 
 
-	public static void setCurrentTender(EiTender currentTender) {
+	public static void setCurrentTender(EiTenderType currentTender) {
 		LmeRestController.currentTender = currentTender;
 	}
 
