@@ -17,20 +17,26 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.RefIdType;
 
 public class EICanceledTenderPayload {
 	private final ActorIdType partyId;
 	private final ActorIdType counterPartyId;
-	public EiResponse response;
+	private EiResponse response;
+	private EiCanceledResponseType eiCanceledResponse;
+	private RefIdType inResponseTo;
 //	public ArrayofResponses responses; NOT USED
 //	refId is in the EiResponse
 
-	
-	public EICanceledTenderPayload(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response) {
+	public EICanceledTenderPayload(ActorIdType partyId, ActorIdType counterPartyId, EiResponse response,
+			EiCanceledResponseType eiCanceledResponse, RefIdType inResponseTo) {
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
+		this.eiCanceledResponse = eiCanceledResponse;
+		this.inResponseTo = inResponseTo;
 	}
 
 	//Default constructor for JSON serialization
@@ -39,25 +45,15 @@ public class EICanceledTenderPayload {
 		this.counterPartyId = new ActorIdType();
 		this.response = new EiResponse(200, "OK");
 	}
-	
-	
+
 	public void print() {
-		String printStringFormat = 
-				"EICanceledTenderPayload  partyId %d counterPartyId %d refId %d ";
-		
-		System.err.println(
-				String.format(printStringFormat, 
-				partyId.value(), 
-				counterPartyId.value(), 
-				response.getRefId()));
+		System.err.println(this);
 	}
 	
-	public String toString()	{
-		return "EICanceledTenderPayload Soure RefId " +
-				"PENDING" +
-				" partyId " + partyId.toString() +
-				" counterPartyId " + counterPartyId.toString() +
-				" response " + response.toString();
+	@Override
+	public String toString() {
+		return "EICanceledTenderPayload [partyId=" + partyId + ", counterPartyId=" + counterPartyId + ", response="
+				+ response + ", eiCanceledResponse=" + eiCanceledResponse + ", inResponseTo=" + inResponseTo + "]";
 	}
 
 	public EiResponse getResponse() {
@@ -75,7 +71,21 @@ public class EICanceledTenderPayload {
 	public ActorIdType getCounterPartyId() {
 		return counterPartyId;
 	}
-	
-	
+
+	public EiCanceledResponseType getEiCanceledResponse() {
+		return eiCanceledResponse;
+	}
+
+	public void setEiCanceledResponse(EiCanceledResponseType eiCanceledResponse) {
+		this.eiCanceledResponse = eiCanceledResponse;
+	}
+
+	public RefIdType getInResponseTo() {
+		return inResponseTo;
+	}
+
+	public void setInResponseTo(RefIdType inResponseTo) {
+		this.inResponseTo = inResponseTo;
+	}
 
 }

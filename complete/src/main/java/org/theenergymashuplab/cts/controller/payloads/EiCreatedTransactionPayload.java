@@ -28,6 +28,7 @@ public class EiCreatedTransactionPayload {
 	public EiResponse response;
 //	public ArrayofResponses responses; NOT USED YET
 	private final RefIdType refId = new RefIdType();
+	private TransactionIdType recipientTransactionId;
 
 	// Default initializer for JSON serialization
 	public EiCreatedTransactionPayload() {
@@ -53,12 +54,14 @@ public class EiCreatedTransactionPayload {
 			TransactionIdType transactionId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,
-			EiResponse response) {
+			EiResponse response,
+			TransactionIdType recipientTransactionId) {
 
 		this.transactionId = transactionId;
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
+		this.recipientTransactionId = recipientTransactionId;
 	}
 
 	public long getId() {
@@ -71,15 +74,18 @@ public class EiCreatedTransactionPayload {
 				transactionId.toString() +
 				" partyId " + partyId.value() +
 				" counterPartyId " + counterPartyId.value() +
-				" refId " + refId.toString());
+				" refId " + refId.toString() + 
+				" recipientTransactionId " + recipientTransactionId.toString());
 	}
 	
+	@Override
 	public String toString()	{
 		return ("EiCreatedTransactionPayload transactionId " +
 				transactionId.toString() +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString());
+				" refId " + refId.toString() + 
+				" recipientTransactionId " + recipientTransactionId.toString());
 	}
 	
 	
@@ -101,5 +107,9 @@ public class EiCreatedTransactionPayload {
 
 	public RefIdType getRefId() {
 		return refId;
+	}
+
+	public TransactionIdType getReceipientTransactionId() {
+		return recipientTransactionId;
 	}
 }

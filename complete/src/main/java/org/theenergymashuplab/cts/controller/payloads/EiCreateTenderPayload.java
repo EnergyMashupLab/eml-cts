@@ -17,14 +17,21 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderType;
+import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.RefIdType;
 
 public class EiCreateTenderPayload {
+	private boolean atMostOne = false;  // EiCreateTenderPayload only carry one tender at a time at the moment, so this isn't actually used
+	private String executionInstructions = "";  // Is not up to the March 2024 spec; executionInstructions behavior not implemented
+	private MarketIdType marketId = new MarketIdType();  // Should be provided externally
+	private int segmentId = 1;  // Assumed to always be one segment, so it's always one at the moment
+	
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
-	private EiTender tender;
+	// TODO The March 2024 standard specifies that EiCreateTenderPayload should have a list of one or more tenders
+	private EiTenderType tender;
 	
 	/*
 	@JsonIgnore
@@ -49,27 +56,18 @@ public class EiCreateTenderPayload {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 
-	public EiCreateTenderPayload(EiTender tender, ActorIdType party, ActorIdType counterParty) {
-
+	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty) {
 		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
-		
-//		System.err.println("EiCreateTender Constructor before this.print()");
-//		this.print();
 	}
 
 	@Override
 	public String toString() {
-		return ("EiCreateTenderPayload party " +
-				partyId.value() +
-				" counterParty " +
-				counterPartyId.value() +
-				" requestId " +
-				requestId.toString() +
-				" " +
-				tender.toString());
+		return "EiCreateTenderPayload [atMostOne=" + atMostOne + ", executionInstructions=" + executionInstructions
+				+ ", marketId=" + marketId + ", segmentId=" + segmentId + ", counterPartyId=" + counterPartyId
+				+ ", partyId=" + partyId + ", requestId=" + requestId + ", tender=" + tender + "]";
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -96,11 +94,43 @@ public class EiCreateTenderPayload {
 		this.requestId = requestId;
 	}
 
-	public EiTender getTender() {
+	public EiTenderType getTender() {
 		return tender;
 	}
 
-	public void setTender(EiTender tender) {
+	public void setTender(EiTenderType tender) {
 		this.tender = tender;
+	}
+
+	public boolean isAtMostOne() {
+		return atMostOne;
+	}
+
+	public void setAtMostOne(boolean atMostOne) {
+		this.atMostOne = atMostOne;
+	}
+
+	public String getExecutionInstructions() {
+		return executionInstructions;
+	}
+
+	public void setExecutionInstructions(String executionInstructions) {
+		this.executionInstructions = executionInstructions;
+	}
+
+	public MarketIdType getMarketId() {
+		return marketId;
+	}
+
+	public void setMarketId(MarketIdType marketId) {
+		this.marketId = marketId;
+	}
+
+	public int getSegmentId() {
+		return segmentId;
+	}
+
+	public void setSegmentId(int segmentId) {
+		this.segmentId = segmentId;
 	}
 }

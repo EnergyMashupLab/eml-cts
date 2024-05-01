@@ -24,10 +24,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.CancelReasonType;
+import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.EiTender;
+import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.EiTransaction;
+import org.theenergymashuplab.cts.TenderDetail;
 import org.theenergymashuplab.cts.TenderIdType;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
+import org.theenergymashuplab.cts.TransactionIdType;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
@@ -155,7 +160,7 @@ public class TeuaRestController {
 			@PathVariable String teuaId,
 			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload
 			)	{
-		EiTender tempTender;
+		EiTenderType tempTender;
 		EiTransaction tempTransaction;
 		// tempPostReponse responds to POST to /sc
 		EiCreateTransactionPayload tempCreate;
@@ -179,11 +184,21 @@ public class TeuaRestController {
 		
 		/*
 		 * Build ClientCreateTransactionPayload to POST to client with same id
-		 */	
+		 */
+		
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+		TenderDetail tenderDetail = tempTender.getTenderDetail();
+		if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+		}
+		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+		
 		clientCreate = new ClientCreateTransactionPayload(
 				/* side 	*/	tempTender.getSide(),
-				/* quantity	*/	tempTender.getQuantity(),
-				/* price	*/	tempTender.getPrice(),
+				/* quantity	*/	tenderIntervalDetail.getQuantity(),
+				/* price	*/	tenderIntervalDetail.getPrice(),
 				/* tenderId	*/	tempTender.getTenderId().value()
 				);
 		
@@ -209,7 +224,8 @@ public class TeuaRestController {
 				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				new TransactionIdType());
 		
 		logger.debug("tempCreated constructed before return " + tempCreated.toString());
 		
@@ -232,12 +248,22 @@ public class TeuaRestController {
 		
 		tempCancel = eiCancelTender;
 		tempTenderId = eiCancelTender.getTenderId();
+		
+		EiCanceledResponseType eiCanceledResponse = new EiCanceledResponseType(
+				CancelReasonType.REQUESTED,
+				eiCancelTender.getMarketOrderId(),
+				0,  // TODO Retrieve remaining quantity left once canceling tenders is implemented
+				false  // TODO Change to true once canceling tenders has been implemented
+		);
 
 		
 		tempCanceled = new EICanceledTenderPayload(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"));
+				new EiResponse(200, "OK"),
+				eiCanceledResponse,
+				eiCancelTender.getRequestId()
+			);
 		
 		return tempCanceled;
 	}
@@ -262,12 +288,12 @@ public class TeuaRestController {
 	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
 	 */
 	@PostMapping("{teuaId}/clientCreateTender")
-	public ClientCreatedTenderPayload postClientCreateTender(
+	public EiCreatedTenderPayload postClientCreateTender(
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateTenderPayload clientCreateTender)	{
 		ClientCreateTenderPayload tempClientCreateTender;	
 		ClientCreatedTenderPayload tempReturn;
-		EiTender tender;
+		EiTenderType tender;
 		EiCreateTenderPayload eiCreateTender;	
 		Integer numericTeuaId = -1;
 		String positionUri;
@@ -312,12 +338,18 @@ public class TeuaRestController {
 		 * 
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
-		tender = new EiTender(
+		
+		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders
+		TenderDetail tenderDetail = new TenderIntervalDetail(
 				tempClientCreateTender.getInterval(),
-				tempClientCreateTender.getQuantity(),
 				tempClientCreateTender.getPrice(),
+				tempClientCreateTender.getQuantity()
+		);
+		tender = new EiTenderType(
 				tempClientCreateTender.getBridgeExpireTime().asInstant(),
-				tempClientCreateTender.getSide());
+				tempClientCreateTender.getSide(),
+				tenderDetail
+		);
 		
 		// 	Construct the EiCreateTender payload to be forwarded to LMA
 		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId],
@@ -340,7 +372,7 @@ public class TeuaRestController {
 		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());
 		
-		return tempReturn;
+		return result;
 	}
 	
 }

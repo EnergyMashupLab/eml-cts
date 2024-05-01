@@ -19,9 +19,13 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.TenderDetail;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
+import org.theenergymashuplab.cts.TransactionIdType;
 
 public class EiCreateTransactionPayload {
 	private ActorIdType counterPartyId;
+	private TransactionIdType marketTransactionId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
 	private EiTransaction transaction;
@@ -35,6 +39,7 @@ public class EiCreateTransactionPayload {
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
 		this.transaction = eiTransaction;
+		this.marketTransactionId = new TransactionIdType();
 	}
 
 	/* 
@@ -45,10 +50,11 @@ public class EiCreateTransactionPayload {
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
 	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party,
-				ActorIdType counterParty) {
+				ActorIdType counterParty, TransactionIdType marketTransactionId) {
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
+		this.marketTransactionId = marketTransactionId;
 		this.requestId = new RefIdType();
 	}
 	
@@ -57,13 +63,23 @@ public class EiCreateTransactionPayload {
 //		String printStringFormat = 
 //			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
 		
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+		TenderDetail tenderDetail = transaction.getTender().getTenderDetail();
+		if (tenderDetail.getClass() != TenderIntervalDetail.class) {
+			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
+		}
+		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
+		
 		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
 				" partyid " + partyId.toString() +
-				" counterPartyid " + counterPartyId.toString() +			
+				" counterPartyid " + counterPartyId.toString() +
+				" marketTransactionid " + marketTransactionId.toString() +			
 				" requestId " + requestId.value() + " TenderId " +
 				transaction.getTender().getTenderId().value() +
-				" quantity " + transaction.getTender().getQuantity() +
-				" price " + transaction.getTender().getPrice());
+				" quantity " + tenderIntervalDetail.getQuantity() +
+				" price " + tenderIntervalDetail.getPrice());
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -96,6 +112,14 @@ public class EiCreateTransactionPayload {
 
 	public void setTransaction(EiTransaction transaction) {
 		this.transaction = transaction;
+	}
+
+	public TransactionIdType getMarketTransactionId() {
+		return marketTransactionId;
+	}
+
+	public void setMarketTransactionId(TransactionIdType marketTransactionId) {
+		this.marketTransactionId = marketTransactionId;
 	}
 	
 }
