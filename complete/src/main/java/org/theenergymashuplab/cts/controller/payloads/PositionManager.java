@@ -203,10 +203,13 @@ public class PositionManager {
 	}
 
 	private CtsStreamType convertPositionsToStream(List<PositionManagerModel> models, Interval boundingInterval) {
+		/* If no positions within the bounding interval, then send back a stream with the same duration
+		 * as the bounding interval and with a single stream interval with a zero quantity
+		 */
 		if (models.isEmpty()) {
 			return new CtsStreamType(
-				new Interval(0, boundingInterval.getDtStart()),
-				List.of(),
+				boundingInterval,
+				List.of(new CtsStreamIntervalType(0, 0, 0)),
 				boundingInterval.dtStart
 			);
 		}
