@@ -109,7 +109,11 @@ public class EiCreatedTransactionPayload {
 		return refId;
 	}
 
-	public TransactionIdType getReceipientTransactionId() {
+	public TransactionIdType getRecipientTransactionId() {
 		return recipientTransactionId;
+	}
+
+	public void setRecipientTransactionId (TransactionIdType recipientTransactionId) {
+		this.recipientTransactionId = recipientTransactionId;
 	}
 }
