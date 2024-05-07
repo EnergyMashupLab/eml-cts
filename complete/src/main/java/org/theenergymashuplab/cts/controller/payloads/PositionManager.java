@@ -28,7 +28,10 @@ import org.theenergymashuplab.cts.ResourceDesignator;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -148,41 +151,85 @@ public class PositionManager {
 	@PostMapping("/position/requestPosition")
 	public EiReplyPositionPayload requestPosition(@RequestBody EiRequestPositionPayload requestPositionPayload) {
 		Interval interval = requestPositionPayload.getBoundingInterval();
-		Long positionParty = requestPositionPayload.getPositionParty().value();
-		Long requestor = requestPositionPayload.getRequestor().value();
-		Long marketId = requestPositionPayload.getMarketId().value();
-		Long requestId = requestPositionPayload.getRequestId().value();
-		String resourceDesignator = requestPositionPayload.getResourceDesignator().name();
+		long positionParty = requestPositionPayload.getPositionParty().value();
 
-		List<PositionManagerModel> queryresult = posDao.getPositionforDuration(positionParty, interval.getDtStart(),
+		List<PositionManagerModel> queryResult = posDao.getPositionforDuration(positionParty, interval.getDtStart(),
 				interval.getDuration().getSeconds());
 		
 		logger.info("/position/requestPosition " +
 				"Interval " + interval.toString());
 
-		// Generating response list.
-		PositionGetPayload tpayload = null;
-		Interval tinterval = null;
-		ArrayList<CtsStreamIntervalType> streamIntervals = new ArrayList<>();
-		CtsStreamType ctsStreamType = new CtsStreamType(interval, streamIntervals, interval.getDtStart());
-		int streamUid = 0;
-		for (PositionManagerModel tposmod : queryresult) {
-			tinterval = new Interval(Duration.between(tposmod.getStartTime(), tposmod.getEndTime()).toMinutes(),
-					tposmod.getStartTime());
-			tpayload = new PositionGetPayload(tinterval, tposmod.getQuantity());
-
-			// Adding to the dataList.
-			CtsStreamIntervalType tempStreamInterval = new CtsStreamIntervalType(0, tpayload.getQuantity(), streamUid);
-			streamUid++;
-			streamIntervals.add(tempStreamInterval);
-		}
+		CtsStreamType ctsStreamType = convertPositionsToStream(queryResult, interval);
 
 		//TODO: Update EiResponse if there are any errors
 		EiReplyPositionPayload replyPositionPayload = new EiReplyPositionPayload(interval, requestPositionPayload.getPositionParty(), ctsStreamType, requestPositionPayload.getRequestor(), new EiResponse(200, "OK"));
-
 		return replyPositionPayload;
 	}
 	
-	
+	/*
+	 * Returns a list of Instants between `startTime` and `endTime` with `duration` amount of time
+	 * between each consecutive interval
+	 */
+	private List<Instant> divideInterval(Instant startTime, Instant endTime, Duration duration) {
+		List<Instant> instants = new ArrayList<>();
+		Instant curTime = startTime;
+		while (curTime.isBefore(endTime)) {
+			instants.add(curTime);
+			curTime = curTime.plus(duration);
+		}
 
+		return instants;
+	}
+
+	/* Returns the smallest duration present in the list of models */
+	private Duration findMinDuration(List<PositionManagerModel> models) {
+		return models.stream()
+			.map(m -> Duration.between(m.getStartTime(), m.getEndTime()))
+			.min((d1, d2) -> d1.compareTo(d2))
+			.orElse(Duration.ZERO);
+	}
+
+	/* Combines all the quantities for each given time slot present in the models */
+	private Map<Instant, Long> mergePositions(List<PositionManagerModel> models) {
+		Map<Instant, Long> mergedPositions = new HashMap<>();
+		Duration minDuration = findMinDuration(models);
+		for (PositionManagerModel model: models) {
+			List<Instant> instants = divideInterval(model.getStartTime(), model.getEndTime(), minDuration);
+			instants.stream()
+				.forEach(i -> mergedPositions.merge(i, model.getQuantity(), Math::addExact));
+		}
+
+		return mergedPositions;
+	}
+
+	private CtsStreamType convertPositionsToStream(List<PositionManagerModel> models, Interval boundingInterval) {
+		/* If no positions within the bounding interval, then send back a stream with the same duration
+		 * as the bounding interval and with a single stream interval with a zero quantity
+		 */
+		if (models.isEmpty()) {
+			return new CtsStreamType(
+				boundingInterval,
+				List.of(new CtsStreamIntervalType(0, 0, 0)),
+				boundingInterval.dtStart
+			);
+		}
+
+		List<CtsStreamIntervalType> streamIntervals = new ArrayList<>();
+		Instant startTime = boundingInterval.getDtStart();
+		Instant endTime = boundingInterval.getDtStart().plus(boundingInterval.getDuration());
+		Duration minDuration = findMinDuration(models);
+		Map<Instant, Long> mergedPositions = mergePositions(models);
+
+		Instant curTime = startTime;
+		int uid = 0;
+		while (curTime.isBefore(endTime)) {
+			long quantity = mergedPositions.getOrDefault(curTime, 0L);
+			CtsStreamIntervalType interval = new CtsStreamIntervalType(0, quantity, uid++);
+			streamIntervals.add(interval);
+			curTime = curTime.plus(minDuration);
+		}
+
+		CtsStreamType stream = new CtsStreamType(new Interval(minDuration.toMinutes(), startTime), streamIntervals, startTime);
+		return stream;
+	}
 }
