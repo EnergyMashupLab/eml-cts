@@ -86,8 +86,10 @@ The project uses standards including
     [OASIS Energy Interoperation Technical Committee](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=energyinterop)).
     See the TC page for latest Working Draft. The Work on this project is coordinated with work in the OASIS TC.
 
+-  The Tender, Transaction, and Position Facets (except for Stream Tenders and Transactions) of ]CTS Committee Specification Draft 3](https://docs.oasis-open.org/energyinterop/ei-cts/v1.0/csd03/ei-cts-v1.0-csd03-public-review-metadata.html) 
+
 -   Informative UML models for Energy Interoperation/CTS payloads as shown in
-    the EI Standard
+    the Draft Standard
 
 -   [ISO 17800 Facility Smart Grid Information Model](https://www.iso.org/standard/71547.html)
 
