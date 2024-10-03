@@ -15,9 +15,4 @@ public abstract class WarrantType {
 	public WarrantType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

@@ -17,9 +17,4 @@ public class BookEntryType {
 	public BookEntryType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

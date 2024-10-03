@@ -13,9 +13,4 @@ public class NameValueLong {
 	public NameValueLong(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

@@ -22,9 +22,4 @@ public class SessionDataType {
 	public SessionDataType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

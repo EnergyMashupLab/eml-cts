@@ -16,9 +16,4 @@ public abstract class EiSubscriptionRequestType {
 	public EiSubscriptionRequestType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

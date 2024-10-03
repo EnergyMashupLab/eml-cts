@@ -17,9 +17,4 @@ public class EiTransactionType {
 	public EiTransactionType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

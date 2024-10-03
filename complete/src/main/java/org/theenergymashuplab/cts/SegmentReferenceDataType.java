@@ -44,9 +44,4 @@ public class SegmentReferenceDataType {
 	public SegmentReferenceDataType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

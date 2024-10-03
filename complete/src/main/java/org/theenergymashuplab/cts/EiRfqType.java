@@ -18,9 +18,4 @@ public class EiRfqType extends TenderBase {
 	public EiRfqType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

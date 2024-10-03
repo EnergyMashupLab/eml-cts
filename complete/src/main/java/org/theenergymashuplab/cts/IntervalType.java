@@ -9,14 +9,10 @@ package org.theenergymashuplab.cts;
 public class IntervalType {
 
 	public InstantType dtStart;
-	public DurationType duration = DurationType.ZERO;
+	// TODO uncomment this after implementation of DurationType
+	//public DurationType duration = DurationType.ZERO;
 
 	public IntervalType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

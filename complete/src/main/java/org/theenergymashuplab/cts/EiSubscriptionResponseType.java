@@ -16,9 +16,4 @@ public abstract class EiSubscriptionResponseType {
 	public EiSubscriptionResponseType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

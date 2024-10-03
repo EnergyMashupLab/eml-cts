@@ -17,9 +17,4 @@ public class InstrumentSessionSummaryType {
 	public InstrumentSessionSummaryType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

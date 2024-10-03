@@ -13,9 +13,4 @@ public class InstrumentBookSummaryType {
 	public InstrumentBookSummaryType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

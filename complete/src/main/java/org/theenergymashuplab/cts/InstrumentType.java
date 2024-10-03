@@ -14,9 +14,4 @@ public class InstrumentType extends ProductType {
 	public InstrumentType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

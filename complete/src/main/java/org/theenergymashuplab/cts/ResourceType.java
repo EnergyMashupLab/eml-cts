@@ -17,9 +17,4 @@ public class ResourceType {
 	public ResourceType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

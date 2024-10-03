@@ -12,9 +12,4 @@ public class InstrumentSessionReportType {
 	public InstrumentSessionReportType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

@@ -18,9 +18,4 @@ public class InstantType {
 	public InstantType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

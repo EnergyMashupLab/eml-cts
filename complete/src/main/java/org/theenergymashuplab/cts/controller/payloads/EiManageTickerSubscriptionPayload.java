@@ -15,9 +15,4 @@ public class EiManageTickerSubscriptionPayload extends EiSubscriptionRequestType
 	public EiManageTickerSubscriptionPayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

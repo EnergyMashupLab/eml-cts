@@ -14,7 +14,9 @@ public class EiQuoteType extends TenderBase {
 	public RfqIdType rfqId;
 	public boolean tradeable;
 
+	
 	public EiQuoteType(){
 
 	}
+	
 }

@@ -14,9 +14,4 @@ public class NameValueString {
 	public NameValueString(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

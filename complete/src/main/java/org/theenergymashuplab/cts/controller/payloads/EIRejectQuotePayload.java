@@ -16,9 +16,4 @@ public class EIRejectQuotePayload {
 	public EIRejectQuotePayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

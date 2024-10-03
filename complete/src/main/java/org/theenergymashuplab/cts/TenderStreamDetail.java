@@ -13,9 +13,4 @@ public class TenderStreamDetail extends TenderDetail {
 	public TenderStreamDetail(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }
