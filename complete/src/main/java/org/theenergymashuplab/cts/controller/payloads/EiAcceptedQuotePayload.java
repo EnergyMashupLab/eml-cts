@@ -1,4 +1,4 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
 
 /**
@@ -11,9 +11,4 @@ public class EiAcceptedQuotePayload extends EiCreatedTransactionPayload {
 	public EiAcceptedQuotePayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

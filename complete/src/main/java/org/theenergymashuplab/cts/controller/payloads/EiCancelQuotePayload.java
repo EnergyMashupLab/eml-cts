@@ -1,5 +1,9 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.MarketOrderIdType;
+import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.TenderIdType;
 
 /**
  * @author crossover
@@ -12,14 +16,9 @@ public class EiCancelQuotePayload {
 	public MarketOrderIdType marketQuoteIds;
 	public ActorIdType partyId;
 	private TenderIdType quoteIds;
-	public RefId requestId;
+	public RefIdType requestId;
 
 	public EiCancelQuotePayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

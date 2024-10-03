@@ -1,5 +1,9 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiCanceledResponseType;
+import org.theenergymashuplab.cts.EiResponseType;
+import org.theenergymashuplab.cts.RefIdType;
 
 /**
  * @author crossover
@@ -17,9 +21,4 @@ public class EICanceledQuotePayload {
 	public EICanceledQuotePayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

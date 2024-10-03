@@ -1,5 +1,6 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.MarketOrderIdType;
 
 /**
  * @author crossover
@@ -13,9 +14,4 @@ public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 	public EiAcceptQuotePayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

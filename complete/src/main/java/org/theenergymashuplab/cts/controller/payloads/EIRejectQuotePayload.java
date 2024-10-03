@@ -1,5 +1,7 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.MarketOrderIdType;
+import org.theenergymashuplab.cts.RefIdType;
 
 /**
  * @author crossover

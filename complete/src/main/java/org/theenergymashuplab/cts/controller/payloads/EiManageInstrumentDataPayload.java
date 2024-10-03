@@ -1,5 +1,9 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.EiSubscriptionRequestType;
+import org.theenergymashuplab.cts.InstrumentSummaryType;
+import org.theenergymashuplab.cts.IntervalType;
+import org.theenergymashuplab.cts.UpdateType;
 
 /**
  * @author crossover
@@ -16,9 +20,4 @@ public class EiManageInstrumentDataPayload extends EiSubscriptionRequestType {
 	public EiManageInstrumentDataPayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

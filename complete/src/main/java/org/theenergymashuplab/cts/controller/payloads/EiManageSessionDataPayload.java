@@ -1,5 +1,6 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.EiSubscriptionRequestType;
 
 /**
  * @author crossover
@@ -11,9 +12,4 @@ public class EiManageSessionDataPayload extends EiSubscriptionRequestType {
 	public EiManageSessionDataPayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

@@ -1,5 +1,10 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiResponseType;
+import org.theenergymashuplab.cts.MarketOrderIdType;
+import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.TenderIdType;
 
 /**
  * @author crossover
@@ -18,9 +23,4 @@ public class EiCreatedQuotePayload {
 	public EiCreatedQuotePayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

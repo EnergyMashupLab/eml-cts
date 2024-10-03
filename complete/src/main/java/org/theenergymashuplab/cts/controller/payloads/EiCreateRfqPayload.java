@@ -1,5 +1,8 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiRfqType;
+import org.theenergymashuplab.cts.RefIdType;
 
 /**
  * @author crossover
@@ -18,9 +21,4 @@ public class EiCreateRfqPayload {
 	public EiCreateRfqPayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

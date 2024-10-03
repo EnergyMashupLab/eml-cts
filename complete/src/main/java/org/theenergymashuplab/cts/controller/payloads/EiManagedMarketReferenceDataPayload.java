@@ -1,5 +1,6 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.EiSubscriptionResponseType;
 
 /**
  * @author crossover
@@ -11,9 +12,4 @@ public class EiManagedMarketReferenceDataPayload extends EiSubscriptionResponseT
 	public EiManagedMarketReferenceDataPayload(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }
