@@ -11,9 +11,4 @@ public class MarketTransactionIdType extends UidType {
 	public MarketTransactionIdType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

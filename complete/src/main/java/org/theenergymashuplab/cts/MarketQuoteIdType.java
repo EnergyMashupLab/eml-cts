@@ -8,14 +8,9 @@ package org.theenergymashuplab.cts;
  */
 public class MarketQuoteIdType {
 
-	public string myUid = "";
+	public String myUid = "";
 
 	public MarketQuoteIdType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

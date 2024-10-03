@@ -1,6 +1,7 @@
 package org.theenergymashuplab.cts;
 
 
+import org.theenergymashuplab.cts.controller.payloads.TickerPayloadBase;
 /**
  * @author crossover
  * @version 1.0
@@ -13,9 +14,4 @@ public class RfqTickerType extends TickerPayloadBase {
 	public RfqTickerType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

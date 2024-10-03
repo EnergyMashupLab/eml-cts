@@ -11,9 +11,4 @@ public class WarrantIdType extends UidType {
 	public WarrantIdType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

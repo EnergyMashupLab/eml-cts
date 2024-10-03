@@ -1,5 +1,8 @@
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.TickerType;
 
 /**
  * @author crossover
@@ -16,9 +19,4 @@ public abstract class TickerPayloadBase {
 	public TickerPayloadBase(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

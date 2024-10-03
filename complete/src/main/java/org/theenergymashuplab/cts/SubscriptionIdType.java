@@ -11,9 +11,4 @@ public class SubscriptionIdType extends UidType {
 	public SubscriptionIdType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

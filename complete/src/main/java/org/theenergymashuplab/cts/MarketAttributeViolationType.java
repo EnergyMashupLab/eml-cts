@@ -8,14 +8,10 @@ package org.theenergymashuplab.cts;
  */
 public class MarketAttributeViolationType {
 
-	public string attributeViolated;
-	public string responseDescription;
+	public String attributeViolated;
+	public String responseDescription;
 
 	public MarketAttributeViolationType(){
-
-	}
-
-	public void finalize() throws Throwable {
 
 	}
 

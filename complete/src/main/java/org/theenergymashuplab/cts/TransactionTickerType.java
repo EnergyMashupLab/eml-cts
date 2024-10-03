@@ -1,6 +1,8 @@
 package org.theenergymashuplab.cts;
 
 
+import org.theenergymashuplab.cts.controller.payloads.TickerPayloadBase;
+
 /**
  * @author crossover
  * @version 1.0
@@ -13,9 +15,4 @@ public class TransactionTickerType extends TickerPayloadBase {
 	public TransactionTickerType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

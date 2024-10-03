@@ -11,14 +11,9 @@ public class ProductType extends ResourceType {
 
 	public DurationType duration;
 	public int quantityScale;
-	public WarantIdType warrantId;
+	public WarrantIdType warrantId;
 
 	public ProductType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

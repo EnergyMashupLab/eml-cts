@@ -9,7 +9,7 @@ package org.theenergymashuplab.cts;
 public class EiTransactionTickerType {
 
 	public IntervalType interval;
-	public string marketContext;
+	public String marketContext;
 	/**
 	 * A long to which the Market or MarketPlace scale factors are applied. High
 	 * performance open source market implementations often use Long rather than Fixed
@@ -25,9 +25,4 @@ public class EiTransactionTickerType {
 	public EiTransactionTickerType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

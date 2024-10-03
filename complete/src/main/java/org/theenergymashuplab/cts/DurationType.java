@@ -19,9 +19,4 @@ public class DurationType {
 	public DurationType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

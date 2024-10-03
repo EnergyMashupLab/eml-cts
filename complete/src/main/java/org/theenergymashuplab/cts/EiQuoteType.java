@@ -17,9 +17,4 @@ public class EiQuoteType extends TenderBase {
 	public EiQuoteType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

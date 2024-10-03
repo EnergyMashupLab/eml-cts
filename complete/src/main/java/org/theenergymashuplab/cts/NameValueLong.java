@@ -8,7 +8,7 @@ package org.theenergymashuplab.cts;
  */
 public class NameValueLong {
 
-	public string attributeName;
+	public String attributeName;
 
 	public NameValueLong(){
 

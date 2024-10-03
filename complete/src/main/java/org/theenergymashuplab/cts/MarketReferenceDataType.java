@@ -27,9 +27,4 @@ public class MarketReferenceDataType {
 	public MarketReferenceDataType(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

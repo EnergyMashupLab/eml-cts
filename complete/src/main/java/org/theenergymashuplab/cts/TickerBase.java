@@ -12,9 +12,4 @@ public abstract class TickerBase {
 	public TickerBase(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 }

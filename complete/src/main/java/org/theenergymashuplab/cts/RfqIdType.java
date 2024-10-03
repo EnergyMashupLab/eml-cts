@@ -11,9 +11,4 @@ public class RfqIdType extends UidType {
 	public RfqIdType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

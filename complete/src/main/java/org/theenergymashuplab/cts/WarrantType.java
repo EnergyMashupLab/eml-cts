@@ -9,8 +9,8 @@ package org.theenergymashuplab.cts;
  */
 public abstract class WarrantType {
 
-	public WarrantIddType warrantId;
-	public string warrantSummary;
+	public WarrantIdType warrantId;
+	public String warrantSummary;
 
 	public WarrantType(){
 

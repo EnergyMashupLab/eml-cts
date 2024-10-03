@@ -8,8 +8,8 @@ package org.theenergymashuplab.cts;
  */
 public class NameValueString {
 
-	public string attributeName;
-	public string attributeValueString;
+	public String attributeName;
+	public String attributeValueString;
 
 	public NameValueString(){
 

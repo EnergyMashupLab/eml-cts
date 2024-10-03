@@ -11,9 +11,4 @@ public class MeasurementPointIdType extends UidType {
 	public MeasurementPointIdType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }

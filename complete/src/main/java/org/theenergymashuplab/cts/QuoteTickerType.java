@@ -1,5 +1,6 @@
 package org.theenergymashuplab.cts;
 
+import org.theenergymashuplab.cts.controller.payloads.TickerPayloadBase;
 
 /**
  * @author crossover
@@ -13,9 +14,4 @@ public class QuoteTickerType extends TickerPayloadBase {
 	public QuoteTickerType(){
 
 	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 }
