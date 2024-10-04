@@ -17,4 +17,33 @@ public class EiTransactionType {
 	public EiTransactionType(){
 
 	}
+
+	public EiTransactionType(MarketTransactionIdType marketTransactionId, EiTenderType tender) {
+		this.marketTransactionId = marketTransactionId;
+		this.tender = tender;
+	}
+
+	public MarketTransactionIdType getMarketTransactionId() {
+		return marketTransactionId;
+	}
+
+	public void setMarketTransactionId(MarketTransactionIdType marketTransactionId) {
+		this.marketTransactionId = marketTransactionId;
+	}
+
+	public EiTenderType getTender() {
+		return tender;
+	}
+
+	public void setTender(EiTenderType tender) {
+		this.tender = tender;
+	}
+
+	@Override
+	public String toString() {
+		return "EiTransactionType{" +
+				"marketTransactionId=" + marketTransactionId +
+				", tender=" + tender +
+				'}';
+	}
 }
