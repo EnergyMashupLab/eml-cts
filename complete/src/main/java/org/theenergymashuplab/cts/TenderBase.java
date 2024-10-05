@@ -14,7 +14,13 @@ public abstract class TenderBase {
 	private SideType side;
 	private TenderDetail tenderDetail;
 	private List<Integer> warrants = null;  // TODO Added due to being a part of the March 2024 spec. warrant behavior has not be implemented yet
-	
+	private WarrantIdType warrantsList;
+
+	// Default constructor for EiRfqType and EiQuoteType
+	public TenderBase(){
+
+	}
+
 	public TenderBase(Instant expirationTime, SideType side, TenderDetail tenderDetail) {
 		this.expirationTime = expirationTime;
 		this.side = side;
