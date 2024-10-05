@@ -18,4 +18,24 @@ public class InstantType {
 	public InstantType(){
 
 	}
+
+	public InstantType(String time) {
+		this.time = time;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
+
+
+	@Override
+	public String toString() {
+		return "InstantType{" +
+				"time='" + time + '\'' +
+				'}';
+	}
 }

@@ -19,4 +19,23 @@ public class DurationType {
 	public DurationType(){
 
 	}
+
+	public DurationType(String duration) {
+		this.duration = duration;
+	}
+
+	public String getDuration() {
+		return duration;
+	}
+
+	public void setDuration(String duration) {
+		this.duration = duration;
+	}
+
+	@Override
+	public String toString() {
+		return "DurationType{" +
+				"duration='" + duration + '\'' +
+				'}';
+	}
 }
