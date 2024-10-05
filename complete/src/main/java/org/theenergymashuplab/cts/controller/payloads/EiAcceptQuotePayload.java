@@ -14,4 +14,23 @@ public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 	public EiAcceptQuotePayload(){
 
 	}
+
+	public EiAcceptQuotePayload(MarketOrderIdType referencedQuoteId){
+		this.referencedQuoteId = referencedQuoteId;
+	}
+
+	public MarketOrderIdType getReferencedQuoteId(){
+		return this.referencedQuoteId;
+	}
+
+	public void setReferencedQuoteID(MarketOrderIdType referencedQuoteId){
+		this.referencedQuoteId = referencedQuoteId;
+	}
+
+	@Override
+	public String toString(){
+		return 	"EiAcceptQuotePayload [" +
+				"referencedQuoteId=" + referencedQuoteId.toString() +
+			                         "]";
+	}
 }

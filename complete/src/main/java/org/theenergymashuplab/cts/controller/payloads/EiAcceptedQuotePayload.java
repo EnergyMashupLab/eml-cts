@@ -11,4 +11,9 @@ public class EiAcceptedQuotePayload extends EiCreatedTransactionPayload {
 	public EiAcceptedQuotePayload(){
 
 	}
+
+	@Override
+	public String toString(){
+		return "EiAcceptQuotePayload []"; 
+	}
 }
