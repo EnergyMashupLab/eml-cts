@@ -12,4 +12,5 @@ public abstract class TickerBase {
 	public TickerBase(){
 
 	}
+
 }

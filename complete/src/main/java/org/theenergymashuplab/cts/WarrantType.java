@@ -15,4 +15,33 @@ public abstract class WarrantType {
 	public WarrantType(){
 
 	}
+
+	public WarrantIdType getWarrantId() {
+		return warrantId;
+	}
+
+	public void setWarrantId(WarrantIdType warrantId) {
+		this.warrantId = warrantId;
+	}
+
+	public String getWarrantSummary() {
+		return warrantSummary;
+	}
+
+	public void setWarrantSummary(String warrantSummary) {
+		this.warrantSummary = warrantSummary;
+	}
+
+	public WarrantType(WarrantIdType warrantId, String warrantSummary) {
+		this.warrantId = warrantId;
+		this.warrantSummary = warrantSummary;
+	}
+
+	@Override
+	public String toString() {
+		return "WarrantType{" +
+				"warrantId=" + warrantId +
+				", warrantSummary='" + warrantSummary + '\'' +
+				'}';
+	}
 }

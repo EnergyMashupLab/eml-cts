@@ -13,4 +13,28 @@ public class TenderTickerType extends TickerPayloadBase {
 	public TenderTickerType(){
 
 	}
+
+	public EiTenderType getTender() {
+		return tender;
+	}
+
+	public void setTender(EiTenderType tender) {
+		this.tender = tender;
+	}
+
+	public TenderTickerType(EiTenderType tender) {
+		this.tender = tender;
+	}
+
+
+	@Override
+	public String toString() {
+		return "TenderTickerType{" +
+				"counterParty=" + counterParty +
+				", party=" + party +
+				", subscriptionId=" + subscriptionId +
+				", tickerType=" + tickerType +
+				", tender=" + tender +
+				'}';
+	}
 }
