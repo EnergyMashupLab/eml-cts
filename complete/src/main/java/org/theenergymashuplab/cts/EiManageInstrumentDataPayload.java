@@ -31,7 +31,7 @@ public class EiManageInstrumentDataPayload {
     public void setInstrumentType(String instrumentType) {
         this.instrumentType = instrumentType;
     } 
-    public void setInstrumentValue(String instrumentValue) {
+    public void setInstrumentValue(double instrumentValue) {
         this.instrumentValue = instrumentValue;
     } 
 }
