@@ -16,4 +16,33 @@ public class EIRejectQuotePayload {
 	public EIRejectQuotePayload(){
 
 	}
+
+	public EIRejectQuotePayload(MarketOrderIdType referencedQuoteId, RefIdType requestId) {
+		this.referencedQuoteId = referencedQuoteId;
+		this.requestId = requestId;
+	}
+
+	public MarketOrderIdType getReferencedQuoteId() {
+		return referencedQuoteId;
+	}
+
+	public void setReferencedQuoteId(MarketOrderIdType referencedQuoteId) {
+		this.referencedQuoteId = referencedQuoteId;
+	}
+
+	public RefIdType getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(RefIdType requestId) {
+		this.requestId = requestId;
+	}
+
+	@Override
+	public String toString() {
+		return "EIRejectQuotePayload{" +
+				"referencedQuoteId=" + referencedQuoteId +
+				", requestId=" + requestId +
+				'}';
+	}
 }
