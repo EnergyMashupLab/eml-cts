@@ -17,4 +17,27 @@ public class ResourceType {
 	public ResourceType(){
 
 	}
+
+	public ResourceType(String resourceAttributes, String resourceDescription, ResourceDesignatorType resourceDesignator, String resourceUnit){
+		this.resourceAttributes = resourceAttributes;
+		this.resourceDescription = resourceDescription;
+		this.resourceDesignator = resourceDesignator;
+		this.resourceUnit = resourceUnit;
+	}
+
+	public String getResourceAttributes() { return resourceAttributes; }
+
+	public void setResourceAttributes(String resourceAttributes) { this.resourceAttributes = resourceAttributes; }
+
+	public String getResourceDescription() { return resourceDescription; }
+
+	public void setResourceDescription(String resourceDescription) { this.resourceDescription = resourceDescription; }
+
+	public ResourceDesignatorType getResourceDesignator() { return resourceDesignator; }
+
+	public void ResourceDesignator(ResourceDesignatorType resourceDesignator) { this.resourceDesignator = resourceDesignator; }
+
+	public String getResourceUnit() { return resourceUnit; }
+
+	public void setResourceUnit(String resourceUnit) { this.resourceUnit = resourceUnit; }
 }

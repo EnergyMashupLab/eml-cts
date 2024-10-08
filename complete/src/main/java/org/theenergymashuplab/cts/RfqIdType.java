@@ -8,7 +8,12 @@ package org.theenergymashuplab.cts;
  */
 public class RfqIdType extends UidType {
 
-	public RfqIdType(){
+	public long value() {
+		return this.myUidId;
+	}
 
+	@Override
+	public String toString()	{
+		return (String.valueOf(myUidId));
 	}
 }

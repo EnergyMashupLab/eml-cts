@@ -16,4 +16,22 @@ public class ProductType extends ResourceType {
 	public ProductType(){
 
 	}
+
+	public ProductType(DurationType duration, int quantityScale, WarrantIdType warrantId) {
+		this.duration = duration;
+		this.quantityScale = quantityScale;
+		this.warrantId = warrantId;
+	}
+
+	public DurationType getDuration() { return duration; }
+
+	public void setDuration(DurationType duration) { this.duration = duration; }
+
+	public int getQuantityScale() { return quantityScale; }
+
+	public void setQuantityScale(int quantityScale) { this.quantityScale = quantityScale; }
+
+	public WarrantIdType getWarrantId() { return warrantId; }
+
+	public void setWarrantId(WarrantIdType warrantId) { this.warrantId = warrantId; }
 }
