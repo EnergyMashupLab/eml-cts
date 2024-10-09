@@ -40,4 +40,13 @@ public class ResourceType {
 	public String getResourceUnit() { return resourceUnit; }
 
 	public void setResourceUnit(String resourceUnit) { this.resourceUnit = resourceUnit; }
+
+	@Override
+	public String toString() {
+		return "ResourceType {" +
+				" resourceAttributes = " + resourceAttributes +
+				", resourceDescription = " + resourceDescription +
+				", resourceDesignator = " + resourceDesignator +
+				", resourceUnit = " + resourceUnit + " }";
+	}
 }

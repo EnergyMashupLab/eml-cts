@@ -214,4 +214,40 @@ public class SegmentReferenceDataType {
 
 	public void setTradeEndpoint(String tradeEndpoint) { this.tradeEndpoint = tradeEndpoint; }
 
+	@Override
+	public String toString() {
+		return "SegmentReferenceDataType {" +
+				" auctionAtClose = " + auctionAtClose +
+				", auctionAtOpen = " + auctionAtOpen +
+				", executionInstructionsAccepted = " + executionInstructionsAccepted +
+				", marketDepth = " + marketDepth +
+				", marketId = " + marketId +
+				", marketInstrumentSummaryAvailable = " + marketInstrumentSummaryAvailable +
+				", marketMechanism = " + marketMechanism +
+				", maxSummaryInstruments = " + maxSummaryInstruments +
+				", maxTenderQuantity = " + maxTenderQuantity +
+				", minTenderQuantity = " + minTenderQuantity +
+				", negotiationsPermitted = " + negotiationsPermitted +
+				", priceScale = " + priceScale +
+				", privateNegotiationViaMarket = " + privateNegotiationViaMarket +
+				", product = " + product +
+				", quantityScale = " + quantityScale +
+				", roundLot = " + roundLot +
+				", scheduledSessionCloseTime = " + scheduledSessionCloseTime +
+				", scheduledSessionOpenTime = " + scheduledSessionOpenTime +
+				", scheduledSessionStartTime = " + scheduledSessionStartTime +
+				", segmentDesc = " + segmentDesc +
+				", segmentId = " + segmentId +
+				", segmentStatus = " + segmentStatus +
+				", streamTradingOk = " + streamTradingOk +
+				", subscriptionEndpoint = " + subscriptionEndpoint +
+				", tickerQuotes = " + tickerQuotes +
+				", tickerRfqs = " + tickerRfqs +
+				", tickerTenders = " + tickerTenders +
+				", tickerTransactions = " + tickerTransactions +
+				", tradeableInstrumentRange = " + tradeableInstrumentRange +
+				", tradeEndpoint = " + tradeEndpoint +
+				"}";
+	}
+
 }

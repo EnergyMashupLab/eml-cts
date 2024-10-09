@@ -34,4 +34,12 @@ public class ProductType extends ResourceType {
 	public WarrantIdType getWarrantId() { return warrantId; }
 
 	public void setWarrantId(WarrantIdType warrantId) { this.warrantId = warrantId; }
+
+	@Override
+	public String toString() {
+		return "ProductType {" +
+				" duration = " + duration +
+				", quantityScale = " + quantityScale +
+				", warrantId = " + warrantId + " }";
+	}
 }

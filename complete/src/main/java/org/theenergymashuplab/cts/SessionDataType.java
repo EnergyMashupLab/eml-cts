@@ -77,4 +77,19 @@ public class SessionDataType {
 	public IntervalType getTradeableInstrumentRange() { return tradeableInstrumentRange; }
 
 	public void setTradeableInstrumentRange(IntervalType tradeableInstrumentRange) { this.tradeableInstrumentRange = tradeableInstrumentRange; }
+
+	@Override
+	public String toString() {
+		return "SessionDataType {" +
+				" currentTradingPhase = " + currentTradingPhase +
+				", marketId = " + marketId +
+				", messageTimeStamp = " + messageTimeStamp +
+				", segmentId = " + segmentId +
+				", sessionClose = " + sessionClose +
+				", sessionOpen = " + sessionOpen +
+				", sessionPreClose = " + sessionPreClose +
+				", sessionStart = " + sessionStart +
+				", sessionStatus = " + sessionStatus +
+				", tradeableInstrumentRange = " + tradeableInstrumentRange + " }";
+	}
 }

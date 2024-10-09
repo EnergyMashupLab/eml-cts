@@ -23,4 +23,10 @@ public class QuoteTickerType extends TickerPayloadBase {
 
 	public EiQuoteType getQuote() { return quote; }
 
+	@Override
+	public String toString() {
+		return "QuoteTickerType {" +
+				" quote = " + quote + " }";
+	}
+
 }
