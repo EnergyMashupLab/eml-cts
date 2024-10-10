@@ -11,4 +11,13 @@ public class MeasurementPointIdType extends UidType {
 	public MeasurementPointIdType(){
 
 	}
+
+	public long value() {
+		return this.myUidId;
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(this.myUidId);
+	}
 }

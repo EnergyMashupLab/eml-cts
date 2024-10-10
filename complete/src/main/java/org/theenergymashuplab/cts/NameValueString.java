@@ -14,4 +14,29 @@ public class NameValueString {
 	public NameValueString(){
 
 	}
+
+	public NameValueString(String attributeName, String attributeValueString){
+		this.attributeName = attributeName;
+	}
+
+	public String getAttributeName() {
+		return attributeName;
+	}
+
+	public void setAttributeName(String attributeName) {
+		this.attributeName = attributeName;
+	}
+
+	public String getAttributeValueString() {
+		return attributeValueString;
+	}
+
+	public void setAttributeValueString(String attributeValueString) {
+		this.attributeValueString = attributeValueString;
+	}
+
+	@Override
+	public String toString() {
+		return "NameValueString [attributeName=" + attributeName + ", attributeValueString=" + attributeValueString + "]";
+	}
 }
