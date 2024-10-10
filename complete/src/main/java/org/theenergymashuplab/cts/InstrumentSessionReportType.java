@@ -7,9 +7,15 @@ package org.theenergymashuplab.cts;
  * @version 1.0
  * @created 28-Sep-2024 8:41:41 PM
  */
-public class InstrumentSessionReportType {
 
+
+public class InstrumentSessionReportType {
 	public InstrumentSessionReportType(){
 
+	}
+
+	@Override
+	public String toString() {
+		return "InstrumentSessionReportType{}";
 	}
 }

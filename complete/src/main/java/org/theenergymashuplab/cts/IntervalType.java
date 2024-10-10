@@ -15,4 +15,23 @@ public class IntervalType {
 	public IntervalType(){
 
 	}
+
+	public IntervalType(InstantType dtStart) {
+		this.dtStart = dtStart;
+	}
+
+	public InstantType getDtStart() {
+		return dtStart;
+	}
+
+	public void setDtStart(InstantType dtStart) {
+		this.dtStart = dtStart;
+	}
+
+	@Override
+	public String toString() {
+		return "IntervalType{" +
+				"dtStart=" + dtStart +
+				'}';
+	}
 }

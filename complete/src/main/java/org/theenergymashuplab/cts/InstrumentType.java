@@ -14,4 +14,30 @@ public class InstrumentType extends ProductType {
 	public InstrumentType(){
 
 	}
+
+	public InstrumentType(InstantType instrumentStart) {
+		this.instrumentStart = instrumentStart;
+	}
+
+	public InstantType getInstrumentStart() {
+		return instrumentStart;
+	}
+
+	public void setInstrumentStart(InstantType instrumentStart) {
+		this.instrumentStart = instrumentStart;
+	}
+
+	@Override
+	public String toString() {
+		return "InstrumentType{" +
+				"instrumentStart=" + instrumentStart +
+				", duration=" + duration +
+				", quantityScale=" + quantityScale +
+				", warrantId=" + warrantId +
+				", resourceAttributes='" + resourceAttributes + '\'' +
+				", resourceDescription='" + resourceDescription + '\'' +
+				", resourceDesignator=" + resourceDesignator +
+				", resourceUnit='" + resourceUnit + '\'' +
+				'}';
+	}
 }
