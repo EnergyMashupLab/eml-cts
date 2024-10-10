@@ -13,4 +13,23 @@ public class InstrumentBookSummaryType {
 	public InstrumentBookSummaryType(){
 
 	}
+
+	public InstrumentBookSummaryType(BookEntryType bookEntries) {
+		this.bookEntries = bookEntries;
+	}
+
+	public BookEntryType getBookEntries() {
+		return bookEntries;
+	}
+
+	public void setBookEntries(BookEntryType bookEntries) {
+		this.bookEntries = bookEntries;
+	}
+
+	@Override
+	public String toString() {
+		return "InstrumentBookSummaryType{" +
+				"bookEntries=" + bookEntries +
+				'}';
+	}
 }
