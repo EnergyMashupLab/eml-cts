@@ -11,4 +11,15 @@ public class WarrantIdType extends UidType {
 	public WarrantIdType(){
 
 	}
+
+	public WarrantIdType(long uidId) {
+		super(uidId);
+	}
+
+	@Override
+	public String toString() {
+		return "WarrantIdType{" +
+				"myUidId=" + myUidId +
+				'}';
+	}
 }

@@ -15,4 +15,27 @@ public class TransactionTickerType extends TickerPayloadBase {
 	public TransactionTickerType(){
 
 	}
+
+	public EiTransactionType getTransaction() {
+		return transaction;
+	}
+
+	public void setTransaction(EiTransactionType transaction) {
+		this.transaction = transaction;
+	}
+
+	@Override
+	public String toString() {
+		return "TransactionTickerType{" +
+				"transaction=" + transaction +
+				", counterParty=" + counterParty +
+				", party=" + party +
+				", subscriptionId=" + subscriptionId +
+				", tickerType=" + tickerType +
+				'}';
+	}
+
+	public TransactionTickerType(EiTransactionType transaction) {
+		this.transaction = transaction;
+	}
 }

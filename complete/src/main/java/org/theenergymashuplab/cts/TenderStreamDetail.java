@@ -13,4 +13,23 @@ public class TenderStreamDetail extends TenderDetail {
 	public TenderStreamDetail(){
 
 	}
+
+	public CtsStreamType getStream() {
+		return stream;
+	}
+
+	public void setStream(CtsStreamType stream) {
+		this.stream = stream;
+	}
+
+	public TenderStreamDetail(CtsStreamType stream) {
+		this.stream = stream;
+	}
+
+	@Override
+	public String toString() {
+		return "TenderStreamDetail{" +
+				"stream=" + stream +
+				'}';
+	}
 }

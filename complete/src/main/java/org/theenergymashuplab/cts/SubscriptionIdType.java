@@ -11,4 +11,15 @@ public class SubscriptionIdType extends UidType {
 	public SubscriptionIdType(){
 
 	}
+
+	public SubscriptionIdType(long uidId) {
+		super(uidId);
+	}
+
+	@Override
+	public String toString() {
+		return "SubscriptionIdType{" +
+				"myUidId=" + myUidId +
+				'}';
+	}
 }
