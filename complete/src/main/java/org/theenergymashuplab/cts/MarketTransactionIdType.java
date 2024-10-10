@@ -11,4 +11,13 @@ public class MarketTransactionIdType extends UidType {
 	public MarketTransactionIdType(){
 
 	}
+
+	public long value() {
+		return this.myUidId;
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(this.myUidId);
+	}
 }

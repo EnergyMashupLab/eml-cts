@@ -10,7 +10,24 @@ public class MarketQuoteIdType {
 
 	public String myUid = "";
 
-	public MarketQuoteIdType(){
+	public MarketQuoteIdType() {
 
+	}
+
+	public MarketQuoteIdType(String myUid) {
+		this.myUid = myUid;
+	}
+
+	public String getMyUid() {
+		return myUid;
+	}
+
+	public void setMyUid(String myUid) {
+		this.myUid = myUid;
+	}
+
+	@Override
+	public String toString() {
+		return "MarketQuoteIdType [myUid=" + myUid + "]";
 	}
 }

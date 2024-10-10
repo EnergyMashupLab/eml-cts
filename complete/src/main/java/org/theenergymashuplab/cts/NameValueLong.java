@@ -13,4 +13,21 @@ public class NameValueLong {
 	public NameValueLong(){
 
 	}
+
+	public NameValueLong(String attributeName) {
+		this.attributeName = attributeName;
+	}
+
+	public String getAttributeName() {
+		return attributeName;
+	}
+
+	public void setAttributeName(String attributeName) {
+		this.attributeName = attributeName;
+	}
+
+	@Override
+	public String toString() {
+		return "NameValueLong [attributeName=" + attributeName + "]";
+	}
 }
