@@ -14,4 +14,19 @@ public class QuoteTickerType extends TickerPayloadBase {
 	public QuoteTickerType(){
 
 	}
+
+	public QuoteTickerType(EiQuoteType quote){
+		this.quote = quote;
+	}
+
+	public void setQuote(EiQuoteType quote) { this.quote = quote; }
+
+	public EiQuoteType getQuote() { return quote; }
+
+	@Override
+	public String toString() {
+		return "QuoteTickerType {" +
+				" quote = " + quote + " }";
+	}
+
 }

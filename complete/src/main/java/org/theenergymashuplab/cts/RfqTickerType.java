@@ -12,6 +12,19 @@ public class RfqTickerType extends TickerPayloadBase {
 	public EiRfqType rfq;
 
 	public RfqTickerType(){
+	}
 
+	public RfqTickerType(EiRfqType rfq){
+		this.rfq = rfq;
+	}
+
+	public void setRfq(EiRfqType rfq) { this.rfq = rfq; }
+
+	public EiRfqType getRfq() { return rfq; }
+
+	@Override
+	public String toString() {
+		return "RfqTickerType {" +
+				" rfq = " + rfq + " }";
 	}
 }
