@@ -9,6 +9,8 @@ import org.theenergymashuplab.cts.EiSubscriptionRequestType;
  */
 public class EiManageMarketReferenceDataPayload extends EiSubscriptionRequestType {
 
+
+
 	public EiManageMarketReferenceDataPayload(){
 
 	}
