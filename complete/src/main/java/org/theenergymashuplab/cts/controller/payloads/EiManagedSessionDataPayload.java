@@ -12,4 +12,9 @@ public class EiManagedSessionDataPayload extends EiSubscriptionResponseType {
 	public EiManagedSessionDataPayload(){
 
 	}
+
+	@Override
+	public String toString(){
+		return "EiManagedSessionDataPayload: []";
+	}
 }

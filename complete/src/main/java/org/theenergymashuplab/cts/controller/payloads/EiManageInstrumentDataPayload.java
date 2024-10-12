@@ -20,4 +20,53 @@ public class EiManageInstrumentDataPayload extends EiSubscriptionRequestType {
 	public EiManageInstrumentDataPayload(){
 
 	}
+
+	public EiManageInstrumentDataPayload(IntervalType boundingInterval, InstrumentSummaryType instrumentSummaryType, 
+			int marketDepth, UpdateType updateType){
+		this.boundingInterval = boundingInterval;
+		this.instrumentSummaryType = instrumentSummaryType;
+		this.marketDepth = marketDepth;
+		this.updateType = updateType;
+	}
+
+
+	public IntervalType getBoundingInterval(){
+		return this.boundingInterval;
+	}
+
+	public void setBoundingInterval(IntervalType boundingInterval){
+		this.boundingInterval = boundingInterval;
+	}
+
+	public InstrumentSummaryType getInstrumentSummaryType(){
+		return this.instrumentSummaryType;
+	}
+
+	public void setInstrumentSummaryType(InstrumentSummaryType instrumentSummaryType){
+		this.instrumentSummaryType = instrumentSummaryType;
+	}
+
+	public int getMarketDepth(){
+		return this.marketDepth;
+	}
+
+	public void setMarketDepth(int marketDepth){
+		this.marketDepth = marketDepth;
+	}
+
+	public UpdateType getUpdateType(){
+		return this.updateType;
+	}
+
+	public void setUpdateType(UpdateType updateType){
+		this.updateType = updateType;
+	}
+
+	@Override
+	public String toString(){
+		return "EiManageInstrumentDataPayload: [boundingInterval=" + this.boundingInterval.toString() +
+				"instrumentSummaryType=" + this.instrumentSummaryType.toString() +
+				"marketDepth=" + this.marketDepth +
+				"updateType=" + this.updateType.toString() + "]";
+	 }
 }

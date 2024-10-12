@@ -12,4 +12,9 @@ public class EiManagedSegmentReferenceDataPayload extends EiSubscriptionResponse
 	public EiManagedSegmentReferenceDataPayload(){
 
 	}
+
+	@Override
+	public String toString(){
+		return "EiManagedSegmentReferenceDataPayload: []";
+	}
 }

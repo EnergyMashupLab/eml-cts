@@ -12,4 +12,9 @@ public class EiManagedInstrumentDataPayload extends EiSubscriptionResponseType {
 	public EiManagedInstrumentDataPayload(){
 
 	}
+
+	@Override
+	public String toString(){
+		return "EiManagedInstrumentDataPayload: []";
+	}
 }

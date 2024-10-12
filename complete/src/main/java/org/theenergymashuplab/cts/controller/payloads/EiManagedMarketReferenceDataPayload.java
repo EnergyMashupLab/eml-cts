@@ -12,4 +12,9 @@ public class EiManagedMarketReferenceDataPayload extends EiSubscriptionResponseT
 	public EiManagedMarketReferenceDataPayload(){
 
 	}
+
+	@Override
+	public String toString(){
+		return "EiManagedMarketReferenceDataPayload: []";
+	}
 }

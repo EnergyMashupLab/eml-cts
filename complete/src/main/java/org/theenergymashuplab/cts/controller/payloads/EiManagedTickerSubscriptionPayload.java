@@ -15,4 +15,23 @@ public class EiManagedTickerSubscriptionPayload extends EiSubscriptionResponseTy
 	public EiManagedTickerSubscriptionPayload(){
 
 	}
+
+	public EiManagedTickerSubscriptionPayload(TickerType tickerType){
+		this.tickerType = tickerType;
+	}
+
+	public TickerType getTickerType(){
+		return this.tickerType;
+	}
+
+	public void setTickerType(TickerType tickerType){
+		this.tickerType = tickerType;
+	}
+
+	@Override
+	public String toString(){
+		return "EiManagedTickerSubscriptionPayload: [" +
+				"tickerType=" + this.tickerType.toString() + "]";
+	}
+
 }
