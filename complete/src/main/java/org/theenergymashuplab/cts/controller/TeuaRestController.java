@@ -327,6 +327,7 @@ public class TeuaRestController {
 			actorIds[numericTeuaId].toString());
 		
 		tempClientCreateTender = clientCreateTender;	// save the parameter
+														
 
 		/*
 		 * Create a new EiTender using the interval, quantity, price,and expiration
@@ -339,12 +340,18 @@ public class TeuaRestController {
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
 		
-		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders - @FIXME Omkar 
-		TenderDetail tenderDetail = new TenderIntervalDetail(
+		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders 
+		// So this will be changed based on what kind of tender we have. If we have an interval tender, then this is fine, but if we have a stream tender, 
+		// we'll need to update the construction of tender detail
+		TenderDetail tenderDetail = null;
+		if(tempClientCreateTender.getBridgeInterval() != null){
+			 tenderDetail = new TenderIntervalDetail(
 				tempClientCreateTender.getInterval(),
 				tempClientCreateTender.getPrice(),
 				tempClientCreateTender.getQuantity()
-		);
+			);
+		}
+
 		tender = new EiTenderType(
 				tempClientCreateTender.getBridgeExpireTime().asInstant(),
 				tempClientCreateTender.getSide(),

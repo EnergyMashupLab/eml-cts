@@ -21,6 +21,7 @@ import java.time.*;
 
 import org.theenergymashuplab.cts.BridgeInstant;
 import org.theenergymashuplab.cts.BridgeInterval;
+import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.SideType;
 
@@ -30,8 +31,10 @@ public class ClientCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
-	private BridgeInterval bridgeInterval;
-	private BridgeInstant bridgeExpireTime;	
+	//So that we can catch TODO
+	private BridgeInterval bridgeInterval = null;
+	private BridgeInstant bridgeExpireTime = null;	
+	private CtsStreamType ctsStream = null;
 //	private boolean ignorePosition; TODO 1.01	
 
 	// Uses BridgeInterval to avoid serialization issues
@@ -70,6 +73,9 @@ public class ClientCreateTenderPayload {
 		this.bridgeInterval = new BridgeInterval(60, dtStart);
 		this.bridgeExpireTime = new BridgeInstant(expire);
 	}
+
+	// Constructor takes stream description
+	//May need new constructor
 	
 	@Override
 	public String toString()	{
@@ -143,6 +149,14 @@ public class ClientCreateTenderPayload {
 
 	public void setBridgeExpireTime(BridgeInstant bridgeExpireTime) {
 		this.bridgeExpireTime = bridgeExpireTime;
+	}
+
+	public CtsStreamType getCtsStream(){
+		return this.ctsStream;
+	}
+
+	public void setCtsStream(CtsStreamType ctsStream){
+		this.ctsStream = ctsStream;
 	}
 
 //	public boolean isIgnorePosition() {
