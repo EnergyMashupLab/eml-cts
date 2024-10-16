@@ -14,6 +14,10 @@ public class TenderStreamDetail extends TenderDetail {
 
 	}
 
+	public TenderStreamDetail(CtsStreamType stream) {
+		this.stream = stream;
+	}
+
 	public CtsStreamType getStream() {
 		return stream;
 	}
@@ -22,14 +26,10 @@ public class TenderStreamDetail extends TenderDetail {
 		this.stream = stream;
 	}
 
-	public TenderStreamDetail(CtsStreamType stream) {
-		this.stream = stream;
-	}
-
 	@Override
 	public String toString() {
 		return "TenderStreamDetail{" +
 				"stream=" + stream +
-				'}';
+				"}";
 	}
 }

@@ -19,7 +19,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  *  As well as from here: https://www.baeldung.com/jackson-inheritance */
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
 @JsonSubTypes({
-    @Type(value = TenderIntervalDetail.class, name = "interval")  // TODO Once TenderStreamInterval has been added, add its type here
+    @Type(value = TenderIntervalDetail.class, name = "interval"),  // TODO Once TenderStreamInterval has been added, add its type here
+	@Type(value = TenderStreamDetail.class, name = "stream") //Added type for JSON
 })
 public abstract class TenderDetail {
 
