@@ -34,6 +34,8 @@ import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
 import org.theenergymashuplab.cts.TenderStreamDetail;
 import org.theenergymashuplab.cts.TransactionIdType;
+import org.theenergymashuplab.cts.controller.payloads.ClientCreateStreamTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.ClientCreatedStreamTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
@@ -385,4 +387,13 @@ public class TeuaRestController {
 		return result;
 	}
 	
+	@PostMapping("{teuaId}/clientCreateStreamTender")
+	public EiCreatedTenderPayload postClientCreateStreamTender(
+			@PathVariable String teuaId,
+			@RequestBody ClientCreateStreamTenderPayload clientCreateStreamTender)	{
+
+			return null;
+			
+
+	}
 }
