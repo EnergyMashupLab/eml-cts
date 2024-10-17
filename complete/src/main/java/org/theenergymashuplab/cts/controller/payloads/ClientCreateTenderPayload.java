@@ -38,9 +38,8 @@ public class ClientCreateTenderPayload {
 	 * bridgeExpireTime will remain null whilst ctsStream is nonNull(if all goes well). This should allow us to take
 	 * action based on what kind of tender we have.
 	 */
-	private BridgeInterval bridgeInterval = null;
-	private BridgeInstant bridgeExpireTime = null;	
-	private CtsStreamType ctsStream = null;
+	private BridgeInterval bridgeInterval;
+	private BridgeInstant bridgeExpireTime;	
 //	private boolean ignorePosition; TODO 1.01	
 
 	// Uses BridgeInterval to avoid serialization issues
@@ -155,14 +154,6 @@ public class ClientCreateTenderPayload {
 
 	public void setBridgeExpireTime(BridgeInstant bridgeExpireTime) {
 		this.bridgeExpireTime = bridgeExpireTime;
-	}
-
-	public CtsStreamType getCtsStream(){
-		return this.ctsStream;
-	}
-
-	public void setCtsStream(CtsStreamType ctsStream){
-		this.ctsStream = ctsStream;
 	}
 
 //	public boolean isIgnorePosition() {

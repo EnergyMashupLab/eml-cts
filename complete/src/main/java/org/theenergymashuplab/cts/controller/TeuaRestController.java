@@ -342,48 +342,18 @@ public class TeuaRestController {
 		 */
 		
 		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders 
-		// So this will be changed based on what kind of tender we have. If we have an interval tender, then this is fine, but if we have a stream tender, 
-		// we'll need to update the construction of tender detail
 		
-		//Just for the compiler to not warn us about noninitialization	
-		TenderDetail tenderDetail = null;
+		TenderDetail tenderDetail;
 
 
 		/*
-		 * Handling of Stream vs. Interval Tenders
-		 * 
-		 * Stream and Interval Tenders will both be POSTED with requests of type "clientCreateTenderPayload", so they will end
-		 * up here. In ClientCreateTenderPayload, the interval and ctsStream attributes are set to null by default. When the JSON
-		 * is serialized, the appropriate setters/getters will be called based on what is in the JSON
-		 *
-		 * Sample Interval Tender POST request:
-		 *
-		 *{"info":"ClientCreateTenderPayload",
-		 * 		"side":"SELL",
-		 * 		"quantity":54,
-		 * 		"price":190,
-		 * 		"ctsTenderId":0,
-		 * 		"bridgeInterval":{"durationInMinutes":60,"dtStart":{"instantString":"2020-06-20T05:00:00Z"}},
-		 * 		"bridgeExpireTime":{"instantString":"2020-06-20T16:00:00Z"}}
-		 * 
-		 * This request would be serialized and the bridgeInterval attribute would be set and therefore nonnull, so
-		 * we would encounter the first case and create an interval tender.
-		 *
-		 *
-		 * 
+		 * We assume that everything that is in here is an interval tender
 		 */
-		if(tempClientCreateTender.getBridgeInterval() != null){
-			 tenderDetail = new TenderIntervalDetail(
+		 tenderDetail = new TenderIntervalDetail(
 				tempClientCreateTender.getInterval(),
 				tempClientCreateTender.getPrice(),
 				tempClientCreateTender.getQuantity()
 			);
-		} else if (tempClientCreateTender.getCtsStream() != null){
-			tenderDetail = new TenderStreamDetail(tempClientCreateTender.getCtsStream());
-		} else {
-			//TODO May not be what we want -- temporary fix
-			logger.traceExit("ERROR: Invalid POST request");
-		}
 
 		tender = new EiTenderType(
 				tempClientCreateTender.getBridgeExpireTime().asInstant(),
