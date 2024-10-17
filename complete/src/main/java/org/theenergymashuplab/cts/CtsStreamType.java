@@ -24,13 +24,11 @@ public class CtsStreamType {
 	 * The duration of each StreamInterval
 	 */
 	private Interval streamIntervalDuration;
-	private BridgeInterval streamBridgeIntervalDuration;
 	/**
 	 * Array of StreamIntervals.
 	 */
 	private List<CtsStreamIntervalType> streamIntervals;
 	private Instant streamStart;
-	private BridgeInstant streamStartBridge;
 
 	public CtsStreamType(){
 	}
@@ -68,12 +66,4 @@ public class CtsStreamType {
 	public void setStreamStart(Instant streamStart) {
 		this.streamStart = streamStart;
 	}
-
-	public void setStreamBridgeIntervalDuration(BridgeInterval streamBridgeIntervalDuration){
-		this.streamBridgeIntervalDuration = streamBridgeIntervalDuration;
-		this.streamIntervalDuration = streamBridgeIntervalDuration.asInterval();
-	}
-
-
-
 }

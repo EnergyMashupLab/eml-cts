@@ -55,7 +55,7 @@ package org.theenergymashuplab.cts;
 			this.dtStart = new BridgeInstant(ctsInterval.dtStart);
 		}
 
-		Interval asInterval() {
+		public Interval asInterval() {
 			return new Interval(durationInMinutes, dtStart.asInstant());
 		}
 

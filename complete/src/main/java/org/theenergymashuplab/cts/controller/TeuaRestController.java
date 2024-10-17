@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.BridgeInterval;
 import org.theenergymashuplab.cts.CancelReasonType;
+import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiTenderType;
@@ -50,6 +52,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -392,8 +395,56 @@ public class TeuaRestController {
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateStreamTenderPayload clientCreateStreamTender)	{
 
-			return null;
-			
+		ClientCreateStreamTenderPayload tempClientCreateStreamTender;	
+		ClientCreatedStreamTenderPayload tempReturn;
+		CtsStreamType stream;
+		EiTenderType tender;
+		//TODO may change this here
+		EiCreateTenderPayload eiCreateTender;	
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+		
+		//Call the serializer
+		tempClientCreateStreamTender = clientCreateStreamTender;	// save the parameter
 
+		TenderDetail tenderDetail;
+		//Construct the bridge interval
+		BridgeInterval startInterval = new BridgeInterval(clientCreateStreamTender.getIntervalDurationInMinutes(), clientCreateStreamTender.getStreamStart().asInstant());
+
+		stream = new CtsStreamType(startInterval.asInterval(),
+								clientCreateStreamTender.getStreamIntervals(), 
+								clientCreateStreamTender.getStreamStart().asInstant());
+
+		tenderDetail = new TenderStreamDetail(stream);
+	
+		//TODO FIXME
+		return null;
 	}
 }

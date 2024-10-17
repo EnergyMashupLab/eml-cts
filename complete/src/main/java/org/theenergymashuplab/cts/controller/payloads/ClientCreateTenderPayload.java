@@ -21,7 +21,6 @@ import java.time.*;
 
 import org.theenergymashuplab.cts.BridgeInstant;
 import org.theenergymashuplab.cts.BridgeInterval;
-import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.SideType;
 
