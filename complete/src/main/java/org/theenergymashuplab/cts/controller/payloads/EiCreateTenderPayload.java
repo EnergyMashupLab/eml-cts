@@ -17,7 +17,6 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.RefIdType;

@@ -31,7 +31,13 @@ public class ClientCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
-	//So that we can catch TODO
+	/*
+	 * We can see either interval tenders or stream tenders with the latest September 2024 standard. To support this, 
+	 * we'll set these attributes initially to be null and allow the JSON serialization to populate them if they appear 
+	 * in the payload. For example, in the POST request, if we see a ctsStream object in the JSON, bridgeInterval and
+	 * bridgeExpireTime will remain null whilst ctsStream is nonNull(if all goes well). This should allow us to take
+	 * action based on what kind of tender we have.
+	 */
 	private BridgeInterval bridgeInterval = null;
 	private BridgeInstant bridgeExpireTime = null;	
 	private CtsStreamType ctsStream = null;
