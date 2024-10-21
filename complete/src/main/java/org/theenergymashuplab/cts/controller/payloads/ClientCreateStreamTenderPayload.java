@@ -20,7 +20,30 @@ public class ClientCreateStreamTenderPayload{
 	public ClientCreateStreamTenderPayload(){
 	}
 
-	public String getInfo() { 
+	public ClientCreateStreamTenderPayload(String info, SideType side, long ctsTenderId, List<CtsStreamIntervalType> streamIntervals, BridgeInstant streamStart, BridgeInstant bridgeExpireTime, long intervalDurationInMinutes) {
+		this.info = info;
+		this.side = side;
+		this.ctsTenderId = ctsTenderId;
+		this.streamIntervals = streamIntervals;
+		this.streamStart = streamStart;
+		this.bridgeExpireTime = bridgeExpireTime;
+		this.intervalDurationInMinutes = intervalDurationInMinutes;
+	}
+
+	@Override
+	public String toString() {
+		return "ClientCreateStreamTenderPayload{" +
+				"info='" + info + '\'' +
+				", side=" + side +
+				", ctsTenderId=" + ctsTenderId +
+				", streamIntervals=" + streamIntervals +
+				", streamStart=" + streamStart +
+				", bridgeExpireTime=" + bridgeExpireTime +
+				", intervalDurationInMinutes=" + intervalDurationInMinutes +
+				'}';
+	}
+
+	public String getInfo() {
 		return info;
 	}
 
