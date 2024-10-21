@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.BridgeInstant;
 import org.theenergymashuplab.cts.BridgeInterval;
 import org.theenergymashuplab.cts.CancelReasonType;
+import org.theenergymashuplab.cts.CtsStreamIntervalType;
 import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponse;
@@ -34,14 +36,16 @@ import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.TenderDetail;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
-import org.theenergymashuplab.cts.TenderStreamDetail;
 import org.theenergymashuplab.cts.TransactionIdType;
 import org.theenergymashuplab.cts.controller.payloads.*;
+
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.Duration;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -405,6 +409,7 @@ public class TeuaRestController {
 					ActorIdType.class);
 		}
 		
+		//Get value of TEUAid
 		numericTeuaId = Integer.valueOf(teuaId);
 		
 		
@@ -424,16 +429,60 @@ public class TeuaRestController {
 		tempClientCreateStreamTender = clientCreateStreamTender;	// save the parameter
 		ClientCreateStreamTenderPayload payload = null;
 
-		TenderDetail tenderDetail;
 		//Construct the bridge interval
 		BridgeInterval startInterval = new BridgeInterval(clientCreateStreamTender.getIntervalDurationInMinutes(), clientCreateStreamTender.getStreamStart().asInstant());
 
+		//Create the new stream object
 		stream = new CtsStreamType(startInterval.asInterval(),
 								clientCreateStreamTender.getStreamIntervals(), 
 								clientCreateStreamTender.getStreamStart().asInstant());
 
-		tenderDetail = new TenderStreamDetail(stream);
+		List<Long> createdTenders = new ArrayList<>();
+
+		//We will keep track of what the current start interval is
+		BridgeInterval currentStartInterval = startInterval;
+		TenderDetail tenderDetail;
+		//BridgeInstant currentStartInstant = new BridgeInstant();
+
+		/*
+		//For each interval in stream intervals
+		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
+			//Create the individual Tender Interval payload
+			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+
+			//Advance the interval by however many minutes we specify
+			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant().plusSeconds(tempClientCreateStreamTender.getIntervalDurationInMinutes()*60));
+			//Set the current start interval
+			currentStartInterval.setDtStart(currentStartInstant);
+//Create the new individual interval tender
+			tender = new EiTenderType(clientCreateStreamTender.getBridgeExpireTime().asInstant(), clientCreateStreamTender.getSide(), tenderDetail);
+			
+			
+			// 	Construct the EiCreateTender payload to be forwarded to LMA
+			eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId],
+						this.lmePartyId);
+			// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+			eiCreateTender.setPartyId(actorIds[numericTeuaId]);
+			eiCreateTender.setCounterPartyId(lmePartyId);
+		
+			logger.trace("TEUA sending EiCreateTender to LMA " +
+					eiCreateTender.toString());
+			
+			//	And forward to the LMA
+			restTemplate = builder.build();
+			EiCreatedTenderPayload result = restTemplate.postForObject
+				("http://localhost:8080/lma/createTender", eiCreateTender,
+						EiCreatedTenderPayload.class);
+
+			createdTenders.add(result.getTenderId().value());
+		}
+
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientCreatedStreamTenderPayload(createdTenders);
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
 	
+		*/
 		//TODO FIXME
 		return null;
 	}

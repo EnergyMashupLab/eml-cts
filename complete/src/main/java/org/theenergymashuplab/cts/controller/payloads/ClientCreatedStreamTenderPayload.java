@@ -1,8 +1,9 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
+import java.util.List;
 
 public class ClientCreatedStreamTenderPayload{
-	long ctsStreamTenderId;
+	private List<Long> ctsStreamTenderIds;
 	private Boolean success = false;
 	private String info = "ClientCreatedStreamTenderPayload";
 
@@ -10,25 +11,23 @@ public class ClientCreatedStreamTenderPayload{
 	public ClientCreatedStreamTenderPayload() {
 	}
 
-	public ClientCreatedStreamTenderPayload(long id){
-		this.ctsStreamTenderId = id;
+	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds){
+		this.ctsStreamTenderIds = ctsStreamTenderIds;
 		this.success = true;
 	}
 
-	public ClientCreatedStreamTenderPayload(long ctsStreamTenderId, Boolean success, String info) {
-		this.ctsStreamTenderId = ctsStreamTenderId;
+	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds, Boolean success, String info) {
+		this.ctsStreamTenderIds = ctsStreamTenderIds;
 		this.success = success;
 		this.info = info;
 	}
 
-
-
-	public long getCtsStreamTenderId() {
-		return ctsStreamTenderId;
+	public List<Long> getCtsStreamTenderId() {
+		return this.ctsStreamTenderIds;
 	}
 
-	public void setCtsStreamTenderId(long ctsStreamTenderId) {
-		this.ctsStreamTenderId = ctsStreamTenderId;
+	public void setCtsStreamTenderId(List<Long> ctsStreamTenderIds) {
+		this.ctsStreamTenderIds = ctsStreamTenderIds;
 	}
 
 	public Boolean getSuccess() {
@@ -50,7 +49,7 @@ public class ClientCreatedStreamTenderPayload{
 	@Override
 	public String toString() {
 		return "ClientCreatedStreamTenderPayload{" +
-				"ctsStreamTenderId=" + ctsStreamTenderId +
+				"ctsStreamTenderIds=" + ctsStreamTenderIds.toString() +
 				", success=" + success +
 				", info='" + info + '\'' +
 				'}';
