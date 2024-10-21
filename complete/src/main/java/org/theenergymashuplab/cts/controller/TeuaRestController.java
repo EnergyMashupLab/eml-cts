@@ -36,17 +36,7 @@ import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
 import org.theenergymashuplab.cts.TenderStreamDetail;
 import org.theenergymashuplab.cts.TransactionIdType;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreateStreamTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
+import org.theenergymashuplab.cts.controller.payloads.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -394,7 +384,8 @@ public class TeuaRestController {
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateStreamTenderPayload clientCreateStreamTender)	{
 
-		ClientCreateStreamTenderPayload tempClientCreateStreamTender;	
+		ClientCreateStreamTenderPayload tempClientCreateStreamTender;
+		ClientCreatedStreamTenderPayload tempReturn;
 		CtsStreamType stream;
 		EiTenderType tender;
 		//TODO may change this here

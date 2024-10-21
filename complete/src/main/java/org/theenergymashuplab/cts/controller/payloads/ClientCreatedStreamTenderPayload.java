@@ -2,12 +2,14 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 
 public class ClientCreatedStreamTenderPayload{
-<<<<<<< HEAD
 	long ctsStreamTenderId;
 	private Boolean success = false;
 	private String info = "ClientCreatedStreamTenderPayload";
 
 	//JSON
+	public ClientCreatedStreamTenderPayload() {
+	}
+
 	public ClientCreatedStreamTenderPayload(long id){
 		this.ctsStreamTenderId = id;
 		this.success = true;
@@ -18,6 +20,8 @@ public class ClientCreatedStreamTenderPayload{
 		this.success = success;
 		this.info = info;
 	}
+
+
 
 	public long getCtsStreamTenderId() {
 		return ctsStreamTenderId;
@@ -50,9 +54,5 @@ public class ClientCreatedStreamTenderPayload{
 				", success=" + success +
 				", info='" + info + '\'' +
 				'}';
-=======
-	//JSON
-	public ClientCreatedStreamTenderPayload(){
->>>>>>> 7f05e5383bd317242a12aa683c7abcc80db366df
 	}
 }
