@@ -37,7 +37,6 @@ import org.theenergymashuplab.cts.TenderIntervalDetail;
 import org.theenergymashuplab.cts.TenderStreamDetail;
 import org.theenergymashuplab.cts.TransactionIdType;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateStreamTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreatedStreamTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
@@ -396,7 +395,6 @@ public class TeuaRestController {
 			@RequestBody ClientCreateStreamTenderPayload clientCreateStreamTender)	{
 
 		ClientCreateStreamTenderPayload tempClientCreateStreamTender;	
-		ClientCreatedStreamTenderPayload tempReturn;
 		CtsStreamType stream;
 		EiTenderType tender;
 		//TODO may change this here
@@ -433,6 +431,7 @@ public class TeuaRestController {
 		
 		//Call the serializer
 		tempClientCreateStreamTender = clientCreateStreamTender;	// save the parameter
+		ClientCreateStreamTenderPayload payload = null;
 
 		TenderDetail tenderDetail;
 		//Construct the bridge interval

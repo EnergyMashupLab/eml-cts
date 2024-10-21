@@ -111,6 +111,7 @@ public class ClientCreateTenderPayload {
 		return side;
 	}
 
+
 	public void setSide(SideType side) {
 		this.side = side;
 	}
