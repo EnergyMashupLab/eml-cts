@@ -3,6 +3,8 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.BridgeInstant;
 import org.theenergymashuplab.cts.CtsStreamIntervalType;
 import org.theenergymashuplab.cts.SideType;
+
+
 import java.util.List;
 
 public class ClientCreateStreamTenderPayload{
@@ -10,8 +12,10 @@ public class ClientCreateStreamTenderPayload{
 	// Side that we are on
 	private SideType side;
 	private long ctsTenderId;
+
 	//A list of our streamIntervals
 	private List<CtsStreamIntervalType> streamIntervals;
+
 	private BridgeInstant streamStart;
 	private BridgeInstant bridgeExpireTime;	
 	private long intervalDurationInMinutes;
