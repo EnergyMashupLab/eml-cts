@@ -3,7 +3,8 @@ package org.theenergymashuplab.cts.controller.payloads;
 import java.util.List;
 
 public class ClientCreatedStreamTenderPayload{
-	private List<Long> ctsStreamTenderIds;
+	//We will return a list of all of the created tenders that we made
+	private List<EiCreatedTenderPayload> ctsStreamTenderIds;
 	private Boolean success = false;
 	private String info = "ClientCreatedStreamTenderPayload";
 
@@ -11,22 +12,22 @@ public class ClientCreatedStreamTenderPayload{
 	public ClientCreatedStreamTenderPayload() {
 	}
 
-	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds){
+	public ClientCreatedStreamTenderPayload(List<EiCreatedTenderPayload> ctsStreamTenderIds){
 		this.ctsStreamTenderIds = ctsStreamTenderIds;
 		this.success = true;
 	}
 
-	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds, Boolean success, String info) {
+	public ClientCreatedStreamTenderPayload(List<EiCreatedTenderPayload> ctsStreamTenderIds, Boolean success, String info) {
 		this.ctsStreamTenderIds = ctsStreamTenderIds;
 		this.success = success;
 		this.info = info;
 	}
 
-	public List<Long> getCtsStreamTenderId() {
+	public List<EiCreatedTenderPayload> getCtsStreamTenderId() {
 		return this.ctsStreamTenderIds;
 	}
 
-	public void setCtsStreamTenderId(List<Long> ctsStreamTenderIds) {
+	public void setCtsStreamTenderId(List<EiCreatedTenderPayload> ctsStreamTenderIds) {
 		this.ctsStreamTenderIds = ctsStreamTenderIds;
 	}
 

@@ -384,7 +384,7 @@ public class TeuaRestController {
 	}
 	
 	@PostMapping("{teuaId}/clientCreateStreamTender")
-	public EiCreatedTenderPayload postClientCreateStreamTender(
+	public ClientCreatedStreamTenderPayload postClientCreateStreamTender(
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateStreamTenderPayload clientCreateStreamTender)	{
 
@@ -419,7 +419,7 @@ public class TeuaRestController {
 		logger.debug("positionUri is " + positionUri);
 		
 		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
-		logger.debug("postEiCreateTender teuaId " +
+		logger.debug("postEiCreateStreamTender teuaId " +
 			teuaId +
 			" actorNumericIds[teuaId] " +
 			actorIds[numericTeuaId].toString());
@@ -435,14 +435,24 @@ public class TeuaRestController {
 								tempClientCreateStreamTender.getStreamIntervals(), 
 								tempClientCreateStreamTender.getStreamStart().asInstant());
 
-		List<Long> createdTenders = new ArrayList<>();
+		//Keep track of all of the created tenders
+		List<EiCreatedTenderPayload> createdTenders = new ArrayList<>();
 
 		//We will keep track of what the current start interval is
 		BridgeInterval currentStartInterval = startInterval;
-		TenderDetail tenderDetail;
 		BridgeInstant currentStartInstant = new BridgeInstant();
 
-		//For each interval in stream intervals
+		TenderDetail tenderDetail;
+
+		/**
+		 * Design of this component:
+		 * 	In the CTS market, stream tenders do not exist. They are simply a client-side semantic that allows clients to construct a stream tender
+		 * 	specifying a stream of resource purchases or sales. Stream tenders themselves are just a sequence of separate tenders with
+		 * 	different prices and quantities, arranged in sequential intervals of the same length. So, we can leverage the existing
+		 * 	architecture around creating tenders to generate a sequence of createTender requests according to the prices and intervals
+		 * 	outlined in the stream tender object. This may later be changed with the implementation of "allOrNone", but currently, it serves our
+		 * 	purposes
+		 */
 		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
 			//Create the individual Tender Interval payload
 			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
@@ -462,24 +472,26 @@ public class TeuaRestController {
 			eiCreateTender.setPartyId(actorIds[numericTeuaId]);
 			eiCreateTender.setCounterPartyId(lmePartyId);
 		
-			logger.trace("TEUA sending EiCreateTender to LMA " +
+			logger.trace("Stream Tender Creation Sequence: TEUA sending EiCreateTender to LMA " +
 					eiCreateTender.toString());
 			
 			//	And forward to the LMA
 			restTemplate = builder.build();
-			EiCreatedTenderPayload result = restTemplate.postForObject
-				("http://localhost:8080/lma/createTender", eiCreateTender,
-						EiCreatedTenderPayload.class);
-
-			createdTenders.add(result.getTenderId().value());
+			// Save this to the 
+			createdTenders.add(
+				restTemplate.postForObject("http://localhost:8080/lma/createTender", 
+											eiCreateTender,
+											EiCreatedTenderPayload.class)
+			);
 		}
 
-		// and put CtsTenderId in ClientCreatedTenderPayload
+		//Make a new return value with the created tenders
 		tempReturn = new ClientCreatedStreamTenderPayload(createdTenders);
-		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+		//Log it
+		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());
-	
-		//TODO FIXME
-		return null;
+
+		//Give this back so we'll see it in postman
+		return tempReturn;
 	}
 }
