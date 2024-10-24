@@ -6,10 +6,17 @@ public class ClientCreatedStreamTenderPayload{
 	//We will return a list of all of the created tenders that we made
 	private List<EiCreatedTenderPayload> ctsStreamTenderIds;
 	private Boolean success = false;
+	private long id;
 	private String info = "ClientCreatedStreamTenderPayload";
 
 	//JSON
 	public ClientCreatedStreamTenderPayload() {
+	}
+
+	//JSON
+	public ClientCreatedStreamTenderPayload(long id) {
+		this.id = id;
+		this.success = true;
 	}
 
 	public ClientCreatedStreamTenderPayload(List<EiCreatedTenderPayload> ctsStreamTenderIds){
@@ -37,6 +44,14 @@ public class ClientCreatedStreamTenderPayload{
 
 	public void setSuccess(Boolean success) {
 		this.success = success;
+	}
+
+	public long getId(){
+		return this.id;
+	}
+
+	public void setId(long id){
+		this.id = id;
 	}
 
 	public String getInfo() {

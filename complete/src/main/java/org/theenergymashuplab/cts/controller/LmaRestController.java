@@ -33,8 +33,10 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateStreamTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreatedStreamTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
 import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
@@ -278,6 +280,39 @@ public class LmaRestController {
 		
 		return tempPostResponse;
 	}
+
+	@PostMapping("/createStreamTender")
+	public EiCreatedStreamTenderPayload postEiCreateStreamTender(
+		@RequestBody EiCreateStreamTenderPayload eiCreateStreamTender){
+
+		EiCreateStreamTenderPayload tempEiCreateStreamTender;
+		EiCreatedStreamTenderPayload tempEiCreatedStreamTender;
+
+		//Initialize the builder
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is method postEiCreateStreamTender	
+    	restTemplate = builder.build();
+
+		//Deserialize what was posted to us
+		tempEiCreateStreamTender = eiCreateStreamTender;
+
+		//Log it
+		logger.debug("postEiCreateStreamTender to LME. TenderId " +
+				tempEiCreateStreamTender.getTender().getTenderId().toString());
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		tempEiCreatedStreamTender = restTemplate.postForObject("http://localhost:8080/lme/createStreamTender", 
+				tempEiCreateStreamTender,
+				EiCreatedStreamTenderPayload.class);
+		
+		//Log it
+		logger.trace("LMA after forward to LME and before return " + tempEiCreatedStreamTender.toString());
+
+		//Return the response
+		return tempEiCreatedStreamTender;
+	}
+	
 
 	public static EiTenderType getCurrentTender() {
 		return currentTender;

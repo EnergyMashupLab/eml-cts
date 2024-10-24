@@ -33,8 +33,10 @@ import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreateStreamTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreatedStreamTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -182,6 +184,20 @@ public class LmeRestController {
 				tempCreate.getRequestId());
 		
 		return tempCreated;
+	}
+
+	@PostMapping("/createStreamTender")
+	public EiCreatedStreamTenderPayload postEiCreateStreamTender(
+		@RequestBody EiCreateStreamTenderPayload eiCreateStreamTenderPayload){
+
+		EiTenderType tempTender;
+		EiCreateStreamTenderPayload createStreamTenderPayload;
+		Boolean addQSuccess = false;
+
+
+
+		return null;
+
 	}
 	
 	
