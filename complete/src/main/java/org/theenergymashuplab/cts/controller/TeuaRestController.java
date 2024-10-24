@@ -23,20 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.BridgeInstant;
-import org.theenergymashuplab.cts.BridgeInterval;
-import org.theenergymashuplab.cts.CancelReasonType;
-import org.theenergymashuplab.cts.CtsStreamIntervalType;
-import org.theenergymashuplab.cts.CtsStreamType;
-import org.theenergymashuplab.cts.EiCanceledResponseType;
-import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.EiTenderType;
-import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.TenderDetail;
-import org.theenergymashuplab.cts.TenderIdType;
-import org.theenergymashuplab.cts.TenderIntervalDetail;
-import org.theenergymashuplab.cts.TransactionIdType;
+import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
 
 
@@ -487,6 +474,109 @@ public class TeuaRestController {
 
 		//Make a new return value with the created tenders
 		tempReturn = new ClientCreatedStreamTenderPayload(createdTenders);
+		//Log it
+		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
+
+		//Give this back so we'll see it in postman
+		return tempReturn;
+	}
+
+	@PostMapping("/{teuaId}/clientCreateStreamQuote")
+	public ClientCreatedStreamQuotePayload postClientCreateStreamQuote(
+			@PathVariable String teuaId,
+			@RequestBody ClientCreateStreamQuotePayload clientCreateStreamQuote)	{
+
+		ClientCreateStreamQuotePayload tempClientCreateStreamQuote;
+		ClientCreatedStreamQuotePayload tempReturn;
+		CtsStreamType stream;
+		EiQuoteType quote;
+		EiCreateQuotePayload eiCreateQuote;
+		Integer numericTeuaId = -1;
+		String positionUri;
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+
+		//Get value of TEUAid
+		numericTeuaId = Integer.valueOf(teuaId);
+
+
+		//convert to URI for position manager
+		positionUri = "/position/"
+				+ actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.debug("postEiCreateStreamTender teuaId " +
+				teuaId +
+				" actorNumericIds[teuaId] " +
+				actorIds[numericTeuaId].toString());
+
+		//Call the serializer
+		tempClientCreateStreamQuote = clientCreateStreamQuote;	// save the parameter
+
+		//Construct the bridge interval
+		BridgeInterval startInterval = new BridgeInterval(clientCreateStreamQuote.getIntervalDurationInMinutes(), clientCreateStreamQuote.getStreamStart().asInstant());
+
+		//Create the new stream object
+		stream = new CtsStreamType(startInterval.asInterval(),
+				tempClientCreateStreamQuote.getStreamIntervals(),
+				tempClientCreateStreamQuote.getStreamStart().asInstant());
+
+		//Keep track of all of the created tenders
+		List<EiCreatedQuotePayload> createdQuotes = new ArrayList<>();
+
+		//We will keep track of what the current start interval is
+		BridgeInterval currentStartInterval = startInterval;
+		BridgeInstant currentStartInstant = new BridgeInstant();
+
+		TenderDetail tenderDetail;
+
+		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
+			//Create the individual Tender Interval payload
+			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+
+			//Advance the interval by however many minutes we specify
+			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant().plusSeconds(tempClientCreateStreamQuote.getIntervalDurationInMinutes()*60));
+			//Set the current start interval
+			currentStartInterval.setDtStart(currentStartInstant);
+			//Create the new individual interval tender
+			quote = new EiQuoteType(clientCreateStreamQuote.getBridgeExpireTime().asInstant(), clientCreateStreamQuote.getSide(), tenderDetail);
+
+			// 	Construct the EiCreateTender payload to be forwarded to LMA
+			eiCreateQuote = new EiCreateQuotePayload(quote, actorIds[numericTeuaId],
+					this.lmePartyId);
+
+			// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+			eiCreateQuote.setPartyId(actorIds[numericTeuaId]);
+			eiCreateQuote.setCounterPartyId(lmePartyId);
+
+			logger.trace("Stream Tender Creation Sequence: TEUA sending EiCreateTender to LMA " +
+					eiCreateQuote.toString());
+
+			//	And forward to the LMA
+//			restTemplate = builder.build();
+//			// Save this to the
+//			createdQuotes.add(
+//					restTemplate.postForObject("http://localhost:8080/lma/createTender",
+//							eiCreateQuote,
+//							EiCreatedQuotePayload.class)
+//			);
+		}
+
+		//Make a new return value with the created tenders
+		tempReturn = new ClientCreatedStreamQuotePayload(createdQuotes);
 		//Log it
 		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());

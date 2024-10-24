@@ -1,6 +1,8 @@
 package org.theenergymashuplab.cts;
 
 
+import java.time.Instant;
+
 /**
  * @author crossover
  * @version 1.0
@@ -25,6 +27,10 @@ public class EiQuoteType extends TenderBase {
 		this.quoteId = quoteId;
 		this.rfqId = rfqId;
 		this.tradeable = tradeable;
+	}
+
+	public EiQuoteType(Instant instant, SideType side, TenderDetail tenderDetail) {
+		super(instant, side, tenderDetail);
 	}
 
 	public MarketQuoteIdType getMarketQuoteId(){
@@ -68,12 +74,13 @@ public class EiQuoteType extends TenderBase {
 	}
 
 	@Override
-	public String toString(){
-		return "EiQuoteType [" +
-				"marketQuoteId=" + this.marketQuoteId.toString() +
-				"privateQuote=" + this.privateQuote +
-				"quoteId=" + this.quoteId.toString() +
-				"rfqId=" + this.rfqId.toString() +
-				"tradeable=" + this.tradeable + "]";
+	public String toString() {
+		return "EiQuoteType{" +
+				"marketQuoteId=" + marketQuoteId +
+				", privateQuote=" + privateQuote +
+				", quoteId=" + quoteId +
+				", rfqId=" + rfqId +
+				", tradeable=" + tradeable +
+				'}';
 	}
 }
