@@ -21,7 +21,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.BridgeInstant;
+import org.theenergymashuplab.cts.BridgeInterval;
 import org.theenergymashuplab.cts.CancelReasonType;
+import org.theenergymashuplab.cts.CtsStreamIntervalType;
+import org.theenergymashuplab.cts.CtsStreamType;
 import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiTenderType;
@@ -31,6 +35,8 @@ import org.theenergymashuplab.cts.LmeSocketClient;
 import org.theenergymashuplab.cts.LmeSocketServer;
 import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.TenderIdType;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
+import org.theenergymashuplab.cts.TenderStreamDetail;
 import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateStreamTenderPayload;
@@ -47,6 +53,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @RestController
@@ -186,18 +194,91 @@ public class LmeRestController {
 		return tempCreated;
 	}
 
+
 	@PostMapping("/createStreamTender")
 	public EiCreatedStreamTenderPayload postEiCreateStreamTender(
 		@RequestBody EiCreateStreamTenderPayload eiCreateStreamTenderPayload){
-
+		EiCreateStreamTenderPayload tempCreateStreamTenderPayload;
+		EiCreatedStreamTenderPayload response = new EiCreatedStreamTenderPayload();
+		EiCreateTenderPayload tempCreate;
 		EiTenderType tempTender;
-		EiCreateStreamTenderPayload createStreamTenderPayload;
+		TenderIntervalDetail tenderDetail;
+		BridgeInterval currentStartInterval;
+		BridgeInstant currentStartInstant = new BridgeInstant();
+		List<Long> createdTenders = new ArrayList<>();
+		TenderStreamDetail tenderStreamDetail;
+		ActorIdType partyID;
+		ActorIdType counterPartyID;
+		CtsStreamType stream;
 		Boolean addQSuccess = false;
+		
+		//Deserialize from the request
+		tempCreateStreamTenderPayload = eiCreateStreamTenderPayload;
 
+		//Grab the stream for us to use
+		tenderStreamDetail = (TenderStreamDetail)tempCreateStreamTenderPayload.getTender().getTenderDetail();
+		stream = tenderStreamDetail.getStream();
+		partyID = tempCreateStreamTenderPayload.getPartyId();
+		counterPartyID = tempCreateStreamTenderPayload.getCounterPartyId();
 
+		//Debug what we got
+		logger.debug("lme/createStreamTender " + tempCreateStreamTenderPayload.toString());
+	
+		/* ================ Forwarding to the market ====================== */
 
-		return null;
+		/**
+		 * Design of this component:
+		 * 	In the CTS market, stream tenders do not exist. They are simply a client-side semantic that allows clients to construct a stream tender
+		 * 	specifying a stream of resource purchases or sales. Stream tenders themselves are just a sequence of separate tenders with
+		 * 	different prices and quantities, arranged in sequential intervals of the same length. So, we can leverage the existing
+		 * 	architecture around creating tenders to generate a sequence of createTender requests according to the prices and intervals
+		 * 	outlined in the stream tender object. This may later be changed with the implementation of "allOrNone", but currently, it serves our
+		 * 	purposes
+		 */
 
+		//Construct the bridge interval
+		BridgeInterval startInterval = new BridgeInterval(tenderStreamDetail.getIntervalDurationInMinutes(), stream.getStreamStart());
+		currentStartInterval = startInterval;
+
+		//So for each interval the we have in the stream intervals
+		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
+			//Create the individual Tender Interval payload
+			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+
+			//Advance the interval by however many minutes we specify
+			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant().plusSeconds(tenderStreamDetail.getIntervalDurationInMinutes()*60));
+			//Set the current start interval
+			currentStartInterval.setDtStart(currentStartInstant);
+			//Create the new individual interval tender
+			tempTender = new EiTenderType(tempCreateStreamTenderPayload.getTender().getExpirationTime(), tempCreateStreamTenderPayload.getTender().getSide(), tenderDetail);
+			
+			//Construct the EiCreateTender payload to be forwarded to LMA
+			tempCreate = new EiCreateTenderPayload(tempTender, partyID, counterPartyID);
+
+			//set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+			tempCreate.setPartyId(partyID);
+			tempCreate.setCounterPartyId(counterPartyID);
+		
+			addQSuccess = queueFromLme.add(tempCreate);
+			logger.debug("queueFomLme addQsuccess " + addQSuccess +
+				" TenderId " + tempTender.getTenderId());
+		
+			//Grab the tender ID and store
+			createdTenders.add(tempTender.getTenderId().value());
+		}
+			
+			//Make a new return value with the created tenders
+		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC " +
+				createdTenders.toString());
+
+		/* ================================================================ */
+
+		response.setPartyId(partyID);
+		response.setResponse(new EiResponse(200, "OK"));
+		response.setCounterPartyId(counterPartyID);
+		response.setCreatedTenders(createdTenders);
+
+		return response;
 	}
 	
 	

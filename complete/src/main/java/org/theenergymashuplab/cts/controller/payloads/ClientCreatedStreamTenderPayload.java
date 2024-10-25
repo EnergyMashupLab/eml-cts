@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ClientCreatedStreamTenderPayload{
 	//We will return a list of all of the created tenders that we made
-	private List<EiCreatedTenderPayload> ctsStreamTenderIds;
+	private List<Long> ctsStreamTenderIds;
 	private Boolean success = false;
 	private long id;
 	private String info = "ClientCreatedStreamTenderPayload";
@@ -19,22 +19,22 @@ public class ClientCreatedStreamTenderPayload{
 		this.success = true;
 	}
 
-	public ClientCreatedStreamTenderPayload(List<EiCreatedTenderPayload> ctsStreamTenderIds){
+	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds){
 		this.ctsStreamTenderIds = ctsStreamTenderIds;
 		this.success = true;
 	}
 
-	public ClientCreatedStreamTenderPayload(List<EiCreatedTenderPayload> ctsStreamTenderIds, Boolean success, String info) {
+	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds, Boolean success, String info) {
 		this.ctsStreamTenderIds = ctsStreamTenderIds;
 		this.success = success;
 		this.info = info;
 	}
 
-	public List<EiCreatedTenderPayload> getCtsStreamTenderId() {
+	public List<Long> getCtsStreamTenderId() {
 		return this.ctsStreamTenderIds;
 	}
 
-	public void setCtsStreamTenderId(List<EiCreatedTenderPayload> ctsStreamTenderIds) {
+	public void setCtsStreamTenderId(List<Long> ctsStreamTenderIds) {
 		this.ctsStreamTenderIds = ctsStreamTenderIds;
 	}
 

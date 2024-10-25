@@ -9,9 +9,10 @@ package org.theenergymashuplab.cts;
 public class TenderStreamDetail extends TenderDetail {
 
 	public CtsStreamType stream;
+	private BridgeInstant streamStart;
+	private long intervalDurationInMinutes;
 
 	public TenderStreamDetail(){
-
 	}
 
 	public TenderStreamDetail(CtsStreamType stream) {
@@ -26,10 +27,28 @@ public class TenderStreamDetail extends TenderDetail {
 		this.stream = stream;
 	}
 
+	public BridgeInstant getStreamStart(){
+		return this.streamStart;
+	}
+
+	public void setStreamStart(BridgeInstant streamStart){
+		this.streamStart = streamStart;
+	}
+
+	public long getIntervalDurationInMinutes(){
+		return this.intervalDurationInMinutes;
+	}
+
+	public void setIntervalDurationInMinutes(long intervalDurationInMinutes){
+		this.intervalDurationInMinutes = intervalDurationInMinutes;
+	}
+
 	@Override
 	public String toString() {
 		return "TenderStreamDetail{" +
-				"stream=" + stream +
+				"stream=" + stream.toString() +
+				//"streamStart=" + streamStart.toString() +
+				"intervalDurationInMinutes=" + intervalDurationInMinutes +
 				"}";
 	}
 }

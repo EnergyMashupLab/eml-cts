@@ -1,5 +1,7 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
+import java.util.List;
+
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.MarketOrderIdType;
@@ -8,12 +10,10 @@ import org.theenergymashuplab.cts.TenderIdType;
 
 public class EiCreatedStreamTenderPayload{
 	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
-	
-	private TenderIdType tenderId;
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
 	public EiResponse response;
-//	public ArrayofResponses responses; NOT USED
+	private List<Long> createdTenders;
 	
 	// Need clarification as to what this attribute refers to before changing or deleting
 	private final RefIdType refId = new RefIdType();
@@ -33,26 +33,30 @@ public class EiCreatedStreamTenderPayload{
 			EiResponse response,
 			RefIdType inResponseTo) {
 
-		this.tenderId = tenderId;
 		this.partyId = partyId;
 		this.counterPartyId = counterPartyId;
 		this.response = response;
 		this.inResponseTo = inResponseTo;
 	}
 
-	public long getId() {
-		return tenderId.value();
-	}
-
 	public void print() {		
 		System.err.println(this);
 	}
 	
+	public List<Long> getCreatedTenders(){
+		return this.createdTenders;
+	}
+
+	public void setCreatedTenders(List<Long> createdTenders){
+		this.createdTenders = createdTenders;
+	}
+
+
 	@Override
 	public String toString() {
-		return "EiCreatedTenderPayload [marketOrderId=" + marketOrderId + ", tenderId=" + tenderId + ", partyId="
+		return "EiCreatedTenderPayload [marketOrderId=" + marketOrderId +  ", partyId="
 				+ partyId + ", counterPartyId=" + counterPartyId + ", response=" + response + ", refId=" + refId
-				+ ", inResponseTo=" + inResponseTo + "]";
+				+ ", inResponseTo=" + inResponseTo +  ", createdTenders=" + createdTenders + "]";
 	}
 	
 	public EiResponse getResponse() {
@@ -61,10 +65,6 @@ public class EiCreatedStreamTenderPayload{
 
 	public void setResponse(EiResponse response) {
 		this.response = response;
-	}
-
-	public TenderIdType getTenderId() {
-		return tenderId;
 	}
 
 	public ActorIdType getPartyId() {
@@ -95,9 +95,6 @@ public class EiCreatedStreamTenderPayload{
 		this.inResponseTo = inResponseTo;
 	}
 
-	public void setTenderId(TenderIdType tenderId) {
-		this.tenderId = tenderId;
-	}
 
 	public void setPartyId(ActorIdType partyId) {
 		this.partyId = partyId;
