@@ -440,7 +440,6 @@ public class TeuaRestController {
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 		eiCreateStreamTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateStreamTender.setCounterPartyId(lmePartyId);
-		
 		//	And forward to the LMA
 		restTemplate = builder.build();
 		EiCreatedStreamTenderPayload result = restTemplate.postForObject
@@ -457,8 +456,8 @@ public class TeuaRestController {
 	}
 
 
-	@PostMapping("/{teuaId}/clientCreateStreamQuote")
-	public ClientCreatedStreamQuotePayload postClientCreateStreamQuote(
+	@PostMapping("{teuaId}/clientCreateStreamQuote")
+	public EiCreatedStreamQuotePayload postClientCreateStreamQuote(
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateStreamQuotePayload clientCreateStreamQuote)	{
 
@@ -466,12 +465,12 @@ public class TeuaRestController {
 		ClientCreatedStreamQuotePayload tempReturn;
 		CtsStreamType stream;
 		EiQuoteType quote;
-		EiCreateQuotePayload eiCreateQuote;
+		EiCreateStreamQuotePayload eiCreateStreamQuote;
 		Integer numericTeuaId = -1;
 		String positionUri;
 
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
-		// scope is function postEiCreateTender
+		// scope is function postEiCreateQuote
 		RestTemplate restTemplate = builder.build();
 
 		if (lmePartyId == null)	{
@@ -485,7 +484,7 @@ public class TeuaRestController {
 		//Get value of TEUAid
 		numericTeuaId = Integer.valueOf(teuaId);
 
-
+		/* Logging */
 		//convert to URI for position manager
 		positionUri = "/position/"
 				+ actorIds[numericTeuaId] +
@@ -493,70 +492,57 @@ public class TeuaRestController {
 		logger.debug("positionUri is " + positionUri);
 
 		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
-		logger.debug("postEiCreateStreamTender teuaId " +
+		logger.debug("postEiCreateStreamQuote teuaId " +
 				teuaId +
 				" actorNumericIds[teuaId] " +
 				actorIds[numericTeuaId].toString());
 
+		/* END LOGGING */
+
+		/* Create the stream Quote */
+
 		//Call the serializer
 		tempClientCreateStreamQuote = clientCreateStreamQuote;	// save the parameter
 
-		//Construct the bridge interval
+		//Construct the start interval
 		BridgeInterval startInterval = new BridgeInterval(clientCreateStreamQuote.getIntervalDurationInMinutes(), clientCreateStreamQuote.getStreamStart().asInstant());
 
-		//Create the new stream object
+		//Create the new stream object for the eiQuoteType
 		stream = new CtsStreamType(startInterval.asInterval(),
 				tempClientCreateStreamQuote.getStreamIntervals(),
 				tempClientCreateStreamQuote.getStreamStart().asInstant());
 
-		//Keep track of all of the created tenders
-		List<EiCreatedQuotePayload> createdQuotes = new ArrayList<>();
+		//Create a new Quote stream detail
+		QuoteStreamDetail quoteDetail = new QuoteStreamDetail(stream);
 
-		//We will keep track of what the current start interval is
-		BridgeInterval currentStartInterval = startInterval;
-		BridgeInstant currentStartInstant = new BridgeInstant();
+		//Save this for later
+		quoteDetail.setIntervalDurationInMinutes(clientCreateStreamQuote.getIntervalDurationInMinutes());
 
-		TenderDetail tenderDetail;
 
-		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
-			//Create the individual Tender Interval payload
-			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+		//Construct the stream Quote object for us to send to LMA
+		quote = new EiQuoteType(tempClientCreateStreamQuote.getBridgeExpireTime().asInstant(), tempClientCreateStreamQuote.getSide(), quoteDetail);
 
-			//Advance the interval by however many minutes we specify
-			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant().plusSeconds(tempClientCreateStreamQuote.getIntervalDurationInMinutes()*60));
-			//Set the current start interval
-			currentStartInterval.setDtStart(currentStartInstant);
-			//Create the new individual interval tender
-			quote = new EiQuoteType(clientCreateStreamQuote.getBridgeExpireTime().asInstant(), clientCreateStreamQuote.getSide(), tenderDetail);
+		System.out.println("Quote : "+ quote.toString());
 
-			// 	Construct the EiCreateTender payload to be forwarded to LMA
-			eiCreateQuote = new EiCreateQuotePayload(quote, actorIds[numericTeuaId],
-					this.lmePartyId);
+		//Construct the EiCreateStreamQuote payload to be forwarded to LMA
+		eiCreateStreamQuote = new EiCreateStreamQuotePayload(quote, actorIds[numericTeuaId], this.lmePartyId);
+		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		eiCreateStreamQuote.setPartyId(actorIds[numericTeuaId]);
+		eiCreateStreamQuote.setCounterPartyId(lmePartyId);
 
-			// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
-			eiCreateQuote.setPartyId(actorIds[numericTeuaId]);
-			eiCreateQuote.setCounterPartyId(lmePartyId);
+		System.out.println("eiCreateStreamQuote value before post to lma"+eiCreateStreamQuote.toString());
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EiCreatedStreamQuotePayload result = restTemplate.postForObject
+				("http://localhost:8080/lma/createStreamQuote", eiCreateStreamQuote,
+						EiCreatedStreamQuotePayload.class);
 
-			logger.trace("Stream Tender Creation Sequence: TEUA sending EiCreateTender to LMA " +
-					eiCreateQuote.toString());
+		/* Done creating stream Quote */
 
-			//	And forward to the LMA
-//			restTemplate = builder.build();
-//			// Save this to the
-//			createdQuotes.add(
-//					restTemplate.postForObject("http://localhost:8080/lma/createTender",
-//							eiCreateQuote,
-//							EiCreatedQuotePayload.class)
-//			);
-		}
+		// and put CtsQuoteId in ClientCreatedQuotePayload
+		logger.trace("TEUA before return ClientCreatedQuote to Client/SC " +
+				result.toString());
 
-		//Make a new return value with the created tenders
-		tempReturn = new ClientCreatedStreamQuotePayload(createdQuotes);
-		//Log it
-		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC " +
-				tempReturn.toString());
-
-		//Give this back so we'll see it in postman
-		return tempReturn;
+		return result;
 	}
 }

@@ -31,15 +31,7 @@ import org.apache.logging.log4j.Logger;
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
-import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateStreamTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedStreamTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.PositionAddPayload;
+import org.theenergymashuplab.cts.controller.payloads.*;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
 import org.theenergymashuplab.cts.SideType;
@@ -312,7 +304,40 @@ public class LmaRestController {
 		//Return the response
 		return tempEiCreatedStreamTender;
 	}
-	
+
+	@PostMapping("/createStreamQuote")
+	public EiCreatedStreamQuotePayload postEiCreateStreamQuote(
+			@RequestBody EiCreateStreamQuotePayload eiCreateStreamQuote){
+
+		EiCreateStreamQuotePayload tempEiCreateStreamQuote;
+		EiCreatedStreamQuotePayload tempEiCreatedStreamQuote;
+
+		//Initialize the builder
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is method postEiCreateStreamTender
+		restTemplate = builder.build();
+
+		//Deserialize what was posted to us
+		tempEiCreateStreamQuote = eiCreateStreamQuote;
+
+		System.out.println("tempEiCreateStreamQuote before passing to lme"+ tempEiCreateStreamQuote.toString());
+
+//		Log it
+		logger.debug("postEiCreateStreamTender to LME. TenderId " +
+				tempEiCreateStreamQuote.getQuote().getQuoteId().toString());
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		tempEiCreatedStreamQuote = restTemplate.postForObject("http://localhost:8080/lme/createStreamQuote",
+				tempEiCreateStreamQuote,
+				EiCreatedStreamQuotePayload.class);
+
+		//Log it
+		logger.trace("LMA after forward to LME and before return " + tempEiCreatedStreamQuote.toString());
+
+		//Return the response
+		return tempEiCreatedStreamQuote;
+	}
 
 	public static EiTenderType getCurrentTender() {
 		return currentTender;

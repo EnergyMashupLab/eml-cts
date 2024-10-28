@@ -8,20 +8,19 @@ import java.time.Instant;
  * @version 1.0
  * @created 28-Sep-2024 8:41:40 PM
  */
-public class EiQuoteType extends TenderBase {
+public class EiQuoteType extends QuoteBase {
 
 	public MarketQuoteIdType marketQuoteId;
 	public boolean privateQuote;
-	public TenderIdType quoteId;
+	public QuoteIdType quoteId = new QuoteIdType();
 	public RfqIdType rfqId;
 	public boolean tradeable;
-
 
 	public EiQuoteType(){
 
 	}
 
-	public EiQuoteType(MarketQuoteIdType marketQuoteId, boolean privateQuote, TenderIdType quoteId, RfqIdType rfqId, boolean tradeable){
+	public EiQuoteType(MarketQuoteIdType marketQuoteId, boolean privateQuote, QuoteIdType quoteId, RfqIdType rfqId, boolean tradeable){
 		this.marketQuoteId = marketQuoteId;
 		this.privateQuote = privateQuote;
 		this.quoteId = quoteId;
@@ -29,8 +28,8 @@ public class EiQuoteType extends TenderBase {
 		this.tradeable = tradeable;
 	}
 
-	public EiQuoteType(Instant instant, SideType side, TenderDetail tenderDetail) {
-		super(instant, side, tenderDetail);
+	public EiQuoteType(Instant instant, SideType side, QuoteDetail quoteDetail) {
+		super(instant, side, quoteDetail);
 	}
 
 	public MarketQuoteIdType getMarketQuoteId(){
@@ -49,11 +48,11 @@ public class EiQuoteType extends TenderBase {
 		this.privateQuote = privateQuote;
 	}
 
-	public TenderIdType getQuoteId(){
+	public QuoteIdType getQuoteId(){
 		return this.quoteId;
 	}
 
-	public void setQuoteId(TenderIdType quoteId){
+	public void setQuoteId(QuoteIdType quoteId){
 		this.quoteId = quoteId;
 	}
 
