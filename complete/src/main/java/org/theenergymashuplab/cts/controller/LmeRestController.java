@@ -328,12 +328,8 @@ public class LmeRestController {
 		//Deserialize from the request
 		tempCreateStreamQuotePayload = eiCreateStreamQuotePayload;
 
-
-		System.out.println("tempCreateStreamQuotePayload in lme "+tempCreateStreamQuotePayload.toString());
-
-
 		//Grab the stream for us to use
-		quoteStreamDetail = (QuoteStreamDetail) tempCreateStreamQuotePayload.getQuote().getQuoteDetail();
+		quoteStreamDetail = (QuoteStreamDetail)tempCreateStreamQuotePayload.getQuote().getQuoteDetail();
 
 		stream = quoteStreamDetail.getStream();
 		partyID = tempCreateStreamQuotePayload.getPartyId();
@@ -377,9 +373,9 @@ public class LmeRestController {
 			tempCreate.setPartyId(partyID);
 			tempCreate.setCounterPartyId(counterPartyID);
 
-			addQSuccess = queueQuoteFromLme.add(tempCreate);
-			logger.debug("queueQuoteFromLme addQsuccess " + addQSuccess +
-					" QuoteId " + tempQuote.getQuoteId());
+		//	addQSuccess = queueQuoteFromLme.add(tempCreate);
+		//	logger.debug("queueQuoteFromLme addQsuccess " + addQSuccess +
+		//			" QuoteId " + tempQuote.getQuoteId());
 
 			//Grab the Quote ID and store
 			createdQuotes.add(tempQuote.getQuoteId().value());
@@ -392,7 +388,7 @@ public class LmeRestController {
 		/* ================================================================ */
 
 		response.setPartyId(partyID);
-		response.setResponse(new EiResponse(200, "OK"));
+		response.setResponse(new EiResponse(210, "NOT YET IMPLEMENTED"));
 		response.setCounterPartyId(counterPartyID);
 		response.setCreatedQuotes(createdQuotes);
 

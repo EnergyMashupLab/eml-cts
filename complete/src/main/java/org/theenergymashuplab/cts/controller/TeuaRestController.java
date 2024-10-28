@@ -376,7 +376,6 @@ public class TeuaRestController {
 			@RequestBody ClientCreateStreamTenderPayload clientCreateStreamTender)	{
 
 		ClientCreateStreamTenderPayload tempClientCreateStreamTender;
-		ClientCreatedStreamTenderPayload tempReturn;
 		CtsStreamType stream;
 		EiTenderType tender;
 		EiCreateStreamTenderPayload eiCreateStreamTender;
@@ -462,7 +461,6 @@ public class TeuaRestController {
 			@RequestBody ClientCreateStreamQuotePayload clientCreateStreamQuote)	{
 
 		ClientCreateStreamQuotePayload tempClientCreateStreamQuote;
-		ClientCreatedStreamQuotePayload tempReturn;
 		CtsStreamType stream;
 		EiQuoteType quote;
 		EiCreateStreamQuotePayload eiCreateStreamQuote;
@@ -503,6 +501,7 @@ public class TeuaRestController {
 
 		//Call the serializer
 		tempClientCreateStreamQuote = clientCreateStreamQuote;	// save the parameter
+		System.out.println(tempClientCreateStreamQuote.getStreamIntervals());
 
 		//Construct the start interval
 		BridgeInterval startInterval = new BridgeInterval(clientCreateStreamQuote.getIntervalDurationInMinutes(), clientCreateStreamQuote.getStreamStart().asInstant());
@@ -522,15 +521,13 @@ public class TeuaRestController {
 		//Construct the stream Quote object for us to send to LMA
 		quote = new EiQuoteType(tempClientCreateStreamQuote.getBridgeExpireTime().asInstant(), tempClientCreateStreamQuote.getSide(), quoteDetail);
 
-		System.out.println("Quote : "+ quote.toString());
-
 		//Construct the EiCreateStreamQuote payload to be forwarded to LMA
 		eiCreateStreamQuote = new EiCreateStreamQuotePayload(quote, actorIds[numericTeuaId], this.lmePartyId);
+
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 		eiCreateStreamQuote.setPartyId(actorIds[numericTeuaId]);
 		eiCreateStreamQuote.setCounterPartyId(lmePartyId);
 
-		System.out.println("eiCreateStreamQuote value before post to lma"+eiCreateStreamQuote.toString());
 		//	And forward to the LMA
 		restTemplate = builder.build();
 		EiCreatedStreamQuotePayload result = restTemplate.postForObject

@@ -110,7 +110,7 @@ public abstract class QuoteBase {
         return quoteDetail;
     }
 
-    public void setQuoteDetail(QuoteDetail QuoteDetail) {
+    public void setQuoteDetail(QuoteDetail quoteDetail) {
         this.quoteDetail = quoteDetail;
     }
 

@@ -320,9 +320,7 @@ public class LmaRestController {
 		//Deserialize what was posted to us
 		tempEiCreateStreamQuote = eiCreateStreamQuote;
 
-		System.out.println("tempEiCreateStreamQuote before passing to lme"+ tempEiCreateStreamQuote.toString());
-
-//		Log it
+		//Log it
 		logger.debug("postEiCreateStreamTender to LME. TenderId " +
 				tempEiCreateStreamQuote.getQuote().getQuoteId().toString());
 		/*
