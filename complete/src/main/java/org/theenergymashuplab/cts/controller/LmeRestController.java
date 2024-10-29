@@ -20,22 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.CancelReasonType;
-import org.theenergymashuplab.cts.EiCanceledResponseType;
-import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.EiTenderType;
-import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.LmeSendTransactions;
-import org.theenergymashuplab.cts.LmeSocketClient;
-import org.theenergymashuplab.cts.LmeSocketServer;
-import org.theenergymashuplab.cts.MarketOrderIdType;
-import org.theenergymashuplab.cts.TenderIdType;
-import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
+import org.theenergymashuplab.cts.*;
+import org.theenergymashuplab.cts.controller.payloads.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -45,6 +31,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @RestController
@@ -54,6 +42,8 @@ public class LmeRestController {
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
+
+
 	// TODO assign in constructor?
 	private static final ActorIdType partyId  = new ActorIdType();
 	
@@ -65,6 +55,10 @@ public class LmeRestController {
 	// Queue capacity is not an issue
 	public static BlockingQueue<EiCreateTenderPayload> queueFromLme 
 		= new ArrayBlockingQueue<EiCreateTenderPayload>(20);
+
+	public static BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme
+			= new ArrayBlockingQueue<EiCreateQuotePayload>(20);
+
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
 	// parallel for MarketCreateTransactionPayloads here in LME.
@@ -183,6 +177,93 @@ public class LmeRestController {
 		
 		return tempCreated;
 	}
+
+
+	@PostMapping("/createStreamTender")
+	public EiCreatedStreamTenderPayload postEiCreateStreamTender(
+		@RequestBody EiCreateStreamTenderPayload eiCreateStreamTenderPayload){
+		EiCreateStreamTenderPayload tempCreateStreamTenderPayload;
+		EiCreatedStreamTenderPayload response = new EiCreatedStreamTenderPayload();
+		EiCreateTenderPayload tempCreate;
+		EiTenderType tempTender;
+		TenderIntervalDetail tenderDetail;
+		BridgeInterval currentStartInterval;
+		BridgeInstant currentStartInstant = new BridgeInstant();
+		List<Long> createdTenders = new ArrayList<>();
+		TenderStreamDetail tenderStreamDetail;
+		ActorIdType partyID;
+		ActorIdType counterPartyID;
+		CtsStreamType stream;
+		Boolean addQSuccess = false;
+		
+		//Deserialize from the request
+		tempCreateStreamTenderPayload = eiCreateStreamTenderPayload;
+
+		//Grab the stream for us to use
+		tenderStreamDetail = (TenderStreamDetail)tempCreateStreamTenderPayload.getTender().getTenderDetail();
+		stream = tenderStreamDetail.getStream();
+		partyID = tempCreateStreamTenderPayload.getPartyId();
+		counterPartyID = tempCreateStreamTenderPayload.getCounterPartyId();
+
+		//Debug what we got
+		logger.debug("lme/createStreamTender " + tempCreateStreamTenderPayload.toString());
+	
+		/* ================ Forwarding to the market ====================== */
+
+		/**
+		 * Design of this component:
+		 * 	In the CTS market, stream tenders do not exist. They are simply a client-side semantic that allows clients to construct a stream tender
+		 * 	specifying a stream of resource purchases or sales. Stream tenders themselves are just a sequence of separate tenders with
+		 * 	different prices and quantities, arranged in sequential intervals of the same length. So, we can leverage the existing
+		 * 	architecture around creating tenders to generate a sequence of createTender requests according to the prices and intervals
+		 * 	outlined in the stream tender object. This may later be changed with the implementation of "allOrNone", but currently, it serves our
+		 * 	purposes
+		 */
+
+		//Construct the bridge interval
+		BridgeInterval startInterval = new BridgeInterval(tenderStreamDetail.getIntervalDurationInMinutes(), stream.getStreamStart());
+		currentStartInterval = startInterval;
+
+		//So for each interval the we have in the stream intervals
+		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
+			//Create the individual Tender Interval payload
+			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+
+			//Advance the interval by however many minutes we specify
+			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant().plusSeconds(tenderStreamDetail.getIntervalDurationInMinutes()*60));
+			//Set the current start interval
+			currentStartInterval.setDtStart(currentStartInstant);
+			//Create the new individual interval tender
+			tempTender = new EiTenderType(tempCreateStreamTenderPayload.getTender().getExpirationTime(), tempCreateStreamTenderPayload.getTender().getSide(), tenderDetail);
+			
+			//Construct the EiCreateTender payload to be forwarded to LMA
+			tempCreate = new EiCreateTenderPayload(tempTender, partyID, counterPartyID);
+
+			//set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+			tempCreate.setPartyId(partyID);
+			tempCreate.setCounterPartyId(counterPartyID);
+		
+			addQSuccess = queueFromLme.add(tempCreate);
+			logger.debug("queueFomLme addQsuccess " + addQSuccess +
+				" TenderId " + tempTender.getTenderId());
+		
+			//Grab the tender ID and store
+			createdTenders.add(tempTender.getTenderId().value());
+		}
+			
+			//Make a new return value with the created tenders
+		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC " +
+				createdTenders.toString());
+
+		/* ================================================================ */
+
+		response.setPartyId(partyID);
+		response.setResponse(new EiResponse(200, "OK"));
+		response.setCounterPartyId(counterPartyID);
+		response.setCreatedTenders(createdTenders);
+
+		return response;
+	}
 	
 	
 	/*
@@ -224,6 +305,95 @@ public class LmeRestController {
 		
 		return tempCanceled;
 	}
+
+
+
+	@PostMapping("/createStreamQuote")
+	public EiCreatedStreamQuotePayload postEiCreateStreamQuote(
+			@RequestBody EiCreateStreamQuotePayload eiCreateStreamQuotePayload){
+		EiCreateStreamQuotePayload tempCreateStreamQuotePayload;
+		EiCreatedStreamQuotePayload response = new EiCreatedStreamQuotePayload();
+		EiCreateQuotePayload tempCreate;
+		EiQuoteType tempQuote;
+		QuoteIntervalDetail quoteDetail;
+		BridgeInterval currentStartInterval;
+		BridgeInstant currentStartInstant = new BridgeInstant();
+		List<Long> createdQuotes = new ArrayList<>();
+		QuoteStreamDetail quoteStreamDetail;
+		ActorIdType partyID;
+		ActorIdType counterPartyID;
+		CtsStreamType stream;
+		Boolean addQSuccess = false;
+
+		//Deserialize from the request
+		tempCreateStreamQuotePayload = eiCreateStreamQuotePayload;
+
+		//Grab the stream for us to use
+		quoteStreamDetail = (QuoteStreamDetail)tempCreateStreamQuotePayload.getQuote().getQuoteDetail();
+
+		stream = quoteStreamDetail.getStream();
+		partyID = tempCreateStreamQuotePayload.getPartyId();
+		counterPartyID = tempCreateStreamQuotePayload.getCounterPartyId();
+
+		//Debug what we got
+		logger.debug("lme/createStreamQuote " + tempCreateStreamQuotePayload.toString());
+
+		/* ================ Forwarding to the market ====================== */
+
+		/**
+		 * Design of this component:
+		 * 	In the CTS market, stream Quotes do not exist. They are simply a client-side semantic that allows clients to construct a stream Quote
+		 * 	specifying a stream of resource purchases or sales. Stream Quotes themselves are just a sequence of separate Quotes with
+		 * 	different prices and quantities, arranged in sequential intervals of the same length. So, we can leverage the existing
+		 * 	architecture around creating Quotes to generate a sequence of createQuote requests according to the prices and intervals
+		 * 	outlined in the stream Quote object. This may later be changed with the implementation of "allOrNone", but currently, it serves our
+		 * 	purposes
+		 */
+
+		//Construct the bridge interval
+		BridgeInterval startInterval = new BridgeInterval(quoteStreamDetail.getIntervalDurationInMinutes(), stream.getStreamStart());
+		currentStartInterval = startInterval;
+
+		//So for each interval the we have in the stream intervals
+		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
+			//Create the individual Quote Interval payload
+			quoteDetail = new QuoteIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+
+			//Advance the interval by however many minutes we specify
+			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant().plusSeconds(quoteStreamDetail.getIntervalDurationInMinutes()*60));
+			//Set the current start interval
+			currentStartInterval.setDtStart(currentStartInstant);
+			//Create the new individual interval Quote
+			tempQuote = new EiQuoteType(tempCreateStreamQuotePayload.getQuote().getExpirationTime(), tempCreateStreamQuotePayload.getQuote().getSide(), quoteDetail);
+
+			//Construct the EiCreateQuote payload to be forwarded to LMA
+			tempCreate = new EiCreateQuotePayload(tempQuote, partyID, counterPartyID);
+
+			//set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+			tempCreate.setPartyId(partyID);
+			tempCreate.setCounterPartyId(counterPartyID);
+
+		//	addQSuccess = queueQuoteFromLme.add(tempCreate);
+		//	logger.debug("queueQuoteFromLme addQsuccess " + addQSuccess +
+		//			" QuoteId " + tempQuote.getQuoteId());
+
+			//Grab the Quote ID and store
+			createdQuotes.add(tempQuote.getQuoteId().value());
+		}
+
+		//Make a new return value with the created Quotes
+		logger.trace("Stream Quote Creation Sequence: TEUA before return ClientCreatedQuote to Client/SC " +
+				createdQuotes.toString());
+
+		/* ================================================================ */
+
+		response.setPartyId(partyID);
+		response.setResponse(new EiResponse(210, "NOT YET IMPLEMENTED"));
+		response.setCounterPartyId(counterPartyID);
+		response.setCreatedQuotes(createdQuotes);
+
+		return response;
+	}
 	
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
@@ -232,6 +402,14 @@ public class LmeRestController {
 
 	public static void setQueueFromLme(BlockingQueue<EiCreateTenderPayload> queueFromLme) {
 		LmeRestController.queueFromLme = queueFromLme;
+	}
+
+	public static BlockingQueue<EiCreateQuotePayload> getQueueQuoteFromLme() {
+		return queueQuoteFromLme;
+	}
+
+	public static void setQueueQuoteFromLme(BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme) {
+		LmeRestController.queueQuoteFromLme = queueQuoteFromLme;
 	}
 
 
