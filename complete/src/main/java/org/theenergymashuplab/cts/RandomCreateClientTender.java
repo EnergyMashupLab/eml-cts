@@ -124,7 +124,7 @@ public class RandomCreateClientTender {
 				System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
 			}
 			// and print the json
-			System.err.println("\n" + json[i] + "***");
+//			System.err.println("\n" + json[i] + "***");
 		}
 	}
 

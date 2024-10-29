@@ -29,6 +29,8 @@ import org.apache.logging.log4j.Logger;
 import org.theenergymashuplab.cts.controller.TeuaRestController;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 
+import java.util.Scanner;
+
 @SpringBootApplication
 public class EnergyApplication {
 	
@@ -45,6 +47,7 @@ public class EnergyApplication {
 	private static RestTemplate restTemplate;
 	final static RestTemplateBuilder builder = new RestTemplateBuilder();
 
+	Scanner myObj = new Scanner(System.in);
 
     public static void main(String[] args) {
     	restTemplate = builder.build();
@@ -65,8 +68,20 @@ public class EnergyApplication {
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");
-			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(87,40,42,50,100);
+//			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
 
+			while (true) {
+				String userInput = myObj.nextLine();
+				if (userInput.equals("exit")) {
+					break;
+				}
+				else {
+					int quantity;
+					try { quantity = Integer.parseInt(userInput); }
+					catch (NumberFormatException e) { quantity = 0; }
+					RandomCreateClientTender randomClientTender = new RandomCreateClientTender(quantity);
+				}
+			}
 //			ActorId actorId = restTemplate.getForObject(
 //					"https://lma/party", ActorId.class);
 //			logger.info(actorId.toString());	
