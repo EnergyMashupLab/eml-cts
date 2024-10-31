@@ -69,7 +69,7 @@ public class EnergyApplication {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");
 //			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
-			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender();
+			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(32,1,5,50,22,122);
 //			while (true) {
 //				String userInput = myObj.nextLine();
 //				if (userInput.equals("exit")) {

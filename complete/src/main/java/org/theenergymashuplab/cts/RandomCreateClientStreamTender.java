@@ -7,7 +7,6 @@ import java.util.Random;
 
 import org.theenergymashuplab.cts.controller.TeuaRestController;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateStreamTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -60,11 +59,79 @@ public class RandomCreateClientStreamTender {
 
     }
 
+    RandomCreateClientStreamTender(int tenderQuantity, int streamQuantity)	{
+        /*
+         *	Produces 50 ClientCreateStreamTenderPayload objects and print to System.out.
+         *
+         *	initialize random generator in class attributes.
+         *	Local instance variable initializers and instance initializers are executed
+         *	after the constructor is invoked
+         */
+        instants = new Instant[24];
+        json = new String[streamQuantity];
+        clientTenders = new ClientCreateStreamTenderPayload[streamQuantity];
+//		mapper.configure((SerializationConfig.Feature.valueOf("WRITE_DATES_AS_TIMESTAMPS")), false);
+        instants[0] = dtStart;
+        for (int i = 1; i < 24; i++) {
+            instants[i] = instants[i-1].plusSeconds(60*60);
+        }
+
+        //	TODO BridgeInterval.toInstrumentNames() can address extended interval length encoding
+
+        //	print the json
+        for (int i = 0; i < streamQuantity; i++)	{
+            clientTenders[i] = randomTender(tenderQuantity,1,30, 50, 100);
+            teuaController.postClientCreateStreamTender("1", clientTenders[i]);
+            try	{
+                json[i] = mapper.writeValueAsString(clientTenders[i]);
+            }	catch (JsonProcessingException e)	{
+                System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
+            }
+            // and print the json
+            System.err.println("\n" + json[i] + "***");
+        }
+
+    }
+
+    RandomCreateClientStreamTender(int tenderQuantity, int streamQuantity, int priceLower, int priceUpper, int quantityLower, int quantityUpper)	{
+        /*
+         *	Produces 50 ClientCreateStreamTenderPayload objects and print to System.out.
+         *
+         *	initialize random generator in class attributes.
+         *	Local instance variable initializers and instance initializers are executed
+         *	after the constructor is invoked
+         */
+        instants = new Instant[24];
+        json = new String[streamQuantity];
+        clientTenders = new ClientCreateStreamTenderPayload[streamQuantity];
+//		mapper.configure((SerializationConfig.Feature.valueOf("WRITE_DATES_AS_TIMESTAMPS")), false);
+        instants[0] = dtStart;
+        for (int i = 1; i < 24; i++) {
+            instants[i] = instants[i-1].plusSeconds(60*60);
+        }
+
+        //	TODO BridgeInterval.toInstrumentNames() can address extended interval length encoding
+
+        //	print the json
+        for (int i = 0; i < streamQuantity; i++)	{
+            clientTenders[i] = randomTender(tenderQuantity,priceLower,priceUpper, quantityLower, quantityUpper);
+            teuaController.postClientCreateStreamTender("1", clientTenders[i]);
+            try	{
+                json[i] = mapper.writeValueAsString(clientTenders[i]);
+            }	catch (JsonProcessingException e)	{
+                System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
+            }
+            // and print the json
+            System.err.println("\n" + json[i] + "***");
+        }
+
+    }
+
     public ClientCreateStreamTenderPayload randomTender(int quantity, int priceLower, int priceUpper, int quantityLower, int quantityUpper)	{
-//        int randQuantity = quantityLower + rand.nextInt((quantityUpper-quantityLower) + 1);
         long price;
-        BridgeInstant startTime = new BridgeInstant(dtStart);
-        BridgeInstant endTime = new BridgeInstant(instants[rand.nextInt(24)]);
+        Instant timestamp = instants[rand.nextInt(24)];
+        BridgeInstant startTime = new BridgeInstant(timestamp);
+        BridgeInstant endTime = new BridgeInstant(timestamp.plusSeconds((quantity + 3) * 60*60)); // Probably needs to be fixed?
 
         String info = "ClientCreateStreamTenderPayload";
         long ctsTenderId = 0;
