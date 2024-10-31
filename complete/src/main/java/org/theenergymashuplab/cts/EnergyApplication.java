@@ -69,19 +69,19 @@ public class EnergyApplication {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");
 //			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
-
-			while (true) {
-				String userInput = myObj.nextLine();
-				if (userInput.equals("exit")) {
-					break;
-				}
-				else {
-					int quantity;
-					try { quantity = Integer.parseInt(userInput); }
-					catch (NumberFormatException e) { quantity = 0; }
-					RandomCreateClientTender randomClientTender = new RandomCreateClientTender(quantity);
-				}
-			}
+			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender();
+//			while (true) {
+//				String userInput = myObj.nextLine();
+//				if (userInput.equals("exit")) {
+//					break;
+//				}
+//				else {
+//					int quantity;
+//					try { quantity = Integer.parseInt(userInput); }
+//					catch (NumberFormatException e) { quantity = 0; }
+//					RandomCreateClientTender randomClientTender = new RandomCreateClientTender(quantity);
+//				}
+//			}
 //			ActorId actorId = restTemplate.getForObject(
 //					"https://lma/party", ActorId.class);
 //			logger.info(actorId.toString());	
