@@ -54,5 +54,4 @@ public class CtsStreamIntervalType {
     public void setStreamUid(int streamUid) {
         this.streamUid = streamUid;
     }
-
 }

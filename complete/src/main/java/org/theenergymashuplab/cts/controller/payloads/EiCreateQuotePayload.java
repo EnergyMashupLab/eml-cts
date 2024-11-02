@@ -45,6 +45,12 @@ public class EiCreateQuotePayload {
 		this.segmentId = segmentId;
 	}
 
+	public EiCreateQuotePayload(EiQuoteType quote, ActorIdType actorId, ActorIdType lmePartyId) {
+		this.quote = quote;
+		this.partyId = actorId;
+		this.counterPartyId = lmePartyId;
+	}
+
 	public boolean getAtMostOne(){
 		return this.atMostOne;
 	}
@@ -134,18 +140,19 @@ public class EiCreateQuotePayload {
 	}
 
 	@Override
-	public String toString(){
-		return "EiCreatedQuotePayload [" +
-				"atMostOne=" + this.atMostOne +
-				"counterPartyId=" + this.counterPartyId.toString() +
-				"executionInstructions=" + this.executionInstructions +
-				"marketId=" + this.marketId.toString() +
-				"partyId=" + this.partyId.toString() +
-				"quote=" + this.quote.toString() +
-				"requestId=" + this.requestId.toString() +
-				"requestPrivate=" + this.requestPrivate +
-				"requestPublication=" + this.requestPublication +
-				"resourceDesignator=" + this.resourceDesignator +
-				"segmentId=" + this.segmentId + "]";
+	public String toString() {
+		return "EiCreateQuotePayload{" +
+				"atMostOne=" + atMostOne +
+				", counterPartyId=" + counterPartyId +
+				", executionInstructions='" + executionInstructions + '\'' +
+				", marketId=" + marketId +
+				", partyId=" + partyId +
+				", quote=" + quote +
+				", requestId=" + requestId +
+				", requestPrivate=" + requestPrivate +
+				", requestPublication=" + requestPublication +
+				", resourceDesignator=" + resourceDesignator +
+				", segmentId=" + segmentId +
+				'}';
 	}
 }
