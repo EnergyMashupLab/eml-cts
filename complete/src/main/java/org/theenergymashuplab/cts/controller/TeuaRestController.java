@@ -568,7 +568,7 @@ public class TeuaRestController {
 			@RequestBody ClientCreateQuotePayload clientCreateQuote)	{
 		ClientCreateQuotePayload tempClientCreateQuote;	
 		ClientCreatedQuotePayload tempReturn;
-		EiQuoteType tender;
+		EiQuoteType quote;
 		EiCreateQuotePayload eiCreateQuote;
 		Integer numericTeuaId = -1;
 		String positionUri;
@@ -614,9 +614,6 @@ public class TeuaRestController {
 		 * 
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
-		
-		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders 
-		
 		TenderDetail tenderDetail;
 
 
@@ -629,14 +626,14 @@ public class TeuaRestController {
 				tempClientCreateQuote.getQuantity()
 			);
 
-		tender = new EiQuoteType(
+		quote = new EiQuoteType(
 				tempClientCreateQuote.getBridgeExpireTime().asInstant(),
 				tempClientCreateQuote.getSide(),
 				tenderDetail
 		);
 		
 		// 	Construct the EiCreateTender payload to be forwarded to LMA
-		eiCreateQuote = new EiCreateQuotePayload(tender, actorIds[numericTeuaId],
+		eiCreateQuote = new EiCreateQuotePayload(quote, actorIds[numericTeuaId],
 				this.lmePartyId);
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 		eiCreateQuote.setPartyId(actorIds[numericTeuaId]);
