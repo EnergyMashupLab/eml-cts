@@ -512,7 +512,7 @@ public class TeuaRestController {
 				tempClientCreateStreamQuote.getStreamStart().asInstant());
 
 		//Create a new Quote stream detail
-		QuoteStreamDetail quoteDetail = new QuoteStreamDetail(stream);
+		TenderStreamDetail quoteDetail = new TenderStreamDetail(stream);
 
 		//Save this for later
 		quoteDetail.setIntervalDurationInMinutes(clientCreateStreamQuote.getIntervalDurationInMinutes());
@@ -562,14 +562,14 @@ public class TeuaRestController {
 	 * on behalf of this client for the Interval, to get a net amount to go from the client's position
 	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
 	 */
-	@PostMapping("{teuaId}/clientCreateTender")
-	public EiCreateQuotePayload postClientCreateQuote(
+	@PostMapping("{teuaId}/clientCreateQuote")
+	public EiCreatedQuotePayload postClientCreateQuote(
 			@PathVariable String teuaId,
 			@RequestBody ClientCreateQuotePayload clientCreateQuote)	{
-		ClientCreateTenderPayload tempClientCreateTender;	
-		ClientCreatedTenderPayload tempReturn;
-		EiTenderType tender;
-		EiCreateTenderPayload eiCreateTender;	
+		ClientCreateQuotePayload tempClientCreateQuote;	
+		ClientCreatedQuotePayload tempReturn;
+		EiQuoteType tender;
+		EiCreateQuotePayload eiCreateQuote;
 		Integer numericTeuaId = -1;
 		String positionUri;
 		
@@ -601,7 +601,7 @@ public class TeuaRestController {
 			" actorNumericIds[teuaId] " +
 			actorIds[numericTeuaId].toString());
 		
-		tempClientCreateTender = clientCreateTender;	// save the parameter
+		tempClientCreateQuote = clientCreateQuote;	// save the parameter
 														
 
 		/*
@@ -624,35 +624,35 @@ public class TeuaRestController {
 		 * We assume that everything that is in here is an interval tender
 		 */
 		 tenderDetail = new TenderIntervalDetail(
-				tempClientCreateTender.getInterval(),
-				tempClientCreateTender.getPrice(),
-				tempClientCreateTender.getQuantity()
+				tempClientCreateQuote.getInterval(),
+				tempClientCreateQuote.getPrice(),
+				tempClientCreateQuote.getQuantity()
 			);
 
-		tender = new EiTenderType(
-				tempClientCreateTender.getBridgeExpireTime().asInstant(),
-				tempClientCreateTender.getSide(),
+		tender = new EiQuoteType(
+				tempClientCreateQuote.getBridgeExpireTime().asInstant(),
+				tempClientCreateQuote.getSide(),
 				tenderDetail
 		);
 		
 		// 	Construct the EiCreateTender payload to be forwarded to LMA
-		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId],
+		eiCreateQuote = new EiCreateQuotePayload(tender, actorIds[numericTeuaId],
 				this.lmePartyId);
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
-		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
-		eiCreateTender.setCounterPartyId(lmePartyId);
+		eiCreateQuote.setPartyId(actorIds[numericTeuaId]);
+		eiCreateQuote.setCounterPartyId(lmePartyId);
 		
 		logger.trace("TEUA sending EiCreateTender to LMA " +
-				eiCreateTender.toString());
+				eiCreateQuote.toString());
 			
 		//	And forward to the LMA
 		restTemplate = builder.build();
-		EiCreatedTenderPayload result = restTemplate.postForObject
-			("http://localhost:8080/lma/createTender", eiCreateTender,
-					EiCreatedTenderPayload.class);
+		EiCreatedQuotePayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/createQuote", eiCreateQuote,
+					EiCreatedQuotePayload.class);
 		
 		// and put CtsTenderId in ClientCreatedTenderPayload
-		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
+		tempReturn = new ClientCreatedQuotePayload(result.getQuoteId().value());
 		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());
 		
