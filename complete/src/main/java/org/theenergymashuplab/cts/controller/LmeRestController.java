@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,6 +43,7 @@ public class LmeRestController {
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
+	//private static ArrayList<Eiq>
 
 
 	// TODO assign in constructor?
@@ -315,11 +317,11 @@ public class LmeRestController {
 		EiCreatedStreamQuotePayload response = new EiCreatedStreamQuotePayload();
 		EiCreateQuotePayload tempCreate;
 		EiQuoteType tempQuote;
-		QuoteIntervalDetail quoteDetail;
+		TenderIntervalDetail quoteDetail;
 		BridgeInterval currentStartInterval;
 		BridgeInstant currentStartInstant = new BridgeInstant();
 		List<Long> createdQuotes = new ArrayList<>();
-		QuoteStreamDetail quoteStreamDetail;
+		TenderStreamDetail quoteStreamDetail;
 		ActorIdType partyID;
 		ActorIdType counterPartyID;
 		CtsStreamType stream;
@@ -329,7 +331,7 @@ public class LmeRestController {
 		tempCreateStreamQuotePayload = eiCreateStreamQuotePayload;
 
 		//Grab the stream for us to use
-		quoteStreamDetail = (QuoteStreamDetail)tempCreateStreamQuotePayload.getQuote().getQuoteDetail();
+		quoteStreamDetail = (TenderStreamDetail)tempCreateStreamQuotePayload.getQuote().getTenderDetail();
 
 		stream = quoteStreamDetail.getStream();
 		partyID = tempCreateStreamQuotePayload.getPartyId();
@@ -357,7 +359,7 @@ public class LmeRestController {
 		//So for each interval the we have in the stream intervals
 		for(CtsStreamIntervalType interval : stream.getStreamIntervals()){
 			//Create the individual Quote Interval payload
-			quoteDetail = new QuoteIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+			quoteDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
 
 			//Advance the interval by however many minutes we specify
 			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant().plusSeconds(quoteStreamDetail.getIntervalDurationInMinutes()*60));

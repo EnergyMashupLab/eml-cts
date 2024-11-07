@@ -8,7 +8,7 @@ import java.time.Instant;
  * @version 1.0
  * @created 28-Sep-2024 8:41:40 PM
  */
-public class EiQuoteType extends QuoteBase {
+public class EiQuoteType extends TenderBase {
 
 	public MarketQuoteIdType marketQuoteId;
 	public boolean privateQuote;
@@ -28,7 +28,7 @@ public class EiQuoteType extends QuoteBase {
 		this.tradeable = tradeable;
 	}
 
-	public EiQuoteType(Instant instant, SideType side, QuoteDetail quoteDetail) {
+	public EiQuoteType(Instant instant, SideType side, TenderDetail quoteDetail) {
 		super(instant, side, quoteDetail);
 	}
 
