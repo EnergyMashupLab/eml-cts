@@ -12,7 +12,7 @@ public class EiQuoteType extends TenderBase {
 
 	public MarketQuoteIdType marketQuoteId;
 	public boolean privateQuote;
-	public QuoteIdType quoteId = new QuoteIdType();
+	public TenderIdType quoteId = new TenderIdType();
 	public RfqIdType rfqId;
 	public boolean tradeable;
 
@@ -20,7 +20,7 @@ public class EiQuoteType extends TenderBase {
 
 	}
 
-	public EiQuoteType(MarketQuoteIdType marketQuoteId, boolean privateQuote, QuoteIdType quoteId, RfqIdType rfqId, boolean tradeable){
+	public EiQuoteType(MarketQuoteIdType marketQuoteId, boolean privateQuote, TenderIdType quoteId, RfqIdType rfqId, boolean tradeable){
 		this.marketQuoteId = marketQuoteId;
 		this.privateQuote = privateQuote;
 		this.quoteId = quoteId;
@@ -48,11 +48,11 @@ public class EiQuoteType extends TenderBase {
 		this.privateQuote = privateQuote;
 	}
 
-	public QuoteIdType getQuoteId(){
+	public TenderIdType getQuoteId(){
 		return this.quoteId;
 	}
 
-	public void setQuoteId(QuoteIdType quoteId){
+	public void setQuoteId(TenderIdType quoteId){
 		this.quoteId = quoteId;
 	}
 

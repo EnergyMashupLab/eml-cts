@@ -43,7 +43,8 @@ public class LmeRestController {
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
-	//private static ArrayList<Eiq>
+	//Default arraylist that will hold all of our quotes
+	private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
 
 
 	// TODO assign in constructor?
@@ -55,11 +56,9 @@ public class LmeRestController {
 	// queueFromLme is used by LmeSocketClient to accept CreateTenderPayload
 	// queue.put here in LME, take in LmeSocketClient which connects to the market
 	// Queue capacity is not an issue
-	public static BlockingQueue<EiCreateTenderPayload> queueFromLme 
-		= new ArrayBlockingQueue<EiCreateTenderPayload>(20);
+	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue<EiCreateTenderPayload>(20);
 
-	public static BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme
-			= new ArrayBlockingQueue<EiCreateQuotePayload>(20);
+	public static BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme = new ArrayBlockingQueue<EiCreateQuotePayload>(20);
 
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
@@ -396,7 +395,65 @@ public class LmeRestController {
 
 		return response;
 	}
+		
+	/*
+	 * POST - /createQuote
+	 * 		RequestBody is EiCreateQuotePayload from LMA
+	 * 		ResponseBody is EiCreatedQuotePayload
+	 *
+	 * Methodology:
+	 * 	Quotes never make it into the market. They are essentially tenders, but instead of
+	 * 	being forwarded to market, they are stored locally here in an arrayList and acted 
+	 *  upon entirely in this class
+	 */
 	
+	@PostMapping("/createQuote")
+	public EiCreatedQuotePayload postEiCreateQuote(
+			@RequestBody EiCreateQuotePayload eiCreateQuote)	{
+		EiQuoteType tempQuote;
+		EiCreateQuotePayload tempCreate = null;
+		EiCreateQuotePayload mapPutReturnValue = null;
+		EiCreatedQuotePayload tempCreated;
+		
+		//Grab the quote payload and quote itself
+		tempCreate = eiCreateQuote;
+		tempQuote = eiCreateQuote.getQuote();
+
+		logger.debug("LmeController before constructor for EiCreatedQuote " +
+				tempQuote.toString());
+		logger.debug("lme/createTender " + eiCreateQuote.toString());
+		
+		/*	ResponseBody
+			public EiCreatedTender(
+				TenderId tenderId,
+				ActorId partyId,queueF
+				EiResponse response)
+		 */
+		
+
+		//Save the queue in our arraylist
+		
+		//logger.debug("queueFomLme addQsuccess " + addQsuccess +
+		//		" TenderId " + tempTender.getTenderId());
+
+		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
+		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
+		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
+		 * with a different tender, leading to a transaction
+		 * 
+		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
+		tempQuote.setMarketQuoteId(new MarketQuoteIdType());
+		
+
+		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
+												tempQuote.getMarketQuoteId(),
+												tempCreate.getPartyId(),
+												tempQuote.getQuoteId(),
+												new EiResponse(200, "OK"));
+
+		return tempCreated;
+	}
+
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
 		return queueFromLme;

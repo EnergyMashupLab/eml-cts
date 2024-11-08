@@ -338,6 +338,43 @@ public class LmaRestController {
 		return tempEiCreatedStreamQuote;
 	}
 
+	/*
+	 * POST - /createTender - POSTed by TEUA/EMA to LMA
+	 *				Forwarded to LME
+	 * 		RequestBody is EiCreateTender
+	 * 		ResponseBody is EiCreatedTender
+	 */
+	@PostMapping("/createQuote")
+	public EiCreatedQuotePayload postEiCreateQuote(
+			@RequestBody EiCreateQuotePayload eiCreateQuote)	{
+
+		EiCreateQuotePayload tempCreate;
+		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
+		EiCreatedQuotePayload tempPostResponse; 
+
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender	
+    	restTemplate = builder.build();
+    	
+		// save CreateTender message as sent by TEUA
+		tempCreate = eiCreateQuote;	
+		
+		logger.debug("postEiCreateTender to LME. TenderId " +
+				tempCreate.getQuote().getQuoteId().toString());
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createQuote", 
+				tempCreate, 
+				EiCreatedQuotePayload.class);
+		
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+	
+		return tempPostResponse;
+	}
+
+
 	public static EiTenderType getCurrentTender() {
 		return currentTender;
 	}

@@ -3,8 +3,10 @@ package org.theenergymashuplab.cts.controller.payloads;
 import java.sql.Ref;
 
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.MarketOrderIdType;
+import org.theenergymashuplab.cts.MarketQuoteIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 
@@ -17,16 +19,17 @@ public class EiCreatedQuotePayload {
 
 	public ActorIdType counterPartyId;
 	public RefIdType inResponseTo;
-	public MarketOrderIdType marketQuoteId;
+	public MarketOrderIdType marketOrderId;
+	public MarketQuoteIdType marketQuoteId;
 	public ActorIdType partyId;
 	public TenderIdType quoteId;
-	public EiResponseType response;
+	public EiResponse response;
 
 	public EiCreatedQuotePayload(){
 
 	}
 
-	public EiCreatedQuotePayload(ActorIdType counterPartyId, RefIdType inResponseTo, MarketOrderIdType marketQuoteId, ActorIdType partyId, TenderIdType quoteId, EiResponseType response){
+	public EiCreatedQuotePayload(ActorIdType counterPartyId, RefIdType inResponseTo, MarketQuoteIdType marketQuoteId, ActorIdType partyId, TenderIdType quoteId, EiResponse response){
 		this.counterPartyId = counterPartyId;
 		this.inResponseTo = inResponseTo;
 		this.marketQuoteId = marketQuoteId;
@@ -34,6 +37,16 @@ public class EiCreatedQuotePayload {
 		this.quoteId = quoteId;
 		this.response = response;
 	}
+
+
+	public EiCreatedQuotePayload(ActorIdType counterPartyId, MarketQuoteIdType marketQuoteId, ActorIdType partyId, TenderIdType quoteId, EiResponse response){
+		this.counterPartyId = counterPartyId;
+		this.marketQuoteId = marketQuoteId;
+		this.partyId = partyId;
+		this.quoteId = quoteId;
+		this.response = response;
+	}
+
 
 	public ActorIdType getCounterPartyId(){
 		return this.counterPartyId;
@@ -51,12 +64,12 @@ public class EiCreatedQuotePayload {
 		this.inResponseTo = inResponseTo;
 	}
 
-	public MarketOrderIdType getMarketQuoteId(){
-		return this.marketQuoteId;
+	public MarketOrderIdType getMarketOrderId(){
+		return this.marketOrderId;
 	}
 
-	public void setMarketQuoteId(MarketOrderIdType marketQuoteId){
-		this.marketQuoteId = marketQuoteId;
+	public void setMarketQuoteId(MarketOrderIdType marketOrderId){
+		this.marketOrderId = marketOrderId;
 	}
 
 	public ActorIdType getPartyId(){
@@ -75,11 +88,11 @@ public class EiCreatedQuotePayload {
 		this.quoteId = quoteId;
 	}
 
-	public EiResponseType getResponse(){
+	public EiResponse getResponse(){
 		return this.response;
 	}
 
-	public void setResponse(EiResponseType response){
+	public void setResponse(EiResponse response){
 		this.response = response;
 	}
 
