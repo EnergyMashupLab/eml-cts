@@ -414,6 +414,7 @@ public class LmeRestController {
 		EiCreateQuotePayload tempCreate = null;
 		EiCreateQuotePayload mapPutReturnValue = null;
 		EiCreatedQuotePayload tempCreated;
+		boolean addSuccess = false;
 		
 		//Grab the quote payload and quote itself
 		tempCreate = eiCreateQuote;
@@ -442,14 +443,20 @@ public class LmeRestController {
 		 * with a different tender, leading to a transaction
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
-		tempQuote.setMarketQuoteId(new MarketQuoteIdType());
-		
+		tempQuote.setMarketOrderId(new MarketOrderIdType());
+		//Add this quote into the volatile storage. It will never hit the database
+		addSuccess = currentQuotes.add(tempQuote);
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
-												tempQuote.getMarketQuoteId(),
+												tempQuote.getMarketOrderId(),
 												tempCreate.getPartyId(),
 												tempQuote.getQuoteId(),
 												new EiResponse(200, "OK"));
+
+		//FIXME later on
+		tempCreated.setInResponseTo(new RefIdType());
+		//Make a new return value with the created Quotes
+		logger.trace("Quote Created");
 
 		return tempCreated;
 	}

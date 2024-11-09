@@ -10,7 +10,7 @@ import java.time.Instant;
  */
 public class EiQuoteType extends TenderBase {
 
-	public MarketQuoteIdType marketQuoteId;
+	public MarketOrderIdType marketOrderId;
 	public boolean privateQuote;
 	public TenderIdType quoteId = new TenderIdType();
 	public RfqIdType rfqId;
@@ -20,8 +20,8 @@ public class EiQuoteType extends TenderBase {
 
 	}
 
-	public EiQuoteType(MarketQuoteIdType marketQuoteId, boolean privateQuote, TenderIdType quoteId, RfqIdType rfqId, boolean tradeable){
-		this.marketQuoteId = marketQuoteId;
+	public EiQuoteType(MarketOrderIdType marketOrderId, boolean privateQuote, TenderIdType quoteId, RfqIdType rfqId, boolean tradeable){
+		this.marketOrderId = marketOrderId;
 		this.privateQuote = privateQuote;
 		this.quoteId = quoteId;
 		this.rfqId = rfqId;
@@ -32,12 +32,12 @@ public class EiQuoteType extends TenderBase {
 		super(instant, side, quoteDetail);
 	}
 
-	public MarketQuoteIdType getMarketQuoteId(){
-		return this.marketQuoteId;
+	public MarketOrderIdType getMarketOrderId(){
+		return this.marketOrderId;
 	}
 
-	public void setMarketQuoteId(MarketQuoteIdType marketQuoteId){
-		this.marketQuoteId = marketQuoteId;
+	public void setMarketOrderId(MarketOrderIdType marketOrderId){
+		this.marketOrderId = marketOrderId;
 	}
 
 	public boolean getPrivateQuote(){
@@ -75,7 +75,7 @@ public class EiQuoteType extends TenderBase {
 	@Override
 	public String toString() {
 		return "EiQuoteType{" +
-				"marketQuoteId=" + marketQuoteId +
+				"marketQuoteId=" + marketOrderId +
 				", privateQuote=" + privateQuote +
 				", quoteId=" + quoteId +
 				", rfqId=" + rfqId +
