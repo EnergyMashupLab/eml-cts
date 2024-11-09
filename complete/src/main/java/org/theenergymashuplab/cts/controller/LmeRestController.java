@@ -366,19 +366,19 @@ public class LmeRestController {
 			currentStartInterval.setDtStart(currentStartInstant);
 			//Create the new individual interval Quote
 			tempQuote = new EiQuoteType(tempCreateStreamQuotePayload.getQuote().getExpirationTime(), tempCreateStreamQuotePayload.getQuote().getSide(), quoteDetail);
+			//FIXME later on-- forced to be 1 now
+			tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 
-			//Construct the EiCreateQuote payload to be forwarded to LMA
+			//Add this into the current quotes arraylist
+			currentQuotes.add(tempQuote);
+
+			/*
 			tempCreate = new EiCreateQuotePayload(tempQuote, partyID, counterPartyID);
 
 			//set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 			tempCreate.setPartyId(partyID);
 			tempCreate.setCounterPartyId(counterPartyID);
-
-		//	addQSuccess = queueQuoteFromLme.add(tempCreate);
-		//	logger.debug("queueQuoteFromLme addQsuccess " + addQSuccess +
-		//			" QuoteId " + tempQuote.getQuoteId());
-
-			//Grab the Quote ID and store
+			*/
 			createdQuotes.add(tempQuote.getQuoteId().value());
 		}
 
@@ -412,7 +412,6 @@ public class LmeRestController {
 			@RequestBody EiCreateQuotePayload eiCreateQuote)	{
 		EiQuoteType tempQuote;
 		EiCreateQuotePayload tempCreate = null;
-		EiCreateQuotePayload mapPutReturnValue = null;
 		EiCreatedQuotePayload tempCreated;
 		boolean addSuccess = false;
 		
@@ -443,7 +442,7 @@ public class LmeRestController {
 		 * with a different tender, leading to a transaction
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
-		tempQuote.setMarketOrderId(new MarketOrderIdType());
+		tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 		//Add this quote into the volatile storage. It will never hit the database
 		addSuccess = currentQuotes.add(tempQuote);
 
