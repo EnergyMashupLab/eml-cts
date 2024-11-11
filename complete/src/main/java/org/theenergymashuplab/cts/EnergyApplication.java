@@ -26,6 +26,10 @@ import org.springframework.web.client.RestTemplate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.theenergymashuplab.cts.controller.TeuaRestController;
+import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
+
+import java.util.Scanner;
 
 @SpringBootApplication
 public class EnergyApplication {
@@ -34,8 +38,7 @@ public class EnergyApplication {
 	 * Global constants
 	 */
 	public final int LME_PORT = 39401;		// for Socket Server in LME takes CreateTransaction
-	public final int MARKET_PORT = 39402;	// for Socket Server in Market takes CreateTender 
-	
+	public final int MARKET_PORT = 39402;	// for Socket Server in Market takes CreateTender
 	
 	private static final Logger logger = LogManager.getLogger(
 			EnergyApplication.class);
@@ -44,6 +47,7 @@ public class EnergyApplication {
 	private static RestTemplate restTemplate;
 	final static RestTemplateBuilder builder = new RestTemplateBuilder();
 
+	Scanner myObj = new Scanner(System.in);
 
     public static void main(String[] args) {
     	restTemplate = builder.build();
@@ -63,7 +67,21 @@ public class EnergyApplication {
 	// TODO EXPERIMENTAL - Candidate for deletion
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
-			logger.info("In CommandLineRunner before getForObject");	
+			logger.info("In CommandLineRunner before getForObject");
+//			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
+			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(32,1,5,50,22,122);
+//			while (true) {
+//				String userInput = myObj.nextLine();
+//				if (userInput.equals("exit")) {
+//					break;
+//				}
+//				else {
+//					int quantity;
+//					try { quantity = Integer.parseInt(userInput); }
+//					catch (NumberFormatException e) { quantity = 0; }
+//					RandomCreateClientTender randomClientTender = new RandomCreateClientTender(quantity);
+//				}
+//			}
 //			ActorId actorId = restTemplate.getForObject(
 //					"https://lma/party", ActorId.class);
 //			logger.info(actorId.toString());	

@@ -35,6 +35,7 @@ public class EiTenderType extends TenderBase {
 		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
 	}
 	
+	//Already have constructor that could be used with streams
 	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail) {
 		super(expirationTime, side, tenderDetail);
 		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
