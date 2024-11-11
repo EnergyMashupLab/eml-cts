@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
 
 @RestController
@@ -44,7 +45,8 @@ public class LmeRestController {
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	//Default arraylist that will hold all of our quotes
-	private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
+	//private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
+	private static HashSet<EiQuoteType> currentQuotes = new HashSet<>();
 
 
 	// TODO assign in constructor?
