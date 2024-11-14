@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
 
 @RestController
@@ -45,6 +46,7 @@ public class LmeRestController {
 	private static TenderIdType currentTenderId;
 	//Default arraylist that will hold all of our quotes
 	private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
+	//private static HashSet<EiQuoteType> currentQuotes = new HashSet<>(300);
 
 
 	// TODO assign in constructor?
@@ -366,19 +368,19 @@ public class LmeRestController {
 			currentStartInterval.setDtStart(currentStartInstant);
 			//Create the new individual interval Quote
 			tempQuote = new EiQuoteType(tempCreateStreamQuotePayload.getQuote().getExpirationTime(), tempCreateStreamQuotePayload.getQuote().getSide(), quoteDetail);
+			//FIXME later on-- forced to be 1 now
+			tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 
-			//Construct the EiCreateQuote payload to be forwarded to LMA
+			//Add this into the current quotes arraylist
+			currentQuotes.add(tempQuote);
+
+			/*
 			tempCreate = new EiCreateQuotePayload(tempQuote, partyID, counterPartyID);
 
 			//set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 			tempCreate.setPartyId(partyID);
 			tempCreate.setCounterPartyId(counterPartyID);
-
-		//	addQSuccess = queueQuoteFromLme.add(tempCreate);
-		//	logger.debug("queueQuoteFromLme addQsuccess " + addQSuccess +
-		//			" QuoteId " + tempQuote.getQuoteId());
-
-			//Grab the Quote ID and store
+			*/
 			createdQuotes.add(tempQuote.getQuoteId().value());
 		}
 
@@ -412,8 +414,8 @@ public class LmeRestController {
 			@RequestBody EiCreateQuotePayload eiCreateQuote)	{
 		EiQuoteType tempQuote;
 		EiCreateQuotePayload tempCreate = null;
-		EiCreateQuotePayload mapPutReturnValue = null;
 		EiCreatedQuotePayload tempCreated;
+		boolean addSuccess = false;
 		
 		//Grab the quote payload and quote itself
 		tempCreate = eiCreateQuote;
@@ -421,7 +423,7 @@ public class LmeRestController {
 
 		logger.debug("LmeController before constructor for EiCreatedQuote " +
 				tempQuote.toString());
-		logger.debug("lme/createTender " + eiCreateQuote.toString());
+		logger.debug("lme/createQuote " + eiCreateQuote.toString());
 		
 		/*	ResponseBody
 			public EiCreatedTender(
@@ -442,18 +444,78 @@ public class LmeRestController {
 		 * with a different tender, leading to a transaction
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
-		tempQuote.setMarketQuoteId(new MarketQuoteIdType());
-		
+		tempQuote.setMarketOrderId(new MarketOrderIdType(1));
+		System.out.println("Added quote with order ID: " + tempQuote.getMarketOrderId());
+		//Add this quote into the volatile storage. It will never hit the database
+		currentQuotes.add(tempQuote);
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
-												tempQuote.getMarketQuoteId(),
+												tempQuote.getMarketOrderId(),
 												tempCreate.getPartyId(),
 												tempQuote.getQuoteId(),
 												new EiResponse(200, "OK"));
 
+		//FIXME later on
+		tempCreated.setInResponseTo(new RefIdType());
+		//Make a new return value with the created Quotes
+		logger.trace("Quote Created");
+
 		return tempCreated;
 	}
 
+	
+	@PostMapping("/acceptQuote")
+	public EiAcceptedQuotePayload postEiAcceptQuote(
+			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
+		EiQuoteType tempQuote = new EiQuoteType();
+		EiQuoteType listQuote;
+		EiAcceptQuotePayload tempAccept = null;
+		EiAcceptedQuotePayload tempAccepted;
+		boolean exists = false;
+		
+		//Grab the quote payload and quote itself
+		tempAccept = eiAcceptQuote;
+		tempAccept.setTransaction(new EiTransaction());
+		//Set this for us to search
+		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
+
+		//Search through our list
+		for(int i = 0; i < currentQuotes.size(); i++){
+			//Grab the quote at the current index
+			listQuote = currentQuotes.get(i);
+			//DEBUG statement comment out when done
+			System.out.println("In list: " + listQuote.getMarketOrderId());
+			if(listQuote.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
+				logger.debug("LMEController successfully found quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString());
+				//DEBUG statement comment out
+				System.out.println("Quote FOUND");
+				exists = true;
+				break;
+			}
+		}
+
+		//If we can't find a quote here, that's the end for us
+		if(!exists){
+			System.out.println("Quote not found");
+			logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
+						"will now exit");
+			//FIXME currently this will just return a blank on failure
+			tempAccepted = new EiAcceptedQuotePayload();
+			tempAccepted.setResponse(new EiResponse(200, "Not found"));
+			//TEMPORARY
+			tempAccepted.setTransactionId(new TransactionIdType());
+			tempAccepted.setRecipientTransactionId(new TransactionIdType());
+			return tempAccepted;
+		}
+
+		//Create the EiAcceptedQuotePayload
+		tempAccepted = new EiAcceptedQuotePayload();
+
+		//Make a new return value with the created Quotes
+		logger.trace("Quote Created");
+
+		return tempAccepted;
+	}
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
 		return queueFromLme;

@@ -20,7 +20,6 @@ public class EiCreatedQuotePayload {
 	public ActorIdType counterPartyId;
 	public RefIdType inResponseTo;
 	public MarketOrderIdType marketOrderId;
-	public MarketQuoteIdType marketQuoteId;
 	public ActorIdType partyId;
 	public TenderIdType quoteId;
 	public EiResponse response;
@@ -29,19 +28,19 @@ public class EiCreatedQuotePayload {
 
 	}
 
-	public EiCreatedQuotePayload(ActorIdType counterPartyId, RefIdType inResponseTo, MarketQuoteIdType marketQuoteId, ActorIdType partyId, TenderIdType quoteId, EiResponse response){
+	public EiCreatedQuotePayload(ActorIdType counterPartyId, RefIdType inResponseTo, MarketOrderIdType marketOrderId, ActorIdType partyId, TenderIdType quoteId, EiResponse response){
 		this.counterPartyId = counterPartyId;
 		this.inResponseTo = inResponseTo;
-		this.marketQuoteId = marketQuoteId;
+		this.marketOrderId = marketOrderId;
 		this.partyId = partyId;
 		this.quoteId = quoteId;
 		this.response = response;
 	}
 
 
-	public EiCreatedQuotePayload(ActorIdType counterPartyId, MarketQuoteIdType marketQuoteId, ActorIdType partyId, TenderIdType quoteId, EiResponse response){
+	public EiCreatedQuotePayload(ActorIdType counterPartyId, MarketOrderIdType marketOrderId, ActorIdType partyId, TenderIdType quoteId, EiResponse response){
 		this.counterPartyId = counterPartyId;
-		this.marketQuoteId = marketQuoteId;
+		this.marketOrderId = marketOrderId;
 		this.partyId = partyId;
 		this.quoteId = quoteId;
 		this.response = response;
@@ -101,7 +100,7 @@ public class EiCreatedQuotePayload {
 		return "EiCreatedQuotePayload [" +
 				"counterPartyId=" + this.counterPartyId.toString() +
 				", inResonseTo=" + this.inResponseTo.toString() +
-				", marketQuoteId=" + this.marketQuoteId.toString() +
+				", marketQuoteId=" + this.marketOrderId.toString() +
 				", partyId=" + this.partyId.toString() +
 				", quoteId=" + this.quoteId.toString() +
 				", response=" + this.response.toString() + "]";

@@ -10,13 +10,17 @@ import org.theenergymashuplab.cts.MarketOrderIdType;
 public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 
 	public MarketOrderIdType referencedQuoteId;
+	public long quantity;
+	public long price;
 
 	public EiAcceptQuotePayload(){
 
 	}
 
-	public EiAcceptQuotePayload(MarketOrderIdType referencedQuoteId){
+	public EiAcceptQuotePayload(MarketOrderIdType referencedQuoteId, long quantity, long price){
 		this.referencedQuoteId = referencedQuoteId;
+		this.quantity = quantity;
+		this.price = price;
 	}
 
 	public MarketOrderIdType getReferencedQuoteId(){
@@ -27,10 +31,28 @@ public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 		this.referencedQuoteId = referencedQuoteId;
 	}
 
+	public long getQuantity(){
+		return this.quantity;
+	}
+
+	public void setQuantity(long quantity){
+		this.quantity = quantity;
+	}
+
+	public long getPrice(){
+		return this.price;
+	}
+
+	public void setPrice(long price){
+		this.price = price;
+	}
+	
 	@Override
 	public String toString(){
 		return 	"EiAcceptQuotePayload [" +
 				"referencedQuoteId=" + referencedQuoteId.toString() +
+				"price=" + price + 
+				"quantity=" + quantity +
 			                         "]";
 	}
 }

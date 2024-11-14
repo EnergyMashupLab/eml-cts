@@ -655,4 +655,72 @@ public class TeuaRestController {
 		
 		return result;
 	}
+
+	@PostMapping("{teuaId}/clientAcceptQuote")
+	public EiCreatedQuotePayload postClientAcceptQuote(
+			@PathVariable String teuaId,
+			@RequestBody ClientAcceptQuotePayload clientAcceptQuote)	{
+		ClientAcceptQuotePayload tempClientAcceptQuote;	
+		ClientAcceptedQuotePayload tempReturn;
+		EiAcceptQuotePayload eiAcceptQuote;
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+		
+		tempClientAcceptQuote = clientAcceptQuote;	// save the parameter
+		System.out.println(tempClientAcceptQuote.toString());
+				
+		//Construct the accept quote payload
+		eiAcceptQuote = new EiAcceptQuotePayload(tempClientAcceptQuote.getReferencedQuoteId(), tempClientAcceptQuote.getQuantity(), tempClientAcceptQuote.getPrice());
+		MarketOrderIdType id = new MarketOrderIdType();
+		//We need to work around the type system to make this happen
+		id.setMyUidId(clientAcceptQuote.getTempReferencedQuoteId());
+		eiAcceptQuote.setReferencedQuoteID(id);
+
+		System.out.println("Will be searching for quote with: " + eiAcceptQuote.getReferencedQuoteId());
+		
+		logger.trace("TEUA sending EiAcceptQuote to LMA " +
+				eiAcceptQuote.toString());
+			
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EiCreatedQuotePayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/acceptQuote", eiAcceptQuote,
+					EiCreatedQuotePayload.class);
+		
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientAcceptedQuotePayload();
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
+		
+		return result;
+	}
+
 }
