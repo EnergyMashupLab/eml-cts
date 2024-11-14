@@ -32,8 +32,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.concurrent.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 
@@ -45,8 +47,8 @@ public class LmeRestController {
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	//Default arraylist that will hold all of our quotes
-	private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
-	//private static HashSet<EiQuoteType> currentQuotes = new HashSet<>(300);
+	//For higher performance consider an alternate data structure such as a hash table
+	private static List<EiQuoteType> currentQuotes = Collections.synchronizedList(new ArrayList<>()); 
 
 
 	// TODO assign in constructor?
@@ -372,6 +374,7 @@ public class LmeRestController {
 			tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 
 			//Add this into the current quotes arraylist
+			//currentQuotes contains all of the quotes created
 			currentQuotes.add(tempQuote);
 
 			/*
@@ -447,6 +450,7 @@ public class LmeRestController {
 		tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 		System.out.println("Added quote with order ID: " + tempQuote.getMarketOrderId());
 		//Add this quote into the volatile storage. It will never hit the database
+		//currentQuotes is an arraylist containing all quotes
 		currentQuotes.add(tempQuote);
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
