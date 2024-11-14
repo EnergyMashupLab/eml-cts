@@ -405,7 +405,7 @@ public class LmaRestController {
 				tempAccept, 
 				EiAcceptedQuotePayload.class);
 		
-		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+		//logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 	
 		return tempPostResponse;
 	}

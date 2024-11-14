@@ -467,47 +467,55 @@ public class LmeRestController {
 	@PostMapping("/acceptQuote")
 	public EiAcceptedQuotePayload postEiAcceptQuote(
 			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
-		EiQuoteType tempQuote;
+		EiQuoteType tempQuote = new EiQuoteType();
+		EiQuoteType listQuote;
 		EiAcceptQuotePayload tempAccept = null;
 		EiAcceptedQuotePayload tempAccepted;
 		boolean exists = false;
 		
 		//Grab the quote payload and quote itself
 		tempAccept = eiAcceptQuote;
-		tempQuote = new EiQuoteType();
+		tempAccept.setTransaction(new EiTransaction());
 		//Set this for us to search
 		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
-		System.out.println("Looking for: " + tempQuote.getMarketOrderId());
 
-
-		for(EiQuoteType q : currentQuotes){
-			System.out.println("In list: " + q.getMarketOrderId());
-			if(q.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
+		//Search through our list
+		for(int i = 0; i < currentQuotes.size(); i++){
+			//Grab the quote at the current index
+			listQuote = currentQuotes.get(i);
+			//DEBUG statement comment out when done
+			System.out.println("In list: " + listQuote.getMarketOrderId());
+			if(listQuote.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
+				logger.debug("LMEController successfully found quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString());
+				//DEBUG statement comment out
 				System.out.println("Quote FOUND");
 				exists = true;
 				break;
 			}
 		}
 
+		//If we can't find a quote here, that's the end for us
 		if(!exists){
 			System.out.println("Quote not found");
+			logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
+						"will now exit");
+			//FIXME currently this will just return a blank on failure
+			tempAccepted = new EiAcceptedQuotePayload();
+			tempAccepted.setResponse(new EiResponse(200, "Not found"));
+			//TEMPORARY
+			tempAccepted.setTransactionId(new TransactionIdType());
+			tempAccepted.setRecipientTransactionId(new TransactionIdType());
+			return tempAccepted;
 		}
 
-		logger.debug("LmeController before constructor for EiCreatedQuote " +
-				tempQuote.toString());
-//		logger.debug("lme/acceptQuote " + eiAcceptQuote.toString());
-		
+		//Create the EiAcceptedQuotePayload
 		tempAccepted = new EiAcceptedQuotePayload();
 
-		//FIXME later on
 		//Make a new return value with the created Quotes
 		logger.trace("Quote Created");
 
 		return tempAccepted;
 	}
-
-
-
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
 		return queueFromLme;

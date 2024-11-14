@@ -19,6 +19,8 @@ public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 
 	public EiAcceptQuotePayload(MarketOrderIdType referencedQuoteId, long quantity, long price){
 		this.referencedQuoteId = referencedQuoteId;
+		this.quantity = quantity;
+		this.price = price;
 	}
 
 	public MarketOrderIdType getReferencedQuoteId(){
