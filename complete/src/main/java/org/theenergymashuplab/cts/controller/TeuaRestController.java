@@ -695,9 +695,16 @@ public class TeuaRestController {
 			actorIds[numericTeuaId].toString());
 		
 		tempClientAcceptQuote = clientAcceptQuote;	// save the parameter
+		System.out.println(tempClientAcceptQuote.toString());
 				
 		//Construct the accept quote payload
 		eiAcceptQuote = new EiAcceptQuotePayload(tempClientAcceptQuote.getReferencedQuoteId(), tempClientAcceptQuote.getQuantity(), tempClientAcceptQuote.getPrice());
+		MarketOrderIdType id = new MarketOrderIdType();
+		//We need to work around the type system to make this happen
+		id.setMyUidId(clientAcceptQuote.getTempReferencedQuoteId());
+		eiAcceptQuote.setReferencedQuoteID(id);
+
+		System.out.println("Will be searching for quote with: " + eiAcceptQuote.getReferencedQuoteId());
 		
 		logger.trace("TEUA sending EiAcceptQuote to LMA " +
 				eiAcceptQuote.toString());

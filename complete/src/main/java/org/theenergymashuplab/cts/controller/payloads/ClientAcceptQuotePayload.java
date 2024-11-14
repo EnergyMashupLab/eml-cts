@@ -6,7 +6,10 @@ public class ClientAcceptQuotePayload{
 	private String info = "ClientAcceptQuotePayload";
 	private long quantity;
 	private long price;
+	//This is essential, it is the only way that we are able to grab quotes and act upon them
+	//in the LME
 	private MarketOrderIdType referencedQuoteId;
+	private long tempReferencedQuoteId;
 
 
 	//JSON
@@ -22,6 +25,13 @@ public class ClientAcceptQuotePayload{
 		this.referencedQuoteId = referencedQuoteId;
 	}
 
+	public long getTempReferencedQuoteId(){
+		return this.tempReferencedQuoteId;
+	}
+
+	public void setTempReferencedQuoteId(long tempReferencedQuoteId){
+		this.tempReferencedQuoteId = tempReferencedQuoteId;
+	}
 	public long getQuantity(){
 		return this.quantity;
 	}
