@@ -25,7 +25,6 @@ import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /*
  * 	Utility routine to generate random CreateClientTenderPayloads
@@ -105,7 +104,7 @@ public class RandomCreateClientTender {
 		instants = new Instant[24];
 		json = new String[quantity];
 		clientTenders = new ClientCreateTenderPayload[quantity];
-		System.err.println("RandomCreateClientTender Constructor\n\n");
+//		System.err.println("RandomCreateClientTender Constructor\n\n");
 //		mapper.configure((SerializationConfig.Feature.valueOf("WRITE_DATES_AS_TIMESTAMPS")), false);
 		instants[0] = dtStart;
 		for (int i = 1; i < 24; i++) {
@@ -124,7 +123,7 @@ public class RandomCreateClientTender {
 				System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
 			}
 			// and print the json
-//			System.err.println("\n" + json[i] + "***");
+			System.err.println("\n" + json[i] + "***");
 		}
 	}
 

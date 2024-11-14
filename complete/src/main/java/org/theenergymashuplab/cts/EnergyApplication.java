@@ -69,18 +69,32 @@ public class EnergyApplication {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");
 //			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
-			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(32,1,5,50,22,122);
+			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(1,32,5,50,22,122);
+//			RandomCreateClientQuote randomClientQuote = new RandomCreateClientQuote();
 //			while (true) {
+//				System.out.println("Generate how many random ClientCreateTenderPayload objects?");
 //				String userInput = myObj.nextLine();
-//				if (userInput.equals("exit")) {
+//				if (userInput.equals("c")) {
 //					break;
 //				}
 //				else {
 //					int quantity;
 //					try { quantity = Integer.parseInt(userInput); }
-//					catch (NumberFormatException e) { quantity = 0; }
+////					catch (NumberFormatException e) { quantity = 0; }
+//					catch (NumberFormatException e) { break; }
 //					RandomCreateClientTender randomClientTender = new RandomCreateClientTender(quantity);
 //				}
+//			}
+//			while (true) {
+//				System.out.println("Generate how many random ClientCreateStreamTenderPayload objects?");
+//				int tenderQuantity, streamQuantity;
+//				System.out.println("CreateClientStreamTender quantity: ");
+//				try { tenderQuantity = Integer.parseInt(myObj.nextLine()); }
+//				catch (NumberFormatException e) { tenderQuantity = 0; }
+//				System.out.println("StreamIntervals quantity: ");
+//				try { streamQuantity = Integer.parseInt(myObj.nextLine()); }
+//				catch (NumberFormatException e) { streamQuantity = 0; }
+//				RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(tenderQuantity,streamQuantity);
 //			}
 //			ActorId actorId = restTemplate.getForObject(
 //					"https://lma/party", ActorId.class);
