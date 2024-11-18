@@ -31,6 +31,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.xml.transform.OutputKeys;
 import java.util.List;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -461,6 +462,38 @@ public class LmeRestController {
 
 		return tempCreated;
 	}
+
+	@PostMapping("/tickers")
+	public EiManagedTickerSubscriptionPayload postEiManagedTicker(
+			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload)	{
+		TickerType tempTickerType;
+		EiResponseType tempResponse;
+		SubscriptionActionType tempSubscriptionActionTaken;
+		RefIdType tempSubscriptionRequestId;
+		EiManageTickerSubscriptionPayload tempSubscribe = null;
+		EiManagedTickerSubscriptionPayload tempSubscribed;
+
+		tempSubscribe = eiManageTickerSubscriptionPayload;
+		tempTickerType = eiManageTickerSubscriptionPayload.getTickerType();
+		tempSubscriptionActionTaken = eiManageTickerSubscriptionPayload.getSubscriptionActionRequested();
+		tempSubscriptionRequestId = eiManageTickerSubscriptionPayload.getSubscriptionRequestId();
+
+
+		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
+		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
+		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
+		 * with a different tender, leading to a transaction
+		 *
+		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
+
+		tempSubscribed = new EiManagedTickerSubscriptionPayload("Multicast session started successfully", tempSubscriptionActionTaken,
+				new EiResponse(200, "OK"),
+				tempSubscriptionRequestId, tempTickerType);
+
+
+		return tempSubscribed;
+	}
+
 
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
