@@ -48,7 +48,8 @@ public class LmeRestController {
 	private static TenderIdType currentTenderId;
 	//Default arraylist that will hold all of our quotes
 	//For higher performance consider an alternate data structure such as a hash table
-	private static List<EiQuoteType> currentQuotes = Collections.synchronizedList(new ArrayList<>()); 
+	//private static List<EiQuoteType> currentQuotes = Collections.synchronizedList(new ArrayList<>()); 
+	private static List<EiQuoteType> currentQuotes = new ArrayList<>(); 
 
 
 	// TODO assign in constructor?
@@ -450,8 +451,11 @@ public class LmeRestController {
 		tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 		System.out.println("Added quote with order ID: " + tempQuote.getMarketOrderId());
 		//Add this quote into the volatile storage. It will never hit the database
-		//currentQuotes is an arraylist containing all quotes
-		currentQuotes.add(tempQuote);
+		//currentQuotes is an arraylist containing all quotes. Since we may be multithreaded here, we will
+		//lock 
+		synchronized(currentQuotes){
+			currentQuotes.add(tempQuote);
+		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
 												tempQuote.getMarketOrderId(),
@@ -468,6 +472,9 @@ public class LmeRestController {
 	}
 
 	
+	/**
+	 * Accept a quote and make the underlying transaction happen
+	 */
 	@PostMapping("/acceptQuote")
 	public EiAcceptedQuotePayload postEiAcceptQuote(
 			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
@@ -483,40 +490,46 @@ public class LmeRestController {
 		//Set this for us to search
 		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
 
-		//Search through our list
-		for(int i = 0; i < currentQuotes.size(); i++){
-			//Grab the quote at the current index
-			listQuote = currentQuotes.get(i);
-			//DEBUG statement comment out when done
-			System.out.println("In list: " + listQuote.getMarketOrderId());
-			if(listQuote.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
-				logger.debug("LMEController successfully found quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString());
-				//DEBUG statement comment out
-				System.out.println("Quote FOUND");
-				exists = true;
-				break;
+		//Synchronized because this can be multithreaded
+		synchronized(currentQuotes){
+			//Search through our list
+			for(int i = 0; i < currentQuotes.size(); i++){
+				//Grab the quote at the current index
+				listQuote = currentQuotes.get(i);
+				//DEBUG statement comment out when done
+				System.out.println("In list: " + listQuote.getMarketOrderId());
+				if(listQuote.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
+					logger.debug("LMEController successfully found quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString());
+					//DEBUG statement comment out
+					System.out.println("Quote FOUND");
+					exists = true;
+					break;
+				}
 			}
+			//If we can't find a quote here, that's the end for us
+			if(!exists){
+				System.out.println("Quote not found");
+				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
+							"will now exit");
+				//FIXME currently this will just return a blank on failure
+				tempAccepted = new EiAcceptedQuotePayload();
+				tempAccepted.setResponse(new EiResponse(200, "Not found"));
+				//TEMPORARY
+				tempAccepted.setTransactionId(new TransactionIdType());
+				tempAccepted.setRecipientTransactionId(new TransactionIdType());
+			} else {
+				//If we get here, we know that we have the quote so we will act upon it
+	
+				//Create the EiAcceptedQuotePayload
+				tempAccepted = new EiAcceptedQuotePayload();
+
+			
+			}
+
 		}
-
-		//If we can't find a quote here, that's the end for us
-		if(!exists){
-			System.out.println("Quote not found");
-			logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
-						"will now exit");
-			//FIXME currently this will just return a blank on failure
-			tempAccepted = new EiAcceptedQuotePayload();
-			tempAccepted.setResponse(new EiResponse(200, "Not found"));
-			//TEMPORARY
-			tempAccepted.setTransactionId(new TransactionIdType());
-			tempAccepted.setRecipientTransactionId(new TransactionIdType());
-			return tempAccepted;
-		}
-
-		//Create the EiAcceptedQuotePayload
-		tempAccepted = new EiAcceptedQuotePayload();
-
+		
 		//Make a new return value with the created Quotes
-		logger.trace("Quote Created");
+		logger.trace("Quote Accepted");
 
 		return tempAccepted;
 	}
