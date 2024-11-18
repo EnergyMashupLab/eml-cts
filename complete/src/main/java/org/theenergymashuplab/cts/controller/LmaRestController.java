@@ -32,15 +32,8 @@ import org.apache.logging.log4j.Logger;
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
+import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
-import org.theenergymashuplab.cts.TenderIdType;
-import org.theenergymashuplab.cts.TenderIntervalDetail;
-import org.theenergymashuplab.cts.SideType;
-import org.theenergymashuplab.cts.TenderDetail;
-import org.theenergymashuplab.cts.Interval;
-import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.EiTenderType;
-import org.theenergymashuplab.cts.ActorIdType;
 
 @RestController
 @RequestMapping("/lma")
@@ -408,6 +401,28 @@ public class LmaRestController {
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 	
 		return tempPostResponse;
+	}
+
+
+	@PostMapping("/subscriptions")
+	public EiSubscriptionResponseType setSubscription(
+			@RequestBody EiSubscriptionRequestType subscriptionRequestType) {
+		EiSubscriptionResponseType tempReturn;
+		EiSubscriptionRequestType subscriptionRequestType1;
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+
+		subscriptionRequestType1 = subscriptionRequestType;
+
+		restTemplate = builder.build();
+		tempReturn = restTemplate.postForObject
+				("http://localhost:8080/lme/subscriptions", subscriptionRequestType1,
+						EiSubscriptionResponseType.class);
+
+		return tempReturn;
+
 	}
 
 

@@ -716,4 +716,62 @@ public class TeuaRestController {
 		return result;
 	}
 
+
+
+
+	@PostMapping("/{teuaId}}/subscription")
+	public EiSubscriptionResponseType setSubscription(
+			@PathVariable String teuaId,
+			@RequestBody EiSubscriptionRequestType subscriptionRequestType) {
+		EiSubscriptionRequestType tempSubscriptionRequestType;
+		EiSubscriptionResponseType tempReturn;
+		Integer numericTeuaId = -1;
+		String positionUri;
+
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+
+		numericTeuaId = Integer.valueOf(teuaId);
+
+
+		//convert to URI for position manager
+		positionUri = "/position/"
+				+ actorIds[numericTeuaId] +
+				"/getPosition";
+
+		logger.debug("positionUri is " + positionUri);
+
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.debug("postEiCreateTender teuaId " +
+				teuaId +
+				" actorNumericIds[teuaId] " +
+				actorIds[numericTeuaId].toString());
+
+		tempSubscriptionRequestType = subscriptionRequestType;
+
+		// FIXME
+
+		restTemplate = builder.build();
+		EiSubscriptionResponseType result = restTemplate.postForObject
+				("http://localhost:8080/lma/subscriptions", subscriptionRequestType,
+						EiSubscriptionResponseType.class);
+
+		// FIXME
+
+		tempReturn = new EiSubscriptionResponseType();
+
+		return result;
+
+	}
+
 }
