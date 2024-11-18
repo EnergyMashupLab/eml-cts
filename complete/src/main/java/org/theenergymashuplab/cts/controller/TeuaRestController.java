@@ -717,7 +717,7 @@ public class TeuaRestController {
 	}
 
 
-	@PostMapping("{teuaId}/tickers")
+	@PostMapping("{teuaId}/clientManageTickerSubscription")
 	public EiManagedTickerSubscriptionPayload postClientTicker(
 			@PathVariable String teuaId,
 			@RequestBody ClientManageTickerSubscriptionPayload clientManageTickerSubscriptionPayload){
@@ -725,7 +725,7 @@ public class TeuaRestController {
 		ClientManagedTickerSubscriptionPayload tempReturn;
 		EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload;
 		Integer numericTeuaId = -1;
-		String positionUri;
+
 
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
@@ -741,11 +741,6 @@ public class TeuaRestController {
 
 		numericTeuaId = Integer.valueOf(teuaId);
 
-		//convert to URI for position manager
-		positionUri = "/position/"
-				+ actorIds[numericTeuaId] +
-				"/getPosition";
-		logger.debug("positionUri is " + positionUri);
 
 		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
 		logger.debug("postEiCreateTender teuaId " +
@@ -765,7 +760,7 @@ public class TeuaRestController {
 
 		restTemplate = builder.build();
 		EiManagedTickerSubscriptionPayload result = restTemplate.postForObject
-				("http://localhost:8080/lma/tickers", eiManageTickerSubscriptionPayload,
+				("http://localhost:8080/lma/manageSubscription", eiManageTickerSubscriptionPayload,
 						EiManagedTickerSubscriptionPayload.class);
 
 		// and put CtsTenderId in ClientCreatedTenderPayload

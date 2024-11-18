@@ -410,7 +410,7 @@ public class LmaRestController {
 		return tempPostResponse;
 	}
 
-	@PostMapping("/tickers")
+	@PostMapping("/manageSubscription")
 	public EiManagedTickerSubscriptionPayload postEiManagedTickerSubscription(
 			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload
 	){
@@ -429,7 +429,7 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/tickers",
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/manageSubscription",
 				tempManage,
 				EiManagedTickerSubscriptionPayload.class);
 

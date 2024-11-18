@@ -463,7 +463,7 @@ public class LmeRestController {
 		return tempCreated;
 	}
 
-	@PostMapping("/tickers")
+	@PostMapping("/manageSubscription")
 	public EiManagedTickerSubscriptionPayload postEiManagedTicker(
 			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload)	{
 		TickerType tempTickerType;
