@@ -398,8 +398,7 @@ public class LmeRestController {
 		response.setResponse(new EiResponse(210, "NOT YET IMPLEMENTED"));
 		response.setCounterPartyId(counterPartyID);
 		response.setCreatedQuotes(createdQuotes);
-
-		return response;
+return response;
 	}
 		
 	/*
@@ -482,6 +481,8 @@ public class LmeRestController {
 		EiQuoteType listQuote;
 		EiAcceptQuotePayload tempAccept = null;
 		EiAcceptedQuotePayload tempAccepted;
+		//In anticipation, we'll need a transaction here
+		EiTransaction transaction = new EiTransaction();
 		boolean exists = false;
 		
 		//Grab the quote payload and quote itself
@@ -489,6 +490,11 @@ public class LmeRestController {
 		tempAccept.setTransaction(new EiTransaction());
 		//Set this for us to search
 		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
+
+		//We can create these now before searching
+		tempAccepted = new EiAcceptedQuotePayload();
+		tempAccepted.setPartyId(tempAccept.getPartyId());
+		tempAccepted.setCounterPartyId(tempAccept.getCounterPartyId());
 
 		//Synchronized because this can be multithreaded
 		synchronized(currentQuotes){
@@ -512,7 +518,6 @@ public class LmeRestController {
 				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
 							"will now exit");
 				//FIXME currently this will just return a blank on failure
-				tempAccepted = new EiAcceptedQuotePayload();
 				tempAccepted.setResponse(new EiResponse(200, "Not found"));
 				//TEMPORARY
 				tempAccepted.setTransactionId(new TransactionIdType());
@@ -521,16 +526,17 @@ public class LmeRestController {
 				//If we get here, we know that we have the quote so we will act upon it
 	
 				//Create the EiAcceptedQuotePayload
-				tempAccepted = new EiAcceptedQuotePayload();
 
-			
+				
+				//Make a new return value with the created Quotes
+				logger.trace("Quote Accepted");
+
 			}
 
 		}
-		
-		//Make a new return value with the created Quotes
-		logger.trace("Quote Accepted");
-
+	
+		//Set the transaction ID here
+		tempAccepted.setTransactionId(transaction.getTransactionId());
 		return tempAccepted;
 	}
 

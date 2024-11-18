@@ -703,6 +703,9 @@ public class TeuaRestController {
 		//We need to work around the type system to make this happen
 		id.setMyUidId(clientAcceptQuote.getTempReferencedQuoteId());
 		eiAcceptQuote.setReferencedQuoteID(id);
+		//These will be flipped on an accept quote
+		eiAcceptQuote.setCounterPartyId(actorIds[numericTeuaId]);
+		eiAcceptQuote.setPartyId(lmePartyId);
 
 		System.out.println("Will be searching for quote with: " + eiAcceptQuote.getReferencedQuoteId());
 		
