@@ -478,9 +478,19 @@ return response;
 	public EiAcceptedQuotePayload postEiAcceptQuote(
 			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
 		EiQuoteType tempQuote = new EiQuoteType();
-		EiQuoteType listQuote;
+		EiQuoteType listQuote = new EiQuoteType();
 		EiAcceptQuotePayload tempAccept = null;
 		EiAcceptedQuotePayload tempAccepted;
+
+		//These dummy transactions with negative IDs will be given back if we have a 
+		//failed transaction.
+		//TODO this may need to be changed later, but it is the best way that I can think of to
+		//indicate that an Accept quote failed
+		TransactionIdType tempTransaction = new TransactionIdType();
+		tempTransaction.setMyUidId(-1);
+		TransactionIdType tempTransaction2 = new TransactionIdType();
+		tempTransaction2.setMyUidId(-1);
+
 		//In anticipation, we'll need a transaction here
 		EiTransaction transaction = new EiTransaction();
 		boolean exists = false;
@@ -507,32 +517,52 @@ return response;
 				if(listQuote.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
 					logger.debug("LMEController successfully found quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString());
 					//DEBUG statement comment out
-					System.out.println("Quote FOUND");
 					exists = true;
 					break;
 				}
 			}
+
 			//If we can't find a quote here, that's the end for us
 			if(!exists){
-				System.out.println("Quote not found");
 				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
 							"will now exit");
-				//FIXME currently this will just return a blank on failure
 				tempAccepted.setResponse(new EiResponse(200, "Not found"));
-				//TEMPORARY
-				tempAccepted.setTransactionId(new TransactionIdType());
-				tempAccepted.setRecipientTransactionId(new TransactionIdType());
+
+
+				//Currently here we'll just set these transactions to have an ID of -1(bad)
+				tempAccepted.setTransactionId(tempTransaction);
+				tempAccepted.setRecipientTransactionId(tempTransaction2);
+
+				//Log it
+				logger.trace("Quote not found");
+
+			//If we get here, we know that we have the quote so we will act upon it
 			} else {
-				//If we get here, we know that we have the quote so we will act upon it
-	
-				//Create the EiAcceptedQuotePayload
+				//Grab the quantity
+				long quoteQuantity = ((TenderIntervalDetail)listQuote.getTenderDetail()).getQuantity();
+				//Grab the price
+				long quotePrice = ((TenderIntervalDetail)listQuote.getTenderDetail()).getPrice();
+
+				/**
+				 * There are two areas where we could have an issue here:
+				 * 		1.) The Accepter is asking for more than the current quantity
+				 * 		2.) The Accepter is bidding a lower price than the current price
+				 * 	On each of these cases, we will send a blank eiAccepted quote as it failed
+				 */
+				if(tempAccept.getQuantity() > quoteQuantity || tempAccept.getPrice() < quotePrice){
+					//Currently here we'll just set these transactions to have an ID of -1(bad)
+					tempAccepted.setTransactionId(tempTransaction);
+					tempAccepted.setRecipientTransactionId(tempTransaction2);
+					tempAccepted.setResponse(new EiResponse(200, "Quote not accepted due to price/quantity mismatch"));
+					//And we'll get out
+					return tempAccepted;
+				}
+
 
 				
 				//Make a new return value with the created Quotes
 				logger.trace("Quote Accepted");
-
 			}
-
 		}
 	
 		//Set the transaction ID here
