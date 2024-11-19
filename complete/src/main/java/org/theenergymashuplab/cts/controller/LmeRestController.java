@@ -486,10 +486,10 @@ return response;
 		//failed transaction.
 		//TODO this may need to be changed later, but it is the best way that I can think of to
 		//indicate that an Accept quote failed
-		TransactionIdType tempTransaction = new TransactionIdType();
-		tempTransaction.setMyUidId(-1);
-		TransactionIdType tempTransaction2 = new TransactionIdType();
-		tempTransaction2.setMyUidId(-1);
+		TransactionIdType tempTransactionID = new TransactionIdType();
+		tempTransactionID.setMyUidId(-1);
+		TransactionIdType tempTransactionID2 = new TransactionIdType();
+		tempTransactionID2.setMyUidId(-1);
 
 		//In anticipation, we'll need a transaction here
 		EiTransaction transaction = new EiTransaction();
@@ -521,17 +521,17 @@ return response;
 					break;
 				}
 			}
-
 			//If we can't find a quote here, that's the end for us
 			if(!exists){
+				System.out.println("Quote with:" + tempQuote.getMarketOrderId().toString() + " does not exist. ERROR");
 				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
 							"will now exit");
-				tempAccepted.setResponse(new EiResponse(200, "Not found"));
+				tempAccepted.setResponse(new EiResponse(500, "Referenced Quote ID does not exist in the QDM"));
 
 
 				//Currently here we'll just set these transactions to have an ID of -1(bad)
-				tempAccepted.setTransactionId(tempTransaction);
-				tempAccepted.setRecipientTransactionId(tempTransaction2);
+				tempAccepted.setTransactionId(tempTransactionID);
+				tempAccepted.setRecipientTransactionId(tempTransactionID2);
 
 				//Log it
 				logger.trace("Quote not found");
@@ -550,15 +550,16 @@ return response;
 				 * 	On each of these cases, we will send a blank eiAccepted quote as it failed
 				 */
 				if(tempAccept.getQuantity() > quoteQuantity || tempAccept.getPrice() < quotePrice){
+					System.out.println("Quote will be rejected due to bad quantity/price");
 					//Currently here we'll just set these transactions to have an ID of -1(bad)
-					tempAccepted.setTransactionId(tempTransaction);
-					tempAccepted.setRecipientTransactionId(tempTransaction2);
-					tempAccepted.setResponse(new EiResponse(200, "Quote not accepted due to price/quantity mismatch"));
+					tempAccepted.setTransactionId(tempTransactionID);
+					tempAccepted.setRecipientTransactionId(tempTransactionID2);
+					tempAccepted.setResponse(new EiResponse(500, "Quote not accepted due to price/quantity mismatch"));
 					//And we'll get out
 					return tempAccepted;
 				}
 
-
+				//If we get here, we know that we have a quote that we can act upon and create a transaction with 
 				
 				//Make a new return value with the created Quotes
 				logger.trace("Quote Accepted");
