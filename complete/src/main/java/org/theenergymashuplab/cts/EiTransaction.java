@@ -46,6 +46,10 @@ public class EiTransaction {
 	public EiTenderType getTender()	{
 		return tender;
 	}
+
+	public void setTender(EiTenderType tender){
+		this.tender = tender;
+	}
 	
 	public String toString() {
 		return ("EiTransaction transactionId " + this.transactionId.toString() +
