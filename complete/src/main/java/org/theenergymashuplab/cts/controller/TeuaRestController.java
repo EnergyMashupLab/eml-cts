@@ -638,6 +638,7 @@ public class TeuaRestController {
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 		eiCreateQuote.setPartyId(actorIds[numericTeuaId]);
 		eiCreateQuote.setCounterPartyId(lmePartyId);
+		eiCreateQuote.setRequestPrivate(false);
 		
 		logger.trace("TEUA sending EiCreateTender to LMA " +
 				eiCreateQuote.toString());

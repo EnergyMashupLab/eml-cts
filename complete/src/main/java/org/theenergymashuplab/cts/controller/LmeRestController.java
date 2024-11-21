@@ -33,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.*;
+import java.awt.JobAttributes.SidesType;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -559,7 +560,27 @@ return response;
 					return tempAccepted;
 				}
 
+				//If we are buying the whole thing we'll have to delete it
+				if(quoteQuantity == tempAccept.getQuantity()){
+					currentQuotes.remove(listQuote);
+				} else {
+					//Update the quantity that we currently have available
+					((TenderIntervalDetail)listQuote.getTenderDetail()).setQuantity(quoteQuantity - tempAccept.getQuantity());
+				}
+
+				//DEBUG
+				System.out.println("After transaction: " + listQuote.toString());
+
 				//If we get here, we know that we have a quote that we can act upon and create a transaction with 
+				//Create the tender for us to use here
+				EiTenderType tender = new EiTenderType(listQuote.getExpirationTime(),
+														SideType.BUY,
+														new TenderIntervalDetail(((TenderIntervalDetail)listQuote.getTenderDetail()).getInterval(),
+																				 tempAccept.getPrice(),
+																				 tempAccept.getQuantity()));
+				//Set the tender for our transaction
+				transaction.setTender(tender);
+				
 				
 				//Make a new return value with the created Quotes
 				logger.trace("Quote Accepted");
