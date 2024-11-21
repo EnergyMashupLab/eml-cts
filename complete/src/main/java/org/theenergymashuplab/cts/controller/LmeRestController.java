@@ -46,6 +46,7 @@ public class LmeRestController {
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
 	private static QuoteTickerType quoteTickerType;
+	private static TenderTickerType tenderTickerType;
 	//Default arraylist that will hold all of our quotes
 	//private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
 	private static HashSet<EiQuoteType> currentQuotes = new HashSet<>();
@@ -166,7 +167,7 @@ public class LmeRestController {
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
 		tempTender.setMarketOrderId(new MarketOrderIdType());
-		
+		tenderTickerType.setTender(tempTender);
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
 		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
