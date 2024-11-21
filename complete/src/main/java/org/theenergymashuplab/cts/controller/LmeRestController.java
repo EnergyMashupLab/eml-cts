@@ -422,7 +422,6 @@ public class LmeRestController {
 		//Grab the quote payload and quote itself
 		tempCreate = eiCreateQuote;
 		tempQuote = eiCreateQuote.getQuote();
-		quoteTickerType.setQuote(tempQuote);
 
 		logger.debug("LmeController before constructor for EiCreatedQuote " +
 				tempQuote.toString());
@@ -451,6 +450,9 @@ public class LmeRestController {
 		//Add this quote into the volatile storage. It will never hit the database
 		addSuccess = currentQuotes.add(tempQuote);
 
+		//Set down here after marketOrderID is set
+
+		quoteTickerType.setQuote(tempQuote);
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
 												tempQuote.getMarketOrderId(),
 												tempCreate.getPartyId(),
