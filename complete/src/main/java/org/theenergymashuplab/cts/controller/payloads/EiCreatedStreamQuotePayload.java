@@ -9,7 +9,7 @@ public class EiCreatedStreamQuotePayload{
     private ActorIdType partyId;
     private ActorIdType counterPartyId;
     public EiResponse response;
-    private List<Long> createdQuotes;
+    private List<EiQuoteType> createdQuotes;
 
     // Need clarification as to what this attribute refers to before changing or deleting
     private final RefIdType refId = new RefIdType();
@@ -22,7 +22,7 @@ public class EiCreatedStreamQuotePayload{
     public EiCreatedStreamQuotePayload()	{
     }
 
-    public EiCreatedStreamQuotePayload(MarketOrderIdType marketOrderId, ActorIdType partyId, ActorIdType counterPartyId, EiResponse response, List<Long> createdQuotes, RefIdType inResponseTo) {
+    public EiCreatedStreamQuotePayload(MarketOrderIdType marketOrderId, ActorIdType partyId, ActorIdType counterPartyId, EiResponse response, List<EiQuoteType> createdQuotes, RefIdType inResponseTo) {
         this.marketOrderId = marketOrderId;
         this.partyId = partyId;
         this.counterPartyId = counterPartyId;
@@ -35,11 +35,11 @@ public class EiCreatedStreamQuotePayload{
         System.err.println(this);
     }
 
-    public List<Long> getCreatedQuotes(){
-        return this.createdQuotes;
+    public List<EiQuoteType> getCreatedQuotes(){
+		return this.createdQuotes;
     }
 
-    public void setCreatedQuotes(List<Long> createdQuotes){
+    public void setCreatedQuotes(List<EiQuoteType> createdQuotes){
         this.createdQuotes = createdQuotes;
     }
 

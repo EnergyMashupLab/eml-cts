@@ -325,7 +325,8 @@ public class LmeRestController {
 		TenderIntervalDetail quoteDetail;
 		BridgeInterval currentStartInterval;
 		BridgeInstant currentStartInstant = new BridgeInstant();
-		List<Long> createdQuotes = new ArrayList<>();
+		//A list of all of the created quotes
+		List<EiQuoteType> createdQuotes = new ArrayList<>();
 		TenderStreamDetail quoteStreamDetail;
 		ActorIdType partyID;
 		ActorIdType counterPartyID;
@@ -375,18 +376,27 @@ public class LmeRestController {
 			//FIXME later on-- forced to be 1 now
 			tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 
+			/**
+			 * Remember here: a quote IS a tender and inherits from parent TenderBase
+			 */
+
+			//Set the marketOrderID here
+			tempQuote.setMarketOrderId(new MarketOrderIdType());
+			//No execution instructions
+			tempQuote.setExecutionInstructions(null);
+			//Not private -- we want to publish
+			tempQuote.setPrivateQuote(false);
+			//Always energy for right now
+			tempQuote.setResourceDesignator(ResourceDesignatorType.ENERGY);
+			//The quote is tradeable
+			tempQuote.setTradeable(true);
+
 			//Add this into the current quotes arraylist
 			//currentQuotes contains all of the quotes created
 			currentQuotes.add(tempQuote);
 
-			/*
-			tempCreate = new EiCreateQuotePayload(tempQuote, partyID, counterPartyID);
-
-			//set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
-			tempCreate.setPartyId(partyID);
-			tempCreate.setCounterPartyId(counterPartyID);
-			*/
-			createdQuotes.add(tempQuote.getQuoteId().value());
+			//Add this into the big list of all created quotes
+			createdQuotes.add(tempQuote);
 		}
 
 		//Make a new return value with the created Quotes
@@ -396,10 +406,10 @@ public class LmeRestController {
 		/* ================================================================ */
 
 		response.setPartyId(partyID);
-		response.setResponse(new EiResponse(210, "NOT YET IMPLEMENTED"));
+		response.setResponse(new EiResponse(200, "Stream Quote Creation Succeeded"));
 		response.setCounterPartyId(counterPartyID);
 		response.setCreatedQuotes(createdQuotes);
-return response;
+		return response;
 	}
 		
 	/*
@@ -481,7 +491,8 @@ return response;
 		EiQuoteType tempQuote = new EiQuoteType();
 		EiQuoteType listQuote = new EiQuoteType();
 		EiAcceptQuotePayload tempAccept = null;
-		EiAcceptedQuotePayload tempAccepted;
+		EiAcceptedQuotePayload sellerAccepted;
+		EiAcceptedQuotePayload buyerAccepted;
 
 		//These dummy transactions with negative IDs will be given back if we have a 
 		//failed transaction.
@@ -503,9 +514,9 @@ return response;
 		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
 
 		//We can create these now before searching
-		tempAccepted = new EiAcceptedQuotePayload();
-		tempAccepted.setPartyId(tempAccept.getPartyId());
-		tempAccepted.setCounterPartyId(tempAccept.getCounterPartyId());
+		buyerAccepted = new EiAcceptedQuotePayload();
+		buyerAccepted.setPartyId(tempAccept.getPartyId());
+		buyerAccepted.setCounterPartyId(tempAccept.getCounterPartyId());
 
 		//Synchronized because this can be multithreaded
 		synchronized(currentQuotes){
@@ -527,12 +538,12 @@ return response;
 				System.out.println("Quote with:" + tempQuote.getMarketOrderId().toString() + " does not exist. ERROR");
 				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
 							"will now exit");
-				tempAccepted.setResponse(new EiResponse(500, "Referenced Quote ID does not exist in the QDM"));
+				buyerAccepted.setResponse(new EiResponse(500, "Referenced Quote ID does not exist in the QDM"));
 
 
 				//Currently here we'll just set these transactions to have an ID of -1(bad)
-				tempAccepted.setTransactionId(tempTransactionID);
-				tempAccepted.setRecipientTransactionId(tempTransactionID2);
+				buyerAccepted.setTransactionId(tempTransactionID);
+				buyerAccepted.setRecipientTransactionId(tempTransactionID2);
 
 				//Log it
 				logger.trace("Quote not found");
@@ -553,11 +564,11 @@ return response;
 				if(tempAccept.getQuantity() > quoteQuantity || tempAccept.getPrice() < quotePrice){
 					System.out.println("Quote will be rejected due to bad quantity/price");
 					//Currently here we'll just set these transactions to have an ID of -1(bad)
-					tempAccepted.setTransactionId(tempTransactionID);
-					tempAccepted.setRecipientTransactionId(tempTransactionID2);
-					tempAccepted.setResponse(new EiResponse(500, "Quote not accepted due to price/quantity mismatch"));
+					buyerAccepted.setTransactionId(tempTransactionID);
+					buyerAccepted.setRecipientTransactionId(tempTransactionID2);
+					buyerAccepted.setResponse(new EiResponse(500, "Quote not accepted due to price/quantity mismatch"));
 					//And we'll get out
-					return tempAccepted;
+					return buyerAccepted;
 				}
 
 				//If we are buying the whole thing we'll have to delete it
@@ -569,6 +580,7 @@ return response;
 				}
 
 				//DEBUG
+				System.out.println("Quote will be LIFTED");
 				System.out.println("After transaction: " + listQuote.toString());
 
 				//If we get here, we know that we have a quote that we can act upon and create a transaction with 
@@ -580,6 +592,9 @@ return response;
 																				 tempAccept.getQuantity()));
 				//Set the tender for our transaction
 				transaction.setTender(tender);
+
+				
+
 				
 				
 				//Make a new return value with the created Quotes
@@ -588,8 +603,8 @@ return response;
 		}
 	
 		//Set the transaction ID here
-		tempAccepted.setTransactionId(transaction.getTransactionId());
-		return tempAccepted;
+		buyerAccepted.setTransactionId(transaction.getTransactionId());
+		return buyerAccepted;
 	}
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
