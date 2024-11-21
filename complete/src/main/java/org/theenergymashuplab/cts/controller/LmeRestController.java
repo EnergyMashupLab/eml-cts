@@ -45,6 +45,7 @@ public class LmeRestController {
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
+	private static QuoteTickerType quoteTickerType;
 	//Default arraylist that will hold all of our quotes
 	//private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
 	private static HashSet<EiQuoteType> currentQuotes = new HashSet<>();
@@ -421,6 +422,7 @@ public class LmeRestController {
 		//Grab the quote payload and quote itself
 		tempCreate = eiCreateQuote;
 		tempQuote = eiCreateQuote.getQuote();
+		quoteTickerType.setQuote(tempQuote);
 
 		logger.debug("LmeController before constructor for EiCreatedQuote " +
 				tempQuote.toString());
