@@ -396,6 +396,7 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempAccept = eiAcceptQuote;	
 		
+		System.out.println("IN LMA:" + tempAccept.getTransaction());
 		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " +
 				tempAccept.getReferencedQuoteId().toString());
 		/*
@@ -405,7 +406,7 @@ public class LmaRestController {
 				tempAccept, 
 				EiAcceptedQuotePayload.class);
 		
-		//logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 	
 		return tempPostResponse;
 	}

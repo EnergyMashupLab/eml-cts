@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.naming.TransactionRef;
 
 //For RestTemplate
 @RestController
@@ -727,15 +728,18 @@ public class TeuaRestController {
 			actorIds[numericTeuaId].toString());
 		
 		tempClientAcceptQuote = clientAcceptQuote;	// save the parameter
-		System.out.println(tempClientAcceptQuote.toString());
 				
 		//Construct the accept quote payload
+		//This constructor will do all of the transaction creation for us
 		eiAcceptQuote = new EiAcceptQuotePayload(tempClientAcceptQuote.getReferencedQuoteId(), tempClientAcceptQuote.getQuantity(), tempClientAcceptQuote.getPrice());
-		MarketOrderIdType id = new MarketOrderIdType();
+		//DEBUG
+		System.out.println(eiAcceptQuote.getTransaction());
 
 		//We need to work around the type system to make this happen
+		MarketOrderIdType id = new MarketOrderIdType();
 		id.setMyUidId(clientAcceptQuote.getTempReferencedQuoteId());
 		eiAcceptQuote.setReferencedQuoteID(id);
+
 		//These will be flipped on an accept quote
 		eiAcceptQuote.setCounterPartyId(actorIds[numericTeuaId]);
 		eiAcceptQuote.setPartyId(lmePartyId);
@@ -753,6 +757,8 @@ public class TeuaRestController {
 		
 		// and put CtsTenderId in ClientCreatedTenderPayload
 		tempReturn = new ClientAcceptedQuotePayload();
+		//Set the market order ID
+		tempReturn.setReferencedQuoteId(result.getMarketOrderId());;
 		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());
 		

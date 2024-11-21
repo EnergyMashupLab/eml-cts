@@ -493,6 +493,7 @@ public class LmeRestController {
 		EiAcceptQuotePayload tempAccept = null;
 		EiAcceptedQuotePayload sellerAccepted;
 		EiAcceptedQuotePayload buyerAccepted;
+		EiTenderType transactionTender;
 
 		//These dummy transactions with negative IDs will be given back if we have a 
 		//failed transaction.
@@ -504,12 +505,10 @@ public class LmeRestController {
 		tempTransactionID2.setMyUidId(-1);
 
 		//In anticipation, we'll need a transaction here
-		EiTransaction transaction = new EiTransaction();
 		boolean exists = false;
 		
 		//Grab the quote payload and quote itself
 		tempAccept = eiAcceptQuote;
-		tempAccept.setTransaction(new EiTransaction());
 		//Set this for us to search
 		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
 
@@ -554,6 +553,13 @@ public class LmeRestController {
 				long quoteQuantity = ((TenderIntervalDetail)listQuote.getTenderDetail()).getQuantity();
 				//Grab the price
 				long quotePrice = ((TenderIntervalDetail)listQuote.getTenderDetail()).getPrice();
+				//Grab the tender from the premade transaction
+				transactionTender = tempAccept.getTransaction().getTender();
+				System.out.println("TENDER IS:"+transactionTender);
+				//Grab the accept quantity
+				long tempQuantity = ((TenderIntervalDetail)transactionTender.getTenderDetail()).getQuantity();
+				//Grab the accept price
+				long tempPrice = ((TenderIntervalDetail)transactionTender.getTenderDetail()).getPrice();
 
 				/**
 				 * There are two areas where we could have an issue here:
@@ -561,7 +567,7 @@ public class LmeRestController {
 				 * 		2.) The Accepter is bidding a lower price than the current price
 				 * 	On each of these cases, we will send a blank eiAccepted quote as it failed
 				 */
-				if(tempAccept.getQuantity() > quoteQuantity || tempAccept.getPrice() < quotePrice){
+				if(tempQuantity > quoteQuantity || tempPrice < quotePrice){
 					System.out.println("Quote will be rejected due to bad quantity/price");
 					//Currently here we'll just set these transactions to have an ID of -1(bad)
 					buyerAccepted.setTransactionId(tempTransactionID);
@@ -572,38 +578,31 @@ public class LmeRestController {
 				}
 
 				//If we are buying the whole thing we'll have to delete it
-				if(quoteQuantity == tempAccept.getQuantity()){
+				if(quoteQuantity == tempQuantity){
 					currentQuotes.remove(listQuote);
 				} else {
 					//Update the quantity that we currently have available
-					((TenderIntervalDetail)listQuote.getTenderDetail()).setQuantity(quoteQuantity - tempAccept.getQuantity());
+					((TenderIntervalDetail)listQuote.getTenderDetail()).setQuantity(quoteQuantity - tempQuantity);
 				}
 
 				//DEBUG
 				System.out.println("Quote will be LIFTED");
 				System.out.println("After transaction: " + listQuote.toString());
 
-				//If we get here, we know that we have a quote that we can act upon and create a transaction with 
-				//Create the tender for us to use here
-				EiTenderType tender = new EiTenderType(listQuote.getExpirationTime(),
-														SideType.BUY,
-														new TenderIntervalDetail(((TenderIntervalDetail)listQuote.getTenderDetail()).getInterval(),
-																				 tempAccept.getPrice(),
-																				 tempAccept.getQuantity()));
-				//Set the tender for our transaction
-				transaction.setTender(tender);
+				//We are buying
+				transactionTender.setSide(SideType.BUY);
+				//Set this just for buyer info
+				transactionTender.setExpirationTime(listQuote.getExpirationTime());
 
-				
-
-				
 				
 				//Make a new return value with the created Quotes
 				logger.trace("Quote Accepted");
 			}
 		}
+		//Set the transactionID
+		buyerAccepted.setTransactionId(tempAccept.getTransaction().getTransactionId());
 	
 		//Set the transaction ID here
-		buyerAccepted.setTransactionId(transaction.getTransactionId());
 		return buyerAccepted;
 	}
 
