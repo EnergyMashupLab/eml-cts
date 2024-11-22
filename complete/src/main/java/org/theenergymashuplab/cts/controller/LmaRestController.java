@@ -408,17 +408,17 @@ public class LmaRestController {
 	public EiSubscriptionResponseType setSubscription(
 			@RequestBody EiSubscriptionRequestType subscriptionRequestType) {
 		EiSubscriptionResponseType tempReturn;
-		EiSubscriptionRequestType subscriptionRequestType1;
+		EiSubscriptionRequestType tempSubscriptionRequestType;
 
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
 		RestTemplate restTemplate = builder.build();
 
-		subscriptionRequestType1 = subscriptionRequestType;
+		tempSubscriptionRequestType = subscriptionRequestType;
 
 		restTemplate = builder.build();
 		tempReturn = restTemplate.postForObject
-				("http://localhost:8080/lme/subscriptions", subscriptionRequestType1,
+				("http://localhost:8080/lme/subscriptions", tempSubscriptionRequestType,
 						EiSubscriptionResponseType.class);
 
 		return tempReturn;

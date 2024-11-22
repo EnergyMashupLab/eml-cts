@@ -722,11 +722,10 @@ public class TeuaRestController {
 	@PostMapping("/{teuaId}}/subscription")
 	public EiSubscriptionResponseType setSubscription(
 			@PathVariable String teuaId,
-			@RequestBody EiSubscriptionRequestType subscriptionRequestType) {
-		EiSubscriptionRequestType tempSubscriptionRequestType;
-		EiSubscriptionResponseType tempReturn;
+			@RequestBody ClientSubscriptionRequestType subscriptionRequestType) {
+		ClientSubscriptionRequestType tempSubscriptionRequestType;
+		ClientSubscriptionResponseType tempReturn;
 		Integer numericTeuaId = -1;
-		String positionUri;
 
 
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -744,19 +743,6 @@ public class TeuaRestController {
 		numericTeuaId = Integer.valueOf(teuaId);
 
 
-		//convert to URI for position manager
-		positionUri = "/position/"
-				+ actorIds[numericTeuaId] +
-				"/getPosition";
-
-		logger.debug("positionUri is " + positionUri);
-
-		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
-		logger.debug("postEiCreateTender teuaId " +
-				teuaId +
-				" actorNumericIds[teuaId] " +
-				actorIds[numericTeuaId].toString());
-
 		tempSubscriptionRequestType = subscriptionRequestType;
 
 		// FIXME
@@ -768,7 +754,7 @@ public class TeuaRestController {
 
 		// FIXME
 
-		tempReturn = new EiSubscriptionResponseType();
+		tempReturn = new ClientSubscriptionResponseType();
 
 		return result;
 
