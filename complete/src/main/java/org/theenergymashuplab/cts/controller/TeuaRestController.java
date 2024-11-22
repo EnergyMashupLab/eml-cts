@@ -719,45 +719,6 @@ public class TeuaRestController {
 
 
 
-	@PostMapping("/{teuaId}}/subscription")
-	public EiSubscriptionResponseType setSubscription(
-			@PathVariable String teuaId,
-			@RequestBody ClientSubscriptionRequestType subscriptionRequestType) {
-		ClientSubscriptionRequestType tempSubscriptionRequestType;
-		ClientSubscriptionResponseType tempReturn;
-		Integer numericTeuaId = -1;
 
-
-		final RestTemplateBuilder builder = new RestTemplateBuilder();
-		// scope is function postEiCreateTender
-		RestTemplate restTemplate = builder.build();
-
-		if (lmePartyId == null)	{
-			// builder = new RestTemplateBuilder();
-			restTemplate = builder.build();
-			lmePartyId = restTemplate.getForObject(
-					"http://localhost:8080/lme/party",
-					ActorIdType.class);
-		}
-
-		numericTeuaId = Integer.valueOf(teuaId);
-
-
-		tempSubscriptionRequestType = subscriptionRequestType;
-
-		// FIXME
-
-		restTemplate = builder.build();
-		EiSubscriptionResponseType result = restTemplate.postForObject
-				("http://localhost:8080/lma/subscriptions", subscriptionRequestType,
-						EiSubscriptionResponseType.class);
-
-		// FIXME
-
-		tempReturn = new ClientSubscriptionResponseType();
-
-		return result;
-
-	}
 
 }

@@ -404,26 +404,6 @@ public class LmaRestController {
 	}
 
 
-	@PostMapping("/subscriptions")
-	public EiSubscriptionResponseType setSubscription(
-			@RequestBody EiSubscriptionRequestType subscriptionRequestType) {
-		EiSubscriptionResponseType tempReturn;
-		EiSubscriptionRequestType tempSubscriptionRequestType;
-
-		final RestTemplateBuilder builder = new RestTemplateBuilder();
-		// scope is function postEiCreateTender
-		RestTemplate restTemplate = builder.build();
-
-		tempSubscriptionRequestType = subscriptionRequestType;
-
-		restTemplate = builder.build();
-		tempReturn = restTemplate.postForObject
-				("http://localhost:8080/lme/subscriptions", tempSubscriptionRequestType,
-						EiSubscriptionResponseType.class);
-
-		return tempReturn;
-
-	}
 
 
 	public static EiTenderType getCurrentTender() {

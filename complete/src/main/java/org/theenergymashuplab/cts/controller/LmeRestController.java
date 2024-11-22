@@ -462,20 +462,6 @@ public class LmeRestController {
 		return tempCreated;
 	}
 
-	@PostMapping("/subscriptions")
-	public EiSubscriptionResponseType postEiSubscription(
-			@RequestBody EiSubscriptionRequestType eiSubscriptionRequestType)	{
-		SubscriptionActionType subscriptionActionTaken;
-		EiSubscriptionResponseType tempReturn;
-
-		// FIXME later Gaurav
-		//  // there is nothing in EiResponseType
-
-		tempReturn = new EiSubscriptionResponseType("Multicast listen refrence", new EiResponseType(), eiSubscriptionRequestType.getSubscriptionActionRequested(),
-				eiSubscriptionRequestType.getSubscriptionRequestId());
-
-		return tempReturn;
-	}
 
 
 
