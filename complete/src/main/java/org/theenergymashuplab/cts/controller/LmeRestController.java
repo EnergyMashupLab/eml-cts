@@ -47,6 +47,9 @@ public class LmeRestController {
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
+	//Quote and tender tickers
+	private static QuoteTickerType quoteTicker = new QuoteTickerType();
+	private static TenderTickerType tenderTicker = new TenderTickerType();
 	//Default arraylist that will hold all of our quotes
 	//For higher performance consider an alternate data structure such as a hash table
 	//private static List<EiQuoteType> currentQuotes = Collections.synchronizedList(new ArrayList<>()); 
@@ -168,6 +171,9 @@ public class LmeRestController {
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
 		tempTender.setMarketOrderId(new MarketOrderIdType());
+		//Set the tender Ticker
+		//TODO not fully implemented
+		tenderTicker.setTender(tempTender);
 		
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
@@ -393,9 +399,19 @@ public class LmeRestController {
 
 			//Add this into the current quotes arraylist
 			//currentQuotes contains all of the quotes created
-			currentQuotes.add(tempQuote);
+			synchronized(currentQuotes){
+				currentQuotes.add(tempQuote);
+			}
 
-			//Add this into the big list of all created quotes
+			/**
+		 	* Synchronized for possibility to multithreading
+		 	*/
+			synchronized(quoteTicker){
+				quoteTicker.setQuote(tempQuote);
+				//TODO send out subscription update here
+			}
+
+			//Temporary storage, NOT the same as overall one
 			createdQuotes.add(tempQuote);
 		}
 
@@ -439,18 +455,6 @@ public class LmeRestController {
 				tempQuote.toString());
 		logger.debug("lme/createQuote " + eiCreateQuote.toString());
 		
-		/*	ResponseBody
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,queueF
-				EiResponse response)
-		 */
-		
-
-		//Save the queue in our arraylist
-		
-		//logger.debug("queueFomLme addQsuccess " + addQsuccess +
-		//		" TenderId " + tempTender.getTenderId());
 
 		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
 		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
@@ -465,6 +469,14 @@ public class LmeRestController {
 		//lock 
 		synchronized(currentQuotes){
 			currentQuotes.add(tempQuote);
+		}
+
+		/**
+		 * Synchronized for possibility to multithreading
+		 */
+		synchronized(quoteTicker){
+			quoteTicker.setQuote(tempQuote);
+			//TODO send out subscription update here
 		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
@@ -605,6 +617,41 @@ public class LmeRestController {
 		//Set the transaction ID here
 		return buyerAccepted;
 	}
+
+	@PostMapping("/manageSubscription")
+	public EiManagedTickerSubscriptionPayload postEiManagedTicker(
+			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload)	{
+		TickerType tempTickerType;
+		EiResponseType tempResponse;
+		SubscriptionActionType tempSubscriptionActionTaken;
+		RefIdType tempSubscriptionRequestId;
+		EiManageTickerSubscriptionPayload tempSubscribe = null;
+		EiManagedTickerSubscriptionPayload tempSubscribed;
+
+		tempSubscribe = eiManageTickerSubscriptionPayload;
+		tempTickerType = eiManageTickerSubscriptionPayload.getTickerType();
+		tempSubscriptionActionTaken = eiManageTickerSubscriptionPayload.getSubscriptionActionRequested();
+		tempSubscriptionRequestId = eiManageTickerSubscriptionPayload.getSubscriptionRequestId();
+
+
+		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
+		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
+		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
+		 * with a different tender, leading to a transaction
+		 *
+		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
+
+		tempSubscribed = new EiManagedTickerSubscriptionPayload("Multicast session started successfully",
+				tempSubscriptionActionTaken,
+				new EiResponseType(),
+				//new EiResponse(200, "OK"),
+				tempSubscriptionRequestId, tempTickerType);
+
+
+		return tempSubscribed;
+	}
+
+
 
 	public static BlockingQueue<EiCreateTenderPayload> getQueueFromLme() {
 		return queueFromLme;
