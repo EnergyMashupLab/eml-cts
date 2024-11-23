@@ -529,8 +529,13 @@ public class LmeRestController {
 		//The buyer and seller both see
 		EiTransaction tempTransaction;
 
-		//This will be used for temporary transaction storage
-		EiTenderType transactionTender;
+		//This tender will eventually be sent to the buyer
+		EiTenderType buyerTender = new EiTenderType();
+		buyerTender.setSide(SideType.BUY);
+
+		//This tender will eventually be sent to the seller 
+		EiTenderType sellerTender = new EiTenderType();
+		sellerTender.setSide(SideType.SELL);
 		
 		//We will send this back whenever we have an issue
 		EiTenderType badBuyerTender = new EiTenderType();
@@ -621,12 +626,12 @@ public class LmeRestController {
 				//Grab the price
 				long quotePrice = ((TenderIntervalDetail)listQuote.getTenderDetail()).getPrice();
 				//Grab the tender from the premade transaction
-				transactionTender = tempAccept.getTransaction().getTender();
-				System.out.println("TENDER IS:"+transactionTender);
+				EiTenderType tempTender = tempAccept.getTransaction().getTender();
+				System.out.println("TENDER IS:"+tempTender);
 				//Grab the accept quantity
-				long tempQuantity = ((TenderIntervalDetail)transactionTender.getTenderDetail()).getQuantity();
+				long tempQuantity = ((TenderIntervalDetail)tempTender.getTenderDetail()).getQuantity();
 				//Grab the accept price
-				long tempPrice = ((TenderIntervalDetail)transactionTender.getTenderDetail()).getPrice();
+				long tempPrice = ((TenderIntervalDetail)tempTender.getTenderDetail()).getPrice();
 
 				/**
 				 * There are two areas where we could have an issue here:
@@ -653,10 +658,16 @@ public class LmeRestController {
 					System.out.println("After transaction: " + listQuote.toString());
 
 					//Set this just for buyer info
-					transactionTender.setExpirationTime(listQuote.getExpirationTime());
+					buyerTender.setExpirationTime(listQuote.getExpirationTime());
+					sellerTender.setExpirationTime(listQuote.getExpirationTime());
+
 					//Set the tender detail for ourselves
-					transactionTender.setTenderDetail(listQuote.getTenderDetail());
+					buyerTender.setTenderDetail(listQuote.getTenderDetail());
+					sellerTender.setTenderDetail(listQuote.getTenderDetail());
 					
+					//Set the transactions
+					buyerTransaction.setTransaction(new EiTransaction(buyerTender));
+					sellerTransaction.setTransaction(new EiTransaction(sellerTender));
 
 					//Make a new return value with the created Quotes
 					logger.trace("Quote Accepted");
@@ -664,9 +675,6 @@ public class LmeRestController {
 			}
 		}
 
-		//Set the transactionID
-		response.setTransactionId(tempAccept.getTransaction().getTransactionId());
-	
 		/**
 		 * At this point the QDM will send out two EiCreateTransaction Payloads 
 		 * containing the transaction tender to both the party and counterparty
