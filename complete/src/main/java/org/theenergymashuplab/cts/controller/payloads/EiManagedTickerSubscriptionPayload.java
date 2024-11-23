@@ -1,6 +1,9 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.EiSubscriptionResponseType;
+import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.SubscriptionActionType;
 import org.theenergymashuplab.cts.TickerType;
 
 /**
@@ -14,6 +17,11 @@ public class EiManagedTickerSubscriptionPayload extends EiSubscriptionResponseTy
 
 	public EiManagedTickerSubscriptionPayload(){
 
+	}
+
+	public EiManagedTickerSubscriptionPayload(String multicastListenReference, SubscriptionActionType subscriptionActionTaken, EiResponseType response, RefIdType subscriptionRequestId, TickerType tickerType) {
+		super(multicastListenReference, subscriptionActionTaken, response, subscriptionRequestId);
+		this.tickerType = tickerType;
 	}
 
 	public EiManagedTickerSubscriptionPayload(TickerType tickerType){

@@ -1,6 +1,10 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
+import org.theenergymashuplab.cts.EiTenderType;
+import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.MarketOrderIdType;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
+import org.theenergymashuplab.cts.TransactionIdType;
 
 /**
  * @author crossover
@@ -10,15 +14,23 @@ import org.theenergymashuplab.cts.MarketOrderIdType;
 public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 
 	public MarketOrderIdType referencedQuoteId;
-	public long quantity;
-	public long price;
 
 	public EiAcceptQuotePayload(){
 
 	}
 
 	public EiAcceptQuotePayload(MarketOrderIdType referencedQuoteId, long quantity, long price){
+		//Instantiate a new transaction
+		this.setTransaction(new EiTransaction());
+		//Instantiate
+		this.getTransaction().setTender(new EiTenderType());
+		//Create a new tender interval detail
+		this.getTransaction().getTender().setTenderDetail(new TenderIntervalDetail(null, price, quantity));;
+		//Set the referenced quote ID
 		this.referencedQuoteId = referencedQuoteId;
+		//Set the market transaction
+		this.setMarketTransactionId(new TransactionIdType());
+
 	}
 
 	public MarketOrderIdType getReferencedQuoteId(){
@@ -28,29 +40,11 @@ public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 	public void setReferencedQuoteID(MarketOrderIdType referencedQuoteId){
 		this.referencedQuoteId = referencedQuoteId;
 	}
-
-	public long getQuantity(){
-		return this.quantity;
-	}
-
-	public void setQuantity(long quantity){
-		this.quantity = quantity;
-	}
-
-	public long getPrice(){
-		return this.price;
-	}
-
-	public void setPrice(long price){
-		this.price = price;
-	}
 	
 	@Override
 	public String toString(){
 		return 	"EiAcceptQuotePayload [" +
 				"referencedQuoteId=" + referencedQuoteId.toString() +
-				"price=" + price + 
-				"quantity=" + quantity +
-			                         "]";
+			                        "]";
 	}
 }

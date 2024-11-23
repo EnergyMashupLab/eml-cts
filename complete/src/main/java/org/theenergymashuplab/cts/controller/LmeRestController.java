@@ -32,8 +32,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.concurrent.*;
+import java.awt.JobAttributes.SidesType;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 
@@ -44,9 +47,13 @@ public class LmeRestController {
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
+	//Quote and tender tickers
+	private static QuoteTickerType quoteTicker = new QuoteTickerType();
+	private static TenderTickerType tenderTicker = new TenderTickerType();
 	//Default arraylist that will hold all of our quotes
-	//private static ArrayList<EiQuoteType> currentQuotes = new ArrayList<>(20);
-	private static HashSet<EiQuoteType> currentQuotes = new HashSet<>();
+	//For higher performance consider an alternate data structure such as a hash table
+	//private static List<EiQuoteType> currentQuotes = Collections.synchronizedList(new ArrayList<>()); 
+	private static List<EiQuoteType> currentQuotes = new ArrayList<>(); 
 
 
 	// TODO assign in constructor?
@@ -164,6 +171,9 @@ public class LmeRestController {
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
 		tempTender.setMarketOrderId(new MarketOrderIdType());
+		//Set the tender Ticker
+		//TODO not fully implemented
+		tenderTicker.setTender(tempTender);
 		
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
@@ -321,7 +331,8 @@ public class LmeRestController {
 		TenderIntervalDetail quoteDetail;
 		BridgeInterval currentStartInterval;
 		BridgeInstant currentStartInstant = new BridgeInstant();
-		List<Long> createdQuotes = new ArrayList<>();
+		//A list of all of the created quotes
+		List<EiQuoteType> createdQuotes = new ArrayList<>();
 		TenderStreamDetail quoteStreamDetail;
 		ActorIdType partyID;
 		ActorIdType counterPartyID;
@@ -371,17 +382,37 @@ public class LmeRestController {
 			//FIXME later on-- forced to be 1 now
 			tempQuote.setMarketOrderId(new MarketOrderIdType(1));
 
+			/**
+			 * Remember here: a quote IS a tender and inherits from parent TenderBase
+			 */
+
+			//Set the marketOrderID here
+			tempQuote.setMarketOrderId(new MarketOrderIdType());
+			//No execution instructions
+			tempQuote.setExecutionInstructions(null);
+			//Not private -- we want to publish
+			tempQuote.setPrivateQuote(false);
+			//Always energy for right now
+			tempQuote.setResourceDesignator(ResourceDesignatorType.ENERGY);
+			//The quote is tradeable
+			tempQuote.setTradeable(true);
+
 			//Add this into the current quotes arraylist
-			currentQuotes.add(tempQuote);
+			//currentQuotes contains all of the quotes created
+			synchronized(currentQuotes){
+				currentQuotes.add(tempQuote);
+			}
 
-			/*
-			tempCreate = new EiCreateQuotePayload(tempQuote, partyID, counterPartyID);
+			/**
+		 	* Synchronized for possibility to multithreading
+		 	*/
+			synchronized(quoteTicker){
+				quoteTicker.setQuote(tempQuote);
+				//TODO send out subscription update here
+			}
 
-			//set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
-			tempCreate.setPartyId(partyID);
-			tempCreate.setCounterPartyId(counterPartyID);
-			*/
-			createdQuotes.add(tempQuote.getQuoteId().value());
+			//Temporary storage, NOT the same as overall one
+			createdQuotes.add(tempQuote);
 		}
 
 		//Make a new return value with the created Quotes
@@ -391,10 +422,9 @@ public class LmeRestController {
 		/* ================================================================ */
 
 		response.setPartyId(partyID);
-		response.setResponse(new EiResponse(210, "NOT YET IMPLEMENTED"));
+		response.setResponse(new EiResponse(200, "Stream Quote Creation Succeeded"));
 		response.setCounterPartyId(counterPartyID);
 		response.setCreatedQuotes(createdQuotes);
-
 		return response;
 	}
 		
@@ -423,20 +453,8 @@ public class LmeRestController {
 
 		logger.debug("LmeController before constructor for EiCreatedQuote " +
 				tempQuote.toString());
-		logger.debug("lme/createTender " + eiCreateQuote.toString());
+		logger.debug("lme/createQuote " + eiCreateQuote.toString());
 		
-		/*	ResponseBody
-			public EiCreatedTender(
-				TenderId tenderId,
-				ActorId partyId,queueF
-				EiResponse response)
-		 */
-		
-
-		//Save the queue in our arraylist
-		
-		//logger.debug("queueFomLme addQsuccess " + addQsuccess +
-		//		" TenderId " + tempTender.getTenderId());
 
 		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
 		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
@@ -445,8 +463,21 @@ public class LmeRestController {
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
 		tempQuote.setMarketOrderId(new MarketOrderIdType(1));
+		System.out.println("Added quote with order ID: " + tempQuote.getMarketOrderId());
 		//Add this quote into the volatile storage. It will never hit the database
-		addSuccess = currentQuotes.add(tempQuote);
+		//currentQuotes is an arraylist containing all quotes. Since we may be multithreaded here, we will
+		//lock 
+		synchronized(currentQuotes){
+			currentQuotes.add(tempQuote);
+		}
+
+		/**
+		 * Synchronized for possibility to multithreading
+		 */
+		synchronized(quoteTicker){
+			quoteTicker.setQuote(tempQuote);
+			//TODO send out subscription update here
+		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
 												tempQuote.getMarketOrderId(),
@@ -461,6 +492,165 @@ public class LmeRestController {
 
 		return tempCreated;
 	}
+
+	
+	/**
+	 * Accept a quote and make the underlying transaction happen
+	 */
+	@PostMapping("/acceptQuote")
+	public EiAcceptedQuotePayload postEiAcceptQuote(
+			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
+		EiQuoteType tempQuote = new EiQuoteType();
+		EiQuoteType listQuote = new EiQuoteType();
+		EiAcceptQuotePayload tempAccept = null;
+		EiAcceptedQuotePayload sellerAccepted;
+		EiAcceptedQuotePayload buyerAccepted;
+		EiTenderType transactionTender;
+
+		//These dummy transactions with negative IDs will be given back if we have a 
+		//failed transaction.
+		//TODO this may need to be changed later, but it is the best way that I can think of to
+		//indicate that an Accept quote failed
+		TransactionIdType tempTransactionID = new TransactionIdType();
+		tempTransactionID.setMyUidId(-1);
+		TransactionIdType tempTransactionID2 = new TransactionIdType();
+		tempTransactionID2.setMyUidId(-1);
+
+		//In anticipation, we'll need a transaction here
+		boolean exists = false;
+		
+		//Grab the quote payload and quote itself
+		tempAccept = eiAcceptQuote;
+		//Set this for us to search
+		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
+
+		//We can create these now before searching
+		buyerAccepted = new EiAcceptedQuotePayload();
+		buyerAccepted.setPartyId(tempAccept.getPartyId());
+		buyerAccepted.setCounterPartyId(tempAccept.getCounterPartyId());
+
+		//Synchronized because this can be multithreaded
+		synchronized(currentQuotes){
+			//Search through our list
+			for(int i = 0; i < currentQuotes.size(); i++){
+				//Grab the quote at the current index
+				listQuote = currentQuotes.get(i);
+				//DEBUG statement comment out when done
+				System.out.println("In list: " + listQuote.getMarketOrderId());
+				if(listQuote.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
+					logger.debug("LMEController successfully found quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString());
+					//DEBUG statement comment out
+					exists = true;
+					break;
+				}
+			}
+			//If we can't find a quote here, that's the end for us
+			if(!exists){
+				System.out.println("Quote with:" + tempQuote.getMarketOrderId().toString() + " does not exist. ERROR");
+				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
+							"will now exit");
+				buyerAccepted.setResponse(new EiResponse(500, "Referenced Quote ID does not exist in the QDM"));
+
+
+				//Currently here we'll just set these transactions to have an ID of -1(bad)
+				buyerAccepted.setTransactionId(tempTransactionID);
+				buyerAccepted.setRecipientTransactionId(tempTransactionID2);
+
+				//Log it
+				logger.trace("Quote not found");
+
+			//If we get here, we know that we have the quote so we will act upon it
+			} else {
+				//Grab the quantity
+				long quoteQuantity = ((TenderIntervalDetail)listQuote.getTenderDetail()).getQuantity();
+				//Grab the price
+				long quotePrice = ((TenderIntervalDetail)listQuote.getTenderDetail()).getPrice();
+				//Grab the tender from the premade transaction
+				transactionTender = tempAccept.getTransaction().getTender();
+				System.out.println("TENDER IS:"+transactionTender);
+				//Grab the accept quantity
+				long tempQuantity = ((TenderIntervalDetail)transactionTender.getTenderDetail()).getQuantity();
+				//Grab the accept price
+				long tempPrice = ((TenderIntervalDetail)transactionTender.getTenderDetail()).getPrice();
+
+				/**
+				 * There are two areas where we could have an issue here:
+				 * 		1.) The Accepter is asking for more than the current quantity
+				 * 		2.) The Accepter is bidding a lower price than the current price
+				 * 	On each of these cases, we will send a blank eiAccepted quote as it failed
+				 */
+				if(tempQuantity > quoteQuantity || tempPrice < quotePrice){
+					System.out.println("Quote will be rejected due to bad quantity/price");
+					//Currently here we'll just set these transactions to have an ID of -1(bad)
+					buyerAccepted.setTransactionId(tempTransactionID);
+					buyerAccepted.setRecipientTransactionId(tempTransactionID2);
+					buyerAccepted.setResponse(new EiResponse(500, "Quote not accepted due to price/quantity mismatch"));
+					//And we'll get out
+					return buyerAccepted;
+				}
+
+				//If we are buying the whole thing we'll have to delete it
+				if(quoteQuantity == tempQuantity){
+					currentQuotes.remove(listQuote);
+				} else {
+					//Update the quantity that we currently have available
+					((TenderIntervalDetail)listQuote.getTenderDetail()).setQuantity(quoteQuantity - tempQuantity);
+				}
+
+				//DEBUG
+				System.out.println("Quote will be LIFTED");
+				System.out.println("After transaction: " + listQuote.toString());
+
+				//We are buying
+				transactionTender.setSide(SideType.BUY);
+				//Set this just for buyer info
+				transactionTender.setExpirationTime(listQuote.getExpirationTime());
+
+				
+				//Make a new return value with the created Quotes
+				logger.trace("Quote Accepted");
+			}
+		}
+		//Set the transactionID
+		buyerAccepted.setTransactionId(tempAccept.getTransaction().getTransactionId());
+	
+		//Set the transaction ID here
+		return buyerAccepted;
+	}
+
+	@PostMapping("/manageSubscription")
+	public EiManagedTickerSubscriptionPayload postEiManagedTicker(
+			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload)	{
+		TickerType tempTickerType;
+		EiResponseType tempResponse;
+		SubscriptionActionType tempSubscriptionActionTaken;
+		RefIdType tempSubscriptionRequestId;
+		EiManageTickerSubscriptionPayload tempSubscribe = null;
+		EiManagedTickerSubscriptionPayload tempSubscribed;
+
+		tempSubscribe = eiManageTickerSubscriptionPayload;
+		tempTickerType = eiManageTickerSubscriptionPayload.getTickerType();
+		tempSubscriptionActionTaken = eiManageTickerSubscriptionPayload.getSubscriptionActionRequested();
+		tempSubscriptionRequestId = eiManageTickerSubscriptionPayload.getSubscriptionRequestId();
+
+
+		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
+		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
+		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
+		 * with a different tender, leading to a transaction
+		 *
+		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
+
+		tempSubscribed = new EiManagedTickerSubscriptionPayload("Multicast session started successfully",
+				tempSubscriptionActionTaken,
+				new EiResponseType(),
+				//new EiResponse(200, "OK"),
+				tempSubscriptionRequestId, tempTickerType);
+
+
+		return tempSubscribed;
+	}
+
 
 
 

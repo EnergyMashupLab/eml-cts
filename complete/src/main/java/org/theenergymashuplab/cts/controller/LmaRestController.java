@@ -389,6 +389,7 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempAccept = eiAcceptQuote;	
 		
+		System.out.println("IN LMA:" + tempAccept.getTransaction());
 		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " +
 				tempAccept.getReferencedQuoteId().toString());
 		/*
@@ -401,6 +402,35 @@ public class LmaRestController {
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 	
 		return tempPostResponse;
+	}
+
+	@PostMapping("/manageSubscription")
+	public EiManagedTickerSubscriptionPayload postEiManagedTickerSubscription(
+			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload
+	){
+		EiManageTickerSubscriptionPayload tempManage;
+		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
+		EiManagedTickerSubscriptionPayload tempPostResponse;
+
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender
+		restTemplate = builder.build();
+
+		// save CreateTender message as sent by TEUA
+		tempManage = eiManageTickerSubscriptionPayload;
+
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/manageSubscription",
+				tempManage,
+				EiManagedTickerSubscriptionPayload.class);
+
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+
+		return tempPostResponse;
+
 	}
 
 

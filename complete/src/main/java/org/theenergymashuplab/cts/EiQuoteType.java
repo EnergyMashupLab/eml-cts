@@ -82,4 +82,14 @@ public class EiQuoteType extends TenderBase {
 				", tradeable=" + tradeable +
 				'}';
 	}
+
+	/**
+	 * We are guaranteed to have a unique market order ID, and the AcceptQuote will reference
+	 * a quote via the marketOrderId. As such, it makes sense to index by it in a hashset
+	 */
+	@Override
+	public int hashCode(){
+		return (int)this.marketOrderId.getMyUidId();
+
+	}
 }

@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.naming.TransactionRef;
 
 //For RestTemplate
 @RestController
@@ -626,19 +627,46 @@ public class TeuaRestController {
 				tempClientCreateQuote.getQuantity()
 			);
 
+		//Let's now build up our quote
 		quote = new EiQuoteType(
+				//The expire time is given to us by the client
 				tempClientCreateQuote.getBridgeExpireTime().asInstant(),
+				//This should ALWAYS be sell
 				tempClientCreateQuote.getSide(),
+				//Stuff in the interval tender
 				tenderDetail
 		);
 		
+
+		/**
+		 * Remember here: a quote IS a tender and inherits from parent TenderBase
+		 */
+
+		//No execution instructions
+		quote.setExecutionInstructions(null);
+		//Not private -- we want to publish
+		quote.setPrivateQuote(false);
+		//Always energy for right now
+		quote.setResourceDesignator(ResourceDesignatorType.ENERGY);
+		//The quote is tradeable
+		quote.setTradeable(true);
+
+
 		// 	Construct the EiCreateTender payload to be forwarded to LMA
 		eiCreateQuote = new EiCreateQuotePayload(quote, actorIds[numericTeuaId],
 				this.lmePartyId);
-		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		//Set the party and counter party ID that we have here
 		eiCreateQuote.setPartyId(actorIds[numericTeuaId]);
+		//Counter party is just the LME (Acts as our QDM)
 		eiCreateQuote.setCounterPartyId(lmePartyId);
+		//We do not have one of these yet
+		eiCreateQuote.setMarketId(null);
+		//We don't want it to be private
+		eiCreateQuote.setRequestPrivate(false);
+		//We want this quote to be published
+		eiCreateQuote.setRequestPublication(true);
 		
+		//Debug log here
 		logger.trace("TEUA sending EiCreateTender to LMA " +
 				eiCreateQuote.toString());
 			
@@ -656,6 +684,10 @@ public class TeuaRestController {
 		return result;
 	}
 
+	
+	/**
+	 * POST clientAcceptQuote posted to TEUA
+	 */
 	@PostMapping("{teuaId}/clientAcceptQuote")
 	public EiCreatedQuotePayload postClientAcceptQuote(
 			@PathVariable String teuaId,
@@ -679,6 +711,7 @@ public class TeuaRestController {
 					ActorIdType.class);
 		}
 		
+		//Grab numeric teuaID
 		numericTeuaId = Integer.valueOf(teuaId);
 		
 		
@@ -697,7 +730,21 @@ public class TeuaRestController {
 		tempClientAcceptQuote = clientAcceptQuote;	// save the parameter
 				
 		//Construct the accept quote payload
+		//This constructor will do all of the transaction creation for us
 		eiAcceptQuote = new EiAcceptQuotePayload(tempClientAcceptQuote.getReferencedQuoteId(), tempClientAcceptQuote.getQuantity(), tempClientAcceptQuote.getPrice());
+		//DEBUG
+		System.out.println(eiAcceptQuote.getTransaction());
+
+		//We need to work around the type system to make this happen
+		MarketOrderIdType id = new MarketOrderIdType();
+		id.setMyUidId(clientAcceptQuote.getTempReferencedQuoteId());
+		eiAcceptQuote.setReferencedQuoteID(id);
+
+		//These will be flipped on an accept quote
+		eiAcceptQuote.setCounterPartyId(actorIds[numericTeuaId]);
+		eiAcceptQuote.setPartyId(lmePartyId);
+
+		System.out.println("Will be searching for quote with: " + eiAcceptQuote.getReferencedQuoteId());
 		
 		logger.trace("TEUA sending EiAcceptQuote to LMA " +
 				eiAcceptQuote.toString());
@@ -710,6 +757,8 @@ public class TeuaRestController {
 		
 		// and put CtsTenderId in ClientCreatedTenderPayload
 		tempReturn = new ClientAcceptedQuotePayload();
+		//Set the market order ID
+		tempReturn.setReferencedQuoteId(result.getMarketOrderId());;
 		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());
 		
@@ -717,6 +766,60 @@ public class TeuaRestController {
 	}
 
 
+	@PostMapping("{teuaId}/clientManageTickerSubscription")
+	public EiManagedTickerSubscriptionPayload postClientTicker(
+			@PathVariable String teuaId,
+			@RequestBody ClientManageTickerSubscriptionPayload clientManageTickerSubscriptionPayload){
+		ClientManageTickerSubscriptionPayload tempClientManageTickerSubscriptionPayload;
+		ClientManagedTickerSubscriptionPayload tempReturn;
+		EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload;
+		Integer numericTeuaId = -1;
+
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+
+		numericTeuaId = Integer.valueOf(teuaId);
+
+
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.debug("postEiCreateTender teuaId " +
+				teuaId +
+				" actorNumericIds[teuaId] " +
+				actorIds[numericTeuaId].toString());
+
+		tempClientManageTickerSubscriptionPayload = clientManageTickerSubscriptionPayload;
+
+		eiManageTickerSubscriptionPayload = new EiManageTickerSubscriptionPayload(tempClientManageTickerSubscriptionPayload.getMarketId(),
+                tempClientManageTickerSubscriptionPayload.getSegmentId(), tempClientManageTickerSubscriptionPayload.getSubscriptionActionType(),
+                tempClientManageTickerSubscriptionPayload.getSubscriptionRequestId(), tempClientManageTickerSubscriptionPayload.getTickerType());
+
+
+		logger.trace("TEUA sending EiManageTicker to LMA " +
+				eiManageTickerSubscriptionPayload.toString());
+
+		restTemplate = builder.build();
+		EiManagedTickerSubscriptionPayload result = restTemplate.postForObject
+				("http://localhost:8080/lma/manageSubscription", eiManageTickerSubscriptionPayload,
+						EiManagedTickerSubscriptionPayload.class);
+
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientManagedTickerSubscriptionPayload();
+		logger.trace("TEUA before return ClientManagerTicker to Client/SC " +
+				tempReturn.toString());
+
+		return result;
+
+	}
 
 
 
