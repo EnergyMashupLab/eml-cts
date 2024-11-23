@@ -80,6 +80,7 @@ public class EiQuoteType extends TenderBase {
 				", quoteId=" + quoteId +
 				", rfqId=" + rfqId +
 				", tradeable=" + tradeable +
+				", tenderDetail: " + this.getTenderDetail().toString() +
 				'}';
 	}
 

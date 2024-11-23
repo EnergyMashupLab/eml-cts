@@ -17,9 +17,13 @@
 package org.theenergymashuplab.cts.controller;
 
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.springframework.boot.rsocket.server.RSocketServer.Transport;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +37,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.*;
-import java.awt.JobAttributes.SidesType;
+import java.awt.Button;
+import java.awt.Robot;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -396,7 +401,6 @@ public class LmeRestController {
 			tempQuote.setResourceDesignator(ResourceDesignatorType.ENERGY);
 			//The quote is tradeable
 			tempQuote.setTradeable(true);
-
 			//Add this into the current quotes arraylist
 			//currentQuotes contains all of the quotes created
 			synchronized(currentQuotes){
@@ -425,6 +429,8 @@ public class LmeRestController {
 		response.setResponse(new EiResponse(200, "Stream Quote Creation Succeeded"));
 		response.setCounterPartyId(counterPartyID);
 		response.setCreatedQuotes(createdQuotes);
+		//Currently not in use
+		response.setInResponseTo(new RefIdType());
 		return response;
 	}
 		
@@ -485,7 +491,7 @@ public class LmeRestController {
 												tempQuote.getQuoteId(),
 												new EiResponse(200, "OK"));
 
-		//FIXME later on
+		tempCreated.setCounterPartyId(tempCreated.getCounterPartyId());
 		tempCreated.setInResponseTo(new RefIdType());
 		//Make a new return value with the created Quotes
 		logger.trace("Quote Created");
@@ -500,34 +506,80 @@ public class LmeRestController {
 	@PostMapping("/acceptQuote")
 	public EiAcceptedQuotePayload postEiAcceptQuote(
 			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
+		//These quotes will be used for the list/quote grabbing
 		EiQuoteType tempQuote = new EiQuoteType();
 		EiQuoteType listQuote = new EiQuoteType();
-		EiAcceptQuotePayload tempAccept = null;
-		EiAcceptedQuotePayload sellerAccepted;
-		EiAcceptedQuotePayload buyerAccepted;
+
+		//We'll need two of these, one for buyer one for seller
+		EiCreateTransactionPayload buyerTransaction = new EiCreateTransactionPayload();
+		EiCreateTransactionPayload sellerTransaction = new EiCreateTransactionPayload();
+
+		//Grab the transaction ID
+		TransactionIdType transactionId = eiAcceptQuote.getTransaction().getTransactionId();
+
+		//Dummy for our POST responses
+		EiCreatedTransactionPayload tempCreated;
+		
+		//To be filled out by JSON
+		EiAcceptQuotePayload tempAccept;
+
+		//This will be sent back to the sending party
+		EiAcceptedQuotePayload response = new EiAcceptedQuotePayload();
+
+		//The buyer and seller both see
+		EiTransaction tempTransaction;
+
+		//This will be used for temporary transaction storage
 		EiTenderType transactionTender;
+		
+		//We will send this back whenever we have an issue
+		EiTenderType badBuyerTender = new EiTenderType();
+		//This is how we will signify it as bad
+		badBuyerTender.setTenderDetail(new TenderIntervalDetail(new Interval(), -1, -1));
+		badBuyerTender.setSide(SideType.BUY);
+	
+		//We will send this back whenever we have an issue
+		EiTenderType badSellerTender = new EiTenderType();
+		//This is how we will signify it as bad
+		badSellerTender.setTenderDetail(new TenderIntervalDetail(new Interval(), -1, -1));
+		badSellerTender.setSide(SideType.SELL);
 
-		//These dummy transactions with negative IDs will be given back if we have a 
-		//failed transaction.
-		//TODO this may need to be changed later, but it is the best way that I can think of to
-		//indicate that an Accept quote failed
-		TransactionIdType tempTransactionID = new TransactionIdType();
-		tempTransactionID.setMyUidId(-1);
-		TransactionIdType tempTransactionID2 = new TransactionIdType();
-		tempTransactionID2.setMyUidId(-1);
 
-		//In anticipation, we'll need a transaction here
+		//For sendinng back to LMA
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;
+		restTemplate = builder.build();
+		
+		//For later on
 		boolean exists = false;
 		
 		//Grab the quote payload and quote itself
 		tempAccept = eiAcceptQuote;
+
+		//Grab this for convenience
+		tempTransaction = tempAccept.getTransaction();
+
 		//Set this for us to search
 		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
 
-		//We can create these now before searching
-		buyerAccepted = new EiAcceptedQuotePayload();
-		buyerAccepted.setPartyId(tempAccept.getPartyId());
-		buyerAccepted.setCounterPartyId(tempAccept.getCounterPartyId());
+		/**
+		 * The buyer is the party the seller is the counterparty
+		 */
+		buyerTransaction.setPartyId(tempAccept.getPartyId());
+		buyerTransaction.setCounterPartyId(tempAccept.getCounterPartyId());
+		buyerTransaction.setMarketTransactionId(transactionId);
+		buyerTransaction.setRequestId(new RefIdType());
+
+		/**
+		 * For the message we will send the seller, these will be flipped
+		 */
+		sellerTransaction.setPartyId(tempAccept.getCounterPartyId());
+		sellerTransaction.setCounterPartyId(tempAccept.getPartyId());
+		sellerTransaction.setMarketTransactionId(transactionId);
+		sellerTransaction.setRequestId(new RefIdType());
+
+		//This will be the same no matter what here
+		response.setTransactionId(transactionId);
 
 		//Synchronized because this can be multithreaded
 		synchronized(currentQuotes){
@@ -544,17 +596,20 @@ public class LmeRestController {
 					break;
 				}
 			}
+
 			//If we can't find a quote here, that's the end for us
-			if(!exists){
+			if(exists == false){
 				System.out.println("Quote with:" + tempQuote.getMarketOrderId().toString() + " does not exist. ERROR");
+				//Log it
 				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
 							"will now exit");
-				buyerAccepted.setResponse(new EiResponse(500, "Referenced Quote ID does not exist in the QDM"));
 
+				//Set a bad response to send out
+				response.setResponse(new EiResponse(500, "Referenced Quote ID does not exist in the QDM"));
 
-				//Currently here we'll just set these transactions to have an ID of -1(bad)
-				buyerAccepted.setTransactionId(tempTransactionID);
-				buyerAccepted.setRecipientTransactionId(tempTransactionID2);
+				//Set the transactions here as bad so that the recipients know
+				buyerTransaction.setTransaction(new EiTransaction(badBuyerTender));
+				sellerTransaction.setTransaction(new EiTransaction(badSellerTender));
 
 				//Log it
 				logger.trace("Quote not found");
@@ -581,42 +636,62 @@ public class LmeRestController {
 				 */
 				if(tempQuantity > quoteQuantity || tempPrice < quotePrice){
 					System.out.println("Quote will be rejected due to bad quantity/price");
-					//Currently here we'll just set these transactions to have an ID of -1(bad)
-					buyerAccepted.setTransactionId(tempTransactionID);
-					buyerAccepted.setRecipientTransactionId(tempTransactionID2);
-					buyerAccepted.setResponse(new EiResponse(500, "Quote not accepted due to price/quantity mismatch"));
-					//And we'll get out
-					return buyerAccepted;
-				}
+					//Flag that this is bad with a bad response
+					response.setResponse(new EiResponse(500, "Quote not accepted due to price/quantity mismatch"));
 
-				//If we are buying the whole thing we'll have to delete it
-				if(quoteQuantity == tempQuantity){
-					currentQuotes.remove(listQuote);
+					//Set the transactions here as bad so that the recipients know
+					buyerTransaction.setTransaction(new EiTransaction(badBuyerTender));
+					sellerTransaction.setTransaction(new EiTransaction(badSellerTender));
+
+
 				} else {
 					//Update the quantity that we currently have available
 					((TenderIntervalDetail)listQuote.getTenderDetail()).setQuantity(quoteQuantity - tempQuantity);
+
+					//DEBUG
+					System.out.println("Quote will be LIFTED");
+					System.out.println("After transaction: " + listQuote.toString());
+
+					//Set this just for buyer info
+					transactionTender.setExpirationTime(listQuote.getExpirationTime());
+					//Set the tender detail for ourselves
+					transactionTender.setTenderDetail(listQuote.getTenderDetail());
+					
+
+					//Make a new return value with the created Quotes
+					logger.trace("Quote Accepted");
 				}
-
-				//DEBUG
-				System.out.println("Quote will be LIFTED");
-				System.out.println("After transaction: " + listQuote.toString());
-
-				//We are buying
-				transactionTender.setSide(SideType.BUY);
-				//Set this just for buyer info
-				transactionTender.setExpirationTime(listQuote.getExpirationTime());
-
-				
-				//Make a new return value with the created Quotes
-				logger.trace("Quote Accepted");
 			}
 		}
+
 		//Set the transactionID
-		buyerAccepted.setTransactionId(tempAccept.getTransaction().getTransactionId());
+		response.setTransactionId(tempAccept.getTransaction().getTransactionId());
 	
-		//Set the transaction ID here
-		return buyerAccepted;
+		/**
+		 * At this point the QDM will send out two EiCreateTransaction Payloads 
+		 * containing the transaction tender to both the party and counterparty
+		 */
+		//Send the buyer transaction out to be handled by LMA
+		restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
+				buyerTransaction, 
+				EiCreatedTransactionPayload.class);
+
+		//Send the seller transaction out to be handled by LMA
+		restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
+				sellerTransaction, 
+				EiCreatedTransactionPayload.class);
+
+		//These ID's will be set for the response
+		response.setPartyId(tempAccept.getPartyId());
+		response.setCounterPartyId(tempAccept.getCounterPartyId());
+
+
+		/**
+		 * The QDM sends an EiAcceptedQuotePayload back to the original sending party
+		 */
+		return response;
 	}
+
 
 	@PostMapping("/manageSubscription")
 	public EiManagedTickerSubscriptionPayload postEiManagedTicker(
