@@ -17,6 +17,18 @@ public class MarketOrderIdType extends UidType {
 	}
 
 
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null){
+			return false;
+		}
+
+		if(obj.getClass() != MarketOrderIdType.class){
+			return false;
+		}
+
+		return ((MarketOrderIdType)obj).value() == this.value();
+	}
 
     @Override
     public String toString() {

@@ -91,6 +91,20 @@ public class EiQuoteType extends TenderBase {
 	@Override
 	public int hashCode(){
 		return (int)this.marketOrderId.getMyUidId();
+	}
 
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null){
+			return false;
+		}
+
+		//Check class equality
+		if(obj.getClass() != EiQuoteType.class){
+			return false;
+		}
+
+		//If their market order IDs equal they are the same for us
+		return ((EiQuoteType)obj).getMarketOrderId().equals(this.getMarketOrderId());
 	}
 }

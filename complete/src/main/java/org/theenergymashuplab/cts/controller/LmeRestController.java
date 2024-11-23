@@ -37,8 +37,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.*;
-import java.awt.Button;
-import java.awt.Robot;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,8 +55,7 @@ public class LmeRestController {
 	private static TenderTickerType tenderTicker = new TenderTickerType();
 	//Default arraylist that will hold all of our quotes
 	//For higher performance consider an alternate data structure such as a hash table
-	//private static List<EiQuoteType> currentQuotes = Collections.synchronizedList(new ArrayList<>()); 
-	private static List<EiQuoteType> currentQuotes = new ArrayList<>(); 
+	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
 
 
 	// TODO assign in constructor?
@@ -404,7 +401,7 @@ public class LmeRestController {
 			//Add this into the current quotes arraylist
 			//currentQuotes contains all of the quotes created
 			synchronized(currentQuotes){
-				currentQuotes.add(tempQuote);
+				currentQuotes.put(tempQuote.hashCode(), tempQuote);
 			}
 
 			/**
@@ -451,7 +448,6 @@ public class LmeRestController {
 		EiQuoteType tempQuote;
 		EiCreateQuotePayload tempCreate = null;
 		EiCreatedQuotePayload tempCreated;
-		boolean addSuccess = false;
 		
 		//Grab the quote payload and quote itself
 		tempCreate = eiCreateQuote;
@@ -474,7 +470,7 @@ public class LmeRestController {
 		//currentQuotes is an arraylist containing all quotes. Since we may be multithreaded here, we will
 		//lock 
 		synchronized(currentQuotes){
-			currentQuotes.add(tempQuote);
+			currentQuotes.put(tempQuote.hashCode(), tempQuote);
 		}
 
 		/**
@@ -588,22 +584,8 @@ public class LmeRestController {
 
 		//Synchronized because this can be multithreaded
 		synchronized(currentQuotes){
-			//Search through our list
-			for(int i = 0; i < currentQuotes.size(); i++){
-				//Grab the quote at the current index
-				listQuote = currentQuotes.get(i);
-				//DEBUG statement comment out when done
-				System.out.println("In list: " + listQuote.getMarketOrderId());
-				if(listQuote.getMarketOrderId().getMyUidId() == tempQuote.getMarketOrderId().getMyUidId()){
-					logger.debug("LMEController successfully found quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString());
-					//DEBUG statement comment out
-					exists = true;
-					break;
-				}
-			}
-
 			//If we can't find a quote here, that's the end for us
-			if(exists == false){
+			if(currentQuotes.containsKey(tempQuote.hashCode()) == false){
 				System.out.println("Quote with:" + tempQuote.getMarketOrderId().toString() + " does not exist. ERROR");
 				//Log it
 				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
@@ -621,6 +603,8 @@ public class LmeRestController {
 
 			//If we get here, we know that we have the quote so we will act upon it
 			} else {
+				listQuote = currentQuotes.get(tempQuote.hashCode());
+				System.out.println(listQuote);
 				//Grab the quantity
 				long quoteQuantity = ((TenderIntervalDetail)listQuote.getTenderDetail()).getQuantity();
 				//Grab the price
