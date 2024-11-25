@@ -6,7 +6,7 @@ import org.theenergymashuplab.cts.SubscriptionActionType;
 import org.theenergymashuplab.cts.TickerType;
 
 public class ClientManagedTickerSubscriptionPayload {
-    public String info = "";
+    public String info = "ClientManagedTickerSubscriptionPayload";
     public TickerType tickerType;
     public String multicastListenReference;
     public EiResponseType response;

@@ -17,6 +17,9 @@
 package org.theenergymashuplab.cts.controller;
 
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.accessibility.AccessibleHypertext;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -383,10 +386,12 @@ public class LmaRestController {
 	@PostMapping("/acceptQuote")
 	public EiAcceptedQuotePayload postEiAcceptQuote(
 			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
-
 		EiAcceptQuotePayload tempAccept;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
 		EiAcceptedQuotePayload tempPostResponse; 
+		ActorIdType tempPartyId;
+		String positionUri;
+
 
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -399,6 +404,13 @@ public class LmaRestController {
 		System.out.println("IN LMA:" + tempAccept.getTransaction());
 		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " +
 				tempAccept.getReferencedQuoteId().toString());
+
+		//Build the position URI
+		tempPartyId = tempAccept.getPartyId();
+		positionUri = "http://localhost:8080/position/" +
+				tempPartyId.toString() +
+				"/add";
+
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
@@ -407,6 +419,7 @@ public class LmaRestController {
 				EiAcceptedQuotePayload.class);
 		
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+
 	
 		return tempPostResponse;
 	}
@@ -439,7 +452,6 @@ public class LmaRestController {
 		return tempPostResponse;
 
 	}
-
 
 
 	public static EiTenderType getCurrentTender() {

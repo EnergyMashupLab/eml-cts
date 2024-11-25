@@ -76,7 +76,7 @@ public class TeuaRestController {
 		initMapArray(idLimit);
 	}
 	
-	// Constructor for class ClientRestController - one parameter
+	// Constructor for class ClientRestController - zero parameters
 	public TeuaRestController(int howMany)	{
 		if (howMany > MAX_COUNT)	{
 			logger.trace("Constructor one parameter howMany " + howMany +
@@ -820,5 +820,8 @@ public class TeuaRestController {
 		return result;
 
 	}
+
+
+
 
 }
