@@ -16,6 +16,7 @@
 
 package org.theenergymashuplab.cts.controller;
 
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.boot.rsocket.server.RSocketServer.Transport;
@@ -35,13 +36,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
 import java.util.concurrent.*;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/lme")
@@ -91,6 +87,9 @@ public class LmeRestController {
 	// 	Need wrapper class Long to use the long ctsTenderId as returned
 	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap =
 			new HashMap<Long, EiCreateTenderPayload>();
+
+	// for subscriptions
+	private final Set<String> subscribers = ConcurrentHashMap.newKeySet();
 
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -410,6 +409,7 @@ public class LmeRestController {
 			synchronized(quoteTicker){
 				quoteTicker.setQuote(tempQuote);
 				//TODO send out subscription update here
+				notifySubscriber(quoteTicker);
 			}
 
 			//Temporary storage, NOT the same as overall one
@@ -479,6 +479,7 @@ public class LmeRestController {
 		synchronized(quoteTicker){
 			quoteTicker.setQuote(tempQuote);
 			//TODO send out subscription update here
+			notifySubscriber(quoteTicker);
 		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
@@ -696,10 +697,28 @@ public class LmeRestController {
 		EiManagedTickerSubscriptionPayload tempSubscribed;
 
 		tempSubscribe = eiManageTickerSubscriptionPayload;
-		tempTickerType = eiManageTickerSubscriptionPayload.getTickerType();
-		tempSubscriptionActionTaken = eiManageTickerSubscriptionPayload.getSubscriptionActionRequested();
-		tempSubscriptionRequestId = eiManageTickerSubscriptionPayload.getSubscriptionRequestId();
+		tempTickerType = tempSubscribe.getTickerType();
+		tempSubscriptionActionTaken = tempSubscribe.getSubscriptionActionRequested();
+		tempSubscriptionRequestId = tempSubscribe.getSubscriptionRequestId();
 
+		// adding subscription to the subscriber data structure
+		if (tempSubscriptionActionTaken == SubscriptionActionType.CANCEL) {
+			String marketId = String.valueOf(eiManageTickerSubscriptionPayload.getMarketId());
+			if (marketId != null) {
+				subscribers.remove(marketId);
+				System.out.println("Market ID removed: " + marketId);
+			} else {
+				System.err.println("Market ID is null, cannot remove.");
+			}
+		} else {
+			String marketId = String.valueOf(eiManageTickerSubscriptionPayload.getMarketId());
+			if (marketId != null) {
+				subscribers.add(marketId);
+				System.out.println("Market ID added: " + marketId);
+			} else {
+				System.err.println("Market ID is null, cannot add.");
+			}
+		}
 
 		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
 		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
@@ -717,6 +736,18 @@ public class LmeRestController {
 
 		return tempSubscribed;
 	}
+
+
+	private void notifySubscriber(QuoteTickerType updatedQuote) {
+		for (String marketId : subscribers) {
+			sendUpdateToSubscriber(marketId, updatedQuote);
+		}
+	}
+
+	private void sendUpdateToSubscriber(String marketId, QuoteTickerType quote) {
+		logger.info("Sending update to subscriber: " + marketId);
+	}
+
 
 
 

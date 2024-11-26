@@ -35,15 +35,8 @@ import org.apache.logging.log4j.Logger;
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
+import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
-import org.theenergymashuplab.cts.TenderIdType;
-import org.theenergymashuplab.cts.TenderIntervalDetail;
-import org.theenergymashuplab.cts.SideType;
-import org.theenergymashuplab.cts.TenderDetail;
-import org.theenergymashuplab.cts.Interval;
-import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.EiTenderType;
-import org.theenergymashuplab.cts.ActorIdType;
 
 @RestController
 @RequestMapping("/lma")
@@ -452,6 +445,8 @@ public class LmaRestController {
 		return tempPostResponse;
 
 	}
+
+
 
 
 	public static EiTenderType getCurrentTender() {
