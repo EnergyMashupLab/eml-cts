@@ -552,8 +552,8 @@ public class LmeRestController {
 		RestTemplate restTemplate;
 		restTemplate = builder.build();
 		
-		//For later on
-		boolean exists = false;
+		//Did we accept the quote or not
+		boolean accepted = false;
 		
 		//Grab the quote payload and quote itself
 		tempAccept = eiAcceptQuote;
@@ -656,6 +656,9 @@ public class LmeRestController {
 
 					//Make a new return value with the created Quotes
 					logger.trace("Quote Accepted");
+
+					//Set this flag for later on
+					accepted = true;
 				}
 			}
 		}
@@ -663,16 +666,20 @@ public class LmeRestController {
 		/**
 		 * At this point the QDM will send out two EiCreateTransaction Payloads 
 		 * containing the transaction tender to both the party and counterparty
+		 *
+		 * We only send these messages if the transaction was actually able to occur
 		 */
-		//Send the buyer transaction out to be handled by LMA
-		restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
-				buyerTransaction, 
-				EiCreatedTransactionPayload.class);
+		if(accepted == true){
+			//Send the buyer transaction out to be handled by LMA
+			restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
+					buyerTransaction, 
+					EiCreatedTransactionPayload.class);
 
-		//Send the seller transaction out to be handled by LMA
-		restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
-				sellerTransaction, 
-				EiCreatedTransactionPayload.class);
+			//Send the seller transaction out to be handled by LMA
+			restTemplate.postForObject("http://localhost:8080/lma/createTransaction", 
+					sellerTransaction, 
+					EiCreatedTransactionPayload.class);
+		}
 
 		//These ID's will be set for the response
 		response.setPartyId(tempAccept.getPartyId());
