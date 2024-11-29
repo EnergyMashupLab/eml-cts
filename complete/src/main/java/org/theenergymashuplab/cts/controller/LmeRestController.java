@@ -37,7 +37,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.*;
-import java.lang.reflect.Array;
 
 @RestController
 @RequestMapping("/lme")
@@ -49,8 +48,7 @@ public class LmeRestController {
 	//Quote and tender tickers
 	private static QuoteTickerType quoteTicker = new QuoteTickerType();
 	private static TenderTickerType tenderTicker = new TenderTickerType();
-	//Default arraylist that will hold all of our quotes
-	//For higher performance consider an alternate data structure such as a hash table
+	//Add a hashmap for our implementation
 	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
 
 
@@ -65,7 +63,6 @@ public class LmeRestController {
 	// Queue capacity is not an issue
 	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue<EiCreateTenderPayload>(20);
 
-	public static BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme = new ArrayBlockingQueue<EiCreateQuotePayload>(20);
 
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
@@ -465,7 +462,6 @@ public class LmeRestController {
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
 		tempQuote.setMarketOrderId(new MarketOrderIdType(1));
-		System.out.println("Added quote with order ID: " + tempQuote.getMarketOrderId());
 		//Add this quote into the volatile storage. It will never hit the database
 		//currentQuotes is an arraylist containing all quotes. Since we may be multithreaded here, we will
 		//lock 
@@ -495,6 +491,54 @@ public class LmeRestController {
 
 		return tempCreated;
 	}
+
+	@PostMapping("/cancelQuote")
+	public EICanceledQuotePayload postEiCancelQuote(
+		@RequestBody EiCancelQuotePayload eiCancelQuote){
+		//This temp quote will be used to grab from the list
+		EiQuoteType tempQuote = new EiQuoteType();
+		EiCancelQuotePayload cancelQuote;
+		EICanceledQuotePayload canceledQuote = new EICanceledQuotePayload();
+		int numberFound = 0;
+
+		//Save the parameter
+		cancelQuote = eiCancelQuote;
+
+		//Let's see if the quote exists
+		synchronized(currentQuotes){
+			for(MarketOrderIdType marketOrderId : cancelQuote.getMarketQuoteIds()){
+				//Set this for searching
+				tempQuote.setMarketOrderId(marketOrderId);
+				System.out.println(tempQuote.hashCode());
+				//If we do have the quote
+				if(currentQuotes.containsKey(tempQuote.hashCode()) == true){
+					//Remove it from the hashmap
+					currentQuotes.remove(tempQuote.hashCode());
+					//We found it
+					numberFound++;
+				}
+			}					
+		}
+		
+		//Set response accordingly
+		if(numberFound == cancelQuote.getMarketQuoteIds().size()){
+			canceledQuote.setEiResponse(new EiResponse(200, "All quotes cancelled successfully"));
+			canceledQuote.setEiCanceledResponse(new EiCanceledResponseType());
+		} else {
+			canceledQuote.setEiResponse(new EiResponse(500, "One or more quotes failed to be canceled"));
+			canceledQuote.setEiCanceledResponse(new EiCanceledResponseType());
+		}
+
+
+		canceledQuote.setCounterPartyId(eiCancelQuote.getCounterPartyId());
+		canceledQuote.setPartyId(eiCancelQuote.getPartyId());
+		canceledQuote.setInResponseTo(new RefIdType());
+
+		logger.trace("EiCanceledQuote in LME before LMA return: " + canceledQuote.toString());
+
+		return canceledQuote;
+	}
+
 
 	
 	/**
@@ -633,6 +677,8 @@ public class LmeRestController {
 					buyerTransaction.setTransaction(new EiTransaction(badBuyerTender));
 					sellerTransaction.setTransaction(new EiTransaction(badSellerTender));
 
+					//Set a bad response to send out
+					response.setResponse(new EiResponse(500, "Bad Quantity or price"));
 
 				} else {
 					//Update the quantity that we currently have available
@@ -656,6 +702,9 @@ public class LmeRestController {
 
 					//Make a new return value with the created Quotes
 					logger.trace("Quote Accepted");
+
+					//Set a bad response to send out
+					response.setResponse(new EiResponse(200, "Quote Accepted"));
 
 					//Set this flag for later on
 					accepted = true;
@@ -764,14 +813,6 @@ public class LmeRestController {
 
 	public static void setQueueFromLme(BlockingQueue<EiCreateTenderPayload> queueFromLme) {
 		LmeRestController.queueFromLme = queueFromLme;
-	}
-
-	public static BlockingQueue<EiCreateQuotePayload> getQueueQuoteFromLme() {
-		return queueQuoteFromLme;
-	}
-
-	public static void setQueueQuoteFromLme(BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme) {
-		LmeRestController.queueQuoteFromLme = queueQuoteFromLme;
 	}
 
 

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.antlr.v4.runtime.misc.TestRig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.naming.TransactionRef;
@@ -759,9 +760,93 @@ public class TeuaRestController {
 		tempReturn = new ClientAcceptedQuotePayload();
 		//Set the market order ID
 		tempReturn.setReferencedQuoteId(result.getMarketOrderId());;
+		tempReturn.setInfo("ClientAcceptedQuotePayload");
+		tempReturn.setPrice(clientAcceptQuote.getPrice());
+		tempReturn.setQuantity(clientAcceptQuote.getQuantity());
+
 		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
 				tempReturn.toString());
 		
+		return result;
+	}
+
+	
+	/**
+	 * Handle a cancel quote request
+	 */
+	@PostMapping("{teuaId}/clientCancelQuote")
+	public EICanceledQuotePayload postClientCancelQuote(
+		@PathVariable String teuaId,
+		@RequestBody ClientCancelQuotePayload clientCancelQuotePayload){
+
+		EiCancelQuotePayload eiCancelQuote = new EiCancelQuotePayload();
+		ClientCancelQuotePayload tempCancel;
+		//A temporary arraylist that we will use
+		ArrayList<MarketOrderIdType> marketQuoteIds = new ArrayList<>();
+
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		//Bookkeeping with IDs
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		//Grab numeric teuaID
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+
+		//Grab the variables here
+		tempCancel = clientCancelQuotePayload;
+		MarketOrderIdType cancelQuoteId;
+
+		for(long id : tempCancel.getMarketQuoteIds()){
+			cancelQuoteId = new MarketOrderIdType();
+			//Explicitly set this to get around the normal atomic increment behavior
+			cancelQuoteId.setMarketOrderId(id);
+			//Add into our arraylist
+			marketQuoteIds.add(cancelQuoteId);
+		}
+
+		
+		//Now prep the EiCancelQuote payload
+		eiCancelQuote.setPartyId(partyId);
+		eiCancelQuote.setCounterPartyId(actorIds[numericTeuaId]);
+		//This is the most important thing to set here
+		eiCancelQuote.setMarketQuoteIds(marketQuoteIds);
+		//New requestID for this
+		eiCancelQuote.setRequestId(new RefIdType());
+		//Not at all used -- placeholder
+		eiCancelQuote.setQuoteIds(new TenderIdType());
+
+		logger.trace("TEUA sending EiCancelQuote to LMA " +
+				eiCancelQuote.toString());
+			
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EICanceledQuotePayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/cancelQuote", eiCancelQuote,
+					EICanceledQuotePayload.class);
+
 		return result;
 	}
 

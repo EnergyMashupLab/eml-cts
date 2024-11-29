@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.lang.module.ModuleDescriptor.Builder;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -394,7 +395,6 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempAccept = eiAcceptQuote;	
 		
-		System.out.println("IN LMA:" + tempAccept.getTransaction());
 		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " +
 				tempAccept.getReferencedQuoteId().toString());
 
@@ -416,6 +416,46 @@ public class LmaRestController {
 	
 		return tempPostResponse;
 	}
+
+	/**
+	 * Mapping to cancel a quote
+	 */
+	@PostMapping("/cancelQuote")
+	public EICanceledQuotePayload postEiCancelQuote(
+		@RequestBody EiCancelQuotePayload eiCancelQuote){
+		EiCancelQuotePayload tempCancel;
+		EICanceledQuotePayload tempPostResponse;
+		ActorIdType tempPartyId;
+		String positionUri;
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;
+		restTemplate = builder.build();
+
+		//Save the message
+		tempCancel = eiCancelQuote;
+	
+		logger.debug("postEiCancelQuote to LME. ReferencedQuoteId: " +
+				tempCancel.getMarketQuoteIds().toString());
+
+		//Build the position URI
+		tempPartyId = tempCancel.getPartyId();
+		positionUri = "http://localhost:8080/position/" +
+				tempPartyId.toString() +
+				"/add";
+
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelQuote", 
+				tempCancel, 
+				EICanceledQuotePayload.class);
+		
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+		return tempPostResponse;
+	}
+
 
 	@PostMapping("/manageSubscription")
 	public EiManagedTickerSubscriptionPayload postEiManagedTickerSubscription(

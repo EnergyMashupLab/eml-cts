@@ -8,7 +8,7 @@ public class ClientManageTickerSubscriptionPayload {
     public MarketIdType marketId;
     public int segmentId;
     public SubscriptionActionType subscriptionActionType;
-//    public SubscriptionIdType subscriptionId;
+    public SubscriptionIdType subscriptionId;
     public RefIdType subscriptionRequestId;
 
     public ClientManageTickerSubscriptionPayload() {
