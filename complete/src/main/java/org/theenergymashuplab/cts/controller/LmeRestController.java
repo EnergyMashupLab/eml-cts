@@ -86,7 +86,7 @@ public class LmeRestController {
 			new HashMap<Long, EiCreateTenderPayload>();
 
 	// for subscriptions
-	private final Set<ActorIdType> subscribers = ConcurrentHashMap.newKeySet();
+	private final ArrayList<ActorIdType> subscribers = new ArrayList<>();
 
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -790,7 +790,7 @@ public class LmeRestController {
 
 
 	private void notifySubscriber(QuoteTickerType updatedQuote) {
-		System.out.println("Entering the notifySubscribers methods"+ updatedQuote.toString());
+		//System.out.println("Entering the notifySubscribers methods"+ updatedQuote.toString());
 		for (ActorIdType partyId : subscribers) {
 			updatedQuote.setParty(partyId);
 			sendUpdateToSubscriber(updatedQuote);
