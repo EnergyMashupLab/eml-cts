@@ -86,7 +86,7 @@ public class LmeRestController {
 			new HashMap<Long, EiCreateTenderPayload>();
 
 	// for subscriptions
-	private final Set<String> subscribers = ConcurrentHashMap.newKeySet();
+	private final Set<ActorIdType> subscribers = ConcurrentHashMap.newKeySet();
 
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -406,6 +406,7 @@ public class LmeRestController {
 			synchronized(quoteTicker){
 				quoteTicker.setQuote(tempQuote);
 				//TODO send out subscription update here
+				System.out.println("Entering the subscription methods");
 				notifySubscriber(quoteTicker);
 			}
 
@@ -475,7 +476,9 @@ public class LmeRestController {
 		synchronized(quoteTicker){
 			quoteTicker.setQuote(tempQuote);
 			//TODO send out subscription update here
+			System.out.println("Entering the subscription methods");
 			notifySubscriber(quoteTicker);
+
 		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
@@ -759,22 +762,14 @@ public class LmeRestController {
 
 		// adding subscription to the subscriber data structure
 		if (tempSubscriptionActionTaken == SubscriptionActionType.CANCEL) {
-			String marketId = String.valueOf(eiManageTickerSubscriptionPayload.getMarketId());
-			if (marketId != null) {
-				subscribers.remove(marketId);
-				System.out.println("Market ID removed: " + marketId);
-			} else {
-				System.err.println("Market ID is null, cannot remove.");
-			}
-		} else {
-			String marketId = String.valueOf(eiManageTickerSubscriptionPayload.getMarketId());
-			if (marketId != null) {
-				subscribers.add(marketId);
-				System.out.println("Market ID added: " + marketId);
-			} else {
-				System.err.println("Market ID is null, cannot add.");
-			}
+				subscribers.remove(partyId);
+				System.out.println("Party ID removed: " + partyId);
 		}
+		else {
+				subscribers.add(partyId);
+				System.out.println("Party ID added: " + partyId);
+		}
+
 
 		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
 		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
@@ -786,7 +781,6 @@ public class LmeRestController {
 		tempSubscribed = new EiManagedTickerSubscriptionPayload("Multicast session started successfully",
 				tempSubscriptionActionTaken,
 				new EiResponseType(),
-				//new EiResponse(200, "OK"),
 				tempSubscriptionRequestId, tempTickerType);
 
 
@@ -794,15 +788,34 @@ public class LmeRestController {
 	}
 
 
+
 	private void notifySubscriber(QuoteTickerType updatedQuote) {
-		for (String marketId : subscribers) {
-			sendUpdateToSubscriber(marketId, updatedQuote);
+		System.out.println("Entering the notifySubscribers methods"+ updatedQuote.toString());
+		for (ActorIdType partyId : subscribers) {
+			updatedQuote.setParty(partyId);
+			sendUpdateToSubscriber(updatedQuote);
 		}
 	}
 
-	private void sendUpdateToSubscriber(String marketId, QuoteTickerType quote) {
-		logger.info("Sending update to subscriber: " + marketId);
+	private void sendUpdateToSubscriber(QuoteTickerType quote) {
+		// Initialize the RestTemplate using RestTemplateBuilder
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate = builder.build();
+		String url = "http://localhost:8080/lma/sendUpdates";
+
+		logger.debug("Sending update to subscriber with partyId: " + quote.getParty());
+
+		try {
+			// Send the POST request
+			restTemplate.postForObject(url, quote, QuoteTickerType.class);
+
+			logger.info("Successfully sent update to subscriber: " + quote.getParty());
+		} catch (Exception e) {
+			// Log the error without interrupting the main flow
+			logger.error("Failed to send update to subscriber: " + quote.getParty() + " at URL: " + url, e);
+		}
 	}
+
 
 
 

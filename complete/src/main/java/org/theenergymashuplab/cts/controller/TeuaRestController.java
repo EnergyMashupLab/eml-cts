@@ -907,6 +907,16 @@ public class TeuaRestController {
 	}
 
 
+	@PostMapping("{teuaId}/sendTickerUpdate")
+	public void sendTickerUpdate(
+			@PathVariable Long teuaId,
+			@RequestBody QuoteTickerType quoteTickerType
+	){
+
+	}
+
+
+
 
 
 }

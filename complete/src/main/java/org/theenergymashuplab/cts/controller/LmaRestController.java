@@ -487,6 +487,72 @@ public class LmaRestController {
 	}
 
 
+	@PostMapping("/sendUpdates")
+	public QuoteTickerType postEiCreateTransactionPayload(
+			@RequestBody QuoteTickerType quoteTickerType)	{
+		System.out.println("Entering the sendUpdate postmapping methods");
+
+		ActorIdType tempPartyId;
+		QuoteTickerType tempQuoteTickerType;
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender
+		restTemplate = builder.build();
+
+		/*
+		 * Originated by LME and forwarded by LMA to TEUA based on market match
+		 * and party. Rewrite messages so party and counterpary are counter-symmetric
+		 */
+
+		//	local temporary variables
+		tempQuoteTickerType = quoteTickerType;
+
+		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
+		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
+		// WORKS WITH INTERVAL TENDERS
+
+		tempPartyId = tempQuoteTickerType.getParty();
+
+		System.out.println("PartyId in  the post mapping methods "+tempPartyId.value());
+
+		/*
+		 * 	Pass the QuoteTickerType payload to the TEUA/EMA keyed by partyId in
+		 * 	the QuoteTickerType
+		 */
+
+		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
+				tempQuoteTickerType.toString());
+
+		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempQuoteTickerType.getParty().value());
+
+		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
+
+		if (tempTeuaUri == null) {
+			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
+					tempQuoteTickerType.getParty().toString());
+			// dump LmaRestController.postLmaToTeuaPartyIdMap
+			// use the value shown in TEUA initialization of the map
+
+			tempTeuaUri = "http://localhost:8080/teua/1/sendTickerUpdate"; // default if error
+			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
+
+		}	else	{
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+					tempQuoteTickerType.getParty().toString() +
+					" counterPartyId " + tempQuoteTickerType.getCounterParty().toString() +
+					" " + tempQuoteTickerType.getSubscriptionId().toString());
+		}
+
+
+		QuoteTickerType tempPostResponse = restTemplate.postForObject(tempTeuaUri,
+				tempQuoteTickerType,
+				QuoteTickerType.class);
+
+		return tempPostResponse;
+	}
+
+
+
 
 
 	public static EiTenderType getCurrentTender() {
