@@ -751,9 +751,14 @@ public class LmeRestController {
 			if(subscriptionsToPartyMap.containsKey(tempSubscribe.getSubscriptionId()) == false){
 				message = "Subscription with ID: " + tempSubscribe.getSubscriptionId() + " does not exist";
 			} else {
-				subscriptionsToPartyMap.remove(tempSubscribe.getSubscriptionId());
-				logger.info("Party ID removed: " + tempSubscribe.getPartyId());
-				message = "Subscription with ID: " + tempSubscribe.getSubscriptionId() + " has been removed";
+				ActorIdType removed = subscriptionsToPartyMap.remove(tempSubscribe.getSubscriptionId());
+				if(removed != null){
+					message = "Subscription with ID: " + tempSubscribe.getSubscriptionId() + " has been removed";
+					logger.info("Party ID removed: " + tempSubscribe.getPartyId());
+				} else {
+					message = "Failed to remove subscription";
+					logger.info("Subscriptoin ID was not removed");
+				}
 			}
 		}
 		else {
