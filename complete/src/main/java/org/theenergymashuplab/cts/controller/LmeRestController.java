@@ -472,10 +472,7 @@ public class LmeRestController {
 		 */
 		synchronized(quoteTicker){
 			quoteTicker.setQuote(tempQuote);
-			//TODO send out subscription update here
-			System.out.println("Entering the subscription methods");
 			notifySubscriber(quoteTicker);
-
 		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
@@ -509,7 +506,6 @@ public class LmeRestController {
 			for(MarketOrderIdType marketOrderId : cancelQuote.getMarketQuoteIds()){
 				//Set this for searching
 				tempQuote.setMarketOrderId(marketOrderId);
-				System.out.println(tempQuote.hashCode());
 				//If we do have the quote
 				if(currentQuotes.containsKey(tempQuote.hashCode()) == true){
 					//Remove it from the hashmap
@@ -558,9 +554,6 @@ public class LmeRestController {
 		//Grab the transaction ID
 		TransactionIdType transactionId = eiAcceptQuote.getTransaction().getTransactionId();
 
-		//Dummy for our POST responses
-		EiCreatedTransactionPayload tempCreated;
-		
 		//To be filled out by JSON
 		EiAcceptQuotePayload tempAccept;
 
@@ -631,7 +624,6 @@ public class LmeRestController {
 		synchronized(currentQuotes){
 			//If we can't find a quote here, that's the end for us
 			if(currentQuotes.containsKey(tempQuote.hashCode()) == false){
-				System.out.println("Quote with:" + tempQuote.getMarketOrderId().toString() + " does not exist. ERROR");
 				//Log it
 				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
 							"will now exit");
@@ -669,7 +661,6 @@ public class LmeRestController {
 				 * 	On each of these cases, we will send a blank eiAccepted quote as it failed
 				 */
 				if(tempQuantity > quoteQuantity || tempPrice < quotePrice){
-					System.out.println("Quote will be rejected due to bad quantity/price");
 					//Flag that this is bad with a bad response
 					response.setResponse(new EiResponse(500, "Quote not accepted due to price/quantity mismatch"));
 
@@ -684,13 +675,11 @@ public class LmeRestController {
 					//Update the quantity that we currently have available
 					((TenderIntervalDetail)listQuote.getTenderDetail()).setQuantity(quoteQuantity - tempQuantity);
 
-					//DEBUG
-					System.out.println("Quote will be LIFTED");
-					System.out.println("After transaction: " + listQuote.toString());
-
 					//Set this just for buyer info
 					buyerTender.setExpirationTime(listQuote.getExpirationTime());
+					buyerTender.setMarketOrderId(listQuote.getMarketOrderId());
 					sellerTender.setExpirationTime(listQuote.getExpirationTime());
+					sellerTender.setMarketOrderId(listQuote.getMarketOrderId());
 
 					//Set the tender detail for ourselves
 					buyerTender.setTenderDetail(listQuote.getTenderDetail());
@@ -755,22 +744,35 @@ public class LmeRestController {
 		tempTickerType = tempSubscribe.getTickerType();
 		tempSubscriptionActionTaken = tempSubscribe.getSubscriptionActionRequested();
 		tempSubscriptionRequestId = tempSubscribe.getSubscriptionRequestId();
+		String message = "";
 
 		// adding subscription to the subscriber data structure
 		if (tempSubscriptionActionTaken == SubscriptionActionType.CANCEL) {
+			if(subscriptionsToPartyMap.containsKey(tempSubscribe.getSubscriptionId()) == false){
+				message = "Subscription with ID: " + tempSubscribe.getSubscriptionId() + " does not exist";
+			} else {
 				subscriptionsToPartyMap.remove(tempSubscribe.getSubscriptionId());
-				logger.trace("Party ID removed: " + tempSubscribe.getPartyId());
+				logger.info("Party ID removed: " + tempSubscribe.getPartyId());
+				message = "Subscription with ID: " + tempSubscribe.getSubscriptionId() + " has been removed";
+			}
 		}
 		else {
+			if(subscriptionsToPartyMap.containsKey(tempSubscribe.getSubscriptionId()) == true){
+				logger.info("Duplicate Subscription ID");
+				message = "Error: Duplicated Subscription ID. Please retry";
+			} else {
 				subscriptionsToPartyMap.put(tempSubscribe.getSubscriptionId(), tempSubscribe.getPartyId());
-				logger.trace("Party ID added: " + tempSubscribe.getPartyId());
+				logger.info("Party ID added: " + tempSubscribe.getPartyId());
+				message = "Subscription with ID: " + tempSubscribe.getSubscriptionId() + " has been created";
+			}
 		}
 
-		tempSubscribed = new EiManagedTickerSubscriptionPayload("Multicast session started successfully",
+		tempSubscribed = new EiManagedTickerSubscriptionPayload(message,
 				tempSubscriptionActionTaken,
 				new EiResponseType(),
 				tempSubscriptionRequestId, tempTickerType);
 
+		tempSubscribed.setSubscriptionId(tempSubscribe.getSubscriptionId());
 
 		return tempSubscribed;
 	}
@@ -878,5 +880,4 @@ public class LmeRestController {
 	public static Logger getLogger() {
 		return logger;
 	}
-	
 }

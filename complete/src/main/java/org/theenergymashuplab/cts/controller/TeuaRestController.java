@@ -742,8 +742,6 @@ public class TeuaRestController {
 		//Construct the accept quote payload
 		//This constructor will do all of the transaction creation for us
 		eiAcceptQuote = new EiAcceptQuotePayload(tempClientAcceptQuote.getReferencedQuoteId(), tempClientAcceptQuote.getQuantity(), tempClientAcceptQuote.getPrice());
-		//DEBUG
-		System.out.println(eiAcceptQuote.getTransaction());
 
 		//We need to work around the type system to make this happen
 		MarketOrderIdType id = new MarketOrderIdType();
@@ -754,8 +752,6 @@ public class TeuaRestController {
 		eiAcceptQuote.setCounterPartyId(actorIds[numericTeuaId]);
 		eiAcceptQuote.setPartyId(lmePartyId);
 
-		System.out.println("Will be searching for quote with: " + eiAcceptQuote.getReferencedQuoteId());
-		
 		logger.trace("TEUA sending EiAcceptQuote to LMA " +
 				eiAcceptQuote.toString());
 			
@@ -903,7 +899,7 @@ public class TeuaRestController {
 		eiManageTickerSubscriptionPayload.setTickerType(tempClientManageTickerSubscriptionPayload.getTickerType());
 		//Set the partyID
 		eiManageTickerSubscriptionPayload.setPartyId(actorIds[numericTeuaId]);
-
+	
 		if(eiManageTickerSubscriptionPayload.getSubscriptionActionRequested() != SubscriptionActionType.CANCEL){
 			//If we are not cancelling, we are creating a whole new subscription, so we will add this in here
 			eiManageTickerSubscriptionPayload.setSubscriptionId(new SubscriptionIdType());
@@ -912,8 +908,7 @@ public class TeuaRestController {
 			SubscriptionIdType subscriptionId = new SubscriptionIdType();
 			subscriptionId.setMyUidId(tempClientManageTickerSubscriptionPayload.getSubscriptionId());
 			eiManageTickerSubscriptionPayload.setSubscriptionId(subscriptionId);
-		}
-		
+		}	
 		//This will be atomically created by a constructor -- every requestID is unique
 		eiManageTickerSubscriptionPayload.setSubscriptionRequestId(new RefIdType());
 
@@ -967,7 +962,5 @@ public class TeuaRestController {
 		tempQuoteTicker = quoteTickerType;
 
 		logger.info(tempQuoteTicker.toString());
-
-
 	}
 }

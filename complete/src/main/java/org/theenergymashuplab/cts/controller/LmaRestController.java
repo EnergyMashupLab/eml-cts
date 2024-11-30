@@ -521,7 +521,6 @@ public class LmaRestController {
 				tempQuoteTickerType.toString());
 
 		tempTeuaUriTicker = postLmaToTeuaPartyIdMapForQuotes.get(tempQuoteTickerType.getParty().value());
-		System.out.println(tempTeuaUri);
 
 		logger.debug("tempTeuaUri is '" + tempTeuaUriTicker + "'");
 
