@@ -3,6 +3,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.SubscriptionActionType;
+import org.theenergymashuplab.cts.SubscriptionIdType;
 import org.theenergymashuplab.cts.TickerType;
 
 public class ClientManagedTickerSubscriptionPayload {
@@ -10,18 +11,21 @@ public class ClientManagedTickerSubscriptionPayload {
     public TickerType tickerType;
     public String multicastListenReference;
     public EiResponseType response;
+	public SubscriptionIdType subscriptionId;
     public SubscriptionActionType subscriptionActionTaken;
     public RefIdType subscriptionRequestId;
 
     public ClientManagedTickerSubscriptionPayload() {
     }
 
-    public ClientManagedTickerSubscriptionPayload(String info, TickerType tickerType, String multicastListenReference, EiResponseType response, SubscriptionActionType subscriptionActionTaken, RefIdType subscriptionRequestId) {
+    public ClientManagedTickerSubscriptionPayload(String info, TickerType tickerType, String multicastListenReference, EiResponseType response, SubscriptionActionType subscriptionActionTaken, RefIdType subscriptionRequestId,
+													SubscriptionIdType subscriptionId) {
         this.info = info;
         this.tickerType = tickerType;
         this.multicastListenReference = multicastListenReference;
         this.response = response;
         this.subscriptionActionTaken = subscriptionActionTaken;
+		this.subscriptionId = subscriptionId;
         this.subscriptionRequestId = subscriptionRequestId;
     }
 
@@ -72,4 +76,12 @@ public class ClientManagedTickerSubscriptionPayload {
     public void setSubscriptionRequestId(RefIdType subscriptionRequestId) {
         this.subscriptionRequestId = subscriptionRequestId;
     }
+
+	public SubscriptionIdType getSubscriptionId(){
+		return this.subscriptionId;
+	}
+
+	public void setSubscriptionId(SubscriptionIdType subscriptionId){
+		this.subscriptionId = subscriptionId;
+	}
 }

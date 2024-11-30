@@ -45,11 +45,14 @@ public class LmeRestController {
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
 	private static TenderIdType currentTenderId;
-	//Quote and tender tickers
+	/**
+	 * This quote ticker is will be sent out to subscribers
+	 */
 	private static QuoteTickerType quoteTicker = new QuoteTickerType();
-	private static TenderTickerType tenderTicker = new TenderTickerType();
 	//Add a hashmap for our implementation
 	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
+	//Correlate subscriptions to their partyIds
+	private static HashMap<SubscriptionIdType, ActorIdType> subscriptionsToPartyMap = new HashMap<>();
 
 
 	// TODO assign in constructor?
@@ -85,8 +88,6 @@ public class LmeRestController {
 	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap =
 			new HashMap<Long, EiCreateTenderPayload>();
 
-	// for subscriptions
-	private final ArrayList<ActorIdType> subscribers = new ArrayList<>();
 
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -113,6 +114,8 @@ public class LmeRestController {
 			lmeSocketServer.start();
 			logger.debug("Starting lmeSocketServer");
 		}
+
+		quoteTicker.setCounterParty(partyId);
 	}
 	
 	/*
@@ -169,10 +172,6 @@ public class LmeRestController {
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
 		tempTender.setMarketOrderId(new MarketOrderIdType());
-		//Set the tender Ticker
-		//TODO not fully implemented
-		tenderTicker.setTender(tempTender);
-		
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
 		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
@@ -405,8 +404,6 @@ public class LmeRestController {
 		 	*/
 			synchronized(quoteTicker){
 				quoteTicker.setQuote(tempQuote);
-				//TODO send out subscription update here
-				System.out.println("Entering the subscription methods");
 				notifySubscriber(quoteTicker);
 			}
 
@@ -749,7 +746,6 @@ public class LmeRestController {
 	public EiManagedTickerSubscriptionPayload postEiManagedTicker(
 			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload)	{
 		TickerType tempTickerType;
-		EiResponseType tempResponse;
 		SubscriptionActionType tempSubscriptionActionTaken;
 		RefIdType tempSubscriptionRequestId;
 		EiManageTickerSubscriptionPayload tempSubscribe = null;
@@ -762,21 +758,13 @@ public class LmeRestController {
 
 		// adding subscription to the subscriber data structure
 		if (tempSubscriptionActionTaken == SubscriptionActionType.CANCEL) {
-				subscribers.remove(partyId);
-				System.out.println("Party ID removed: " + partyId);
+				subscriptionsToPartyMap.remove(tempSubscribe.getSubscriptionId());
+				logger.trace("Party ID removed: " + tempSubscribe.getPartyId());
 		}
 		else {
-				subscribers.add(partyId);
-				System.out.println("Party ID added: " + partyId);
+				subscriptionsToPartyMap.put(tempSubscribe.getSubscriptionId(), tempSubscribe.getPartyId());
+				logger.trace("Party ID added: " + tempSubscribe.getPartyId());
 		}
-
-
-		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
-		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
-		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
-		 * with a different tender, leading to a transaction
-		 *
-		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
 
 		tempSubscribed = new EiManagedTickerSubscriptionPayload("Multicast session started successfully",
 				tempSubscriptionActionTaken,
@@ -788,11 +776,14 @@ public class LmeRestController {
 	}
 
 
-
+	/**
+	 * Notify all parties subscribed
+	 */
 	private void notifySubscriber(QuoteTickerType updatedQuote) {
 		//System.out.println("Entering the notifySubscribers methods"+ updatedQuote.toString());
-		for (ActorIdType partyId : subscribers) {
-			updatedQuote.setParty(partyId);
+		for (SubscriptionIdType subscriptionId : subscriptionsToPartyMap.keySet()) {
+			updatedQuote.setParty(subscriptionsToPartyMap.get(subscriptionId));
+			updatedQuote.setSubscriptionId(subscriptionId);
 			sendUpdateToSubscriber(updatedQuote);
 		}
 	}
@@ -805,15 +796,10 @@ public class LmeRestController {
 
 		logger.debug("Sending update to subscriber with partyId: " + quote.getParty());
 
-		try {
-			// Send the POST request
-			restTemplate.postForObject(url, quote, QuoteTickerType.class);
+		// Send the POST request
+		restTemplate.postForObject(url, quote, QuoteTickerType.class);
 
-			logger.info("Successfully sent update to subscriber: " + quote.getParty());
-		} catch (Exception e) {
-			// Log the error without interrupting the main flow
-			logger.error("Failed to send update to subscriber: " + quote.getParty() + " at URL: " + url, e);
-		}
+		logger.info("Successfully sent update to subscriber: " + quote.getParty());
 	}
 
 

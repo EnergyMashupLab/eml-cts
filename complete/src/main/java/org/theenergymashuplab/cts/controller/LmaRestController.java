@@ -48,10 +48,12 @@ public class LmaRestController {
 	private static TenderIdType currentTenderId;
 	private static final ActorIdType partyId  = new ActorIdType();
 	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
+	private static String tempTeuaUriTicker = "http://localhost:8080/teua/1/sendTickerUpdate";
 	
 	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
 	//	pushed here by TEUA which has the ActorId and {id} information
 	public static ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMap;
+	public static ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMapForQuotes;
 	//	Initialized in TeuaRestController as this static map
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -507,44 +509,41 @@ public class LmaRestController {
 		//	local temporary variables
 		tempQuoteTickerType = quoteTickerType;
 
-		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
-		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
-		// WORKS WITH INTERVAL TENDERS
-
 		tempPartyId = tempQuoteTickerType.getParty();
 
-		System.out.println("PartyId in  the post mapping methods "+tempPartyId.value());
+		logger.trace("PartyId in  the post mapping methods "+tempPartyId.value());
 
 		/*
 		 * 	Pass the QuoteTickerType payload to the TEUA/EMA keyed by partyId in
 		 * 	the QuoteTickerType
 		 */
-
 		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
 				tempQuoteTickerType.toString());
 
-		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempQuoteTickerType.getParty().value());
+		tempTeuaUriTicker = postLmaToTeuaPartyIdMapForQuotes.get(tempQuoteTickerType.getParty().value());
+		System.out.println(tempTeuaUri);
 
-		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
+		logger.debug("tempTeuaUri is '" + tempTeuaUriTicker + "'");
 
-		if (tempTeuaUri == null) {
+		if (tempTeuaUriTicker == null) {
 			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
 					tempQuoteTickerType.getParty().toString());
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
 
-			tempTeuaUri = "http://localhost:8080/teua/1/sendTickerUpdate"; // default if error
-			logger.info("tempTeuaUri is null. Using " + tempTeuaUri);
+			tempTeuaUriTicker = "http://localhost:8080/teua/1/sendTickerUpdate"; // default if error
+			logger.info("tempTeuaUri is null. Using " + tempTeuaUriTicker);
 
 		}	else	{
-			logger.trace("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUriTicker + " partyId " +
 					tempQuoteTickerType.getParty().toString() +
 					" counterPartyId " + tempQuoteTickerType.getCounterParty().toString() +
 					" " + tempQuoteTickerType.getSubscriptionId().toString());
 		}
 
 
-		QuoteTickerType tempPostResponse = restTemplate.postForObject(tempTeuaUri,
+		//Send update back to TEUA
+		QuoteTickerType tempPostResponse = restTemplate.postForObject(tempTeuaUriTicker,
 				tempQuoteTickerType,
 				QuoteTickerType.class);
 
