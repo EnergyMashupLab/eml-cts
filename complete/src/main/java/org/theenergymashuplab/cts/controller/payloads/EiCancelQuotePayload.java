@@ -1,5 +1,7 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
+import java.util.ArrayList;
+
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.RefIdType;
@@ -13,7 +15,8 @@ import org.theenergymashuplab.cts.TenderIdType;
 public class EiCancelQuotePayload {
 
 	public ActorIdType counterPartyId;
-	public MarketOrderIdType marketQuoteIds;
+	//A list of marketQuoteIds to cancel 
+	public ArrayList<MarketOrderIdType> marketQuoteIds;
 	public ActorIdType partyId;
 	private TenderIdType quoteIds;
 	public RefIdType requestId;
@@ -22,7 +25,7 @@ public class EiCancelQuotePayload {
 
 	}
 
-	public EiCancelQuotePayload(ActorIdType counterPartyId, MarketOrderIdType marketQuoteIds, ActorIdType partyId, TenderIdType quoteIds, RefIdType requestId){
+	public EiCancelQuotePayload(ActorIdType counterPartyId, ArrayList<MarketOrderIdType> marketQuoteIds, ActorIdType partyId, TenderIdType quoteIds, RefIdType requestId){
 		this.counterPartyId = counterPartyId;
 		this.marketQuoteIds = marketQuoteIds;
 		this.partyId = partyId;
@@ -38,16 +41,16 @@ public class EiCancelQuotePayload {
 		this.counterPartyId = counterPartyId;
 	}
 
-	public MarketOrderIdType getMarketQuoteIds(){
+	public ArrayList<MarketOrderIdType> getMarketQuoteIds(){
 		return this.marketQuoteIds;
 	}
 
-	public void setMarketQuoteIds(MarketOrderIdType marketQuoteIds){
+	public void setMarketQuoteIds(ArrayList<MarketOrderIdType> marketQuoteIds){
 		this.marketQuoteIds = marketQuoteIds;
 	}
 
 	public ActorIdType getPartyId(){
-		return this.getPartyId();
+		return this.partyId;
 	}
 
 	public void setPartyId(ActorIdType partyId){

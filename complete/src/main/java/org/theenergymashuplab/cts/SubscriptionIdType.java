@@ -22,4 +22,22 @@ public class SubscriptionIdType extends UidType {
 				"myUidId=" + myUidId +
 				'}';
 	}
+
+	@Override
+	public int hashCode(){
+		return (int)super.getMyUidId();
+	}
+
+	@Override
+	public boolean equals(Object other){
+		if(other == null){
+			return false;
+		}
+
+		if(other.getClass() != SubscriptionIdType.class){
+			return false;
+		}
+
+		return ((SubscriptionIdType)other).hashCode() == this.hashCode();
+	}
 }

@@ -3,6 +3,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.SideType;
+import org.theenergymashuplab.cts.SubscriptionIdType;
 import org.theenergymashuplab.cts.TickerType;
 
 /**
@@ -15,14 +16,14 @@ public abstract class TickerPayloadBase {
 	public ActorIdType counterParty;
 	public ActorIdType party;
 	public SideType side;
-	public RefIdType subscriptionId;
+	public SubscriptionIdType subscriptionId;
 	public TickerType tickerType;
 
 	public TickerPayloadBase(){
 
 	}
 
-	public TickerPayloadBase(ActorIdType counterParty, ActorIdType party, SideType side, RefIdType subscriptionId, TickerType tickerType) {
+	public TickerPayloadBase(ActorIdType counterParty, ActorIdType party, SideType side, SubscriptionIdType subscriptionId, TickerType tickerType) {
 		this.counterParty = counterParty;
 		this.party = party;
 		this.side = side;
@@ -54,11 +55,11 @@ public abstract class TickerPayloadBase {
 		this.side = side;
 	}
 
-	public RefIdType getSubscriptionId() {
+	public SubscriptionIdType getSubscriptionId() {
 		return subscriptionId;
 	}
 
-	public void setSubscriptionId(RefIdType subscriptionId) {
+	public void setSubscriptionId(SubscriptionIdType subscriptionId) {
 		this.subscriptionId = subscriptionId;
 	}
 

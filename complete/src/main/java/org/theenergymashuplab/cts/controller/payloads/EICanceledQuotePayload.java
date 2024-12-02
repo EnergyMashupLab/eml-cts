@@ -2,6 +2,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiCanceledResponseType;
+import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
 
@@ -14,11 +15,17 @@ public class EICanceledQuotePayload {
 
 	public ActorIdType counterPartyId;
 	public EiCanceledResponseType eiCanceledResponse;
-	public EiResponseType eiResponse;
+	public EiResponse eiResponse;
 	public RefIdType inResponseTo;
 	public ActorIdType partyId;
 
-	public EICanceledQuotePayload(ActorIdType counterPartyId, EiCanceledResponseType eiCanceledResponse, EiResponseType eiResponse, RefIdType inResponseTo, ActorIdType partyId){
+
+	//JSON
+	public EICanceledQuotePayload(){
+
+	}
+
+	public EICanceledQuotePayload(ActorIdType counterPartyId, EiCanceledResponseType eiCanceledResponse, EiResponse eiResponse, RefIdType inResponseTo, ActorIdType partyId){
 		this.counterPartyId = counterPartyId;
 		this.eiCanceledResponse = eiCanceledResponse;
 		this.eiResponse = eiResponse;
@@ -43,11 +50,11 @@ public class EICanceledQuotePayload {
 		this.eiCanceledResponse = eiCanceledResponse;
 	}
 	
-	public EiResponseType getEiResponse(){
+	public EiResponse getEiResponse(){
 		return this.eiResponse;
 	}
 
-	public void setEiResponse(EiResponseType eiResponse){
+	public void setEiResponse(EiResponse eiResponse){
 		this.eiResponse = eiResponse;
 	}
 
