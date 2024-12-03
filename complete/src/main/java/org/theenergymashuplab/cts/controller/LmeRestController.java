@@ -67,9 +67,9 @@ public class LmeRestController {
 	// queueFromLme is used by LmeSocketClient to accept CreateTenderPayload
 	// queue.put here in LME, take in LmeSocketClient which connects to the market
 	// Queue capacity is not an issue
-	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue<EiCreateTenderPayload>(20);
+	public static BlockingQueue<EiCreateTenderPayload> queueFromLme = new ArrayBlockingQueue<EiCreateTenderPayload>(200);
 
-	public static BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme = new ArrayBlockingQueue<EiCreateQuotePayload>(20);
+	public static BlockingQueue<EiCreateQuotePayload> queueQuoteFromLme = new ArrayBlockingQueue<EiCreateQuotePayload>(200);
 
 	public static LmeSocketClient lmeSocketClient = new LmeSocketClient();
 	
@@ -77,7 +77,7 @@ public class LmeRestController {
 	// queue.put by LmeSocketServer, queue.take here in LME to produce an 
 	// EiCreateTransactionPayload to be forwarded to LMA
 	public static BlockingQueue<EiCreateTransactionPayload> eiCreateTransactionQueue =
-			new ArrayBlockingQueue<EiCreateTransactionPayload>(20);
+			new ArrayBlockingQueue<EiCreateTransactionPayload>(200);
 	public static LmeSocketServer lmeSocketServer = new LmeSocketServer();
 	
 	LmeSendTransactions lmeSendTransactionsThread = new LmeSendTransactions();
@@ -676,7 +676,6 @@ public class LmeRestController {
 		//These ID's will be set for the response
 		response.setPartyId(tempAccept.getPartyId());
 		response.setCounterPartyId(tempAccept.getCounterPartyId());
-
 
 		/**
 		 * The QDM sends an EiAcceptedQuotePayload back to the original sending party

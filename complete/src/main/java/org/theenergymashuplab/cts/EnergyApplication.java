@@ -69,7 +69,7 @@ public class EnergyApplication {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");
 //			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
-			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(25,24,5,50,22,122);
+//			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(25,24,5,50,22,122);
 //			RandomCreateClientQuote randomClientQuote = new RandomCreateClientQuote();
 //			while (true) {
 //				System.out.println("Generate how many random ClientCreateTenderPayload objects?");

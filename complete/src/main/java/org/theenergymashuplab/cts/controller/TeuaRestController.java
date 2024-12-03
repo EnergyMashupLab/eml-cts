@@ -574,7 +574,7 @@ public class TeuaRestController {
 		Integer numericTeuaId = -1;
 		String positionUri;
 		
-		
+		System.out.println(clientCreateQuote);
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
 		RestTemplate restTemplate = builder.build();
@@ -697,8 +697,7 @@ public class TeuaRestController {
 		EiAcceptQuotePayload eiAcceptQuote;
 		Integer numericTeuaId = -1;
 		String positionUri;
-		
-		
+
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
 		RestTemplate restTemplate = builder.build();

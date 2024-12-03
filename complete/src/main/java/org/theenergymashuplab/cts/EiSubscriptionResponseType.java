@@ -9,7 +9,7 @@ package org.theenergymashuplab.cts;
 public abstract class EiSubscriptionResponseType {
 
 	public String multicastListenReference;
-	public EiResponse response;
+	public EiResponseType response;
 	public SubscriptionActionType subscriptionActionTaken;
 	public RefIdType subscriptionRequestId;
 
@@ -17,7 +17,7 @@ public abstract class EiSubscriptionResponseType {
 
 	}
 
-	public EiSubscriptionResponseType(String multicastListenReference, SubscriptionActionType subscriptionActionTaken, EiResponse response, RefIdType subscriptionRequestId) {
+	public EiSubscriptionResponseType(String multicastListenReference, SubscriptionActionType subscriptionActionTaken, EiResponseType response, RefIdType subscriptionRequestId) {
 		this.multicastListenReference = multicastListenReference;
 		this.subscriptionActionTaken = subscriptionActionTaken;
 		this.response = response;
@@ -32,11 +32,9 @@ public abstract class EiSubscriptionResponseType {
 		this.multicastListenReference = multicastListenReference;
 	}
 
-	public EiResponse getResponse() {
-		return response;
-	}
+	public EiResponseType getResponse() { return response; }
 
-	public void setResponse(EiResponse response) {
+	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
 
