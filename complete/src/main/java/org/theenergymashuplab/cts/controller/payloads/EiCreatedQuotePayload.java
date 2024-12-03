@@ -46,7 +46,6 @@ public class EiCreatedQuotePayload {
 		this.response = response;
 	}
 
-
 	public ActorIdType getCounterPartyId(){
 		return this.counterPartyId;
 	}

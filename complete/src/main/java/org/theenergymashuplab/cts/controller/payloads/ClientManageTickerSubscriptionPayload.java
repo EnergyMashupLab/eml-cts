@@ -8,19 +8,18 @@ public class ClientManageTickerSubscriptionPayload {
     public MarketIdType marketId;
     public int segmentId;
     public SubscriptionActionType subscriptionActionType;
-//    public SubscriptionIdType subscriptionId;
-    public RefIdType subscriptionRequestId;
+	public long subscriptionId;
 
     public ClientManageTickerSubscriptionPayload() {
     }
 
-    public ClientManageTickerSubscriptionPayload(String info, TickerType tickerType, MarketIdType marketId, int segmentId, SubscriptionActionType subscriptionActionType, RefIdType subscriptionRequestId) {
+    public ClientManageTickerSubscriptionPayload(String info, TickerType tickerType, MarketIdType marketId, int segmentId, SubscriptionActionType subscriptionActionType, long subscriptionId) {
         this.info = info;
         this.tickerType = tickerType;
         this.marketId = marketId;
         this.segmentId = segmentId;
         this.subscriptionActionType = subscriptionActionType;
-        this.subscriptionRequestId = subscriptionRequestId;
+		this.subscriptionId = subscriptionId;
     }
 
     public String getInfo() {
@@ -30,6 +29,14 @@ public class ClientManageTickerSubscriptionPayload {
     public void setInfo(String info) {
         this.info = info;
     }
+
+	public long getSubscriptionId(){
+		return this.subscriptionId;
+	}
+
+	public void setSubscriptionId(long subscriptionId){
+		this.subscriptionId = subscriptionId;
+	}
 
     public TickerType getTickerType() {
         return tickerType;
@@ -62,14 +69,5 @@ public class ClientManageTickerSubscriptionPayload {
     public void setSubscriptionActionType(SubscriptionActionType subscriptionActionType) {
         this.subscriptionActionType = subscriptionActionType;
     }
-
-    public RefIdType getSubscriptionRequestId() {
-        return subscriptionRequestId;
-    }
-
-    public void setSubscriptionRequestId(RefIdType subscriptionRequestId) {
-        this.subscriptionRequestId = subscriptionRequestId;
-    }
-
 
 }

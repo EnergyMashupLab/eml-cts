@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.lang.module.ModuleDescriptor.Builder;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,15 +36,8 @@ import org.apache.logging.log4j.Logger;
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
+import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
-import org.theenergymashuplab.cts.TenderIdType;
-import org.theenergymashuplab.cts.TenderIntervalDetail;
-import org.theenergymashuplab.cts.SideType;
-import org.theenergymashuplab.cts.TenderDetail;
-import org.theenergymashuplab.cts.Interval;
-import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.EiTenderType;
-import org.theenergymashuplab.cts.ActorIdType;
 
 @RestController
 @RequestMapping("/lma")
@@ -54,10 +48,12 @@ public class LmaRestController {
 	private static TenderIdType currentTenderId;
 	private static final ActorIdType partyId  = new ActorIdType();
 	private static String tempTeuaUri = "http://localhost:8080/teua/1/createTransaction";
+	private static String tempTeuaUriTicker = "http://localhost:8080/teua/1/sendTickerUpdate";
 	
 	// 	partyId to URI for posting EiCreateTransaction to /teua/{id}
 	//	pushed here by TEUA which has the ActorId and {id} information
 	public static ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMap;
+	public static ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMapForQuotes;
 	//	Initialized in TeuaRestController as this static map
 	
 	private static final Logger logger = LogManager.getLogger(
@@ -401,7 +397,6 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempAccept = eiAcceptQuote;	
 		
-		System.out.println("IN LMA:" + tempAccept.getTransaction());
 		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " +
 				tempAccept.getReferencedQuoteId().toString());
 
@@ -423,6 +418,46 @@ public class LmaRestController {
 	
 		return tempPostResponse;
 	}
+
+	/**
+	 * Mapping to cancel a quote
+	 */
+	@PostMapping("/cancelQuote")
+	public EICanceledQuotePayload postEiCancelQuote(
+		@RequestBody EiCancelQuotePayload eiCancelQuote){
+		EiCancelQuotePayload tempCancel;
+		EICanceledQuotePayload tempPostResponse;
+		ActorIdType tempPartyId;
+		String positionUri;
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;
+		restTemplate = builder.build();
+
+		//Save the message
+		tempCancel = eiCancelQuote;
+	
+		logger.debug("postEiCancelQuote to LME. ReferencedQuoteId: " +
+				tempCancel.getMarketQuoteIds().toString());
+
+		//Build the position URI
+		tempPartyId = tempCancel.getPartyId();
+		positionUri = "http://localhost:8080/position/" +
+				tempPartyId.toString() +
+				"/add";
+
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelQuote", 
+				tempCancel, 
+				EICanceledQuotePayload.class);
+		
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+		return tempPostResponse;
+	}
+
 
 	@PostMapping("/manageSubscription")
 	public EiManagedTickerSubscriptionPayload postEiManagedTickerSubscription(
@@ -452,6 +487,70 @@ public class LmaRestController {
 		return tempPostResponse;
 
 	}
+
+
+	@PostMapping("/sendUpdates")
+	public QuoteTickerType postEiCreateTransactionPayload(
+			@RequestBody QuoteTickerType quoteTickerType)	{
+		System.out.println("Entering the sendUpdate postmapping methods");
+
+		ActorIdType tempPartyId;
+		QuoteTickerType tempQuoteTickerType;
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender
+		restTemplate = builder.build();
+
+		/*
+		 * Originated by LME and forwarded by LMA to TEUA based on market match
+		 * and party. Rewrite messages so party and counterpary are counter-symmetric
+		 */
+
+		//	local temporary variables
+		tempQuoteTickerType = quoteTickerType;
+
+		tempPartyId = tempQuoteTickerType.getParty();
+
+		logger.trace("PartyId in  the post mapping methods "+tempPartyId.value());
+
+		/*
+		 * 	Pass the QuoteTickerType payload to the TEUA/EMA keyed by partyId in
+		 * 	the QuoteTickerType
+		 */
+		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
+				tempQuoteTickerType.toString());
+
+		tempTeuaUriTicker = postLmaToTeuaPartyIdMapForQuotes.get(tempQuoteTickerType.getParty().value());
+
+		logger.debug("tempTeuaUri is '" + tempTeuaUriTicker + "'");
+
+		if (tempTeuaUriTicker == null) {
+			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
+					tempQuoteTickerType.getParty().toString());
+			// dump LmaRestController.postLmaToTeuaPartyIdMap
+			// use the value shown in TEUA initialization of the map
+
+			tempTeuaUriTicker = "http://localhost:8080/teua/1/sendTickerUpdate"; // default if error
+			logger.info("tempTeuaUri is null. Using " + tempTeuaUriTicker);
+
+		}	else	{
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUriTicker + " partyId " +
+					tempQuoteTickerType.getParty().toString() +
+					" counterPartyId " + tempQuoteTickerType.getCounterParty().toString() +
+					" " + tempQuoteTickerType.getSubscriptionId().toString());
+		}
+
+
+		//Send update back to TEUA
+		QuoteTickerType tempPostResponse = restTemplate.postForObject(tempTeuaUriTicker,
+				tempQuoteTickerType,
+				QuoteTickerType.class);
+
+		return tempPostResponse;
+	}
+
+
+
 
 
 	public static EiTenderType getCurrentTender() {

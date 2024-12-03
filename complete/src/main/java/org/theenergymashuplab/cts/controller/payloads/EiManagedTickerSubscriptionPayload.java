@@ -4,6 +4,7 @@ import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.EiSubscriptionResponseType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.SubscriptionActionType;
+import org.theenergymashuplab.cts.SubscriptionIdType;
 import org.theenergymashuplab.cts.TickerType;
 
 /**
@@ -14,6 +15,7 @@ import org.theenergymashuplab.cts.TickerType;
 public class EiManagedTickerSubscriptionPayload extends EiSubscriptionResponseType {
 
 	public TickerType tickerType;
+	public SubscriptionIdType subscriptionId;
 
 	public EiManagedTickerSubscriptionPayload(){
 
@@ -34,6 +36,14 @@ public class EiManagedTickerSubscriptionPayload extends EiSubscriptionResponseTy
 
 	public void setTickerType(TickerType tickerType){
 		this.tickerType = tickerType;
+	}
+
+	public SubscriptionIdType getSubscriptionId(){
+		return this.subscriptionId;
+	}
+
+	public void setSubscriptionId(SubscriptionIdType subscriptionId){
+		this.subscriptionId = subscriptionId;
 	}
 
 	@Override
