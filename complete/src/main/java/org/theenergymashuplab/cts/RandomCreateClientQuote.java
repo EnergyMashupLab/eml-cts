@@ -9,7 +9,6 @@ import org.theenergymashuplab.cts.controller.payloads.ClientCreateQuotePayload;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
 
 public class RandomCreateClientQuote {
     @JsonIgnore
@@ -52,13 +51,83 @@ public class RandomCreateClientQuote {
             try	{
                 json[i] = mapper.writeValueAsString(clientQuotes[i]);
             }	catch (JsonProcessingException e)	{
-                System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
+                System.err.println("CreateRandomClientQuote: JsonProcessingException " + e);
             }
             // and print the json
             System.err.println("\n" + json[i] + "***");
         }
 
     }
+
+
+    RandomCreateClientQuote(int quantity) {
+        /*
+         *	Produces a specified ClientCreateTenderPayload objects and print to System.out.
+         *
+         *	initialize random generator in class attributes.
+         *	Local instance variable initializers and instance initializers are executed
+         *	after the constructor is invoked
+         */
+        instants = new Instant[24];
+        json = new String[quantity];
+        clientQuotes = new ClientCreateQuotePayload[quantity];
+//		System.err.println("RandomCreateClientTender Constructor\n\n");
+//		mapper.configure((SerializationConfig.Feature.valueOf("WRITE_DATES_AS_TIMESTAMPS")), false);
+        instants[0] = dtStart;
+        for (int i = 1; i < 24; i++) {
+            instants[i] = instants[i - 1].plusSeconds(60 * 60);
+        }
+
+        //	TODO BridgeInterval.toInstrumentNames() can address extended interval length encoding
+
+        //	print the json
+        for (int i = 0; i < quantity; i++) {
+            clientQuotes[i] = randomQuote(1,30, 50, 100);
+            teuaController.postClientCreateQuote("1", clientQuotes[i]);
+            try {
+                json[i] = mapper.writeValueAsString(clientQuotes[i]);
+            } catch (JsonProcessingException e) {
+                System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
+            }
+            // and print the json
+            System.err.println("\n" + json[i] + "***");
+        }
+    }
+
+    RandomCreateClientQuote(int quantity, int priceLower, int priceUpper, int quantityLower, int quantityUpper) {
+        /*
+         *	Produces a specified ClientCreateTenderPayload objects and print to System.out.
+         *
+         *	initialize random generator in class attributes.
+         *	Local instance variable initializers and instance initializers are executed
+         *	after the constructor is invoked
+         */
+        instants = new Instant[24];
+        json = new String[quantity];
+        clientQuotes = new ClientCreateQuotePayload[quantity];
+        System.err.println("RandomCreateClientTender Constructor\n\n");
+//		mapper.configure((SerializationConfig.Feature.valueOf("WRITE_DATES_AS_TIMESTAMPS")), false);
+        instants[0] = dtStart;
+        for (int i = 1; i < 24; i++) {
+            instants[i] = instants[i - 1].plusSeconds(60 * 60);
+        }
+
+        //	TODO BridgeInterval.toInstrumentNames() can address extended interval length encoding
+
+        //	print the json
+        for (int i = 0; i < quantity; i++) {
+            clientQuotes[i] = randomQuote(priceLower, priceUpper, quantityLower, quantityUpper);
+            teuaController.postClientCreateQuote("1", clientQuotes[i]);
+            try {
+                json[i] = mapper.writeValueAsString(clientQuotes[i]);
+            } catch (JsonProcessingException e) {
+                System.err.println("CreateRandomClientTender: JsonProcessingException " + e);
+            }
+            // and print the json
+            System.err.println("\n" + json[i] + "***");
+        }
+    }
+
 
     public ClientCreateQuotePayload randomQuote(int priceLower, int priceUpper, int quantityLower, int quantityUpper)	{
 //		int randQuantity = 50 + rand.nextInt(51); // random quantity from 50 to 100

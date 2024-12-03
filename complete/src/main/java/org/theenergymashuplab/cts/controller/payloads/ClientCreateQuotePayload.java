@@ -25,7 +25,7 @@ import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.SideType;
 
 public class ClientCreateQuotePayload {
-	private String info = "ClientCreateTenderPayload";
+	private String info = "ClientCreateQuotePayload";
 	private SideType side;
 	private long quantity;
 	private long price;

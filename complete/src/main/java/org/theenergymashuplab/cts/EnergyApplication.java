@@ -26,8 +26,6 @@ import org.springframework.web.client.RestTemplate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.theenergymashuplab.cts.controller.TeuaRestController;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 
 import java.util.Scanner;
 
@@ -70,7 +68,11 @@ public class EnergyApplication {
 			logger.info("In CommandLineRunner before getForObject");
 //			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
 //			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(25,24,5,50,22,122);
-//			RandomCreateClientQuote randomClientQuote = new RandomCreateClientQuote();
+			RandomCreateClientQuote randomClientQuote = new RandomCreateClientQuote(500);
+//			randomClientQuote = new RandomCreateClientQuote(3);
+//			randomClientQuote = new RandomCreateClientQuote(11,22,33,11,66);
+//			RandomCreateClientStreamQuote randomClientStreamQuote = new RandomCreateClientStreamQuote();
+			RandomAcceptClientQuote randomClientAccept = new RandomAcceptClientQuote();
 //			while (true) {
 //				System.out.println("Generate how many random ClientCreateTenderPayload objects?");
 //				String userInput = myObj.nextLine();

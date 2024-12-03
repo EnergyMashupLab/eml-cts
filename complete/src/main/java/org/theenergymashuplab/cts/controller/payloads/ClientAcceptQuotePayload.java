@@ -19,6 +19,12 @@ public class ClientAcceptQuotePayload{
 
 	}
 
+	public ClientAcceptQuotePayload(long tempReferencedQuoteId,long quantity, long price){
+		this.tempReferencedQuoteId = tempReferencedQuoteId;
+		this.quantity = quantity;
+		this.price = price;
+	}
+
 	public MarketOrderIdType getReferencedQuoteId(){
 		return this.referencedQuoteId;
 	}

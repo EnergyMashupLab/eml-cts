@@ -22,8 +22,7 @@ public class ClientCreateStreamQuotePayload {
     public ClientCreateStreamQuotePayload() {
     }
 
-    public ClientCreateStreamQuotePayload(String info, SideType side, long ctsQuoteId, List<CtsStreamIntervalType> streamIntervals, BridgeInstant streamStart, BridgeInstant bridgeExpireTime, long intervalDurationInMinutes) {
-        this.info = info;
+    public ClientCreateStreamQuotePayload(SideType side, long ctsQuoteId, List<CtsStreamIntervalType> streamIntervals, BridgeInstant streamStart, BridgeInstant bridgeExpireTime, long intervalDurationInMinutes) {
         this.side = side;
         this.ctsQuoteId = ctsQuoteId;
         this.streamIntervals = streamIntervals;
