@@ -12,9 +12,15 @@ public abstract class TenderBase {
 	private int quantityScale = 1;  // TODO Added due to being a part of the March 2024 spec. Variable quantity scales have not been implemented, so its always assumed to be 1 at the moment
 	private ResourceDesignatorType resourceDesignator = ResourceDesignatorType.ENERGY;
 	private SideType side;
-	private TenderDetail tenderDetail;
+	private TenderDetail tenderDetail; //If we have a stream type, this will be set to TenderStreamDetail
 	private List<Integer> warrants = null;  // TODO Added due to being a part of the March 2024 spec. warrant behavior has not be implemented yet
-	
+	private WarrantIdType warrantsList;
+
+	// Default constructor for EiRfqType and EiQuoteType
+	public TenderBase(){
+
+	}
+
 	public TenderBase(Instant expirationTime, SideType side, TenderDetail tenderDetail) {
 		this.expirationTime = expirationTime;
 		this.side = side;

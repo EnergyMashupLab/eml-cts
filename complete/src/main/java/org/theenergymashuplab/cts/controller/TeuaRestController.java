@@ -23,34 +23,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.CancelReasonType;
-import org.theenergymashuplab.cts.EiCanceledResponseType;
-import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.EiTenderType;
-import org.theenergymashuplab.cts.EiTransaction;
-import org.theenergymashuplab.cts.TenderDetail;
-import org.theenergymashuplab.cts.TenderIdType;
-import org.theenergymashuplab.cts.TenderIntervalDetail;
-import org.theenergymashuplab.cts.TransactionIdType;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreateTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.ClientCreatedTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.EICanceledTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCancelTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
+import org.theenergymashuplab.cts.*;
+import org.theenergymashuplab.cts.controller.payloads.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.antlr.v4.runtime.misc.TestRig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.naming.TransactionRef;
 
 //For RestTemplate
 @RestController
@@ -105,14 +91,18 @@ public class TeuaRestController {
 	public void initMapArray(int howMany)	{
 		int i;    
 		String clientUri, teuaUri;
+		String clientTickerUri, teuaTickerUri;
 
 	    //	HOOK for SC/Client IP address/port - default is localhost
 	    String clientUriPrefix = "http://localhost:8080/client/";
 	    String clientUriSuffix = "/clientCreateTransaction";
+		String clientTickerUriSuffix = "/clientSendTickerUpdate";
 	    String teuaUriPrefix = "http://localhost:8080/teua/";
 	    String teuaUriSuffix = "/createTransaction";
+		String teuaTickerUriSuffix = "/sendTickerUpdate";
 	    ActorIdType tempActorId;
 	    String mapReturns;
+		String mapReturnsTicker;
 	
 		// Initialize global parallel arrays
 	    actorNumericIds = new Long[idLimit];
@@ -121,17 +111,24 @@ public class TeuaRestController {
 		//	Triple the size should limit collisions and chain length
 		LmaRestController.postLmaToTeuaPartyIdMap = 
 					new ConcurrentHashMap<Long, String>(idLimit*3);
+		LmaRestController.postLmaToTeuaPartyIdMapForQuotes = 
+					new ConcurrentHashMap<Long, String>(idLimit*3);
 
 		for (i = 0; i < this.idLimit; i++)	{
 			clientUri = clientUriPrefix + String.valueOf(i) + clientUriSuffix;
+			clientTickerUri = clientUriPrefix + String.valueOf(i) + clientTickerUriSuffix;
 			postClientCreateTransactionUri[i] = clientUri;
 			tempActorId = new ActorIdType();
 			actorIds[i] = tempActorId;
 			actorNumericIds[i] = tempActorId.value();
 			teuaUri = teuaUriPrefix + String.valueOf(i) + teuaUriSuffix;
+			teuaTickerUri = teuaUriPrefix + String.valueOf(i) + teuaTickerUriSuffix;
 			mapReturns = LmaRestController.postLmaToTeuaPartyIdMap.put(actorNumericIds[i], teuaUri);
+			mapReturnsTicker = LmaRestController.postLmaToTeuaPartyIdMapForQuotes.put(actorNumericIds[i], teuaTickerUri);
+
 			
 			logger.trace("mapReturns '"+ mapReturns + "' for key " + actorNumericIds[i]);
+			logger.trace("mapReturnsTicker '"+ mapReturnsTicker + "' for key " + actorNumericIds[i]);
 			logger.trace("Map size " + LmaRestController.postLmaToTeuaPartyIdMap.size() +
 					" i = " + i + " " + clientUri + " " + teuaUri +
 					" actorId " + actorNumericIds[i].toString());
@@ -327,6 +324,7 @@ public class TeuaRestController {
 			actorIds[numericTeuaId].toString());
 		
 		tempClientCreateTender = clientCreateTender;	// save the parameter
+														
 
 		/*
 		 * Create a new EiTender using the interval, quantity, price,and expiration
@@ -339,12 +337,20 @@ public class TeuaRestController {
 		 * if Building sends to /teua/7 that means it's client 7
 		 */
 		
-		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders
-		TenderDetail tenderDetail = new TenderIntervalDetail(
+		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders 
+		
+		TenderDetail tenderDetail;
+
+
+		/*
+		 * We assume that everything that is in here is an interval tender
+		 */
+		 tenderDetail = new TenderIntervalDetail(
 				tempClientCreateTender.getInterval(),
 				tempClientCreateTender.getPrice(),
 				tempClientCreateTender.getQuantity()
-		);
+			);
+
 		tender = new EiTenderType(
 				tempClientCreateTender.getBridgeExpireTime().asInstant(),
 				tempClientCreateTender.getSide(),
@@ -375,4 +381,586 @@ public class TeuaRestController {
 		return result;
 	}
 	
+	@PostMapping("{teuaId}/clientCreateStreamTender")
+	public EiCreatedStreamTenderPayload postClientCreateStreamTender(
+			@PathVariable String teuaId,
+			@RequestBody ClientCreateStreamTenderPayload clientCreateStreamTender)	{
+
+		ClientCreateStreamTenderPayload tempClientCreateStreamTender;
+		CtsStreamType stream;
+		EiTenderType tender;
+		EiCreateStreamTenderPayload eiCreateStreamTender;
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		//Get value of TEUAid
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		/* Logging */	
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateStreamTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+		
+		/* END LOGGING */
+
+		/* Create the stream tender */
+
+		//Call the serializer 
+		tempClientCreateStreamTender = clientCreateStreamTender;	// save the parameter
+		
+		//Construct the start interval
+		BridgeInterval startInterval = new BridgeInterval(clientCreateStreamTender.getIntervalDurationInMinutes(), clientCreateStreamTender.getStreamStart().asInstant());
+
+		//Create the new stream object for the eiTenderType
+		stream = new CtsStreamType(startInterval.asInterval(),
+								tempClientCreateStreamTender.getStreamIntervals(), 
+								tempClientCreateStreamTender.getStreamStart().asInstant());
+
+		//Create a new tender stream detail
+		TenderStreamDetail tenderDetail = new TenderStreamDetail(stream);
+		//Save this for later
+		tenderDetail.setIntervalDurationInMinutes(clientCreateStreamTender.getIntervalDurationInMinutes());
+		
+
+		//Construct the stream tender object for us to send to LMA
+		tender = new EiTenderType(tempClientCreateStreamTender.getBridgeExpireTime().asInstant(), tempClientCreateStreamTender.getSide(), tenderDetail);
+
+		//Construct the EiCreateStreamTender payload to be forwarded to LMA
+		eiCreateStreamTender = new EiCreateStreamTenderPayload(tender, actorIds[numericTeuaId], this.lmePartyId);
+		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		eiCreateStreamTender.setPartyId(actorIds[numericTeuaId]);
+		eiCreateStreamTender.setCounterPartyId(lmePartyId);
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EiCreatedStreamTenderPayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/createStreamTender", eiCreateStreamTender,
+					EiCreatedStreamTenderPayload.class);
+
+		/* Done creating stream tender */
+
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				result.toString());
+		
+		return result;
+	}
+
+
+	@PostMapping("{teuaId}/clientCreateStreamQuote")
+	public EiCreatedStreamQuotePayload postClientCreateStreamQuote(
+			@PathVariable String teuaId,
+			@RequestBody ClientCreateStreamQuotePayload clientCreateStreamQuote)	{
+
+		ClientCreateStreamQuotePayload tempClientCreateStreamQuote;
+		CtsStreamType stream;
+		EiQuoteType quote;
+		EiCreateStreamQuotePayload eiCreateStreamQuote;
+		Integer numericTeuaId = -1;
+		String positionUri;
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateQuote
+		RestTemplate restTemplate = builder.build();
+
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+
+		//Get value of TEUAid
+		numericTeuaId = Integer.valueOf(teuaId);
+
+		/* Logging */
+		//convert to URI for position manager
+		positionUri = "/position/"
+				+ actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.debug("postEiCreateStreamQuote teuaId " +
+				teuaId +
+				" actorNumericIds[teuaId] " +
+				actorIds[numericTeuaId].toString());
+
+		/* END LOGGING */
+
+		/* Create the stream Quote */
+
+		//Call the serializer
+		tempClientCreateStreamQuote = clientCreateStreamQuote;	// save the parameter
+		System.out.println(tempClientCreateStreamQuote.getStreamIntervals());
+
+		//Construct the start interval
+		BridgeInterval startInterval = new BridgeInterval(clientCreateStreamQuote.getIntervalDurationInMinutes(), clientCreateStreamQuote.getStreamStart().asInstant());
+
+		//Create the new stream object for the eiQuoteType
+		stream = new CtsStreamType(startInterval.asInterval(),
+				tempClientCreateStreamQuote.getStreamIntervals(),
+				tempClientCreateStreamQuote.getStreamStart().asInstant());
+
+		//Create a new Quote stream detail
+		TenderStreamDetail quoteDetail = new TenderStreamDetail(stream);
+
+		//Save this for later
+		quoteDetail.setIntervalDurationInMinutes(clientCreateStreamQuote.getIntervalDurationInMinutes());
+
+
+		//Construct the stream Quote object for us to send to LMA
+		quote = new EiQuoteType(tempClientCreateStreamQuote.getBridgeExpireTime().asInstant(), tempClientCreateStreamQuote.getSide(), quoteDetail);
+
+		//Construct the EiCreateStreamQuote payload to be forwarded to LMA
+		eiCreateStreamQuote = new EiCreateStreamQuotePayload(quote, actorIds[numericTeuaId], this.lmePartyId);
+
+		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		eiCreateStreamQuote.setPartyId(actorIds[numericTeuaId]);
+		eiCreateStreamQuote.setCounterPartyId(lmePartyId);
+
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EiCreatedStreamQuotePayload result = restTemplate.postForObject
+				("http://localhost:8080/lma/createStreamQuote", eiCreateStreamQuote,
+						EiCreatedStreamQuotePayload.class);
+
+		/* Done creating stream Quote */
+
+		// and put CtsQuoteId in ClientCreatedQuotePayload
+		logger.trace("TEUA before return ClientCreatedQuote to Client/SC " +
+				result.toString());
+
+		return result;
+	}
+
+
+/*
+	 * POST - /clientCreateTender processed and sent to LMA,
+	 * received from Client/SC
+	 * 		RequestBody is ClientCreateTenderPayload
+	 * 		ResponseBody is ClientCreatedTenderPayload
+	 * 
+	 * Query PositionManager for the TEUA's PartyId, net full requirements energy request
+	 * (positive or negative) and forward the EiCreateTenderPayload with adjusted quanity
+	 * and possible different Side to LMA
+	 * 
+	 * Processing the request from the Building Controller (SC/Client)
+	 * Return the ClientCreatedTenderPayload which is just CTS TenderId for new tender
+	 * 
+	 * NOTE that the quantity in a ClientCreateTender is FULL REQUIREMENTS for the
+	 * Interval. The User Agent will adjust that request by energy already bought or sold
+	 * on behalf of this client for the Interval, to get a net amount to go from the client's position
+	 * (energy already bought or sold, netted) to the Full Requirements amount for Interval.
+	 */
+	@PostMapping("{teuaId}/clientCreateQuote")
+	public EiCreatedQuotePayload postClientCreateQuote(
+			@PathVariable String teuaId,
+			@RequestBody ClientCreateQuotePayload clientCreateQuote)	{
+		ClientCreateQuotePayload tempClientCreateQuote;	
+		ClientCreatedQuotePayload tempReturn;
+		EiQuoteType quote;
+		EiCreateQuotePayload eiCreateQuote;
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+		
+		tempClientCreateQuote = clientCreateQuote;	// save the parameter
+														
+
+		/*
+		 * Create a new EiTender using the interval, quantity, price,and expiration
+		 * time  sent by the Client/SC, and insert it via the constructor in a
+		 * new EiCreateTenderPayload.
+		 * 
+		 * partyId is in actorNumericIds[] , counterPartyId is the LME representing
+		 * the market and the POST is to the LMA.
+		 * 
+		 * if Building sends to /teua/7 that means it's client 7
+		 */
+		TenderDetail tenderDetail;
+
+
+		/*
+		 * We assume that everything that is in here is an interval tender
+		 */
+		 tenderDetail = new TenderIntervalDetail(
+				tempClientCreateQuote.getInterval(),
+				tempClientCreateQuote.getPrice(),
+				tempClientCreateQuote.getQuantity()
+			);
+
+		//Let's now build up our quote
+		quote = new EiQuoteType(
+				//The expire time is given to us by the client
+				tempClientCreateQuote.getBridgeExpireTime().asInstant(),
+				//This should ALWAYS be sell
+				tempClientCreateQuote.getSide(),
+				//Stuff in the interval tender
+				tenderDetail
+		);
+		
+
+		/**
+		 * Remember here: a quote IS a tender and inherits from parent TenderBase
+		 */
+
+		//No execution instructions
+		quote.setExecutionInstructions(null);
+		//Not private -- we want to publish
+		quote.setPrivateQuote(false);
+		//Always energy for right now
+		quote.setResourceDesignator(ResourceDesignatorType.ENERGY);
+		//The quote is tradeable
+		quote.setTradeable(true);
+
+
+		// 	Construct the EiCreateTender payload to be forwarded to LMA
+		eiCreateQuote = new EiCreateQuotePayload(quote, actorIds[numericTeuaId],
+				this.lmePartyId);
+		//Set the party and counter party ID that we have here
+		eiCreateQuote.setPartyId(actorIds[numericTeuaId]);
+		//Counter party is just the LME (Acts as our QDM)
+		eiCreateQuote.setCounterPartyId(lmePartyId);
+		//We do not have one of these yet
+		eiCreateQuote.setMarketId(null);
+		//We don't want it to be private
+		eiCreateQuote.setRequestPrivate(false);
+		//We want this quote to be published
+		eiCreateQuote.setRequestPublication(true);
+		
+		//Debug log here
+		logger.trace("TEUA sending EiCreateTender to LMA " +
+				eiCreateQuote.toString());
+			
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EiCreatedQuotePayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/createQuote", eiCreateQuote,
+					EiCreatedQuotePayload.class);
+		
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientCreatedQuotePayload(result.getQuoteId().value());
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
+		
+		return result;
+	}
+
+	
+	/**
+	 * POST clientAcceptQuote posted to TEUA
+	 */
+	@PostMapping("{teuaId}/clientAcceptQuote")
+	public EiCreatedQuotePayload postClientAcceptQuote(
+			@PathVariable String teuaId,
+			@RequestBody ClientAcceptQuotePayload clientAcceptQuote)	{
+		ClientAcceptQuotePayload tempClientAcceptQuote;	
+		ClientAcceptedQuotePayload tempReturn;
+		EiAcceptQuotePayload eiAcceptQuote;
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		//Grab numeric teuaID
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+		
+		tempClientAcceptQuote = clientAcceptQuote;	// save the parameter
+				
+		//Construct the accept quote payload
+		//This constructor will do all of the transaction creation for us
+		eiAcceptQuote = new EiAcceptQuotePayload(tempClientAcceptQuote.getReferencedQuoteId(), tempClientAcceptQuote.getQuantity(), tempClientAcceptQuote.getPrice());
+
+		//We need to work around the type system to make this happen
+		MarketOrderIdType id = new MarketOrderIdType();
+		id.setMyUidId(clientAcceptQuote.getTempReferencedQuoteId());
+		eiAcceptQuote.setReferencedQuoteID(id);
+
+		//These will be flipped on an accept quote
+		eiAcceptQuote.setCounterPartyId(actorIds[numericTeuaId]);
+		eiAcceptQuote.setPartyId(lmePartyId);
+
+		logger.trace("TEUA sending EiAcceptQuote to LMA " +
+				eiAcceptQuote.toString());
+			
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EiCreatedQuotePayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/acceptQuote", eiAcceptQuote,
+					EiCreatedQuotePayload.class);
+		
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientAcceptedQuotePayload();
+		//Set the market order ID
+		tempReturn.setReferencedQuoteId(result.getMarketOrderId());;
+		tempReturn.setInfo("ClientAcceptedQuotePayload");
+		tempReturn.setPrice(clientAcceptQuote.getPrice());
+		tempReturn.setQuantity(clientAcceptQuote.getQuantity());
+
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
+		
+		return result;
+	}
+
+	
+	/**
+	 * Handle a cancel quote request
+	 */
+	@PostMapping("{teuaId}/clientCancelQuote")
+	public EICanceledQuotePayload postClientCancelQuote(
+		@PathVariable String teuaId,
+		@RequestBody ClientCancelQuotePayload clientCancelQuotePayload){
+
+		EiCancelQuotePayload eiCancelQuote = new EiCancelQuotePayload();
+		ClientCancelQuotePayload tempCancel;
+		//A temporary arraylist that we will use
+		ArrayList<MarketOrderIdType> marketQuoteIds = new ArrayList<>();
+
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		//Bookkeeping with IDs
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		//Grab numeric teuaID
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+
+		//Grab the variables here
+		tempCancel = clientCancelQuotePayload;
+		MarketOrderIdType cancelQuoteId;
+
+		for(long id : tempCancel.getMarketQuoteIds()){
+			cancelQuoteId = new MarketOrderIdType();
+			//Explicitly set this to get around the normal atomic increment behavior
+			cancelQuoteId.setMarketOrderId(id);
+			//Add into our arraylist
+			marketQuoteIds.add(cancelQuoteId);
+		}
+
+		
+		//Now prep the EiCancelQuote payload
+		eiCancelQuote.setPartyId(partyId);
+		eiCancelQuote.setCounterPartyId(actorIds[numericTeuaId]);
+		//This is the most important thing to set here
+		eiCancelQuote.setMarketQuoteIds(marketQuoteIds);
+		//New requestID for this
+		eiCancelQuote.setRequestId(new RefIdType());
+		//Not at all used -- placeholder
+		eiCancelQuote.setQuoteIds(new TenderIdType());
+
+		logger.trace("TEUA sending EiCancelQuote to LMA " +
+				eiCancelQuote.toString());
+			
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EICanceledQuotePayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/cancelQuote", eiCancelQuote,
+					EICanceledQuotePayload.class);
+
+		return result;
+	}
+
+
+	@PostMapping("{teuaId}/clientManageTickerSubscription")
+	public EiManagedTickerSubscriptionPayload postClientTicker(
+			@PathVariable String teuaId,
+			@RequestBody ClientManageTickerSubscriptionPayload clientManageTickerSubscriptionPayload){
+		ClientManageTickerSubscriptionPayload tempClientManageTickerSubscriptionPayload;
+		ClientManagedTickerSubscriptionPayload tempReturn;
+		EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload;
+		Integer numericTeuaId = -1;
+
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+
+		numericTeuaId = Integer.valueOf(teuaId);
+
+
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.debug("postEiCreateTender teuaId " +
+				teuaId +
+				" actorNumericIds[teuaId] " +
+				actorIds[numericTeuaId].toString());
+
+		tempClientManageTickerSubscriptionPayload = clientManageTickerSubscriptionPayload;
+
+		//Create and populate the EI payload
+		eiManageTickerSubscriptionPayload = new EiManageTickerSubscriptionPayload();
+
+		eiManageTickerSubscriptionPayload.setMarketId(tempClientManageTickerSubscriptionPayload.getMarketId());
+		eiManageTickerSubscriptionPayload.setSegmentId(tempClientManageTickerSubscriptionPayload.getSegmentId());
+		eiManageTickerSubscriptionPayload.setSubscriptionActionRequested(tempClientManageTickerSubscriptionPayload.getSubscriptionActionType());
+		//This will only support quotes for right now
+		eiManageTickerSubscriptionPayload.setTickerType(tempClientManageTickerSubscriptionPayload.getTickerType());
+		//Set the partyID
+		eiManageTickerSubscriptionPayload.setPartyId(actorIds[numericTeuaId]);
+	
+		if(eiManageTickerSubscriptionPayload.getSubscriptionActionRequested() != SubscriptionActionType.CANCEL){
+			//If we are not cancelling, we are creating a whole new subscription, so we will add this in here
+			eiManageTickerSubscriptionPayload.setSubscriptionId(new SubscriptionIdType());
+		} else {
+			//If we are trying to cancel, it will then be important to get the actual ID
+			SubscriptionIdType subscriptionId = new SubscriptionIdType();
+			subscriptionId.setMyUidId(tempClientManageTickerSubscriptionPayload.getSubscriptionId());
+			eiManageTickerSubscriptionPayload.setSubscriptionId(subscriptionId);
+		}	
+		//This will be atomically created by a constructor -- every requestID is unique
+		eiManageTickerSubscriptionPayload.setSubscriptionRequestId(new RefIdType());
+
+		logger.trace("TEUA sending EiManageTicker to LMA " +
+				eiManageTickerSubscriptionPayload.toString());
+
+		//Send this off to the LMA
+		restTemplate = builder.build();
+		EiManagedTickerSubscriptionPayload result = restTemplate.postForObject
+				("http://localhost:8080/lma/manageSubscription", eiManageTickerSubscriptionPayload,
+						EiManagedTickerSubscriptionPayload.class);
+
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientManagedTickerSubscriptionPayload();
+		logger.trace("TEUA before return ClientManagerTicker to Client/SC " +
+				tempReturn.toString());
+
+		return result;
+	}
+
+
+	@PostMapping("{teuaId}/sendTickerUpdate")
+	public void sendTickerUpdate(
+			@PathVariable String teuaId,
+			@RequestBody QuoteTickerType quoteTickerType
+	){
+		QuoteTickerType tempQuoteTicker;
+		Integer numericTeuaId = -1;
+
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+		if (lmePartyId == null)	{
+				// builder = new RestTemplateBuilder();
+				restTemplate = builder.build();
+				lmePartyId = restTemplate.getForObject(
+						"http://localhost:8080/lme/party",
+						ActorIdType.class);
+		}
+
+		numericTeuaId = Integer.valueOf(teuaId);
+
+
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);
+		logger.debug("postEiCreateTender teuaId " +
+				teuaId +
+				" actorNumericIds[teuaId] " +
+				actorIds[numericTeuaId].toString());
+
+
+		tempQuoteTicker = quoteTickerType;
+
+		logger.info(tempQuoteTicker.toString());
+	}
 }

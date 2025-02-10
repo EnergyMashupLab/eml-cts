@@ -29,7 +29,21 @@ public class Interval {
 	 * 
 	 *  Elsewhere duration is number of minutes, converted in the constructor
 	 */
-	
+
+
+	/**
+	 * Default constructor used for JSON serialization
+	 */ 
+	public Interval(){
+		this.dtStart = Instant.EPOCH;
+		this.duration = Duration.ZERO;
+	}
+
+	public Interval(Duration duration, Instant dtStart) {
+		this.duration = duration;
+		this.dtStart = dtStart;
+	}
+
 	public Interval(long durationInMinutes, Instant dtStart){
 		this.duration = Duration.ofSeconds(60*durationInMinutes);
 		this.dtStart = dtStart;

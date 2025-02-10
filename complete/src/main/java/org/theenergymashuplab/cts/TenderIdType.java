@@ -17,7 +17,7 @@
 package org.theenergymashuplab.cts;
 
 
-public class TenderIdType extends RefIdType	{
+public class TenderIdType extends UidType {
 	
 	public long value() {
 		return this.myUidId;

@@ -22,11 +22,11 @@ import java.time.format.DateTimeFormatter;
 
 public class BridgeInstant {
 	private String instantString = new String("");
-//	private Instant instant;
+	private Instant instant;
 	private static final DateTimeFormatter INSTANT_INSTRUMENT_FORMATTER =
 		DateTimeFormatter.ofPattern("MMddHHmm").withZone(ZoneId.of("Z"));
 
-	BridgeInstant() {
+	public BridgeInstant() {
 	}
 
 	public BridgeInstant(Instant javaInstant) {
@@ -49,6 +49,11 @@ public class BridgeInstant {
 
 	public void setInstantString(String instantString) {
 		this.instantString = instantString;
+	}
+
+	public void setInstant(Instant instant){
+		this.instant = instant;
+		this.instantString = instant.toString();
 	}
 
 	//	Code from Parity CtsBridge uses mehods not available here
