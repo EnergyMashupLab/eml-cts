@@ -77,14 +77,17 @@ Standards Used
 
 The project uses standards including
 
+-   The Energy Interoperation Common Transactive Services (CTS) Version 1.0 (Work in progress in the
+    [OASIS Energy Interoperation Technical Committee](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=energyinterop)).
+    See the TC page for latest Working Draft. The Work on this project is coordinated with work in the OASIS TC by overlapping membership.
+
+-   The current Working Draft of the Standard in progress is [Common Transactive Services (CTS) Version 1.0 Work Draft 32](https://groups.oasis-open.org/higherlogic/ws/public/download/72568/ei-cts-v1.0-wd32.pdf) dated February 17, 2025.
+
 -   The TEMIX profile of [OASIS Energy
     Interoperation](https://docs.oasis-open.org/energyinterop/ei/v1.0/os/energyinterop-v1.0-os.html).
     Energy Interoperation is the profile base of [OpenADR 2](https://www.openadr.org/) standardized as
     [IEC 62746-10-1](<https://webstore.iec.ch/publication/26267>)
     
--   The Energy Interoperation Common Transactive Services (CTS) Version 1.0 (Work in progress in the
-    [OASIS Energy Interoperation Technical Committee](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=energyinterop)).
-    See the TC page for latest Working Draft. The Work on this project is coordinated with work in the OASIS TC.
 
 -  The Tender, Transaction, and Position Facets (except for Stream Tenders and Transactions) of [CTS Committee Specification Draft 3](https://docs.oasis-open.org/energyinterop/ei-cts/v1.0/csd03/ei-cts-v1.0-csd03-public-review-metadata.html) 
 
