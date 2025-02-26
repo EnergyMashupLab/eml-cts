@@ -18,12 +18,12 @@ public class EiCreateRfqPayload {
 	public boolean requestPublication;
 	public EiRfqType rfq;
 
-	public EiCreateRfqPayload(){
+	public EiCreateRfqPayload() {
 
 	}
 
 	public EiCreateRfqPayload(ActorIdType counterPartyId, ActorIdType partyId, RefIdType requestId,
-			boolean requestPrivate, boolean requestPublication, EiRfqType rfq){
+			boolean requestPrivate, boolean requestPublication, EiRfqType rfq) {
 		this.counterPartyId = counterPartyId;
 		this.partyId = partyId;
 		this.requestId = requestId;
@@ -32,56 +32,56 @@ public class EiCreateRfqPayload {
 		this.rfq = rfq;
 	}
 
-	public ActorIdType getCounterPartyId(){
+	public ActorIdType getCounterPartyId() {
 		return this.counterPartyId;
 	}
 
-	public void setCounterPartyId(ActorIdType counterPartyId){
+	public void setCounterPartyId(ActorIdType counterPartyId) {
 		this.counterPartyId = counterPartyId;
 	}
 
-	public ActorIdType getPartyId(){
+	public ActorIdType getPartyId() {
 		return this.partyId;
 	}
 
-	public void setPartyId(ActorIdType partyId){
+	public void setPartyId(ActorIdType partyId) {
 		this.partyId = partyId;
 	}
 
-	public RefIdType getRequestId(){
+	public RefIdType getRequestId() {
 		return this.requestId;
 	}
 
-	public void setRequestId(RefIdType requestId){
+	public void setRequestId(RefIdType requestId) {
 		this.requestId = requestId;
 	}
 
-	public boolean getRequestPrivate(){
+	public boolean getRequestPrivate() {
 		return this.requestPrivate;
 	}
 
-	public void setRequestPrivate(boolean requestPrivate){
+	public void setRequestPrivate(boolean requestPrivate) {
 		this.requestPrivate = requestPrivate;
 	}
 
-	public boolean getRequestPublication(){
+	public boolean getRequestPublication() {
 		return this.requestPublication;
 	}
 
-	public void setRequestPublication(boolean requestPublication){
+	public void setRequestPublication(boolean requestPublication) {
 		this.requestPublication = requestPublication;
 	}
 
-	public EiRfqType getRfq(){
+	public EiRfqType getRfq() {
 		return this.rfq;
 	}
 
-	public void setRfq(EiRfqType rfq){
+	public void setRfq(EiRfqType rfq) {
 		this.rfq = rfq;
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return "EiCreateRfqPayload: [" +
 				"counterPartyId=" + this.counterPartyId.toString() +
 				"partyId=" + this.partyId.toString() +
