@@ -17,37 +17,39 @@ public class EiManagedTickerSubscriptionPayload extends EiSubscriptionResponseTy
 	public TickerType tickerType;
 	public SubscriptionIdType subscriptionId;
 
-	public EiManagedTickerSubscriptionPayload(){
+	public EiManagedTickerSubscriptionPayload() {
 
 	}
 
-	public EiManagedTickerSubscriptionPayload(String multicastListenReference, SubscriptionActionType subscriptionActionTaken, EiResponseType response, RefIdType subscriptionRequestId, TickerType tickerType) {
+	public EiManagedTickerSubscriptionPayload(String multicastListenReference,
+			SubscriptionActionType subscriptionActionTaken, EiResponseType response, RefIdType subscriptionRequestId,
+			TickerType tickerType) {
 		super(multicastListenReference, subscriptionActionTaken, response, subscriptionRequestId);
 		this.tickerType = tickerType;
 	}
 
-	public EiManagedTickerSubscriptionPayload(TickerType tickerType){
+	public EiManagedTickerSubscriptionPayload(TickerType tickerType) {
 		this.tickerType = tickerType;
 	}
 
-	public TickerType getTickerType(){
+	public TickerType getTickerType() {
 		return this.tickerType;
 	}
 
-	public void setTickerType(TickerType tickerType){
+	public void setTickerType(TickerType tickerType) {
 		this.tickerType = tickerType;
 	}
 
-	public SubscriptionIdType getSubscriptionId(){
+	public SubscriptionIdType getSubscriptionId() {
 		return this.subscriptionId;
 	}
 
-	public void setSubscriptionId(SubscriptionIdType subscriptionId){
+	public void setSubscriptionId(SubscriptionIdType subscriptionId) {
 		this.subscriptionId = subscriptionId;
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return "EiManagedTickerSubscriptionPayload: [" +
 				"tickerType=" + this.tickerType.toString() + "]";
 	}
