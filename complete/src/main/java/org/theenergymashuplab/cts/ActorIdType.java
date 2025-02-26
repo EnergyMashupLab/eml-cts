@@ -22,10 +22,6 @@ public class ActorIdType extends UidType {
 
 	}
 
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
 	public long value() {
 		return this.myUidId;
 	}

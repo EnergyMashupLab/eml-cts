@@ -25,10 +25,6 @@ public class EiCancelQuotePayload {
 
 	}
 
-	public void finalize() throws Throwable {
-
-	}
-
 	public EiCancelQuotePayload(ActorIdType counterPartyId, ArrayList<MarketOrderIdType> marketQuoteIds,
 			ActorIdType partyId, ArrayList<TenderIdType> quoteIds, RefIdType requestId) {
 		this.counterPartyId = counterPartyId;
