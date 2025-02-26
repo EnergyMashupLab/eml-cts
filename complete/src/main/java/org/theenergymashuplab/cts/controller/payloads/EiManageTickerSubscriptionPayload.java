@@ -11,7 +11,7 @@ public class EiManageTickerSubscriptionPayload extends EiSubscriptionRequestType
 
 	public TickerType tickerType;
 
-	public EiManageTickerSubscriptionPayload(){
+	public EiManageTickerSubscriptionPayload() {
 
 	}
 
@@ -19,11 +19,12 @@ public class EiManageTickerSubscriptionPayload extends EiSubscriptionRequestType
 		this.tickerType = tickerType;
 	}
 
-	public EiManageTickerSubscriptionPayload(MarketIdType marketId, int segmentId, SubscriptionActionType subscriptionActionRequested, RefIdType subscriptionRequestId, TickerType tickerType, ActorIdType partyId) {
+	public EiManageTickerSubscriptionPayload(MarketIdType marketId, int segmentId,
+			SubscriptionActionType subscriptionActionRequested, RefIdType subscriptionRequestId, TickerType tickerType,
+			ActorIdType partyId) {
 		super(marketId, segmentId, subscriptionActionRequested, subscriptionRequestId, partyId);
 		this.tickerType = tickerType;
 	}
-
 
 	public TickerType getTickerType() {
 		return tickerType;
