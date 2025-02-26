@@ -138,3 +138,5 @@ hs_err_pid*
 .ionide
 /complete/client-run
 /complete/system-run
+
+.idea/
