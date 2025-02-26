@@ -18,15 +18,19 @@ public class EiCancelQuotePayload {
 	// A list of marketQuoteIds to cancel
 	public ArrayList<MarketOrderIdType> marketQuoteIds;
 	public ActorIdType partyId;
-	private TenderIdType quoteIds;
+	private ArrayList<TenderIdType> quoteIds;
 	public RefIdType requestId;
 
 	public EiCancelQuotePayload() {
 
 	}
 
+	public void finalize() throws Throwable {
+
+	}
+
 	public EiCancelQuotePayload(ActorIdType counterPartyId, ArrayList<MarketOrderIdType> marketQuoteIds,
-			ActorIdType partyId, TenderIdType quoteIds, RefIdType requestId) {
+			ActorIdType partyId, ArrayList<TenderIdType> quoteIds, RefIdType requestId) {
 		this.counterPartyId = counterPartyId;
 		this.marketQuoteIds = marketQuoteIds;
 		this.partyId = partyId;
@@ -58,11 +62,11 @@ public class EiCancelQuotePayload {
 		this.partyId = partyId;
 	}
 
-	public TenderIdType getQuoteIds() {
+	public ArrayList<TenderIdType> getQuoteIds() {
 		return this.quoteIds;
 	}
 
-	public void setQuoteIds(TenderIdType quoteIds) {
+	public void setQuoteIds(ArrayList<TenderIdType> quoteIds) {
 		this.quoteIds = quoteIds;
 	}
 
