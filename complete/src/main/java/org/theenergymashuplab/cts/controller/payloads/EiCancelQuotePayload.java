@@ -15,17 +15,18 @@ import org.theenergymashuplab.cts.TenderIdType;
 public class EiCancelQuotePayload {
 
 	public ActorIdType counterPartyId;
-	//A list of marketQuoteIds to cancel 
+	// A list of marketQuoteIds to cancel
 	public ArrayList<MarketOrderIdType> marketQuoteIds;
 	public ActorIdType partyId;
 	private TenderIdType quoteIds;
 	public RefIdType requestId;
 
-	public EiCancelQuotePayload(){
+	public EiCancelQuotePayload() {
 
 	}
 
-	public EiCancelQuotePayload(ActorIdType counterPartyId, ArrayList<MarketOrderIdType> marketQuoteIds, ActorIdType partyId, TenderIdType quoteIds, RefIdType requestId){
+	public EiCancelQuotePayload(ActorIdType counterPartyId, ArrayList<MarketOrderIdType> marketQuoteIds,
+			ActorIdType partyId, TenderIdType quoteIds, RefIdType requestId) {
 		this.counterPartyId = counterPartyId;
 		this.marketQuoteIds = marketQuoteIds;
 		this.partyId = partyId;
@@ -33,48 +34,48 @@ public class EiCancelQuotePayload {
 		this.requestId = requestId;
 	}
 
-	public ActorIdType getCounterPartyId(){
+	public ActorIdType getCounterPartyId() {
 		return this.counterPartyId;
 	}
 
-	public void setCounterPartyId(ActorIdType counterPartyId){
+	public void setCounterPartyId(ActorIdType counterPartyId) {
 		this.counterPartyId = counterPartyId;
 	}
 
-	public ArrayList<MarketOrderIdType> getMarketQuoteIds(){
+	public ArrayList<MarketOrderIdType> getMarketQuoteIds() {
 		return this.marketQuoteIds;
 	}
 
-	public void setMarketQuoteIds(ArrayList<MarketOrderIdType> marketQuoteIds){
+	public void setMarketQuoteIds(ArrayList<MarketOrderIdType> marketQuoteIds) {
 		this.marketQuoteIds = marketQuoteIds;
 	}
 
-	public ActorIdType getPartyId(){
+	public ActorIdType getPartyId() {
 		return this.partyId;
 	}
 
-	public void setPartyId(ActorIdType partyId){
+	public void setPartyId(ActorIdType partyId) {
 		this.partyId = partyId;
 	}
 
-	public TenderIdType getQuoteIds(){
+	public TenderIdType getQuoteIds() {
 		return this.quoteIds;
 	}
 
-	public void setQuoteIds(TenderIdType quoteIds){
+	public void setQuoteIds(TenderIdType quoteIds) {
 		this.quoteIds = quoteIds;
 	}
 
-	public RefIdType getRequestId(){
+	public RefIdType getRequestId() {
 		return this.requestId;
 	}
 
-	public void setRequestId(RefIdType requestId){
+	public void setRequestId(RefIdType requestId) {
 		this.requestId = requestId;
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return "EiCancelQuotePayload [" +
 				"counterPartyId=" + this.counterPartyId.toString() +
 				", marketQuoteIds=" + this.marketQuoteIds.toString() +
