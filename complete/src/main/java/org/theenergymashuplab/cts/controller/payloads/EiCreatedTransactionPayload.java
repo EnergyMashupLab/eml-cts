@@ -18,22 +18,25 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.MarketTransactionIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TransactionIdType;
 
 public class EiCreatedTransactionPayload {
-	private TransactionIdType transactionId;
-	private ActorIdType partyId;
-	private ActorIdType counterPartyId;
+	public ActorIdType counterPartyId;
+	public MarketTransactionIdType marketTransactionId;
+	public ActorIdType partyId;
+	// Should be RecipientTransactionIdType, but the class does not exist
+	public TransactionIdType recipientTransactionId;
+	public final RefIdType refId = new RefIdType();
 	public EiResponse response;
-//	public ArrayofResponses responses; NOT USED YET
-	private final RefIdType refId = new RefIdType();
-	private TransactionIdType recipientTransactionId;
+	public TransactionIdType transactionId;
 
 	// Default initializer for JSON serialization
 	public EiCreatedTransactionPayload() {
+
 	}
-	
+
 	public TransactionIdType getTransactionId() {
 		return transactionId;
 	}
@@ -68,27 +71,26 @@ public class EiCreatedTransactionPayload {
 		return transactionId.value();
 	}
 
-	public void print() {		
+	public void print() {
 		System.err.println(
 				"EiCreatedTransactionPayload transactionId " +
-				transactionId.toString() +
-				" partyId " + partyId.value() +
-				" counterPartyId " + counterPartyId.value() +
-				" refId " + refId.toString() + 
-				" recipientTransactionId " + recipientTransactionId.toString());
+						transactionId.toString() +
+						" partyId " + partyId.value() +
+						" counterPartyId " + counterPartyId.value() +
+						" refId " + refId.toString() +
+						" recipientTransactionId " + recipientTransactionId.toString());
 	}
-	
+
 	@Override
-	public String toString()	{
+	public String toString() {
 		return ("EiCreatedTransactionPayload transactionId " +
 				transactionId.toString() +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() + 
+				" refId " + refId.toString() +
 				" recipientTransactionId " + recipientTransactionId.toString());
 	}
-	
-	
+
 	public EiResponse getResponse() {
 		return response;
 	}
@@ -113,7 +115,7 @@ public class EiCreatedTransactionPayload {
 		return recipientTransactionId;
 	}
 
-	public void setRecipientTransactionId (TransactionIdType recipientTransactionId) {
+	public void setRecipientTransactionId(TransactionIdType recipientTransactionId) {
 		this.recipientTransactionId = recipientTransactionId;
 	}
 }
