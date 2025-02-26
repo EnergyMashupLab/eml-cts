@@ -17,13 +17,21 @@
 package org.theenergymashuplab.cts;
 
 public class ActorIdType extends UidType {
-	
+
+	public ActorIdType() {
+
+	}
+
+	public void finalize() throws Throwable {
+		super.finalize();
+	}
+
 	public long value() {
 		return this.myUidId;
 	}
-	
+
 	@Override
-	public String toString()	{
+	public String toString() {
 		return (String.valueOf(myUidId));
 	}
 }
