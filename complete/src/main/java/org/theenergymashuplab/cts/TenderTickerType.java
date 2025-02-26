@@ -1,6 +1,7 @@
 package org.theenergymashuplab.cts;
 
 import org.theenergymashuplab.cts.controller.payloads.TickerPayloadBase;
+
 /**
  * @author crossover
  * @version 1.0
@@ -8,33 +9,29 @@ import org.theenergymashuplab.cts.controller.payloads.TickerPayloadBase;
  */
 public class TenderTickerType extends TickerPayloadBase {
 
-	public EiTenderType tender;
+    public EiTenderType tender;
 
-	public TenderTickerType(){
+    public TenderTickerType() {
 
-	}
+    }
 
-	public EiTenderType getTender() {
-		return tender;
-	}
+    public EiTenderType getTender() {
+        return tender;
+    }
 
-	public void setTender(EiTenderType tender) {
-		this.tender = tender;
-	}
+    public void setTender(EiTenderType tender) {
+        this.tender = tender;
+    }
 
-	public TenderTickerType(EiTenderType tender) {
-		this.tender = tender;
-	}
-
-
-	@Override
-	public String toString() {
-		return "TenderTickerType{" +
-				"counterParty=" + counterParty +
-				", party=" + party +
-				", subscriptionId=" + subscriptionId +
-				", tickerType=" + tickerType +
-				", tender=" + tender +
-				'}';
-	}
+    @Override
+    public String toString() {
+        return "TenderTickerType{" +
+                "tender=" + tender +
+                ", counterParty=" + counterParty +
+                ", party=" + party +
+                ", side=" + side +
+                ", subscriptionId=" + subscriptionId +
+                ", tickerType=" + tickerType +
+                '}';
+    }
 }
