@@ -136,5 +136,6 @@ hs_err_pid*
 # Ignore all local history of files
 .history
 .ionide
+.vscode
 /complete/client-run
 /complete/system-run
