@@ -139,3 +139,5 @@ hs_err_pid*
 .vscode
 /complete/client-run
 /complete/system-run
+
+.idea/

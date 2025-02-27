@@ -16,21 +16,25 @@
 
 package org.theenergymashuplab.cts;
 
+/**
+ * @author crossover
+ * @version 1.0
+ * @created 18-Feb-2025 11:30:37 AM
+ */
 
 public class TenderIdType extends UidType {
-	
-	public long value() {
-		return this.myUidId;
-	}
-	
-	public TenderIdType()	{
-	}
-	
-	@Override
-	public String toString()	{
-		return String.valueOf(myUidId);
-	}
 
-	// NEED SETTERS AND GETTERS FOR JSON SERIALIZATION?
-	
+    public long value() {
+        return this.myUidId;
+    }
+
+    public TenderIdType() {
+    }
+
+    @Override
+    public String toString() {
+        return "TenderIdType{" +
+                "myUidId=" + myUidId +
+                '}';
+    }
 }
