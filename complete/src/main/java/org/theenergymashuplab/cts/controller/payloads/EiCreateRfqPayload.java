@@ -104,6 +104,7 @@ public class EiCreateRfqPayload {
 				"requestId=" + this.requestId.toString() +
 				"requestPrivate=" + this.requestPrivate +
 				"requestPublication=" + this.requestPublication +
-				"rfq=" + this.rfq + "]";
+				"rfq=" + this.rfq +
+				"]";
 	}
 }

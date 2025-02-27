@@ -159,7 +159,7 @@ public class EiCreateQuotePayload {
 
 	@Override
 	public String toString() {
-		return "EiCreateQuotePayload{" +
+		return "EiCreateQuotePayload [" +
 				"atMostOne=" + atMostOne +
 				", counterPartyId=" + counterPartyId +
 				", executionInstructions='" + executionInstructions + '\'' +
@@ -171,6 +171,6 @@ public class EiCreateQuotePayload {
 				", requestPublication=" + requestPublication +
 				", resourceDesignator=" + resourceDesignator +
 				", segmentId=" + segmentId +
-				'}';
+				"]";
 	}
 }

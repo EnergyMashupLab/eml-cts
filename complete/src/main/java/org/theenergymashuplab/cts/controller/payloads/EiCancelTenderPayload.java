@@ -64,8 +64,13 @@ public class EiCancelTenderPayload {
 
 	@Override
 	public String toString() {
-		return "EiCancelTenderPayload [counterPartyId=" + counterPartyId + ", partyId=" + partyId + ", requestId="
-				+ requestId + ", tenderId=" + tenderId + ", marketOrderId=" + marketOrderId + "]";
+		return "EiCancelTenderPayload [" +
+				"counterPartyId=" + counterPartyId +
+				", partyId=" + partyId +
+				", requestId=" + requestId +
+				", tenderId=" + tenderId +
+				", marketOrderId=" + marketOrderId +
+				"]";
 	}
 
 	public ActorIdType getCounterPartyId() {
