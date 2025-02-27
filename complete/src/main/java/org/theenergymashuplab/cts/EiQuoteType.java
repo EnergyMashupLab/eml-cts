@@ -1,12 +1,23 @@
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.theenergymashuplab.cts;
 
 import java.time.Instant;
 
-/**
- * @author crossover
- * @version 1.0
- * @created 28-Sep-2024 8:41:40 PM
- */
 public class EiQuoteType extends TenderBase {
 
 	public MarketOrderIdType marketQuoteId;
@@ -32,11 +43,11 @@ public class EiQuoteType extends TenderBase {
 		super(instant, side, quoteDetail);
 	}
 
-	public MarketOrderIdType getMarketOrderId() {
-		return this.marketQuoteId;
+	public MarketOrderIdType getMarketQuoteId() {
+		return marketQuoteId;
 	}
 
-	public void setMarketOrderId(MarketOrderIdType marketQuoteId) {
+	public void setMarketQuoteId(MarketOrderIdType marketQuoteId) {
 		this.marketQuoteId = marketQuoteId;
 	}
 
@@ -107,6 +118,6 @@ public class EiQuoteType extends TenderBase {
 		}
 
 		// If their market order IDs equal they are the same for us
-		return ((EiQuoteType) obj).getMarketOrderId().equals(this.getMarketOrderId());
+		return ((EiQuoteType) obj).getMarketQuoteId().equals(this.getMarketQuoteId());
 	}
 }
