@@ -377,14 +377,14 @@ public class LmeRestController {
 			//Create the new individual interval Quote
 			tempQuote = new EiQuoteType(tempCreateStreamQuotePayload.getQuote().getExpirationTime(), tempCreateStreamQuotePayload.getQuote().getSide(), quoteDetail);
 			//FIXME later on-- forced to be 1 now
-			tempQuote.setMarketOrderId(new MarketOrderIdType(1));
+			tempQuote.setMarketQuoteId(new MarketOrderIdType(1));
 
 			/**
 			 * Remember here: a quote IS a tender and inherits from parent TenderBase
 			 */
 
 			//Set the marketOrderID here
-			tempQuote.setMarketOrderId(new MarketOrderIdType());
+			tempQuote.setMarketQuoteId(new MarketOrderIdType());
 			//No execution instructions
 			tempQuote.setExecutionInstructions(null);
 			//Not private -- we want to publish
@@ -459,7 +459,7 @@ public class LmeRestController {
 		 * with a different tender, leading to a transaction
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
-		tempQuote.setMarketOrderId(new MarketOrderIdType(1));
+		tempQuote.setMarketQuoteId(new MarketOrderIdType(1));
 		//Add this quote into the volatile storage. It will never hit the database
 		//currentQuotes is an arraylist containing all quotes. Since we may be multithreaded here, we will
 		//lock 
@@ -476,7 +476,7 @@ public class LmeRestController {
 		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
-												tempQuote.getMarketOrderId(),
+												tempQuote.getMarketQuoteId(),
 												tempCreate.getPartyId(),
 												tempQuote.getQuoteId(),
 												new EiResponse(200, "OK"));
@@ -505,7 +505,7 @@ public class LmeRestController {
 		synchronized(currentQuotes){
 			for(MarketOrderIdType marketOrderId : cancelQuote.getMarketQuoteIds()){
 				//Set this for searching
-				tempQuote.setMarketOrderId(marketOrderId);
+				tempQuote.setMarketQuoteId(marketOrderId);
 				//If we do have the quote
 				if(currentQuotes.containsKey(tempQuote.hashCode()) == true){
 					//Remove it from the hashmap
@@ -599,7 +599,7 @@ public class LmeRestController {
 		tempTransaction = tempAccept.getTransaction();
 
 		//Set this for us to search
-		tempQuote.setMarketOrderId(tempAccept.getReferencedQuoteId());
+		tempQuote.setMarketQuoteId(tempAccept.getReferencedQuoteId());
 
 		/**
 		 * The buyer is the party the seller is the counterparty
@@ -625,7 +625,7 @@ public class LmeRestController {
 			//If we can't find a quote here, that's the end for us
 			if(currentQuotes.containsKey(tempQuote.hashCode()) == false){
 				//Log it
-				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketOrderId().toString() + 
+				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketQuoteId().toString() + 
 							"will now exit");
 
 				//Set a bad response to send out
@@ -677,9 +677,9 @@ public class LmeRestController {
 
 					//Set this just for buyer info
 					buyerTender.setExpirationTime(listQuote.getExpirationTime());
-					buyerTender.setMarketOrderId(listQuote.getMarketOrderId());
+					buyerTender.setMarketOrderId(listQuote.getMarketQuoteId());
 					sellerTender.setExpirationTime(listQuote.getExpirationTime());
-					sellerTender.setMarketOrderId(listQuote.getMarketOrderId());
+					sellerTender.setMarketOrderId(listQuote.getMarketQuoteId());
 
 					//Set the tender detail for ourselves
 					buyerTender.setTenderDetail(listQuote.getTenderDetail());
