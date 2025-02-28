@@ -6,7 +6,6 @@ import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.MarketOrderIdType;
-import org.theenergymashuplab.cts.MarketQuoteIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
 
