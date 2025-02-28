@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2025 The Energy Mashup Lab
- * 
+ * Copyright 2019-2020 The Energy Mashup Lab
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,25 +18,22 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponse;
-import org.theenergymashuplab.cts.MarketTransactionIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TransactionIdType;
 
 public class EiCreatedTransactionPayload {
-	public ActorIdType counterPartyId;
-	public MarketTransactionIdType marketTransactionId;
-	public ActorIdType partyId;
-	// Should be RecipientTransactionIdType, but the class does not exist
-	public TransactionIdType recipientTransactionId;
-	public final RefIdType refId = new RefIdType();
+	private TransactionIdType transactionId;
+	private ActorIdType partyId;
+	private ActorIdType counterPartyId;
 	public EiResponse response;
-	public TransactionIdType transactionId;
+//	public ArrayofResponses responses; NOT USED YET
+	private final RefIdType refId = new RefIdType();
+	private TransactionIdType recipientTransactionId;
 
 	// Default initializer for JSON serialization
 	public EiCreatedTransactionPayload() {
-
 	}
-
+	
 	public TransactionIdType getTransactionId() {
 		return transactionId;
 	}
@@ -71,26 +68,27 @@ public class EiCreatedTransactionPayload {
 		return transactionId.value();
 	}
 
-	public void print() {
+	public void print() {		
 		System.err.println(
 				"EiCreatedTransactionPayload transactionId " +
-						transactionId.toString() +
-						" partyId " + partyId.value() +
-						" counterPartyId " + counterPartyId.value() +
-						" refId " + refId.toString() +
-						" recipientTransactionId " + recipientTransactionId.toString());
+				transactionId.toString() +
+				" partyId " + partyId.value() +
+				" counterPartyId " + counterPartyId.value() +
+				" refId " + refId.toString() + 
+				" recipientTransactionId " + recipientTransactionId.toString());
 	}
-
+	
 	@Override
-	public String toString() {
+	public String toString()	{
 		return ("EiCreatedTransactionPayload transactionId " +
 				transactionId.toString() +
 				" partyId " + partyId.toString() +
 				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
+				" refId " + refId.toString() + 
 				" recipientTransactionId " + recipientTransactionId.toString());
 	}
-
+	
+	
 	public EiResponse getResponse() {
 		return response;
 	}
@@ -115,7 +113,7 @@ public class EiCreatedTransactionPayload {
 		return recipientTransactionId;
 	}
 
-	public void setRecipientTransactionId(TransactionIdType recipientTransactionId) {
+	public void setRecipientTransactionId (TransactionIdType recipientTransactionId) {
 		this.recipientTransactionId = recipientTransactionId;
 	}
 }

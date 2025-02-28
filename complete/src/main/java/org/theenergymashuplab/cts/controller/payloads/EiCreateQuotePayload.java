@@ -1,19 +1,3 @@
-/*
- * Copyright 2019-2025 The Energy Mashup Lab
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
@@ -41,14 +25,12 @@ public class EiCreateQuotePayload {
 	public ResourceDesignatorType resourceDesignator;
 	public int segmentId;
 
-	public EiCreateQuotePayload() {
+	public EiCreateQuotePayload(){
 
 	}
 
-	public EiCreateQuotePayload(boolean atMostOne, ActorIdType counterPartyId, String executionInstructions,
-			MarketIdType marketId, ActorIdType partyId, EiQuoteType quote,
-			RefIdType requestId, boolean requestPrivate, boolean requestPublication,
-			ResourceDesignatorType resourceDesignator, int segmentId) {
+	public EiCreateQuotePayload(boolean atMostOne, ActorIdType counterPartyId, String executionInstructions, MarketIdType marketId, ActorIdType partyId, EiQuoteType quote,
+			RefIdType requestId, boolean requestPrivate, boolean requestPublication, ResourceDesignatorType resourceDesignator, int segmentId){
 
 		this.atMostOne = atMostOne;
 		this.counterPartyId = counterPartyId;
@@ -69,97 +51,97 @@ public class EiCreateQuotePayload {
 		this.counterPartyId = lmePartyId;
 	}
 
-	public boolean getAtMostOne() {
+	public boolean getAtMostOne(){
 		return this.atMostOne;
 	}
 
-	public void setAtMostOne(boolean atMostOne) {
+	public void setAtMostOne(boolean atMostOne){
 		this.atMostOne = atMostOne;
 	}
 
-	public ActorIdType getCounterPartyId() {
+	public ActorIdType getCounterPartyId(){
 		return this.counterPartyId;
 	}
 
-	public void setCounterPartyId(ActorIdType counterPartyId) {
+	public void setCounterPartyId(ActorIdType counterPartyId){
 		this.counterPartyId = counterPartyId;
 	}
 
-	public String getExecutionInstructions() {
+	public String getExecutionInstructions(){
 		return this.executionInstructions;
 	}
 
-	public void setExecutionInstructions(String executionInstructions) {
+	public void setExecutionInstructions(String executionInstructions){
 		this.executionInstructions = executionInstructions;
 	}
 
-	public MarketIdType getMarketId() {
+	public MarketIdType getMarketId(){
 		return this.marketId;
 	}
 
-	public void setMarketId(MarketIdType marketId) {
+	public void setMarketId(MarketIdType marketId){
 		this.marketId = marketId;
 	}
 
-	public ActorIdType getPartyId() {
+	public ActorIdType getPartyId(){
 		return this.partyId;
 	}
 
-	public void setPartyId(ActorIdType partyId) {
+	public void setPartyId(ActorIdType partyId){
 		this.partyId = partyId;
 	}
 
-	public EiQuoteType getQuote() {
+	public EiQuoteType getQuote(){
 		return this.quote;
 	}
 
-	public void setQuote(EiQuoteType quote) {
+	public void setQuote(EiQuoteType quote){
 		this.quote = quote;
 	}
 
-	public RefIdType getRequestId() {
+	public RefIdType getRequestId(){
 		return this.requestId;
 	}
 
-	public void setRequestId(RefIdType requestId) {
+	public void setRequestId(RefIdType requestId){
 		this.requestId = requestId;
 	}
 
-	public boolean getRequestPrivate() {
+	public boolean getRequestPrivate(){
 		return this.requestPrivate;
 	}
 
-	public void setRequestPrivate(boolean requestPrivate) {
+	public void setRequestPrivate(boolean requestPrivate){
 		this.requestPrivate = requestPrivate;
 	}
 
-	public boolean getRequestPublication() {
+	public boolean getRequestPublication(){
 		return this.requestPublication;
 	}
 
-	public void setRequestPublication(boolean requestPublication) {
+	public void setRequestPublication(boolean requestPublication){
 		this.requestPublication = requestPublication;
 	}
 
-	public ResourceDesignatorType getResourceDesginator() {
+	public ResourceDesignatorType getResourceDesginator(){
 		return this.resourceDesignator;
 	}
 
-	public void setResourceDesignator(ResourceDesignatorType resourceDesignator) {
+	public void setResourceDesignator(ResourceDesignatorType resourceDesignator){
 		this.resourceDesignator = resourceDesignator;
 	}
 
-	public int getSegmentId() {
+	public int getSegmentId(){
 		return this.segmentId;
 	}
 
-	public void setSegmentId(int segmentId) {
+	public void setSegmentId(int segmentId){
 		this.segmentId = segmentId;
 	}
 
 	@Override
 	public String toString() {
-		return "EiCreateQuotePayload [" +
+		return "EiCreateQuotePayload{" +
 				"atMostOne=" + atMostOne +
 				", counterPartyId=" + counterPartyId +
 				", executionInstructions='" + executionInstructions + '\'' +
@@ -171,6 +153,6 @@ public class EiCreateQuotePayload {
 				", requestPublication=" + requestPublication +
 				", resourceDesignator=" + resourceDesignator +
 				", segmentId=" + segmentId +
-				"]";
+				'}';
 	}
 }
