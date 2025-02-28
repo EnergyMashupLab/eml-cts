@@ -1,38 +1,27 @@
-/*
- * Copyright 2019-2025 The Energy Mashup Lab
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.theenergymashuplab.cts;
+
 
 import java.time.Instant;
 
+/**
+ * @author crossover
+ * @version 1.0
+ * @created 28-Sep-2024 8:41:40 PM
+ */
 public class EiQuoteType extends TenderBase {
 
-	public MarketOrderIdType marketQuoteId;
+	public MarketOrderIdType marketOrderId;
 	public boolean privateQuote;
 	public TenderIdType quoteId = new TenderIdType();
 	public RfqIdType rfqId;
 	public boolean tradeable;
 
-	public EiQuoteType() {
+	public EiQuoteType(){
 
 	}
 
-	public EiQuoteType(MarketOrderIdType marketQuoteId, boolean privateQuote, TenderIdType quoteId, RfqIdType rfqId,
-			boolean tradeable) {
-		this.marketQuoteId = marketQuoteId;
+	public EiQuoteType(MarketOrderIdType marketOrderId, boolean privateQuote, TenderIdType quoteId, RfqIdType rfqId, boolean tradeable){
+		this.marketOrderId = marketOrderId;
 		this.privateQuote = privateQuote;
 		this.quoteId = quoteId;
 		this.rfqId = rfqId;
@@ -43,50 +32,50 @@ public class EiQuoteType extends TenderBase {
 		super(instant, side, quoteDetail);
 	}
 
-	public MarketOrderIdType getMarketQuoteId() {
-		return marketQuoteId;
+	public MarketOrderIdType getMarketOrderId(){
+		return this.marketOrderId;
 	}
 
-	public void setMarketQuoteId(MarketOrderIdType marketQuoteId) {
-		this.marketQuoteId = marketQuoteId;
+	public void setMarketOrderId(MarketOrderIdType marketOrderId){
+		this.marketOrderId = marketOrderId;
 	}
 
-	public boolean getPrivateQuote() {
+	public boolean getPrivateQuote(){
 		return this.privateQuote;
 	}
 
-	public void setPrivateQuote(boolean privateQuote) {
+	public void setPrivateQuote(boolean privateQuote){
 		this.privateQuote = privateQuote;
 	}
 
-	public TenderIdType getQuoteId() {
+	public TenderIdType getQuoteId(){
 		return this.quoteId;
 	}
 
-	public void setQuoteId(TenderIdType quoteId) {
+	public void setQuoteId(TenderIdType quoteId){
 		this.quoteId = quoteId;
 	}
 
-	public RfqIdType getRfqId() {
+	public RfqIdType getRfqId(){
 		return this.rfqId;
 	}
 
-	public void setRfqId(RfqIdType rfqId) {
+	public void setRfqId(RfqIdType rfqId){
 		this.rfqId = rfqId;
 	}
 
-	public boolean getTradeable() {
+	public boolean getTradeable(){
 		return this.tradeable;
 	}
 
-	public void setTradeable(boolean tradeable) {
+	public void setTradeable(boolean tradeable){
 		this.tradeable = tradeable;
 	}
 
 	@Override
 	public String toString() {
 		return "EiQuoteType{" +
-				"marketQuoteId=" + marketQuoteId +
+				"marketQuoteId=" + marketOrderId +
 				", privateQuote=" + privateQuote +
 				", quoteId=" + quoteId +
 				", rfqId=" + rfqId +
@@ -96,28 +85,26 @@ public class EiQuoteType extends TenderBase {
 	}
 
 	/**
-	 * We are guaranteed to have a unique market order ID, and the AcceptQuote will
-	 * reference
-	 * a quote via the marketQuoteId. As such, it makes sense to index by it in a
-	 * hashset
+	 * We are guaranteed to have a unique market order ID, and the AcceptQuote will reference
+	 * a quote via the marketOrderId. As such, it makes sense to index by it in a hashset
 	 */
 	@Override
-	public int hashCode() {
-		return (int) this.marketQuoteId.getMyUidId();
+	public int hashCode(){
+		return (int)this.marketOrderId.getMyUidId();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
+	public boolean equals(Object obj){
+		if(obj == null){
 			return false;
 		}
 
-		// Check class equality
-		if (obj.getClass() != EiQuoteType.class) {
+		//Check class equality
+		if(obj.getClass() != EiQuoteType.class){
 			return false;
 		}
 
-		// If their market order IDs equal they are the same for us
-		return ((EiQuoteType) obj).getMarketQuoteId().equals(this.getMarketQuoteId());
+		//If their market order IDs equal they are the same for us
+		return ((EiQuoteType)obj).getMarketOrderId().equals(this.getMarketOrderId());
 	}
 }
