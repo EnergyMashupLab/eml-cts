@@ -17,15 +17,16 @@
 package org.theenergymashuplab.cts;
 
 public class TransactionIdType extends UidType {
+	
+	public long value() {
+		return this.myUidId;
+	}
+	
+	@Override
+	public String toString()	{
+		return (String.valueOf(myUidId));
+	}
 
-    public TransactionIdType() {
+	// NEED SETTERS AND GETTERS FOR JSON SERIALIZATION?
 
-    }
-
-    @Override
-    public String toString() {
-        return "TransactionIdType{" +
-                "myUidId=" + myUidId +
-                '}';
-    }
 }
