@@ -841,7 +841,8 @@ public class TeuaRestController {
 		//New requestID for this
 		eiCancelQuote.setRequestId(new RefIdType());
 		//Not at all used -- placeholder
-		eiCancelQuote.setQuoteIds(new TenderIdType());
+		eiCancelQuote.setQuoteIds(new ArrayList<TenderIdType>());
+		
 
 		logger.trace("TEUA sending EiCancelQuote to LMA " +
 				eiCancelQuote.toString());
