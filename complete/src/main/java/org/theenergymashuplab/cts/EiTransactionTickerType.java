@@ -1,10 +1,26 @@
-package org.theenergymashuplab.cts;
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+package org.theenergymashuplab.cts;
 
 /**
  * @author crossover
  * @version 1.0
- * @created 28-Sep-2024 8:41:40 PM
+ * @created 18-Feb-2025 11:30:37 AM
  */
 public class EiTransactionTickerType {
 
@@ -22,11 +38,12 @@ public class EiTransactionTickerType {
 	public SideType side;
 	public RefIdType tickerId;
 
-	public EiTransactionTickerType(){
+	public EiTransactionTickerType() {
 
 	}
 
-	public EiTransactionTickerType(IntervalType interval, String marketContext, long price, long quantity, ResourceDesignatorType resourceDesignator, InstantType saleTime, SideType side, RefIdType tickerId) {
+	public EiTransactionTickerType(IntervalType interval, String marketContext, long price, long quantity,
+								   ResourceDesignatorType resourceDesignator, InstantType saleTime, SideType side, RefIdType tickerId) {
 		this.interval = interval;
 		this.marketContext = marketContext;
 		this.price = price;
@@ -37,8 +54,32 @@ public class EiTransactionTickerType {
 		this.tickerId = tickerId;
 	}
 
-	public IntervalType getInterval() {
-		return interval;
+	public void setSide(SideType side) {
+		this.side = side;
+	}
+
+	public void setSaleTime(InstantType saleTime) {
+		this.saleTime = saleTime;
+	}
+
+	public void setTickerId(RefIdType tickerId) {
+		this.tickerId = tickerId;
+	}
+
+	public void setResourceDesignator(ResourceDesignatorType resourceDesignator) {
+		this.resourceDesignator = resourceDesignator;
+	}
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
+	}
+
+	public void setPrice(long price) {
+		this.price = price;
+	}
+
+	public void setMarketContext(String marketContext) {
+		this.marketContext = marketContext;
 	}
 
 	public void setInterval(IntervalType interval) {
@@ -49,56 +90,32 @@ public class EiTransactionTickerType {
 		return marketContext;
 	}
 
-	public void setMarketContext(String marketContext) {
-		this.marketContext = marketContext;
-	}
-
-	public long getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(long quantity) {
-		this.quantity = quantity;
-	}
-
-	public long getPrice() {
-		return price;
-	}
-
-	public void setPrice(long price) {
-		this.price = price;
-	}
-
 	public ResourceDesignatorType getResourceDesignator() {
 		return resourceDesignator;
-	}
-
-	public void setResourceDesignator(ResourceDesignatorType resourceDesignator) {
-		this.resourceDesignator = resourceDesignator;
-	}
-
-	public InstantType getSaleTime() {
-		return saleTime;
-	}
-
-	public void setSaleTime(InstantType saleTime) {
-		this.saleTime = saleTime;
 	}
 
 	public SideType getSide() {
 		return side;
 	}
 
-	public void setSide(SideType side) {
-		this.side = side;
+	public long getQuantity() {
+		return quantity;
+	}
+
+	public long getPrice() {
+		return price;
+	}
+
+	public IntervalType getInterval() {
+		return interval;
+	}
+
+	public InstantType getSaleTime() {
+		return saleTime;
 	}
 
 	public RefIdType getTickerId() {
 		return tickerId;
-	}
-
-	public void setTickerId(RefIdType tickerId) {
-		this.tickerId = tickerId;
 	}
 
 	@Override
@@ -114,4 +131,9 @@ public class EiTransactionTickerType {
 				", tickerId=" + tickerId +
 				'}';
 	}
+
+	//	public void finalize() throws Throwable {
+//
+//	}
+
 }
