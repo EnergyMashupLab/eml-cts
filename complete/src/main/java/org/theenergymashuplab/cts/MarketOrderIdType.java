@@ -26,7 +26,7 @@ public class MarketOrderIdType extends UidType {
 
 	private long marketOrderId;
 
-	public MarketOrderIdType(int id) {
+	public MarketOrderIdType(long id) {
 		this.setMyUidId(id);
 	}
 
