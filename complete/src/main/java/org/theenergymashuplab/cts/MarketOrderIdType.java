@@ -24,20 +24,20 @@ package org.theenergymashuplab.cts;
  */
 public class MarketOrderIdType extends UidType {
 
-	private long marketOrderId;
+	private int marketOrderId;
 
-	public MarketOrderIdType(long id) {
+	public MarketOrderIdType(int id) {
 		this.setMyUidId(id);
 	}
 
 	@Override
-	public long getMarketOrderId()
+	public int getMarketOrderId()
 	{
 		return marketOrderId;
 	}
 
 	@Override
-	public void setMarketOrderId(long marketOrderId) {
+	public void setMarketOrderId(int marketOrderId) {
 		this.marketOrderId = marketOrderId;
 	}
 
