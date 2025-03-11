@@ -34,13 +34,12 @@ public abstract class EiSubscriptionRequestType {
 	}
 
 	public EiSubscriptionRequestType(MarketIdType marketId, int segmentId, SubscriptionActionType subscriptionActionRequested,
-									 RefIdType subscriptionRequestId) {
+									 RefIdType subscriptionRequestId, ActorIdType actorId) {
 		this.marketId = marketId;
 		this.segmentId = segmentId;
 		this.subscriptionActionRequested = subscriptionActionRequested;
 		this.subscriptionRequestId = subscriptionRequestId;
 	}
-
 	public void setSubscriptionActionRequested(SubscriptionActionType subscriptionActionRequested) {
 		this.subscriptionActionRequested = subscriptionActionRequested;
 	}
