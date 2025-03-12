@@ -17,37 +17,40 @@ express or implied.
 
 package org.theenergymashuplab.cts;
 
-/**
- * @author crossover
- * @version 1.0
- * @created 18-Feb-2025 11:30:38 AM
- */
 public class MarketOrderIdType extends UidType {
 
-	private int marketOrderId;
-
-	public MarketOrderIdType(int id) {
-		this.setMyUidId(id);
+	public MarketOrderIdType(long uidId) {
+		super(uidId);
 	}
 
-	@Override
-	public int getMarketOrderId()
-	{
-		return marketOrderId;
+	public MarketOrderIdType() {
 	}
 
+	/**
+	 * This will be used in the explicit case that we want a duplicate
+	 */
+	public void setMarketOrderId(long uidId){
+		super.setMyUidId(uidId);
+	}
+
+
 	@Override
-	public void setMarketOrderId(int marketOrderId) {
-		this.marketOrderId = marketOrderId;
+	public boolean equals(Object obj){
+		if(obj == null){
+			return false;
+		}
+
+		if(obj.getClass() != MarketOrderIdType.class){
+			return false;
+		}
+
+		return ((MarketOrderIdType)obj).value() == this.value();
 	}
 
 	@Override
 	public String toString() {
-		return super.toString();
+		return "MarketOrderIdType{" +
+				"myUidId=" + myUidId +
+				'}';
 	}
-
-//	public void finalize() throws Throwable {
-//		super.finalize();
-//	}
-
 }
