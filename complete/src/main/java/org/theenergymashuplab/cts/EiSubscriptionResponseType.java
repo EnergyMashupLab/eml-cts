@@ -17,10 +17,11 @@ express or implied.
 
 package org.theenergymashuplab.cts;
 
+
 /**
  * @author crossover
  * @version 1.0
- * @created 18-Feb-2025 11:30:37 AM
+ * @created 28-Sep-2024 8:41:40 PM
  */
 public abstract class EiSubscriptionResponseType {
 
@@ -33,44 +34,43 @@ public abstract class EiSubscriptionResponseType {
 
 	}
 
-	public EiSubscriptionResponseType(String multicastListenReference, EiResponseType response,
-									  SubscriptionActionType subscriptionActionTaken, RefIdType subscriptionRequestId) {
+	public EiSubscriptionResponseType(String multicastListenReference, SubscriptionActionType subscriptionActionTaken, EiResponseType response, RefIdType subscriptionRequestId) {
 		this.multicastListenReference = multicastListenReference;
-		this.response = response;
 		this.subscriptionActionTaken = subscriptionActionTaken;
+		this.response = response;
 		this.subscriptionRequestId = subscriptionRequestId;
+	}
+
+	public String getMulticastListenReference() {
+		return multicastListenReference;
 	}
 
 	public void setMulticastListenReference(String multicastListenReference) {
 		this.multicastListenReference = multicastListenReference;
 	}
 
-	public void setSubscriptionActionTaken(SubscriptionActionType subscriptionActionTaken) {
-		this.subscriptionActionTaken = subscriptionActionTaken;
+	public EiResponseType getResponse() {
+		return response;
 	}
 
 	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
 
-	public void setSubscriptionRequestId(RefIdType subscriptionRequestId) {
-		this.subscriptionRequestId = subscriptionRequestId;
+	public SubscriptionActionType getSubscriptionActionTaken() {
+		return subscriptionActionTaken;
+	}
+
+	public void setSubscriptionActionTaken(SubscriptionActionType subscriptionActionTaken) {
+		this.subscriptionActionTaken = subscriptionActionTaken;
 	}
 
 	public RefIdType getSubscriptionRequestId() {
 		return subscriptionRequestId;
 	}
 
-	public SubscriptionActionType getSubscriptionActionTaken() {
-		return subscriptionActionTaken;
-	}
-
-	public EiResponseType getResponse() {
-		return response;
-	}
-
-	public String getMulticastListenReference() {
-		return multicastListenReference;
+	public void setSubscriptionRequestId(RefIdType subscriptionRequestId) {
+		this.subscriptionRequestId = subscriptionRequestId;
 	}
 
 	@Override
@@ -82,9 +82,4 @@ public abstract class EiSubscriptionResponseType {
 				", subscriptionRequestId=" + subscriptionRequestId +
 				'}';
 	}
-
-	//	public void finalize() throws Throwable {
-//
-//	}
-
 }
