@@ -264,9 +264,9 @@ public class EiTenderEncoderDecoder {
 
 			TenderIntervalDetail tenderIntervalDetail = new TenderIntervalDetail(interval, price, quantity);
 		}
-
+		
+		// Decode (SideType)
 		org.theenergymashuplab.cts.SideType side;
-		// Decode the side of the tender (SideType)
 		if (eiCreateTenderPayloadDecoder.tender().tenderBase()
 				.side() == org.theenergymashuplab.cts.generated_files.SideType.BUY) {
 			side = org.theenergymashuplab.cts.SideType.BUY;
