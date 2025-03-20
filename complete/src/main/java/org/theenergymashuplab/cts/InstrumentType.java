@@ -42,7 +42,7 @@ public class InstrumentType extends ProductType {
 				"instrumentStart=" + instrumentStart +
 				", duration=" + duration +
 				", quantityScale=" + quantityScale +
-				", warrantId=" + warrantId +
+				", warrantId=" + warrants +
 				", resourceAttributes='" + resourceAttributes + '\'' +
 				", resourceDescription='" + resourceDescription + '\'' +
 				", resourceDesignator=" + resourceDesignator +

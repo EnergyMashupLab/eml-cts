@@ -23,7 +23,6 @@ public class ProductType extends ResourceType {
 	public DurationType duration;
 	public int quantityScale;
 	public ArrayList<WarrantIdType> warrants;
-	public WarrantIdType warrantId;
 
 	public ProductType() {
 
@@ -33,7 +32,6 @@ public class ProductType extends ResourceType {
 		this.duration = duration;
 		this.quantityScale = quantityScale;
 		this.warrants = warrants;
-		this.warrantId = warrants.getFirst();
 	}
 
 	public DurationType getDuration() {
@@ -52,14 +50,12 @@ public class ProductType extends ResourceType {
 		this.quantityScale = quantityScale;
 	}
 
-	public WarrantIdType getWarrantId() {
-		// Previously, warrants was a single value, not an arraylist of WarrantIdType.
-		return warrantId;
+	public ArrayList<WarrantIdType> getWarrants() {
+		return warrants;
 	}
 
-	public void setWarrantId(ArrayList<WarrantIdType> warrants) {
+	public void setWarrants(ArrayList<WarrantIdType> warrants) {
 		this.warrants = warrants;
-		this.warrantId = warrants.getFirst();
 	}
 
 	@Override
@@ -67,6 +63,6 @@ public class ProductType extends ResourceType {
 		return "ProductType {" +
 				" duration = " + duration +
 				", quantityScale = " + quantityScale +
-				", warrantId = " + warrantId + " }";
+				", warrantId = " + warrants + " }";
 	}
 }
