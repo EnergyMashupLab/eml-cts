@@ -27,14 +27,22 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
+import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.agrona.concurrent.UnsafeBuffer;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.nio.ByteBuffer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 
 import java.util.concurrent.*;
 
@@ -93,7 +101,15 @@ public class LmeRestController {
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
 	
-	LmeRestController()	{
+	  MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+ 	  EiCreateTenderPayloadDecoder eiCreateTenderPayloadDecoder = new EiCreateTenderPayloadDecoder();
+ 	  ByteBuffer bbf = ByteBuffer.allocate(4096);
+ 	  UnsafeBuffer buffer = new UnsafeBuffer(bbf);
+ 	  
+ 	  MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+ 	  EiCreatedTenderPayloadEncoder eiCreatedTenderPayloadEncoder = new EiCreatedTenderPayloadEncoder();
+ 	
+ 	  LmeRestController()	{
 		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
 		
 		//	Start thread to read createTransactionQ and send
@@ -134,21 +150,40 @@ public class LmeRestController {
 	 */
 	
 	@PostMapping("/createTender")
-	public EiCreatedTenderPayload 	postEiCreateTender(
-			@RequestBody EiCreateTenderPayload eiCreateTender)	{
+	public byte[] postEiCreateTender(
+ 			@RequestBody byte[] eiCreateTenderByteArr) throws Exception	{
 		EiTenderType tempTender;
 		EiCreateTenderPayload tempCreate = null;
 		EiCreateTenderPayload mapPutReturnValue = null;
 		EiCreatedTenderPayload tempCreated;
 		Boolean addQsuccess = false;
 		
-		tempCreate = eiCreateTender;
-		tempTender = eiCreateTender.getTender();
+		//tempCreate = eiCreateTender;
+ 		//tempTender = eiCreateTender.getTender();
+ 		
+ 		//Decode EiCreateTenderPayload
+ 				int bufferOffset_lengthToRead = messageHeaderDecoder.encodedLength();
+ 				buffer.putBytes(0, eiCreateTenderByteArr, 0, bufferOffset_lengthToRead);
+ 				messageHeaderDecoder.wrap(buffer, 0);
+ 
+ 				//We have got the id, Now based on ID we will use correct decoder
+ 				int templateId = messageHeaderDecoder.templateId();
+ 
+ 				//Length encoded message
+ 				int actingBlockLength = messageHeaderDecoder.blockLength();
+ 
 
-		logger.debug("LmeController before constructor for EiCreatedTender " +
-				tempTender.toString());
-		logger.debug("lme/createTender " + eiCreateTender.toString());
-		
+				//Length encoded message
+ 				int actingVersion = messageHeaderDecoder.version();
+ 
+ 
+ 				buffer.putBytes(0, eiCreateTenderByteArr, bufferOffset_lengthToRead, actingBlockLength);
+ 
+ 				EiCreateTenderPayload EiCreateTenderResponse = EiTenderEncoderDcoder.eiCreateTenderPayloadDecode(eiCreateTenderPayloadDecoder, buffer, bufferOffset_lengthToRead, actingBlockLength, actingVersion);
+ 
+ 		//logger.debug("LmeController before constructor for EiCreatedTender " +tempTender.toString());
+ 		logger.debug("lme/createTender " + EiCreateTenderResponse.toString());
+ 		
 		/*	ResponseBody
 			public EiCreatedTender(
 				TenderId tenderId,
