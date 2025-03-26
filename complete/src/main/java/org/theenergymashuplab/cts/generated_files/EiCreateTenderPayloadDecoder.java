@@ -10,7 +10,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public class EiCreateTenderPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 144;
+    public static final int BLOCK_LENGTH = 152;
     public static final int TEMPLATE_ID = 5;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -207,7 +207,7 @@ public class EiCreateTenderPayloadDecoder
 
     public static int executionInstructionsEncodingLength()
     {
-        return 4;
+        return 8;
     }
 
     public static String executionInstructionsMetaAttribute(final MetaAttribute metaAttribute)
@@ -220,13 +220,26 @@ public class EiCreateTenderPayloadDecoder
         return "";
     }
 
-    private final VarStringEncodingDecoder executionInstructions = new VarStringEncodingDecoder();
-
-    public VarStringEncodingDecoder executionInstructions()
+    public static long executionInstructionsNullValue()
     {
-        executionInstructions.wrap(buffer, offset + 9);
-        return executionInstructions;
+        return 0xffffffffffffffffL;
     }
+
+    public static long executionInstructionsMinValue()
+    {
+        return 0x0L;
+    }
+
+    public static long executionInstructionsMaxValue()
+    {
+        return 0xfffffffffffffffeL;
+    }
+
+    public long executionInstructions()
+    {
+        return buffer.getLong(offset + 9, java.nio.ByteOrder.LITTLE_ENDIAN);
+    }
+
 
     public static int marketIdId()
     {
@@ -240,7 +253,7 @@ public class EiCreateTenderPayloadDecoder
 
     public static int marketIdEncodingOffset()
     {
-        return 13;
+        return 17;
     }
 
     public static int marketIdEncodingLength()
@@ -275,7 +288,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long marketId()
     {
-        return buffer.getLong(offset + 13, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 17, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
@@ -291,7 +304,7 @@ public class EiCreateTenderPayloadDecoder
 
     public static int partyIdEncodingOffset()
     {
-        return 21;
+        return 25;
     }
 
     public static int partyIdEncodingLength()
@@ -326,7 +339,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long partyId()
     {
-        return buffer.getLong(offset + 21, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 25, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
@@ -342,7 +355,7 @@ public class EiCreateTenderPayloadDecoder
 
     public static int requestIdEncodingOffset()
     {
-        return 29;
+        return 33;
     }
 
     public static int requestIdEncodingLength()
@@ -377,7 +390,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long requestId()
     {
-        return buffer.getLong(offset + 29, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 33, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
@@ -393,7 +406,7 @@ public class EiCreateTenderPayloadDecoder
 
     public static int segmentIdEncodingOffset()
     {
-        return 37;
+        return 41;
     }
 
     public static int segmentIdEncodingLength()
@@ -428,7 +441,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long segmentId()
     {
-        return (buffer.getInt(offset + 37, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 41, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
     }
 
 
@@ -444,12 +457,12 @@ public class EiCreateTenderPayloadDecoder
 
     public static int tenderEncodingOffset()
     {
-        return 41;
+        return 45;
     }
 
     public static int tenderEncodingLength()
     {
-        return 103;
+        return 107;
     }
 
     public static String tenderMetaAttribute(final MetaAttribute metaAttribute)
@@ -466,7 +479,7 @@ public class EiCreateTenderPayloadDecoder
 
     public EiTenderTypeDecoder tender()
     {
-        tender.wrap(buffer, offset + 41);
+        tender.wrap(buffer, offset + 45);
         return tender;
     }
 
@@ -518,15 +531,7 @@ public class EiCreateTenderPayloadDecoder
         builder.append(counterPartyId());
         builder.append('|');
         builder.append("executionInstructions=");
-        final VarStringEncodingDecoder executionInstructions = executionInstructions();
-        if (executionInstructions != null)
-        {
-            executionInstructions.appendTo(builder);
-        }
-        else
-        {
-            builder.append("null");
-        }
+        builder.append(executionInstructions());
         builder.append('|');
         builder.append("marketId=");
         builder.append(marketId());

@@ -42,23 +42,10 @@ public class EiTenderEncoderDecoder {
 		encoder.wrap(buffer, offset);
 
 		String executionInstructions = eiCreateTenderPayload.getExecutionInstructions();
+		eiCreateTenderPayloadEncoder.executionInstructions(0L);
 
-		if (executionInstructions != null) {
-			byte[] varData = executionInstructions.getBytes(StandardCharsets.UTF_8);
 
-			// Encode length
-			encoder.length(varData.length);
-
-			// Encode the string data after the length
-			int varDataOffset = offset + VarStringEncodingEncoder.varDataEncodingOffset();
-			buffer.putBytes(varDataOffset, varData);
-		} else {
-			// Handle null by setting length to null value
-			encoder.length(VarStringEncodingEncoder.lengthNullValue());
-		}
-		;
-
-		// party Id Field
+		//encoding the party Id Field
 		eiCreateTenderPayloadEncoder.partyId(eiCreateTenderPayload.getPartyId().getMyUidId());
 
 		// request Id field
@@ -72,17 +59,22 @@ public class EiTenderEncoderDecoder {
 		// MarketOrderID
 		eiCreateTenderPayloadEncoder.tender()
 				.marketOrderId(eiCreateTenderPayload.getTender().getMarketOrderId().value());
-		// TenderID
+		// ENCODE TenderID
 		eiCreateTenderPayloadEncoder.tender().tenderId(eiCreateTenderPayload.getTender().getTenderId().value());
 
-		// all or None
+		// ENCODE all or None
 		eiCreateTenderPayloadEncoder.tender().tenderBase()
 				.allOrNone(eiCreateTenderPayload.getTender().isAllOrNone() ? BooleanType.TRUE : BooleanType.FALSE);
 
-		// expiration time
-		eiCreateTenderPayloadEncoder.tender().tenderBase().expirationTime().seconds(10).nano(00);
+		// ENCODE expiration time
+		Instant expirationTime = eiCreateTenderPayload.getTender().getExpirationTime();
+		eiCreateTenderPayloadEncoder.tender().tenderBase()
+		    .expirationTime()
+		    .seconds(expirationTime.getEpochSecond())
+		    .nano(expirationTime.getNano());
 
-		// market ID
+
+		// ENCODE market ID
 		eiCreateTenderPayloadEncoder.tender().tenderBase()
 				.marketId(eiCreateTenderPayload.getTender().getMarketId().value());
 
@@ -93,7 +85,7 @@ public class EiTenderEncoderDecoder {
 		eiCreateTenderPayloadEncoder.tender().tenderBase()
 				.quantityScale(eiCreateTenderPayload.getTender().getQuantityScale());
 		
-		// resource Designator
+		// encode resource Designator
 		org.theenergymashuplab.cts.generated_files.ResourceDesignatorType encodedResourceDesignator;
 
 		switch (eiCreateTenderPayload.getTender().getResourceDesignator()) {
@@ -125,13 +117,13 @@ public class EiTenderEncoderDecoder {
 			throw new IllegalArgumentException(
 					"Invalid ResourceDesignator: " + eiCreateTenderPayload.getTender().getResourceDesignator());
 		}
+		
 		eiCreateTenderPayloadEncoder.tender().tenderBase().resourceDesignator(encodedResourceDesignator);
 
-		// segmentId
+		// encode segmentId
 		eiCreateTenderPayloadEncoder.tender().tenderBase().segmentId(eiCreateTenderPayload.getSegmentId());
 
 		// sideType
-
 		if (eiCreateTenderPayload.getTender().getSide() == org.theenergymashuplab.cts.SideType.BUY) {
 			eiCreateTenderPayloadEncoder.tender().tenderBase()
 					.side(org.theenergymashuplab.cts.generated_files.SideType.BUY);
@@ -140,7 +132,7 @@ public class EiTenderEncoderDecoder {
 					.side(org.theenergymashuplab.cts.generated_files.SideType.SELL);
 		}
 
-		// TENDER DETAIL
+		//ENCODE TENDER DETAIL
 		var tenderEncoder = eiCreateTenderPayloadEncoder.tender();
 		TenderDetail tenderDetail = eiCreateTenderPayload.getTender().getTenderDetail();
 
@@ -154,11 +146,18 @@ public class EiTenderEncoderDecoder {
 			//
 			eiCreateTenderPayloadEncoder.tender().tenderBase().tenderDetail().price(price).quantity(quantity);
 
-			eiCreateTenderPayloadEncoder.tender().tenderBase().tenderDetail().interval().dtStart().seconds(10).nano(00);
+			Instant dtStart = interval.getDtStart();
+			Duration duration = interval.getDuration();
 
-			eiCreateTenderPayloadEncoder.tender().tenderBase().tenderDetail().interval().duration().seconds(10)
-					.nano(00);
+			eiCreateTenderPayloadEncoder.tender().tenderBase().tenderDetail()
+			    .interval().dtStart()
+			        .seconds(dtStart.getEpochSecond())
+			        .nano(dtStart.getNano());
 
+			eiCreateTenderPayloadEncoder.tender().tenderBase().tenderDetail()
+			    .interval().duration()
+			        .seconds(duration.getSeconds())
+			        .nano(duration.getNano());
 		} else {
 			throw new IllegalStateException("Unexpected TenderDetail type: " + tenderDetail.getClass().getName());
 		}
@@ -201,24 +200,14 @@ public class EiTenderEncoderDecoder {
 		ActorIdType counterPartyId = new ActorIdType();
 		counterPartyId.setMyUidId(eiCreateTenderPayloadDecoder.counterPartyId());
 
-		// Execution Instructions Field
-		VarStringEncodingDecoder executionInstructionsDecoder = eiCreateTenderPayloadDecoder.executionInstructions();
-		String executionInstructions = null;
-
-		long length = executionInstructionsDecoder.length();
-		if (length != VarStringEncodingDecoder.lengthNullValue()) {
-			int dataOffset = executionInstructionsDecoder.offset() + VarStringEncodingDecoder.varDataEncodingOffset();
-			byte[] varData = new byte[(int) length];
-			executionInstructionsDecoder.buffer().getBytes(dataOffset, varData);
-			executionInstructions = new String(varData, StandardCharsets.UTF_8);
-		}
-
+		long execInstr = eiCreateTenderPayloadDecoder.executionInstructions();
+		String executionInstructions = (execInstr == 0) ? "" : String.valueOf(execInstr);
 		eiCreateTenderPayload.setExecutionInstructions(executionInstructions);
 
 		// Decode marketId
 		MarketIdType marketIdType = new MarketIdType();
 		marketIdType.setMyUidId(eiCreateTenderPayloadDecoder.marketId());
-		eiCreateTenderPayload.getTender().setMarketId(marketIdType);
+		eiCreateTenderPayload.setMarketId(marketIdType);
 
 		// Decode the 'partyId' (ActorIdType)
 		ActorIdType partyId = new ActorIdType();
@@ -241,11 +230,18 @@ public class EiTenderEncoderDecoder {
 		tenderId.setMyUidId(eiCreateTenderPayloadDecoder.tender().tenderId());
 
 		// Decode the 'tender' (EiTenderType)
-
 		EiTenderType tender = new EiTenderType();
+		
+		// Decode the expiration time (Instant) and set the tender expire time
+		long expirationTimeSeconds = eiCreateTenderPayloadDecoder.tender().tenderBase().expirationTime().seconds();
+		int expirationTimeNano = (int) eiCreateTenderPayloadDecoder.tender().tenderBase().expirationTime().nano();
+
+		Instant expirationTime = Instant.ofEpochSecond(expirationTimeSeconds, expirationTimeNano);
+
 		// Get the 'tenderDetail' decoder
 		TenderIntervalDetailDecoder tenderDetailDecoder = eiCreateTenderPayloadDecoder.tender().tenderBase()
 				.tenderDetail();
+		
 		TenderDetail tenderDetail = null;
 
 		// Extract details from the TenderIntervalDetailDecoder
@@ -263,7 +259,11 @@ public class EiTenderEncoderDecoder {
 					tenderDetailDecoder.interval().duration().nano()));
 
 			TenderIntervalDetail tenderIntervalDetail = new TenderIntervalDetail(interval, price, quantity);
+			tenderDetail = tenderIntervalDetail;
+
 		}
+		
+
 		
 		// Decode (SideType)
 		org.theenergymashuplab.cts.SideType side;
@@ -277,46 +277,32 @@ public class EiTenderEncoderDecoder {
 			throw new IllegalArgumentException(
 					"Unknown side type: " + eiCreateTenderPayloadDecoder.tender().tenderBase().side());
 		}
+		
 
-		// Decode the expiration time (Instant) and set the tender expire time
-		long expirationTimeSeconds = eiCreateTenderPayloadDecoder.tender().tenderBase().expirationTime().seconds();
-		int expirationTimeNano = (int) eiCreateTenderPayloadDecoder.tender().tenderBase().expirationTime().nano();
+		EiTenderType eiTenderType = new EiTenderType(expirationTime, side, tenderDetail, marketOrderId);
+		
+		// Decode the 'marketId' (MarketIdType)
+		MarketIdType marketId = new MarketIdType();
+		marketId.setMyUidId(eiCreateTenderPayloadDecoder.tender().tenderBase().marketId());
 
-		Instant expirationTime = Instant.ofEpochSecond(expirationTimeSeconds, expirationTimeNano);
-
-		EiTenderType eiTenderType = new EiTenderType(expirationTime, side, tenderDetail, marketOrderId
-
-		);
+		eiTenderType.setMarketId(marketId);
 
 		// Decode 'AllOrNone' (Boolean)
 		BooleanType allOrNone = eiCreateTenderPayloadDecoder.tender().tenderBase().allOrNone();
 		eiTenderType.setAllOrNone(allOrNone == BooleanType.TRUE); // Set it as true if it is BooleanType.TRUE
 
-		// Decode execution instructions
-		VarStringEncodingDecoder executionInstructionsDecoderTender = eiCreateTenderPayloadDecoder
-				.executionInstructions();
-		String executionInstructionsTender = null;
-
-		length = executionInstructionsDecoderTender.length();
-		if (length != VarStringEncodingDecoder.lengthNullValue()) {
-			int dataOffset = executionInstructionsDecoderTender.offset()
-					+ VarStringEncodingDecoder.varDataEncodingOffset();
-			byte[] varData = new byte[(int) length];
-			executionInstructionsDecoderTender.buffer().getBytes(dataOffset, varData);
-			executionInstructionsTender = new String(varData, StandardCharsets.UTF_8);
-		}
-
-		eiTenderType.setExecutionInstructions(executionInstructions); // Set the decoded execution instructions
-
 		// Decode price scale (e.g., price scale could be a numeric value like an
 		// integer or long)
 		int priceScale = (int) eiCreateTenderPayloadDecoder.tender().tenderBase().priceScale();
+		
 		eiTenderType.setPriceScale(priceScale);
 
 		// Decode quantity scale (e.g., quantity scale could be a numeric value)
 		int quantityScale = (int) eiCreateTenderPayloadDecoder.tender().tenderBase().quantityScale();
+		
 		eiTenderType.setQuantityScale(quantityScale); // Set the decoded quantity scale
 		
+		//decode the resourceDesignator
 		org.theenergymashuplab.cts.generated_files.ResourceDesignatorType generatedResourceDesignator = eiCreateTenderPayloadDecoder.tender().tenderBase().resourceDesignator();
 		org.theenergymashuplab.cts.ResourceDesignatorType resourceDesignator = null;
 
@@ -371,77 +357,77 @@ public class EiTenderEncoderDecoder {
 		return eiCreateTenderPayload;
 	}
 
-	/*
-	 * public static int eiCreatedTenderEncode(EiCreatedTenderPayloadEncoder
-	 * eiCreatedTenderPayloadEncoder, UnsafeBuffer directBuffer,
-	 * MessageHeaderEncoder messageHeaderEncoder, EiCreatedTenderPayload
-	 * eiCreatedTenderPayload) {
-	 * 
-	 * eiCreatedTenderPayloadEncoder.wrapAndApplyHeader(directBuffer, 0,
-	 * messageHeaderEncoder);
-	 * 
-	 * eiCreatedTenderPayloadEncoder.counterPartyId()
-	 * .value(eiCreatedTenderPayload.getCounterPartyId().getMyUidId());
-	 * 
-	 * 
-	 * eiCreatedTenderPayloadEncoder.partyId()
-	 * .value(eiCreatedTenderPayload.getPartyId().getMyUidId());
-	 * 
-	 * 
-	 * eiCreatedTenderPayloadEncoder.refId()
-	 * .value(eiCreatedTenderPayload.getRefId().getMyUidId());
-	 * 
-	 * eiCreatedTenderPayloadEncoder.tenderId()
-	 * .value(eiCreatedTenderPayload.getTenderId().getMyUidId());
-	 * 
-	 * eiCreatedTenderPayloadEncoder.response() .responseCode(200)
-	 * .responseDescription();
-	 * 
-	 * System.out.println(""); System.out.println(
-	 * "-------------------------------------------------------------------------");
-	 * System.out.println("EiCreatedTenderPayload Encoded :-");
-	 * System.out.println(eiCreatedTenderPayloadEncoder.toString());
-	 * 
-	 * return messageHeaderEncoder.ENCODED_LENGTH +
-	 * eiCreatedTenderPayloadEncoder.encodedLength();
-	 * 
-	 * }
-	 * 
-	 * 
-	 * public static EiCreatedTenderPayload eiCreatedTenderPayloadDecoder(
-	 * EiCreatedTenderPayloadDecoder eiCreatedTenderPayloadDecoder , UnsafeBuffer
-	 * directBuffer, int bufferOffset, int actingBlockLength, int actingVersion)
-	 * throws Exception{
-	 * 
-	 * eiCreatedTenderPayloadDecoder.wrap(directBuffer, 0, actingBlockLength,
-	 * actingVersion);
-	 * 
-	 * System.out.println(""); System.out.println(
-	 * "-------------------------------------------------------------------------");
-	 * System.out.println("EiCreatedTenderPayload Decoded :-");
-	 * System.out.println(eiCreatedTenderPayloadDecoder.toString());
-	 * 
-	 * EiCreatedTenderPayload eiCreatedTenderPayload = new EiCreatedTenderPayload();
-	 * 
-	 * ActorIdType counterPartyId = new ActorIdType();
-	 * counterPartyId.setMyUidId(eiCreatedTenderPayloadDecoder.counterPartyId().
-	 * value()); eiCreatedTenderPayload.setCounterPartyId(counterPartyId);
-	 * 
-	 * ActorIdType partyId = new ActorIdType();
-	 * partyId.setMyUidId(eiCreatedTenderPayloadDecoder.partyId().value());
-	 * eiCreatedTenderPayload.setPartyId(partyId);
-	 * 
-	 * EiResponse response = new EiResponse();
-	 * response.setResponseCode(eiCreatedTenderPayloadDecoder.response().
-	 * responseCode()); response.setResponseDescription("Successfull");
-	 * eiCreatedTenderPayload.setResponse(response);
-	 * 
-	 * TenderIdType tenderId = new TenderIdType();
-	 * tenderId.setMyUidId(eiCreatedTenderPayloadDecoder.tenderId().value());
-	 * eiCreatedTenderPayload.setTenderId(tenderId);
-	 * 
-	 * return eiCreatedTenderPayload;
-	 * 
-	 * }
-	 */
+//	
+//	  public static int eiCreatedTenderEncode(EiCreatedTenderPayloadEncoder
+//	  eiCreatedTenderPayloadEncoder, UnsafeBuffer directBuffer,
+//	  MessageHeaderEncoder messageHeaderEncoder, EiCreatedTenderPayload
+//	  eiCreatedTenderPayload) {
+//	  
+//	  eiCreatedTenderPayloadEncoder.wrapAndApplyHeader(directBuffer, 0,
+//	  messageHeaderEncoder);
+//	  
+//	  eiCreatedTenderPayloadEncoder.counterPartyId()
+//	  .value(eiCreatedTenderPayload.getCounterPartyId().getMyUidId());
+//	  
+//	  
+//	  eiCreatedTenderPayloadEncoder.partyId()
+//	  .value(eiCreatedTenderPayload.getPartyId().getMyUidId());
+//	  
+//	  
+//	  eiCreatedTenderPayloadEncoder.refId()
+//	  .value(eiCreatedTenderPayload.getRefId().getMyUidId());
+//	  
+//	  eiCreatedTenderPayloadEncoder.tenderId()
+//	  .value(eiCreatedTenderPayload.getTenderId().getMyUidId());
+//	  
+//	  eiCreatedTenderPayloadEncoder.response() .responseCode(200)
+//	  .responseDescription();
+//	  
+//	  System.out.println(""); System.out.println(
+//	  "-------------------------------------------------------------------------");
+//	  System.out.println("EiCreatedTenderPayload Encoded :-");
+//	  System.out.println(eiCreatedTenderPayloadEncoder.toString());
+//	  
+//	  return messageHeaderEncoder.ENCODED_LENGTH +
+//	  eiCreatedTenderPayloadEncoder.encodedLength();
+//	  
+//	  }
+//	  
+//	  
+//	  public static EiCreatedTenderPayload eiCreatedTenderPayloadDecoder(
+//	  EiCreatedTenderPayloadDecoder eiCreatedTenderPayloadDecoder , UnsafeBuffer
+//	  directBuffer, int bufferOffset, int actingBlockLength, int actingVersion)
+//	  throws Exception{
+//	  
+//	  eiCreatedTenderPayloadDecoder.wrap(directBuffer, 0, actingBlockLength,
+//	  actingVersion);
+//	  
+//	  System.out.println(""); System.out.println(
+//	  "-------------------------------------------------------------------------");
+//	  System.out.println("EiCreatedTenderPayload Decoded :-");
+//	  System.out.println(eiCreatedTenderPayloadDecoder.toString());
+//	  
+//	  EiCreatedTenderPayload eiCreatedTenderPayload = new EiCreatedTenderPayload();
+//	  
+//	  ActorIdType counterPartyId = new ActorIdType();
+//	  counterPartyId.setMyUidId(eiCreatedTenderPayloadDecoder.counterPartyId().
+//	  value()); eiCreatedTenderPayload.setCounterPartyId(counterPartyId);
+//	  
+//	  ActorIdType partyId = new ActorIdType();
+//	  partyId.setMyUidId(eiCreatedTenderPayloadDecoder.partyId().value());
+//	  eiCreatedTenderPayload.setPartyId(partyId);
+//	  
+//	  EiResponse response = new EiResponse();
+//	  response.setResponseCode(eiCreatedTenderPayloadDecoder.response().
+//	  responseCode()); response.setResponseDescription("Successfull");
+//	  eiCreatedTenderPayload.setResponse(response);
+//	  
+//	  TenderIdType tenderId = new TenderIdType();
+//	  tenderId.setMyUidId(eiCreatedTenderPayloadDecoder.tenderId().value());
+//	  eiCreatedTenderPayload.setTenderId(tenderId);
+//	  
+//	  return eiCreatedTenderPayload;
+//	  
+//	  }
+//	 
 }

@@ -12,7 +12,7 @@ public class EiTenderTypeDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 103;
+    public static final int ENCODED_LENGTH = 107;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -133,7 +133,7 @@ public class EiTenderTypeDecoder
 
     public static int tenderBaseEncodingLength()
     {
-        return 87;
+        return 91;
     }
 
     public static int tenderBaseSinceVersion()

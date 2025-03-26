@@ -12,7 +12,7 @@ public class TenderBaseDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 87;
+    public static final int ENCODED_LENGTH = 91;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -87,7 +87,7 @@ public class TenderBaseDecoder
 
     public static int executionInstructionsEncodingLength()
     {
-        return 4;
+        return 8;
     }
 
     public static int executionInstructionsSinceVersion()
@@ -95,22 +95,30 @@ public class TenderBaseDecoder
         return 0;
     }
 
-    private final VarStringEncodingDecoder executionInstructions = new VarStringEncodingDecoder();
-
-    /**
-     * Variable length UTF-8 String.
-     *
-     * @return VarStringEncodingDecoder : Variable length UTF-8 String.
-     */
-    public VarStringEncodingDecoder executionInstructions()
+    public static long executionInstructionsNullValue()
     {
-        executionInstructions.wrap(buffer, offset + 1);
-        return executionInstructions;
+        return 0xffffffffffffffffL;
     }
+
+    public static long executionInstructionsMinValue()
+    {
+        return 0x0L;
+    }
+
+    public static long executionInstructionsMaxValue()
+    {
+        return 0xfffffffffffffffeL;
+    }
+
+    public long executionInstructions()
+    {
+        return buffer.getLong(offset + 1, java.nio.ByteOrder.LITTLE_ENDIAN);
+    }
+
 
     public static int expirationTimeEncodingOffset()
     {
-        return 5;
+        return 9;
     }
 
     public static int expirationTimeEncodingLength()
@@ -132,13 +140,13 @@ public class TenderBaseDecoder
      */
     public InstantTypeDecoder expirationTime()
     {
-        expirationTime.wrap(buffer, offset + 5);
+        expirationTime.wrap(buffer, offset + 9);
         return expirationTime;
     }
 
     public static int marketIdEncodingOffset()
     {
-        return 17;
+        return 21;
     }
 
     public static int marketIdEncodingLength()
@@ -168,13 +176,13 @@ public class TenderBaseDecoder
 
     public long marketId()
     {
-        return buffer.getLong(offset + 17, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 21, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
     public static int priceScaleEncodingOffset()
     {
-        return 25;
+        return 29;
     }
 
     public static int priceScaleEncodingLength()
@@ -204,13 +212,13 @@ public class TenderBaseDecoder
 
     public long priceScale()
     {
-        return (buffer.getInt(offset + 25, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 29, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
     }
 
 
     public static int quantityScaleEncodingOffset()
     {
-        return 29;
+        return 33;
     }
 
     public static int quantityScaleEncodingLength()
@@ -240,13 +248,13 @@ public class TenderBaseDecoder
 
     public long quantityScale()
     {
-        return (buffer.getInt(offset + 29, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 33, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
     }
 
 
     public static int resourceDesignatorEncodingOffset()
     {
-        return 33;
+        return 37;
     }
 
     public static int resourceDesignatorEncodingLength()
@@ -261,18 +269,18 @@ public class TenderBaseDecoder
 
     public short resourceDesignatorRaw()
     {
-        return ((short)(buffer.getByte(offset + 33) & 0xFF));
+        return ((short)(buffer.getByte(offset + 37) & 0xFF));
     }
 
     public ResourceDesignatorType resourceDesignator()
     {
-        return ResourceDesignatorType.get(((short)(buffer.getByte(offset + 33) & 0xFF)));
+        return ResourceDesignatorType.get(((short)(buffer.getByte(offset + 37) & 0xFF)));
     }
 
 
     public static int segmentIdEncodingOffset()
     {
-        return 34;
+        return 38;
     }
 
     public static int segmentIdEncodingLength()
@@ -302,13 +310,13 @@ public class TenderBaseDecoder
 
     public long segmentId()
     {
-        return (buffer.getInt(offset + 34, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 38, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
     }
 
 
     public static int sideEncodingOffset()
     {
-        return 38;
+        return 42;
     }
 
     public static int sideEncodingLength()
@@ -323,18 +331,18 @@ public class TenderBaseDecoder
 
     public byte sideRaw()
     {
-        return buffer.getByte(offset + 38);
+        return buffer.getByte(offset + 42);
     }
 
     public SideType side()
     {
-        return SideType.get(buffer.getByte(offset + 38));
+        return SideType.get(buffer.getByte(offset + 42));
     }
 
 
     public static int tenderDetailEncodingOffset()
     {
-        return 39;
+        return 43;
     }
 
     public static int tenderDetailEncodingLength()
@@ -356,13 +364,13 @@ public class TenderBaseDecoder
      */
     public TenderIntervalDetailDecoder tenderDetail()
     {
-        tenderDetail.wrap(buffer, offset + 39);
+        tenderDetail.wrap(buffer, offset + 43);
         return tenderDetail;
     }
 
     public static int warrantsEncodingOffset()
     {
-        return 79;
+        return 83;
     }
 
     public static int warrantsEncodingLength()
@@ -392,7 +400,7 @@ public class TenderBaseDecoder
 
     public long warrants()
     {
-        return buffer.getLong(offset + 79, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 83, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
@@ -418,15 +426,7 @@ public class TenderBaseDecoder
         builder.append(allOrNone());
         builder.append('|');
         builder.append("executionInstructions=");
-        final VarStringEncodingDecoder executionInstructions = executionInstructions();
-        if (executionInstructions != null)
-        {
-            executionInstructions.appendTo(builder);
-        }
-        else
-        {
-            builder.append("null");
-        }
+        builder.append(executionInstructions());
         builder.append('|');
         builder.append("expirationTime=");
         final InstantTypeDecoder expirationTime = expirationTime();

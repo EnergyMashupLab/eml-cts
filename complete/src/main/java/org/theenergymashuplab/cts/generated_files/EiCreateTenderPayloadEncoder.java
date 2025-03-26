@@ -10,7 +10,7 @@ import org.agrona.MutableDirectBuffer;
 @SuppressWarnings("all")
 public class EiCreateTenderPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 144;
+    public static final int BLOCK_LENGTH = 152;
     public static final int TEMPLATE_ID = 5;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -208,7 +208,7 @@ public class EiCreateTenderPayloadEncoder
 
     public static int executionInstructionsEncodingLength()
     {
-        return 4;
+        return 8;
     }
 
     public static String executionInstructionsMetaAttribute(final MetaAttribute metaAttribute)
@@ -221,13 +221,27 @@ public class EiCreateTenderPayloadEncoder
         return "";
     }
 
-    private final VarStringEncodingEncoder executionInstructions = new VarStringEncodingEncoder();
-
-    public VarStringEncodingEncoder executionInstructions()
+    public static long executionInstructionsNullValue()
     {
-        executionInstructions.wrap(buffer, offset + 9);
-        return executionInstructions;
+        return 0xffffffffffffffffL;
     }
+
+    public static long executionInstructionsMinValue()
+    {
+        return 0x0L;
+    }
+
+    public static long executionInstructionsMaxValue()
+    {
+        return 0xfffffffffffffffeL;
+    }
+
+    public EiCreateTenderPayloadEncoder executionInstructions(final long value)
+    {
+        buffer.putLong(offset + 9, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return this;
+    }
+
 
     public static int marketIdId()
     {
@@ -241,7 +255,7 @@ public class EiCreateTenderPayloadEncoder
 
     public static int marketIdEncodingOffset()
     {
-        return 13;
+        return 17;
     }
 
     public static int marketIdEncodingLength()
@@ -276,7 +290,7 @@ public class EiCreateTenderPayloadEncoder
 
     public EiCreateTenderPayloadEncoder marketId(final long value)
     {
-        buffer.putLong(offset + 13, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 17, value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
@@ -293,7 +307,7 @@ public class EiCreateTenderPayloadEncoder
 
     public static int partyIdEncodingOffset()
     {
-        return 21;
+        return 25;
     }
 
     public static int partyIdEncodingLength()
@@ -328,7 +342,7 @@ public class EiCreateTenderPayloadEncoder
 
     public EiCreateTenderPayloadEncoder partyId(final long value)
     {
-        buffer.putLong(offset + 21, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 25, value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
@@ -345,7 +359,7 @@ public class EiCreateTenderPayloadEncoder
 
     public static int requestIdEncodingOffset()
     {
-        return 29;
+        return 33;
     }
 
     public static int requestIdEncodingLength()
@@ -380,7 +394,7 @@ public class EiCreateTenderPayloadEncoder
 
     public EiCreateTenderPayloadEncoder requestId(final long value)
     {
-        buffer.putLong(offset + 29, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 33, value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
@@ -397,7 +411,7 @@ public class EiCreateTenderPayloadEncoder
 
     public static int segmentIdEncodingOffset()
     {
-        return 37;
+        return 41;
     }
 
     public static int segmentIdEncodingLength()
@@ -432,7 +446,7 @@ public class EiCreateTenderPayloadEncoder
 
     public EiCreateTenderPayloadEncoder segmentId(final long value)
     {
-        buffer.putInt(offset + 37, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 41, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
@@ -449,12 +463,12 @@ public class EiCreateTenderPayloadEncoder
 
     public static int tenderEncodingOffset()
     {
-        return 41;
+        return 45;
     }
 
     public static int tenderEncodingLength()
     {
-        return 103;
+        return 107;
     }
 
     public static String tenderMetaAttribute(final MetaAttribute metaAttribute)
@@ -471,7 +485,7 @@ public class EiCreateTenderPayloadEncoder
 
     public EiTenderTypeEncoder tender()
     {
-        tender.wrap(buffer, offset + 41);
+        tender.wrap(buffer, offset + 45);
         return tender;
     }
 

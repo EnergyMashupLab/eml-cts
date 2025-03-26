@@ -31,6 +31,7 @@ import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
+import org.theenergymashuplab.cts.sbe.EiTenderEncoderDecoder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -150,40 +151,21 @@ public class LmeRestController {
 	 */
 	
 	@PostMapping("/createTender")
-	public byte[] postEiCreateTender(
- 			@RequestBody byte[] eiCreateTenderByteArr) throws Exception	{
+	public EiCreatedTenderPayload 	postEiCreateTender(
+			@RequestBody EiCreateTenderPayload eiCreateTender)	{
 		EiTenderType tempTender;
 		EiCreateTenderPayload tempCreate = null;
 		EiCreateTenderPayload mapPutReturnValue = null;
 		EiCreatedTenderPayload tempCreated;
 		Boolean addQsuccess = false;
 		
-		//tempCreate = eiCreateTender;
- 		//tempTender = eiCreateTender.getTender();
- 		
- 		//Decode EiCreateTenderPayload
- 				int bufferOffset_lengthToRead = messageHeaderDecoder.encodedLength();
- 				buffer.putBytes(0, eiCreateTenderByteArr, 0, bufferOffset_lengthToRead);
- 				messageHeaderDecoder.wrap(buffer, 0);
- 
- 				//We have got the id, Now based on ID we will use correct decoder
- 				int templateId = messageHeaderDecoder.templateId();
- 
- 				//Length encoded message
- 				int actingBlockLength = messageHeaderDecoder.blockLength();
- 
+		tempCreate = eiCreateTender;
+		tempTender = eiCreateTender.getTender();
 
-				//Length encoded message
- 				int actingVersion = messageHeaderDecoder.version();
- 
- 
- 				buffer.putBytes(0, eiCreateTenderByteArr, bufferOffset_lengthToRead, actingBlockLength);
- 
- 				EiCreateTenderPayload EiCreateTenderResponse = EiTenderEncoderDcoder.eiCreateTenderPayloadDecode(eiCreateTenderPayloadDecoder, buffer, bufferOffset_lengthToRead, actingBlockLength, actingVersion);
- 
- 		//logger.debug("LmeController before constructor for EiCreatedTender " +tempTender.toString());
- 		logger.debug("lme/createTender " + EiCreateTenderResponse.toString());
- 		
+		logger.debug("LmeController before constructor for EiCreatedTender " +
+				tempTender.toString());
+		logger.debug("lme/createTender " + eiCreateTender.toString());
+		
 		/*	ResponseBody
 			public EiCreatedTender(
 				TenderId tenderId,

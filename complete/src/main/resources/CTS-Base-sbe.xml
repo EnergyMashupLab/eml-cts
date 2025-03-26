@@ -225,7 +225,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	<!--Added tenderBase as an element pending addressing inheritance-->
 	<composite name="TenderBase" description="See TenderBase.java" >
 		<ref name="allOrNone" type="BooleanType" />
-		<ref name="executionInstructions" type="varStringEncoding" />
+	<type name="executionInstructions" id="3" primitiveType="uint64" /><!-- Will be set to a uint64 instead of VarStringEncoding due to the string being one Char or "" in nearly all cases-->
 		<ref name="expirationTime" type="InstantType" />
 		<ref name="marketId" type="MarketIdType" />
 		<type name="priceScale" primitiveType="uint32" />
@@ -287,7 +287,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 <sbe:message name="EiCreateTenderPayload" id="5"	description="See EiCreateTenderPayload.java">
 	<field name="atMostOne" id="1" type="BooleanType" />
 	<field name="counterPartyId" id="2" type="ActorIdType"/>
-	<field name="executionInstructions" id="3" type="varStringEncoding" />
+	<field name="executionInstructions" id="3" type="uint64" /><!-- Will be set to a uint64 instead of VarStringEncoding due to the string being one Char or "" in nearly all cases-->
 	<field name="marketId" id="4" type ="MarketIdType"/>
  	<field name="partyId" id="5" type="ActorIdType"/>
 	<field name="requestId" id="6" type="RefIdType"/>

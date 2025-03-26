@@ -12,7 +12,7 @@ public class TenderBaseEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 87;
+    public static final int ENCODED_LENGTH = 91;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -77,25 +77,34 @@ public class TenderBaseEncoder
 
     public static int executionInstructionsEncodingLength()
     {
-        return 4;
+        return 8;
     }
 
-    private final VarStringEncodingEncoder executionInstructions = new VarStringEncodingEncoder();
-
-    /**
-     * Variable length UTF-8 String.
-     *
-     * @return VarStringEncodingEncoder : Variable length UTF-8 String.
-     */
-    public VarStringEncodingEncoder executionInstructions()
+    public static long executionInstructionsNullValue()
     {
-        executionInstructions.wrap(buffer, offset + 1);
-        return executionInstructions;
+        return 0xffffffffffffffffL;
     }
+
+    public static long executionInstructionsMinValue()
+    {
+        return 0x0L;
+    }
+
+    public static long executionInstructionsMaxValue()
+    {
+        return 0xfffffffffffffffeL;
+    }
+
+    public TenderBaseEncoder executionInstructions(final long value)
+    {
+        buffer.putLong(offset + 1, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return this;
+    }
+
 
     public static int expirationTimeEncodingOffset()
     {
-        return 5;
+        return 9;
     }
 
     public static int expirationTimeEncodingLength()
@@ -112,13 +121,13 @@ public class TenderBaseEncoder
      */
     public InstantTypeEncoder expirationTime()
     {
-        expirationTime.wrap(buffer, offset + 5);
+        expirationTime.wrap(buffer, offset + 9);
         return expirationTime;
     }
 
     public static int marketIdEncodingOffset()
     {
-        return 17;
+        return 21;
     }
 
     public static int marketIdEncodingLength()
@@ -143,14 +152,14 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder marketId(final long value)
     {
-        buffer.putLong(offset + 17, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 21, value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
 
     public static int priceScaleEncodingOffset()
     {
-        return 25;
+        return 29;
     }
 
     public static int priceScaleEncodingLength()
@@ -175,14 +184,14 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder priceScale(final long value)
     {
-        buffer.putInt(offset + 25, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 29, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
 
     public static int quantityScaleEncodingOffset()
     {
-        return 29;
+        return 33;
     }
 
     public static int quantityScaleEncodingLength()
@@ -207,14 +216,14 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder quantityScale(final long value)
     {
-        buffer.putInt(offset + 29, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 33, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
 
     public static int resourceDesignatorEncodingOffset()
     {
-        return 33;
+        return 37;
     }
 
     public static int resourceDesignatorEncodingLength()
@@ -224,13 +233,13 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder resourceDesignator(final ResourceDesignatorType value)
     {
-        buffer.putByte(offset + 33, (byte)value.value());
+        buffer.putByte(offset + 37, (byte)value.value());
         return this;
     }
 
     public static int segmentIdEncodingOffset()
     {
-        return 34;
+        return 38;
     }
 
     public static int segmentIdEncodingLength()
@@ -255,14 +264,14 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder segmentId(final long value)
     {
-        buffer.putInt(offset + 34, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 38, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
 
     public static int sideEncodingOffset()
     {
-        return 38;
+        return 42;
     }
 
     public static int sideEncodingLength()
@@ -272,13 +281,13 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder side(final SideType value)
     {
-        buffer.putByte(offset + 38, value.value());
+        buffer.putByte(offset + 42, value.value());
         return this;
     }
 
     public static int tenderDetailEncodingOffset()
     {
-        return 39;
+        return 43;
     }
 
     public static int tenderDetailEncodingLength()
@@ -295,13 +304,13 @@ public class TenderBaseEncoder
      */
     public TenderIntervalDetailEncoder tenderDetail()
     {
-        tenderDetail.wrap(buffer, offset + 39);
+        tenderDetail.wrap(buffer, offset + 43);
         return tenderDetail;
     }
 
     public static int warrantsEncodingOffset()
     {
-        return 79;
+        return 83;
     }
 
     public static int warrantsEncodingLength()
@@ -326,7 +335,7 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder warrants(final long value)
     {
-        buffer.putLong(offset + 79, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 83, value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
