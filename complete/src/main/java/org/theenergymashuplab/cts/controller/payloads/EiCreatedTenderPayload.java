@@ -61,8 +61,8 @@ public class EiCreatedTenderPayload {
 	@Override
 	public String toString() {
 		return "EiCreatedTenderPayload [marketOrderId=" + marketOrderId + ", tenderId=" + tenderId + ", partyId=" + partyId
-				+ ", counterPartyId=" + counterPartyId + ", response=" + response + ", refId=" + refId + ", inResponseTo=" + inResponseTo
-				+ "]";
+				+ ", counterPartyId=" + counterPartyId + ", response=" + response + ", refId=" + refId + ", inResponseTo="
+				+ inResponseTo + "]";
 	}
 
 	public EiResponse getResponse() {

@@ -36,8 +36,7 @@ public class ClientCreatedTenderPayload {
 
 	@Override
 	public String toString() {
-		return (info + " success is " + success.toString() +
-				" CtsTenderId " + ctsTenderId);
+		return (info + " success is " + success.toString() + " CtsTenderId " + ctsTenderId);
 	}
 
 	public long getCtsTenderId() {

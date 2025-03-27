@@ -53,8 +53,7 @@ import java.util.Random;
 @RequestMapping("/client") // will be dynamic URI with /sc/{id}/
 public class ClientRestController {
 
-	private static final Logger logger = LogManager.getLogger(
-			ClientRestController.class);
+	private static final Logger logger = LogManager.getLogger(ClientRestController.class);
 	final ObjectMapper mapper = new ObjectMapper();
 
 	// for managing client/{id} and teua/{id}
@@ -80,8 +79,7 @@ public class ClientRestController {
 		postClientCreateTenderUri = new String[this.idLimit];
 
 		for (i = 0; i < this.idLimit; i++) {
-			postClientCreateTenderUri[i] = uriPrefix +
-					String.valueOf(i) + uriSuffix;
+			postClientCreateTenderUri[i] = uriPrefix + String.valueOf(i) + uriSuffix;
 		}
 	}
 
@@ -92,15 +90,13 @@ public class ClientRestController {
 		this.idLimit = howMany;
 
 		for (i = 0; i < this.idLimit; i++) {
-			postClientCreateTenderUri[i] = uriPrefix +
-					String.valueOf(i) + uriSuffix;
+			postClientCreateTenderUri[i] = uriPrefix + String.valueOf(i) + uriSuffix;
 		}
 	}
 
 	@PostMapping("/{id}/clientCreateTransaction")
 	public ClientCreatedTransactionPayload postTransaction(
-			@RequestBody ClientCreateTransactionPayload clientCreateTransactionPayload,
-			@PathVariable String id) {
+			@RequestBody ClientCreateTransactionPayload clientCreateTransactionPayload, @PathVariable String id) {
 
 		ClientCreateTransactionPayload tempClientCreateTransaction;
 		tempClientCreateTransaction = clientCreateTransactionPayload;
@@ -108,9 +104,8 @@ public class ClientRestController {
 		// Build response
 		ClientCreatedTransactionPayload response = new ClientCreatedTransactionPayload();
 
-		logger.info("/clientCreateTransaction POSTed to /client/" +
-				id + "/clientCreateTransaction " +
-				tempClientCreateTransaction.toString());
+		logger.info("/clientCreateTransaction POSTed to /client/" + id + "/clientCreateTransaction "
+				+ tempClientCreateTransaction.toString());
 
 		/*
 		 * INSERT SC/Client code to track tenders and transactions against then
@@ -120,11 +115,10 @@ public class ClientRestController {
 	}
 
 	/*
-	 * GET - /client/clientTender responds with a randomized clientCreateTender,
-	 * serialized to JSON for use with Postman for functional testing
+	 * GET - /client/clientTender responds with a randomized clientCreateTender, serialized to JSON for use with Postman for
+	 * functional testing
 	 * 
-	 * The ClientRestController also accepts those payloads (e.g. from Postman)
-	 * and forwards them unchanged to our TEUA.
+	 * The ClientRestController also accepts those payloads (e.g. from Postman) and forwards them unchanged to our TEUA.
 	 */
 	@GetMapping("/clientTender")
 	public ClientTender getClientTender() {
@@ -148,9 +142,8 @@ public class ClientRestController {
 	}
 
 	/*
-	 * GET - /client/clientTransaction responds with a randomized
-	 * clientCreateTransaction,
-	 * serialized to JSON for use with Postman for functional testing
+	 * GET - /client/clientTransaction responds with a randomized clientCreateTransaction, serialized to JSON for use with Postman
+	 * for functional testing
 	 */
 	@GetMapping("/clientTransaction")
 	public ClientCreateTransactionPayload getClientTransaction() {
@@ -170,11 +163,7 @@ public class ClientRestController {
 			randSide = SideType.SELL;
 		}
 
-		tempTransaction = new ClientCreateTransactionPayload(
-				randSide,
-				randQuantity,
-				randPrice,
-				ctsTenderId);
+		tempTransaction = new ClientCreateTransactionPayload(randSide, randQuantity, randPrice, ctsTenderId);
 		// System.err.println(tempTender.toString());
 		// ClientTender(SideType side, long quantity, long price)
 
@@ -188,17 +177,12 @@ public class ClientRestController {
 	 * 
 	 * Simplifies use of Postman for testing
 	 * 
-	 * NOTE that the quantity in a ClientCreateTender is FULL REQUIREMENTS for the
-	 * Interval. The User Agent will adjust that request by energy already bought or
-	 * sold
-	 * on behalf of this client for the Interval, to get a net amount to go from the
-	 * client's position
-	 * (energy already bought or sold, netted) to the Full Requirements amount for
-	 * Interval.
+	 * NOTE that the quantity in a ClientCreateTender is FULL REQUIREMENTS for the Interval. The User Agent will adjust that
+	 * request by energy already bought or sold on behalf of this client for the Interval, to get a net amount to go from the
+	 * client's position (energy already bought or sold, netted) to the Full Requirements amount for Interval.
 	 */
 	@PostMapping("/clientCreateTender")
-	public ClientCreatedTenderPayload postClientCreateTender(
-			@RequestBody ClientCreateTenderPayload clientCreateTender) {
+	public ClientCreatedTenderPayload postClientCreateTender(@RequestBody ClientCreateTenderPayload clientCreateTender) {
 		ClientCreateTenderPayload tempCreate;
 
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -207,8 +191,7 @@ public class ClientRestController {
 		tempCreate = clientCreateTender; // as received
 
 		/*
-		 * Forward the @RequestBody as received,
-		 * Wait for and return the @ReponseBody as received
+		 * Forward the @RequestBody as received, Wait for and return the @ReponseBody as received
 		 */
 		System.err.println("/clientCreateTender received " + clientCreateTender.toString());
 		logger.debug("before forwarding CLientCreateTender to TEUA " + tempCreate.toString());
@@ -216,8 +199,7 @@ public class ClientRestController {
 		// And forward to the TEUA
 		restTemplate = builder.build();
 		ClientCreatedTenderPayload result = restTemplate.postForObject("http://localhost:8080/teua/clientCreateTender",
-				tempCreate,
-				ClientCreatedTenderPayload.class);
+				tempCreate, ClientCreatedTenderPayload.class);
 
 		logger.debug("Result is " + result.toString());
 

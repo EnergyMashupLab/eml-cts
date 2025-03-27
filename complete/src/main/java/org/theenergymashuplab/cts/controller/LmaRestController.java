@@ -56,8 +56,7 @@ public class LmaRestController {
 	public static ConcurrentHashMap<Long, String> postLmaToTeuaPartyIdMapForQuotes;
 	// Initialized in TeuaRestController as this static map
 
-	private static final Logger logger = LogManager.getLogger(
-			LmaRestController.class);
+	private static final Logger logger = LogManager.getLogger(LmaRestController.class);
 
 	public LmaRestController() { // zero parameter constructor
 		logger.trace("LMA zero parameter constructor");
@@ -72,14 +71,11 @@ public class LmaRestController {
 	}
 
 	/*
-	 * POST - /createTender - POSTed by TEUA/EMA to LMA
-	 * Forwarded to LME
-	 * RequestBody is EiCreateTender
-	 * ResponseBody is EiCreatedTender
+	 * POST - /createTender - POSTed by TEUA/EMA to LMA Forwarded to LME RequestBody is EiCreateTender ResponseBody is
+	 * EiCreatedTender
 	 */
 	@PostMapping("/createTender")
-	public EiCreatedTenderPayload postEiCreateTender(
-			@RequestBody EiCreateTenderPayload eiCreateTender) {
+	public EiCreatedTenderPayload postEiCreateTender(@RequestBody EiCreateTenderPayload eiCreateTender) {
 
 		EiCreateTenderPayload tempCreate;
 		// Will pass on eiCreateTender body to LME and return its response
@@ -94,21 +90,17 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempCreate = eiCreateTender;
 
-		logger.debug("postEiCreateTender to LME. TenderId " +
-				tempCreate.getTender().getTenderId().toString());
+		logger.debug("postEiCreateTender to LME. TenderId " + tempCreate.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender",
-				tempCreate,
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", tempCreate,
 				EiCreatedTenderPayload.class);
 
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 
 		/*
-		 * tempCreated = new EiCreatedTender(tempTender.getTenderId(),
-		 * tempCreate.getPartyId(),
-		 * tempCreate.getCounterPartyId(),
+		 * tempCreated = new EiCreatedTender(tempTender.getTenderId(), tempCreate.getPartyId(), tempCreate.getCounterPartyId(),
 		 * new EiResponse(200, "OK"));
 		 */
 
@@ -116,9 +108,8 @@ public class LmaRestController {
 	}
 
 	/*
-	 * POST - /createTransaction - comes from LME based on market matches
-	 * RequestBody is EiCreateTransaction
-	 * ResponseBody is EiCreatedTransaction
+	 * POST - /createTransaction - comes from LME based on market matches RequestBody is EiCreateTransaction ResponseBody is
+	 * EiCreatedTransaction
 	 */
 
 	@PostMapping("/createTransaction")
@@ -143,8 +134,8 @@ public class LmaRestController {
 
 		logger.debug("Start of EiCreateTransaction in LMA");
 		/*
-		 * Originated by LME and forwarded by LMA to TEUA based on market match
-		 * and party. Rewrite messages so party and counterpary are counter-symmetric
+		 * Originated by LME and forwarded by LMA to TEUA based on market match and party. Rewrite messages so party and
+		 * counterpary are counter-symmetric
 		 */
 		// local temporary variables
 		tempCreate = eiCreateTransactionPayload;
@@ -162,12 +153,10 @@ public class LmaRestController {
 		tempPartyId = tempCreate.getPartyId();
 		positionParty = tempPartyId;
 		positionInterval = tenderIntervalDetail.getInterval();
-		logger.debug("positionParty.toString is " + positionParty + " positionInterval " +
-				positionInterval.toString() + " tempPartyId " + tempPartyId.toString());
+		logger.debug("positionParty.toString is " + positionParty + " positionInterval " + positionInterval.toString()
+				+ " tempPartyId " + tempPartyId.toString());
 
-		positionUri = "http://localhost:8080/position/" +
-				positionParty.toString() +
-				"/add";
+		positionUri = "http://localhost:8080/position/" + positionParty.toString() + "/add";
 
 		positionQuantity = (tempTender.getSide() == SideType.BUY ? tenderIntervalDetail.getQuantity()
 				: -tenderIntervalDetail.getQuantity());
@@ -178,16 +167,11 @@ public class LmaRestController {
 		positionAddPayload = new PositionAddPayload(positionInterval, positionQuantity);
 
 		logger.trace("Before call to " + positionUri);
-		positionResponse = restTemplate.postForObject(
-				positionUri,
-				positionAddPayload,
-				String.class);
-		logger.debug("return from " + positionUri +
-				" result " + positionResponse);
+		positionResponse = restTemplate.postForObject(positionUri, positionAddPayload, String.class);
+		logger.debug("return from " + positionUri + " result " + positionResponse);
 
 		/*
-		 * Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in
-		 * the EiCreateTransactionPayload
+		 * Pass the EiCreateTransaction payload to the TEUA/EMA keyed by partyId in the EiCreateTransactionPayload
 		 */
 
 		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " + tempCreate.toString());
@@ -196,8 +180,7 @@ public class LmaRestController {
 		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
 
 		if (tempTeuaUri == null) {
-			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
-					tempCreate.getPartyId().toString());
+			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " + tempCreate.getPartyId().toString());
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
 
@@ -214,15 +197,12 @@ public class LmaRestController {
 			// }
 			// }
 		} else {
-			logger.trace("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " +
-					tempCreate.getPartyId().toString() +
-					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
-					" " + tempCreate.getTransaction().toString());
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUri + " partyId " + tempCreate.getPartyId().toString()
+					+ " counterPartyId " + tempCreate.getCounterPartyId().toString() + " "
+					+ tempCreate.getTransaction().toString());
 		}
 
-		tempPostResponse = restTemplate.postForObject(tempTeuaUri,
-				tempCreate,
-				EiCreatedTransactionPayload.class);
+		tempPostResponse = restTemplate.postForObject(tempTeuaUri, tempCreate, EiCreatedTransactionPayload.class);
 
 		// And send the EiCreatedTransaction from the TEUA back to the LME
 		return tempPostResponse;
@@ -231,14 +211,11 @@ public class LmaRestController {
 	/*
 	 * TODO Implement EiCancelTender and ClientCancelTender
 	 * 
-	 * POST - /cancelTender
-	 * RequestBody is EiCancelTender
-	 * ResponseBody is EiCanceledTender
+	 * POST - /cancelTender RequestBody is EiCancelTender ResponseBody is EiCanceledTender
 	 */
 
 	@PostMapping("/cancelTender")
-	public EICanceledTenderPayload postEiCancelTenderPayload(
-			@RequestBody EiCancelTenderPayload eiCancelTender) {
+	public EICanceledTenderPayload postEiCancelTenderPayload(@RequestBody EiCancelTenderPayload eiCancelTender) {
 		EiCancelTenderPayload tempCancel;
 		EICanceledTenderPayload tempPostResponse;
 
@@ -254,17 +231,14 @@ public class LmaRestController {
 		tempCancel = eiCancelTender;
 
 		/*
-		 * tempCanceled = new EICanceledTender(
-		 * tempCancel.getPartyId(),
-		 * tempCancel.getCounterPartyId(),
-		 * new EiResponse(200, "OK"));
+		 * tempCanceled = new EICanceledTender( tempCancel.getPartyId(), tempCancel.getCounterPartyId(), new EiResponse(200,
+		 * "OK"));
 		 */
 
 		/*
 		 * Pass on to LME and use POST responseBody EiCanceledTender in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelTender",
-				tempCancel,
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelTender", tempCancel,
 				EICanceledTenderPayload.class);
 
 		logger.info("LMA after forward CancelTender to LME and before return " + tempPostResponse.toString());
@@ -273,8 +247,7 @@ public class LmaRestController {
 	}
 
 	@PostMapping("/createStreamTender")
-	public EiCreatedStreamTenderPayload postEiCreateStreamTender(
-			@RequestBody EiCreateStreamTenderPayload eiCreateStreamTender) {
+	public EiCreatedStreamTenderPayload postEiCreateStreamTender(@RequestBody EiCreateStreamTenderPayload eiCreateStreamTender) {
 
 		EiCreateStreamTenderPayload tempEiCreateStreamTender;
 		EiCreatedStreamTenderPayload tempEiCreatedStreamTender;
@@ -288,14 +261,13 @@ public class LmaRestController {
 		tempEiCreateStreamTender = eiCreateStreamTender;
 
 		// Log it
-		logger.debug("postEiCreateStreamTender to LME. TenderId " +
-				tempEiCreateStreamTender.getTender().getTenderId().toString());
+		logger.debug(
+				"postEiCreateStreamTender to LME. TenderId " + tempEiCreateStreamTender.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
 		tempEiCreatedStreamTender = restTemplate.postForObject("http://localhost:8080/lme/createStreamTender",
-				tempEiCreateStreamTender,
-				EiCreatedStreamTenderPayload.class);
+				tempEiCreateStreamTender, EiCreatedStreamTenderPayload.class);
 
 		// Log it
 		logger.trace("LMA after forward to LME and before return " + tempEiCreatedStreamTender.toString());
@@ -305,8 +277,7 @@ public class LmaRestController {
 	}
 
 	@PostMapping("/createStreamQuote")
-	public EiCreatedStreamQuotePayload postEiCreateStreamQuote(
-			@RequestBody EiCreateStreamQuotePayload eiCreateStreamQuote) {
+	public EiCreatedStreamQuotePayload postEiCreateStreamQuote(@RequestBody EiCreateStreamQuotePayload eiCreateStreamQuote) {
 
 		EiCreateStreamQuotePayload tempEiCreateStreamQuote;
 		EiCreatedStreamQuotePayload tempEiCreatedStreamQuote;
@@ -320,14 +291,12 @@ public class LmaRestController {
 		tempEiCreateStreamQuote = eiCreateStreamQuote;
 
 		// Log it
-		logger.debug("postEiCreateStreamTender to LME. TenderId " +
-				tempEiCreateStreamQuote.getQuote().getQuoteId().toString());
+		logger.debug("postEiCreateStreamTender to LME. TenderId " + tempEiCreateStreamQuote.getQuote().getQuoteId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
 		tempEiCreatedStreamQuote = restTemplate.postForObject("http://localhost:8080/lme/createStreamQuote",
-				tempEiCreateStreamQuote,
-				EiCreatedStreamQuotePayload.class);
+				tempEiCreateStreamQuote, EiCreatedStreamQuotePayload.class);
 
 		// Log it
 		logger.trace("LMA after forward to LME and before return " + tempEiCreatedStreamQuote.toString());
@@ -337,14 +306,11 @@ public class LmaRestController {
 	}
 
 	/*
-	 * POST - /createTender - POSTed by TEUA/EMA to LMA
-	 * Forwarded to LME
-	 * RequestBody is EiCreateTender
-	 * ResponseBody is EiCreatedTender
+	 * POST - /createTender - POSTed by TEUA/EMA to LMA Forwarded to LME RequestBody is EiCreateTender ResponseBody is
+	 * EiCreatedTender
 	 */
 	@PostMapping("/createQuote")
-	public EiCreatedQuotePayload postEiCreateQuote(
-			@RequestBody EiCreateQuotePayload eiCreateQuote) {
+	public EiCreatedQuotePayload postEiCreateQuote(@RequestBody EiCreateQuotePayload eiCreateQuote) {
 
 		EiCreateQuotePayload tempCreate;
 		// Will pass on eiCreateTender body to LME and return its response
@@ -359,13 +325,11 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempCreate = eiCreateQuote;
 
-		logger.debug("postEiCreateTender to LME. TenderId " +
-				tempCreate.getQuote().getQuoteId().toString());
+		logger.debug("postEiCreateTender to LME. TenderId " + tempCreate.getQuote().getQuoteId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createQuote",
-				tempCreate,
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createQuote", tempCreate,
 				EiCreatedQuotePayload.class);
 
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
@@ -374,14 +338,11 @@ public class LmaRestController {
 	}
 
 	/*
-	 * POST - /createTender - POSTed by TEUA/EMA to LMA
-	 * Forwarded to LME
-	 * RequestBody is EiCreateTender
-	 * ResponseBody is EiCreatedTender
+	 * POST - /createTender - POSTed by TEUA/EMA to LMA Forwarded to LME RequestBody is EiCreateTender ResponseBody is
+	 * EiCreatedTender
 	 */
 	@PostMapping("/acceptQuote")
-	public EiAcceptedQuotePayload postEiAcceptQuote(
-			@RequestBody EiAcceptQuotePayload eiAcceptQuote) {
+	public EiAcceptedQuotePayload postEiAcceptQuote(@RequestBody EiAcceptQuotePayload eiAcceptQuote) {
 		EiAcceptQuotePayload tempAccept;
 		// Will pass on eiCreateTender body to LME and return its response
 		// tempPostResponse
@@ -397,20 +358,16 @@ public class LmaRestController {
 		// save CreateTender message as sent by TEUA
 		tempAccept = eiAcceptQuote;
 
-		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " +
-				tempAccept.getReferencedQuoteId().toString());
+		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " + tempAccept.getReferencedQuoteId().toString());
 
 		// Build the position URI
 		tempPartyId = tempAccept.getPartyId();
-		positionUri = "http://localhost:8080/position/" +
-				tempPartyId.toString() +
-				"/add";
+		positionUri = "http://localhost:8080/position/" + tempPartyId.toString() + "/add";
 
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/acceptQuote",
-				tempAccept,
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/acceptQuote", tempAccept,
 				EiAcceptedQuotePayload.class);
 
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
@@ -422,8 +379,7 @@ public class LmaRestController {
 	 * Mapping to cancel a quote
 	 */
 	@PostMapping("/cancelQuote")
-	public EICanceledQuotePayload postEiCancelQuote(
-			@RequestBody EiCancelQuotePayload eiCancelQuote) {
+	public EICanceledQuotePayload postEiCancelQuote(@RequestBody EiCancelQuotePayload eiCancelQuote) {
 		EiCancelQuotePayload tempCancel;
 		EICanceledQuotePayload tempPostResponse;
 		ActorIdType tempPartyId;
@@ -436,21 +392,17 @@ public class LmaRestController {
 		// Save the message
 		tempCancel = eiCancelQuote;
 
-		logger.debug("postEiCancelQuote to LME. ReferencedQuoteId: " +
-				tempCancel.getMarketQuoteIds().toString());
+		logger.debug("postEiCancelQuote to LME. ReferencedQuoteId: " + tempCancel.getMarketQuoteIds().toString());
 
 		// Build the position URI
 		tempPartyId = tempCancel.getPartyId();
-		positionUri = "http://localhost:8080/position/" +
-				tempPartyId.toString() +
-				"/add";
+		positionUri = "http://localhost:8080/position/" + tempPartyId.toString() + "/add";
 
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
 
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelQuote",
-				tempCancel,
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/cancelQuote", tempCancel,
 				EICanceledQuotePayload.class);
 
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
@@ -476,8 +428,7 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/manageSubscription",
-				tempManage,
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/manageSubscription", tempManage,
 				EiManagedTickerSubscriptionPayload.class);
 
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
@@ -487,8 +438,7 @@ public class LmaRestController {
 	}
 
 	@PostMapping("/sendUpdates")
-	public QuoteTickerType postEiCreateTransactionPayload(
-			@RequestBody QuoteTickerType quoteTickerType) {
+	public QuoteTickerType postEiCreateTransactionPayload(@RequestBody QuoteTickerType quoteTickerType) {
 		System.out.println("Entering the sendUpdate postmapping methods");
 
 		ActorIdType tempPartyId;
@@ -499,8 +449,8 @@ public class LmaRestController {
 		restTemplate = builder.build();
 
 		/*
-		 * Originated by LME and forwarded by LMA to TEUA based on market match
-		 * and party. Rewrite messages so party and counterpary are counter-symmetric
+		 * Originated by LME and forwarded by LMA to TEUA based on market match and party. Rewrite messages so party and
+		 * counterpary are counter-symmetric
 		 */
 
 		// local temporary variables
@@ -511,19 +461,17 @@ public class LmaRestController {
 		logger.trace("PartyId in  the post mapping methods " + tempPartyId.value());
 
 		/*
-		 * Pass the QuoteTickerType payload to the TEUA/EMA keyed by partyId in
-		 * the QuoteTickerType
+		 * Pass the QuoteTickerType payload to the TEUA/EMA keyed by partyId in the QuoteTickerType
 		 */
-		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
-				tempQuoteTickerType.toString());
+		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " + tempQuoteTickerType.toString());
 
 		tempTeuaUriTicker = postLmaToTeuaPartyIdMapForQuotes.get(tempQuoteTickerType.getParty().value());
 
 		logger.debug("tempTeuaUri is '" + tempTeuaUriTicker + "'");
 
 		if (tempTeuaUriTicker == null) {
-			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " +
-					tempQuoteTickerType.getParty().toString());
+			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for "
+					+ tempQuoteTickerType.getParty().toString());
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
 
@@ -531,15 +479,14 @@ public class LmaRestController {
 			logger.info("tempTeuaUri is null. Using " + tempTeuaUriTicker);
 
 		} else {
-			logger.trace("LMA posting EiCreateTran to " + tempTeuaUriTicker + " partyId " +
-					tempQuoteTickerType.getParty().toString() +
-					" counterPartyId " + tempQuoteTickerType.getCounterParty().toString() +
-					" " + tempQuoteTickerType.getSubscriptionId().toString());
+			logger.trace(
+					"LMA posting EiCreateTran to " + tempTeuaUriTicker + " partyId " + tempQuoteTickerType.getParty().toString()
+							+ " counterPartyId " + tempQuoteTickerType.getCounterParty().toString() + " "
+							+ tempQuoteTickerType.getSubscriptionId().toString());
 		}
 
 		// Send update back to TEUA
-		QuoteTickerType tempPostResponse = restTemplate.postForObject(tempTeuaUriTicker,
-				tempQuoteTickerType,
+		QuoteTickerType tempPostResponse = restTemplate.postForObject(tempTeuaUriTicker, tempQuoteTickerType,
 				QuoteTickerType.class);
 
 		return tempPostResponse;

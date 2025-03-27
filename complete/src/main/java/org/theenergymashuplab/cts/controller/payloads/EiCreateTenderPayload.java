@@ -22,7 +22,8 @@ import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.RefIdType;
 
 public class EiCreateTenderPayload {
-	private boolean atMostOne = false; // EiCreateTenderPayload only carry one tender at a time at the moment, so this isn't actually used
+	private boolean atMostOne = false; // EiCreateTenderPayload only carry one tender at a time at the moment, so this isn't
+										// actually used
 	private String executionInstructions = ""; // Is not up to the March 2024 spec; executionInstructions behavior not implemented
 	private MarketIdType marketId = new MarketIdType(); // Should be provided externally
 	private int segmentId = 1; // 1 for OrderBook market, 2 for Auction market
@@ -47,8 +48,9 @@ public class EiCreateTenderPayload {
 	}
 
 	/*
-	 * Parallel for EiCreateTransaction, EiCreateTender: pass in a completed Tender/Transaction which includes through its Tender interval,
-	 * quantity, price, or for EiCancelTender only the TenderId. Add party, counterParty, and requestId for the message payload.
+	 * Parallel for EiCreateTransaction, EiCreateTender: pass in a completed Tender/Transaction which includes through its Tender
+	 * interval, quantity, price, or for EiCancelTender only the TenderId. Add party, counterParty, and requestId for the message
+	 * payload.
 	 */
 
 	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty, int segmentId) {
@@ -61,9 +63,9 @@ public class EiCreateTenderPayload {
 
 	@Override
 	public String toString() {
-		return "EiCreateTenderPayload [atMostOne=" + atMostOne + ", executionInstructions=" + executionInstructions + ", marketId="
-				+ marketId + ", segmentId=" + segmentId + ", counterPartyId=" + counterPartyId + ", partyId=" + partyId + ", requestId="
-				+ requestId + ", tender=" + tender + "]";
+		return "EiCreateTenderPayload [atMostOne=" + atMostOne + ", executionInstructions=" + executionInstructions
+				+ ", marketId=" + marketId + ", segmentId=" + segmentId + ", counterPartyId=" + counterPartyId + ", partyId="
+				+ partyId + ", requestId=" + requestId + ", tender=" + tender + "]";
 	}
 
 	public ActorIdType getCounterPartyId() {

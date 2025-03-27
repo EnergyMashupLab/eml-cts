@@ -34,15 +34,11 @@ public class ClientCreateTenderPayload {
 	// have the property
 	private int segmentId = 1; // Set to 1 for orderbook by default for backwards compatability
 	/*
-	 * We can see either interval tenders or stream tenders with the latest
-	 * September 2024 standard. To support this,
-	 * we'll set these attributes initially to be null and allow the JSON
-	 * serialization to populate them if they appear
-	 * in the payload. For example, in the POST request, if we see a ctsStream
-	 * object in the JSON, bridgeInterval and
-	 * bridgeExpireTime will remain null whilst ctsStream is nonNull(if all goes
-	 * well). This should allow us to take
-	 * action based on what kind of tender we have.
+	 * We can see either interval tenders or stream tenders with the latest September 2024 standard. To support this, we'll set
+	 * these attributes initially to be null and allow the JSON serialization to populate them if they appear in the payload. For
+	 * example, in the POST request, if we see a ctsStream object in the JSON, bridgeInterval and bridgeExpireTime will remain
+	 * null whilst ctsStream is nonNull(if all goes well). This should allow us to take action based on what kind of tender we
+	 * have.
 	 */
 	private BridgeInterval bridgeInterval;
 	private BridgeInstant bridgeExpireTime;
@@ -50,8 +46,7 @@ public class ClientCreateTenderPayload {
 
 	// Uses BridgeInterval to avoid serialization issues
 
-	ClientCreateTenderPayload() {
-	}
+	ClientCreateTenderPayload() {}
 
 	public ClientCreateTenderPayload(SideType side, long quantity, long price) {
 		// DEBUG start time and expiration time for test payloads
@@ -71,8 +66,7 @@ public class ClientCreateTenderPayload {
 	}
 
 	// Constructor takes interval description`
-	public ClientCreateTenderPayload(SideType side, long quantity, long price,
-			Instant dtStart, long minutes) {
+	public ClientCreateTenderPayload(SideType side, long quantity, long price, Instant dtStart, long minutes) {
 		// DEBUG start time and expiration time for test payloads
 		Instant expire;
 
@@ -86,8 +80,7 @@ public class ClientCreateTenderPayload {
 	}
 
 	// Only purpose is to have a constructor that takes a segmentId
-	public ClientCreateTenderPayload(SideType side, long quantity, long price,
-			Instant dtStart, long minutes, int segmentId) {
+	public ClientCreateTenderPayload(SideType side, long quantity, long price, Instant dtStart, long minutes, int segmentId) {
 		// DEBUG start time and expiration time for test payloads
 		Instant expire;
 

@@ -50,85 +50,74 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * designed to create random bids and asks
  */
 public class RandomEiTender {
+	@JsonIgnore
+	final static Random rand = new Random();
 
-		@JsonIgnore
-		final static Random rand = new Random();
-		
-		// debug - effectively local constants pending richer constructor.
-		public  Instant dtStart = Instant.parse("2020-03-15T10:00:00.00Z");
-		public static Duration duration = Duration.ZERO;
+	// debug - effectively local constants pending richer constructor.
+	public Instant dtStart = Instant.parse("2020-03-15T10:00:00.00Z");
+	public static Duration duration = Duration.ZERO;
 
-		private EiTenderType randTender;
-		Interval interval = new Interval(60, dtStart);	//	60 minute interval at dtStart
-		
-		RandomEiTender()	{
-			// initialize random generator in class attributes
-			// Local instance variable initializers and instance initializers are executed
-			// after the constructor is invoked
-		}
-		
-		public EiTenderType randomTender()	{
-			int randQuantity = 50 + rand.nextInt(50); // random quantity from 50 to 100
-			Interval interval = new Interval(60, dtStart);	//	60 minute interval at dtStart
-			long price = 12; // cents
-			
-			price = rand.nextInt(29) + 1;	//random price from 1..30 cents
-			Instant exp = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
+	private EiTenderType randTender;
+	Interval interval = new Interval(60, dtStart); // 60 minute interval at dtStart
 
-			SideType side = SideType.BUY;
-			if (rand.nextInt(100) > 50)	{
-				side = SideType.SELL;
-			}
-			
-			TenderDetail tenderDetail = new TenderIntervalDetail(interval, price, randQuantity);
-			randTender = new EiTenderType(Instant.now(), side, tenderDetail);
-			return randTender;
-		}
-		
-		public Instant getDtStart() {
-			return dtStart;
-		}
-
-
-		public void setDtStart(Instant dtStart) {
-			this.dtStart = dtStart;
-		}
-
-
-		public static Duration getDuration() {
-			return duration;
-		}
-
-
-		public static void setDuration(Duration duration) {
-			RandomEiTender.duration = duration;
-		}
-
-
-		public EiTenderType getRandTender() {
-			return randTender;
-		}
-
-
-		public void setRandTender(EiTenderType randTender) {
-			this.randTender = randTender;
-		}
-
-
-		public Interval getInterval() {
-			return interval;
-		}
-
-
-		public void setInterval(Interval interval) {
-			this.interval = interval;
-		}
-
-/*
-		public static Random getRand() {
-			return rand;
-		}
-*/
-
-
+	RandomEiTender() {
+		// initialize random generator in class attributes
+		// Local instance variable initializers and instance initializers are executed
+		// after the constructor is invoked
 	}
+
+	public EiTenderType randomTender() {
+		int randQuantity = 50 + rand.nextInt(50); // random quantity from 50 to 100
+		Interval interval = new Interval(60, dtStart); // 60 minute interval at dtStart
+		long price = 12; // cents
+
+		price = rand.nextInt(29) + 1; // random price from 1..30 cents
+		Instant exp = dtStart.plusSeconds(60 * 60 * 11); // DEBUG 11 hours after dtStart
+
+		SideType side = SideType.BUY;
+		if (rand.nextInt(100) > 50) {
+			side = SideType.SELL;
+		}
+
+		TenderDetail tenderDetail = new TenderIntervalDetail(interval, price, randQuantity);
+		randTender = new EiTenderType(Instant.now(), side, tenderDetail);
+		return randTender;
+	}
+
+	public Instant getDtStart() {
+		return dtStart;
+	}
+
+	public void setDtStart(Instant dtStart) {
+		this.dtStart = dtStart;
+	}
+
+	public static Duration getDuration() {
+		return duration;
+	}
+
+	public static void setDuration(Duration duration) {
+		RandomEiTender.duration = duration;
+	}
+
+	public EiTenderType getRandTender() {
+		return randTender;
+	}
+
+	public void setRandTender(EiTenderType randTender) {
+		this.randTender = randTender;
+	}
+
+	public Interval getInterval() {
+		return interval;
+	}
+
+	public void setInterval(Interval interval) {
+		this.interval = interval;
+	}
+
+	/*
+	 * public static Random getRand() { return rand; }
+	 */
+
+}

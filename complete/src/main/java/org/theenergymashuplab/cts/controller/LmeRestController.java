@@ -77,16 +77,14 @@ public class LmeRestController {
 	LmeSendTransactions lmeSendTransactionsThread = new LmeSendTransactions();
 
 	/*
-	 * HashMap to correlate CTS TenderIdType and EiCreateTenderPayload
-	 * referenced by the MarketCreateTransaction
+	 * HashMap to correlate CTS TenderIdType and EiCreateTenderPayload referenced by the MarketCreateTransaction
 	 */
 	// TODO count down original quantity from Transactions against the Tender;
 	// remove from map when zero
 	// Need wrapper class Long to use the long ctsTenderId as returned
 	public static HashMap<Long, EiCreateTenderPayload> ctsTenderIdToCreateTenderMap = new HashMap<Long, EiCreateTenderPayload>();
 
-	private static final Logger logger = LogManager.getLogger(
-			LmeRestController.class);
+	private static final Logger logger = LogManager.getLogger(LmeRestController.class);
 
 	LmeRestController() {
 		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
@@ -121,14 +119,11 @@ public class LmeRestController {
 	}
 
 	/*
-	 * POST - /createTender
-	 * RequestBody is EiCreateTenderPayload from LMA
-	 * ResponseBody is EiCreatedTenderPayload
+	 * POST - /createTender RequestBody is EiCreateTenderPayload from LMA ResponseBody is EiCreatedTenderPayload
 	 */
 
 	@PostMapping("/createTender")
-	public EiCreatedTenderPayload postEiCreateTender(
-			@RequestBody EiCreateTenderPayload eiCreateTender) {
+	public EiCreatedTenderPayload postEiCreateTender(@RequestBody EiCreateTenderPayload eiCreateTender) {
 		EiTenderType tempTender;
 		EiCreateTenderPayload tempCreate = null;
 		EiCreateTenderPayload mapPutReturnValue = null;
@@ -138,16 +133,11 @@ public class LmeRestController {
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
-		logger.debug("LmeController before constructor for EiCreatedTender " +
-				tempTender.toString());
+		logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
 		logger.debug("lme/createTender " + eiCreateTender.toString());
 
 		/*
-		 * ResponseBody
-		 * public EiCreatedTender(
-		 * TenderId tenderId,
-		 * ActorId partyId,queueF
-		 * EiResponse response)
+		 * ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
 		 */
 
 		// Forward to market
@@ -156,34 +146,23 @@ public class LmeRestController {
 
 		// TODO switch .add() to blocking .take() after verification
 		addQsuccess = queueFromLme.add(tempCreate);
-		logger.debug("queueFomLme addQsuccess " + addQsuccess +
-				" TenderId " + tempTender.getTenderId());
+		logger.debug("queueFomLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
 
 		/*
-		 * TODO Not conforming with March 2024 spec. The market (parity) is where the
-		 * market order id should come from
-		 * Currently, there's no way to retrieve the market order id of a tender after
-		 * it has been submitted.
-		 * The only place where parity sends back it's assigned market order id is after
-		 * the tender has been matched
-		 * with a different tender, leading to a transaction
-		 * 
-		 * In short, this isn't where the market order id should be set, it should be
-		 * retrieved from parity
+		 * TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from Currently,
+		 * there's no way to retrieve the market order id of a tender after it has been submitted. The only place where parity
+		 * sends back it's assigned market order id is after the tender has been matched with a different tender, leading to a
+		 * transaction In short, this isn't where the market order id should be set, it should be retrieved from parity
 		 */
 		tempTender.setMarketOrderId(new MarketOrderIdType());
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
-		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
-				tempCreate);
+		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(), tempCreate);
 
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		// TODO consider return value if value already in map
-		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
-				tempCreate.getPartyId(),
-				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"),
-				tempCreate.getRequestId());
+		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(), tempCreate.getPartyId(),
+				tempCreate.getCounterPartyId(), new EiResponse(200, "OK"), tempCreate.getRequestId());
 
 		return tempCreated;
 	}
@@ -221,17 +200,13 @@ public class LmeRestController {
 
 		/**
 		 * Design of this component:
-		 * In the CTS market, stream tenders do not exist. They are simply a client-side
-		 * semantic that allows clients to construct a stream tender
-		 * specifying a stream of resource purchases or sales. Stream tenders themselves
-		 * are just a sequence of separate tenders with
-		 * different prices and quantities, arranged in sequential intervals of the same
-		 * length. So, we can leverage the existing
-		 * architecture around creating tenders to generate a sequence of createTender
-		 * requests according to the prices and intervals
-		 * outlined in the stream tender object. This may later be changed with the
-		 * implementation of "allOrNone", but currently, it serves our
-		 * purposes
+		 * 
+		 * In the CTS market, stream tenders do not exist. They are simply a client-side semantic that allows clients to construct
+		 * a stream tender specifying a stream of resource purchases or sales. Stream tenders themselves are just a sequence of
+		 * separate tenders with different prices and quantities, arranged in sequential intervals of the same length. So, we can
+		 * leverage the existing architecture around creating tenders to generate a sequence of createTender requests according to
+		 * the prices and intervals outlined in the stream tender object. This may later be changed with the implementation of
+		 * "allOrNone", but currently, it serves our purposes
 		 */
 
 		// Construct the bridge interval
@@ -242,8 +217,8 @@ public class LmeRestController {
 		// So for each interval the we have in the stream intervals
 		for (CtsStreamIntervalType interval : stream.getStreamIntervals()) {
 			// Create the individual Tender Interval payload
-			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(),
-					interval.getStreamIntervalPrice(), interval.getStreamIntervalQuantity());
+			tenderDetail = new TenderIntervalDetail(currentStartInterval.asInterval(), interval.getStreamIntervalPrice(),
+					interval.getStreamIntervalQuantity());
 
 			// Advance the interval by however many minutes we specify
 			currentStartInstant.setInstant(currentStartInterval.getDtStart().asInstant()
@@ -263,16 +238,15 @@ public class LmeRestController {
 			tempCreate.setCounterPartyId(counterPartyID);
 
 			addQSuccess = queueFromLme.add(tempCreate);
-			logger.debug("queueFomLme addQsuccess " + addQSuccess +
-					" TenderId " + tempTender.getTenderId());
+			logger.debug("queueFomLme addQsuccess " + addQSuccess + " TenderId " + tempTender.getTenderId());
 
 			// Grab the tender ID and store
 			createdTenders.add(tempTender.getTenderId().value());
 		}
 
 		// Make a new return value with the created tenders
-		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC " +
-				createdTenders.toString());
+		logger.trace("Stream Tender Creation Sequence: TEUA before return ClientCreatedTender to Client/SC "
+				+ createdTenders.toString());
 
 		/* ================================================================ */
 
@@ -285,19 +259,14 @@ public class LmeRestController {
 	}
 
 	/*
-	 * POST EiCreateTransaction to LMA
-	 *
-	 * is in LmeSendTransaction
+	 * POST EiCreateTransaction to LMA is in LmeSendTransaction
 	 */
 
 	/*
-	 * POST - /cancelTender
-	 * RequestBody is EiCancelTender from TEUA/Client by way of LMA
-	 * ResponseBody is EiCanceledTender
+	 * POST - /cancelTender RequestBody is EiCancelTender from TEUA/Client by way of LMA ResponseBody is EiCanceledTender
 	 */
 	@PostMapping("/cancelTender")
-	public EICanceledTenderPayload postEiCancelTenderPayload(
-			@RequestBody EiCancelTenderPayload eiCancelTenderPayload) {
+	public EICanceledTenderPayload postEiCancelTenderPayload(@RequestBody EiCancelTenderPayload eiCancelTenderPayload) {
 		TenderIdType tempTenderId;
 		EiCancelTenderPayload tempCancel;
 		EICanceledTenderPayload tempCanceled;
@@ -307,21 +276,29 @@ public class LmeRestController {
 
 		// tempCancel.print(); // DEBUG
 
-		EiCanceledResponseType eiCanceledResponse = new EiCanceledResponseType(
-				CancelReasonType.REQUESTED,
-				tempCancel.getMarketOrderId(),
-				0, // TODO Not up to March 2024 spec: Retrieve remaining quantity left once
-					// canceling tenders is implemented
+		EiCanceledResponseType eiCanceledResponse = new EiCanceledResponseType(CancelReasonType.REQUESTED,
+				tempCancel.getMarketOrderId(), 0, // TODO
+													// Not
+													// up
+													// to
+													// March
+													// 2024
+													// spec:
+													// Retrieve
+													// remaining
+													// quantity
+													// left
+													// once
+													// canceling
+													// tenders
+													// is
+													// implemented
 				false // TODO Not up to March 2024 spec: Change to true once canceling tenders has
 						// been implemented
 		);
 
-		tempCanceled = new EICanceledTenderPayload(
-				tempCancel.getPartyId(),
-				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"),
-				eiCanceledResponse,
-				tempCancel.getRequestId());
+		tempCanceled = new EICanceledTenderPayload(tempCancel.getPartyId(), tempCancel.getCounterPartyId(),
+				new EiResponse(200, "OK"), eiCanceledResponse, tempCancel.getRequestId());
 
 		return tempCanceled;
 	}
@@ -360,18 +337,12 @@ public class LmeRestController {
 		/* ================ Forwarding to the market ====================== */
 
 		/**
-		 * Design of this component:
-		 * In the CTS market, stream Quotes do not exist. They are simply a client-side
-		 * semantic that allows clients to construct a stream Quote
-		 * specifying a stream of resource purchases or sales. Stream Quotes themselves
-		 * are just a sequence of separate Quotes with
-		 * different prices and quantities, arranged in sequential intervals of the same
-		 * length. So, we can leverage the existing
-		 * architecture around creating Quotes to generate a sequence of createQuote
-		 * requests according to the prices and intervals
-		 * outlined in the stream Quote object. This may later be changed with the
-		 * implementation of "allOrNone", but currently, it serves our
-		 * purposes
+		 * Design of this component: In the CTS market, stream Quotes do not exist. They are simply a client-side semantic that
+		 * allows clients to construct a stream Quote specifying a stream of resource purchases or sales. Stream Quotes themselves
+		 * are just a sequence of separate Quotes with different prices and quantities, arranged in sequential intervals of the
+		 * same length. So, we can leverage the existing architecture around creating Quotes to generate a sequence of createQuote
+		 * requests according to the prices and intervals outlined in the stream Quote object. This may later be changed with the
+		 * implementation of "allOrNone", but currently, it serves our purposes
 		 */
 
 		// Construct the bridge interval
@@ -429,8 +400,8 @@ public class LmeRestController {
 		}
 
 		// Make a new return value with the created Quotes
-		logger.trace("Stream Quote Creation Sequence: TEUA before return ClientCreatedQuote to Client/SC " +
-				createdQuotes.toString());
+		logger.trace(
+				"Stream Quote Creation Sequence: TEUA before return ClientCreatedQuote to Client/SC " + createdQuotes.toString());
 
 		/* ================================================================ */
 
@@ -444,21 +415,13 @@ public class LmeRestController {
 	}
 
 	/*
-	 * POST - /createQuote
-	 * RequestBody is EiCreateQuotePayload from LMA
-	 * ResponseBody is EiCreatedQuotePayload
-	 *
-	 * Methodology:
-	 * Quotes never make it into the market. They are essentially tenders, but
-	 * instead of
-	 * being forwarded to market, they are stored locally here in an arrayList and
-	 * acted
-	 * upon entirely in this class
+	 * POST - /createQuote RequestBody is EiCreateQuotePayload from LMA ResponseBody is EiCreatedQuotePayload Methodology: Quotes
+	 * never make it into the market. They are essentially tenders, but instead of being forwarded to market, they are stored
+	 * locally here in an arrayList and acted upon entirely in this class
 	 */
 
 	@PostMapping("/createQuote")
-	public EiCreatedQuotePayload postEiCreateQuote(
-			@RequestBody EiCreateQuotePayload eiCreateQuote) {
+	public EiCreatedQuotePayload postEiCreateQuote(@RequestBody EiCreateQuotePayload eiCreateQuote) {
 		EiQuoteType tempQuote;
 		EiCreateQuotePayload tempCreate = null;
 		EiCreatedQuotePayload tempCreated;
@@ -467,21 +430,14 @@ public class LmeRestController {
 		tempCreate = eiCreateQuote;
 		tempQuote = eiCreateQuote.getQuote();
 
-		logger.debug("LmeController before constructor for EiCreatedQuote " +
-				tempQuote.toString());
+		logger.debug("LmeController before constructor for EiCreatedQuote " + tempQuote.toString());
 		logger.debug("lme/createQuote " + eiCreateQuote.toString());
 
 		/*
-		 * TODO Not conforming with March 2024 spec. The market (parity) is where the
-		 * market order id should come from
-		 * Currently, there's no way to retrieve the market order id of a tender after
-		 * it has been submitted.
-		 * The only place where parity sends back it's assigned market order id is after
-		 * the tender has been matched
-		 * with a different tender, leading to a transaction
-		 * 
-		 * In short, this isn't where the market order id should be set, it should be
-		 * retrieved from parity
+		 * TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from Currently,
+		 * there's no way to retrieve the market order id of a tender after it has been submitted. The only place where parity
+		 * sends back it's assigned market order id is after the tender has been matched with a different tender, leading to a
+		 * transaction In short, this isn't where the market order id should be set, it should be retrieved from parity
 		 */
 		tempQuote.setMarketQuoteId(new MarketOrderIdType(1));
 		// Add this quote into the volatile storage. It will never hit the database
@@ -500,11 +456,8 @@ public class LmeRestController {
 			notifySubscriber(quoteTicker);
 		}
 
-		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(),
-				tempQuote.getMarketQuoteId(),
-				tempCreate.getPartyId(),
-				tempQuote.getQuoteId(),
-				new EiResponse(200, "OK"));
+		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(), tempQuote.getMarketQuoteId(),
+				tempCreate.getPartyId(), tempQuote.getQuoteId(), new EiResponse(200, "OK"));
 
 		tempCreated.setCounterPartyId(tempCreated.getCounterPartyId());
 		tempCreated.setInResponseTo(new RefIdType());
@@ -515,8 +468,7 @@ public class LmeRestController {
 	}
 
 	@PostMapping("/cancelQuote")
-	public EICanceledQuotePayload postEiCancelQuote(
-			@RequestBody EiCancelQuotePayload eiCancelQuote) {
+	public EICanceledQuotePayload postEiCancelQuote(@RequestBody EiCancelQuotePayload eiCancelQuote) {
 		// This temp quote will be used to grab from the list
 		EiQuoteType tempQuote = new EiQuoteType();
 		EiCancelQuotePayload cancelQuote;
@@ -563,8 +515,7 @@ public class LmeRestController {
 	 * Accept a quote and make the underlying transaction happen
 	 */
 	@PostMapping("/acceptQuote")
-	public EiAcceptedQuotePayload postEiAcceptQuote(
-			@RequestBody EiAcceptQuotePayload eiAcceptQuote) {
+	public EiAcceptedQuotePayload postEiAcceptQuote(@RequestBody EiAcceptQuotePayload eiAcceptQuote) {
 		// These quotes will be used for the list/quote grabbing
 		EiQuoteType tempQuote = new EiQuoteType();
 		EiQuoteType listQuote = new EiQuoteType();
@@ -646,9 +597,8 @@ public class LmeRestController {
 			// If we can't find a quote here, that's the end for us
 			if (currentQuotes.containsKey(tempQuote.hashCode()) == false) {
 				// Log it
-				logger.debug("LMEController did not find quote for EiAcceptedQuote: "
-						+ tempQuote.getMarketQuoteId().toString() +
-						"will now exit");
+				logger.debug("LMEController did not find quote for EiAcceptedQuote: " + tempQuote.getMarketQuoteId().toString()
+						+ "will now exit");
 
 				// Set a bad response to send out
 				response.setResponse(new EiResponse(500, "Referenced Quote ID does not exist in the QDM"));
@@ -677,10 +627,9 @@ public class LmeRestController {
 				long tempPrice = ((TenderIntervalDetail) tempTender.getTenderDetail()).getPrice();
 
 				/**
-				 * There are two areas where we could have an issue here:
-				 * 1.) The Accepter is asking for more than the current quantity
-				 * 2.) The Accepter is bidding a lower price than the current price
-				 * On each of these cases, we will send a blank eiAccepted quote as it failed
+				 * There are two areas where we could have an issue here: 1.) The Accepter is asking for more than the current
+				 * quantity 2.) The Accepter is bidding a lower price than the current price On each of these cases, we will send
+				 * a blank eiAccepted quote as it failed
 				 */
 				if (tempQuantity > quoteQuantity || tempPrice < quotePrice) {
 					// Flag that this is bad with a bad response
@@ -724,20 +673,18 @@ public class LmeRestController {
 		}
 
 		/**
-		 * At this point the QDM will send out two EiCreateTransaction Payloads
-		 * containing the transaction tender to both the party and counterparty
+		 * At this point the QDM will send out two EiCreateTransaction Payloads containing the transaction tender to both the
+		 * party and counterparty
 		 *
 		 * We only send these messages if the transaction was actually able to occur
 		 */
 		if (accepted == true) {
 			// Send the buyer transaction out to be handled by LMA
-			restTemplate.postForObject("http://localhost:8080/lma/createTransaction",
-					buyerTransaction,
+			restTemplate.postForObject("http://localhost:8080/lma/createTransaction", buyerTransaction,
 					EiCreatedTransactionPayload.class);
 
 			// Send the seller transaction out to be handled by LMA
-			restTemplate.postForObject("http://localhost:8080/lma/createTransaction",
-					sellerTransaction,
+			restTemplate.postForObject("http://localhost:8080/lma/createTransaction", sellerTransaction,
 					EiCreatedTransactionPayload.class);
 		}
 
@@ -791,9 +738,7 @@ public class LmeRestController {
 			}
 		}
 
-		tempSubscribed = new EiManagedTickerSubscriptionPayload(message,
-				tempSubscriptionActionTaken,
-				new EiResponseType(),
+		tempSubscribed = new EiManagedTickerSubscriptionPayload(message, tempSubscriptionActionTaken, new EiResponseType(),
 				tempSubscriptionRequestId, tempTickerType);
 
 		tempSubscribed.setSubscriptionId(tempSubscribe.getSubscriptionId());
