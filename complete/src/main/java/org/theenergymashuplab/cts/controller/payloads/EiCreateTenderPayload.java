@@ -26,7 +26,6 @@ public class EiCreateTenderPayload {
 										// actually used
 	private String executionInstructions = ""; // Is not up to the March 2024 spec; executionInstructions behavior not implemented
 	private MarketIdType marketId = new MarketIdType(); // Should be provided externally
-	private int segmentId = 1; // 1 for OrderBook market, 2 for Auction market
 
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
@@ -53,19 +52,18 @@ public class EiCreateTenderPayload {
 	 * payload.
 	 */
 
-	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty, int segmentId) {
+	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty) {
 		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
-		this.segmentId = segmentId;
 	}
 
 	@Override
 	public String toString() {
 		return "EiCreateTenderPayload [atMostOne=" + atMostOne + ", executionInstructions=" + executionInstructions
-				+ ", marketId=" + marketId + ", segmentId=" + segmentId + ", counterPartyId=" + counterPartyId + ", partyId="
-				+ partyId + ", requestId=" + requestId + ", tender=" + tender + "]";
+				+ ", marketId=" + marketId + ", segmentId=" + tender.segmentId + ", counterPartyId=" + counterPartyId
+				+ ", partyId=" + partyId + ", requestId=" + requestId + ", tender=" + tender + "]";
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -122,13 +120,5 @@ public class EiCreateTenderPayload {
 
 	public void setMarketId(MarketIdType marketId) {
 		this.marketId = marketId;
-	}
-
-	public int getSegmentId() {
-		return segmentId;
-	}
-
-	public void setSegmentId(int segmentId) {
-		this.segmentId = segmentId;
 	}
 }

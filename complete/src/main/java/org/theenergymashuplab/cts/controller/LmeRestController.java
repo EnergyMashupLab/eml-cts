@@ -119,7 +119,9 @@ public class LmeRestController {
 	}
 
 	/*
-	 * POST - /createTender RequestBody is EiCreateTenderPayload from LMA ResponseBody is EiCreatedTenderPayload
+	 * POST - /createTender RequestBody is EiCreateTenderPayload from LMA
+	 * 
+	 * ResponseBody is EiCreatedTenderPayload
 	 */
 
 	@PostMapping("/createTender")
@@ -230,7 +232,7 @@ public class LmeRestController {
 					tempCreateStreamTenderPayload.getTender().getSide(), tenderDetail);
 
 			// Construct the EiCreateTender payload to be forwarded to LMA
-			tempCreate = new EiCreateTenderPayload(tempTender, partyID, counterPartyID, 1);
+			tempCreate = new EiCreateTenderPayload(tempTender, partyID, counterPartyID);
 
 			// set party and counterParty -partyId saved in actorIds, counterParty is
 			// lmePartyId
@@ -277,25 +279,12 @@ public class LmeRestController {
 		// tempCancel.print(); // DEBUG
 
 		EiCanceledResponseType eiCanceledResponse = new EiCanceledResponseType(CancelReasonType.REQUESTED,
-				tempCancel.getMarketOrderId(), 0, // TODO
-													// Not
-													// up
-													// to
-													// March
-													// 2024
-													// spec:
-													// Retrieve
-													// remaining
-													// quantity
-													// left
-													// once
-													// canceling
-													// tenders
-													// is
-													// implemented
-				false // TODO Not up to March 2024 spec: Change to true once canceling tenders has
-						// been implemented
-		);
+				tempCancel.getMarketOrderId(), 0,
+				// TODO Not up to March 2024 spec:
+				// Retrieve remaining quantity left once canceling tenders is implemented
+
+				// TODO Not up to March 2024 spec: Change to true once canceling tenders has been implemented
+				false);
 
 		tempCanceled = new EICanceledTenderPayload(tempCancel.getPartyId(), tempCancel.getCounterPartyId(),
 				new EiResponse(200, "OK"), eiCanceledResponse, tempCancel.getRequestId());

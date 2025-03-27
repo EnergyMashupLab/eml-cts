@@ -284,11 +284,10 @@ public class TeuaRestController {
 				tempClientCreateTender.getQuantity());
 
 		tender = new EiTenderType(tempClientCreateTender.getBridgeExpireTime().asInstant(), tempClientCreateTender.getSide(),
-				tenderDetail);
+				tenderDetail, tempClientCreateTender.getSegmentId());
 
 		// Construct the EiCreateTender payload to be forwarded to LMA
-		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId], this.lmePartyId,
-				tempClientCreateTender.getSegmentId());
+		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId], this.lmePartyId);
 
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 		eiCreateTender.setPartyId(actorIds[numericTeuaId]);

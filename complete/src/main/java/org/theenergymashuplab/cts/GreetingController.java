@@ -48,15 +48,16 @@ public class GreetingController {
 	 * GET methods are to return JSON EiCreateTender and EiCreateTransaction to use with Postman testing
 	 */
 	/*
-	 * GET - /CreateTender responds with a new EiCreateTender ResponseBody is EiCreateTender DEBUG version - uses RandomEiTender, sequential
-	 * actorId, response tenderId not correlated to any RequestBody
+	 * GET - /CreateTender responds with a new EiCreateTender ResponseBody is EiCreateTender DEBUG version - uses RandomEiTender,
+	 * sequential actorId, response tenderId not correlated to any RequestBody
 	 */
 	@GetMapping("/CreateTender")
-	public EiCreateTenderPayload eiCreateTenderPayload(@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
+	public EiCreateTenderPayload eiCreateTenderPayload(
+			@RequestParam(name = "number", defaultValue = "tid not assigned") String tid) {
 		EiTenderType tempTender = new RandomEiTender().randomTender();
 
 		// actor Ids will come from POST RequestBody
-		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType(), tempTender.getSegmentId());
+		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType());
 	}
 
 	/*
@@ -101,8 +102,8 @@ public class GreetingController {
 	}
 
 	/*
-	 * GET - /clientCreateTender responds with a new ClientCreateTenderPayload ResponseBody is ClientCreatedTenderPayload DEBUG version -
-	 * uses RandomEiTender, sequential actorId, response tenderId not correlated to any RequestBody
+	 * GET - /clientCreateTender responds with a new ClientCreateTenderPayload ResponseBody is ClientCreatedTenderPayload DEBUG
+	 * version - uses RandomEiTender, sequential actorId, response tenderId not correlated to any RequestBody
 	 */
 	@GetMapping("/clientCreateTender")
 	public ClientCreateTenderPayload clientCreateTenderPayload(
@@ -122,7 +123,8 @@ public class GreetingController {
 			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
 		}
 		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
-		return new ClientCreateTenderPayload(tempTender.getSide(), tenderIntervalDetail.getQuantity(), tenderIntervalDetail.getPrice());
+		return new ClientCreateTenderPayload(tempTender.getSide(), tenderIntervalDetail.getQuantity(),
+				tenderIntervalDetail.getPrice());
 	}
 
 	/*

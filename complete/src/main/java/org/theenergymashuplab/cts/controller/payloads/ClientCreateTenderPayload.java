@@ -30,9 +30,8 @@ public class ClientCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
-	// TODO remove setting the segmentId to 1 by default once POSTMAN scripts all
-	// have the property
 	private int segmentId = 1; // Set to 1 for orderbook by default for backwards compatability
+
 	/*
 	 * We can see either interval tenders or stream tenders with the latest September 2024 standard. To support this, we'll set
 	 * these attributes initially to be null and allow the JSON serialization to populate them if they appear in the payload. For
@@ -53,8 +52,7 @@ public class ClientCreateTenderPayload {
 		Instant expire = null;
 		Instant dtStart = Instant.parse("2020-05-31T10:00:00.00Z");
 		expire = dtStart.plusSeconds(60 * 60 * 11); // DEBUG 11 hours after dtStart
-		// System.err.println("ClientCreateTenderPayload: expire " +
-		// expire.toString());
+		// System.err.println("ClientCreateTenderPayload: expire " + expire.toString());
 
 		this.side = side;
 		this.quantity = quantity;

@@ -43,6 +43,13 @@ public class EiTenderType extends TenderBase {
 		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
 	}
 
+	// Constructor that takes a segmentId for the Auction market implementation
+	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail, int segmentId) {
+		super(expirationTime, side, tenderDetail);
+		this.setSegmentId(segmentId);
+		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
+	}
+
 	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail, MarketOrderIdType marketOrderId) {
 		super(expirationTime, side, tenderDetail);
 		this.marketOrderId = marketOrderId;
