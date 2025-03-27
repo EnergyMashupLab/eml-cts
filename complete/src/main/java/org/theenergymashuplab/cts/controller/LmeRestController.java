@@ -49,8 +49,13 @@ public class LmeRestController {
 	 * This quote ticker is will be sent out to subscribers
 	 */
 	private static QuoteTickerType quoteTicker = new QuoteTickerType();
-	// Add a hashmap for our implementation
+
+	// Add a hashmap for quote driven market implementation
 	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
+
+	// Hashmap for Auction market implementation
+	private static HashMap<Integer, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
+
 	// Correlate subscriptions to their partyIds
 	private static HashMap<SubscriptionIdType, ActorIdType> subscriptionsToPartyMap = new HashMap<>();
 
@@ -148,7 +153,7 @@ public class LmeRestController {
 
 		// TODO switch .add() to blocking .take() after verification
 		addQsuccess = queueFromLme.add(tempCreate);
-		logger.debug("queueFomLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
+		logger.debug("queueFromLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
 
 		/*
 		 * TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from Currently,
@@ -505,6 +510,7 @@ public class LmeRestController {
 	 */
 	@PostMapping("/acceptQuote")
 	public EiAcceptedQuotePayload postEiAcceptQuote(@RequestBody EiAcceptQuotePayload eiAcceptQuote) {
+		logger.trace("Inside accept quote");
 		// These quotes will be used for the list/quote grabbing
 		EiQuoteType tempQuote = new EiQuoteType();
 		EiQuoteType listQuote = new EiQuoteType();
