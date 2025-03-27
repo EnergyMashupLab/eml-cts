@@ -30,6 +30,9 @@ public class ClientCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
+	// TODO remove setting the segmentId to 1 by default once POSTMAN scripts all
+	// have the property
+	private int segmentId = 1; // Set to 1 for orderbook by default for backwards compatability
 	/*
 	 * We can see either interval tenders or stream tenders with the latest
 	 * September 2024 standard. To support this,
@@ -47,7 +50,7 @@ public class ClientCreateTenderPayload {
 
 	// Uses BridgeInterval to avoid serialization issues
 
-	ClientCreateTenderPayload() { // json
+	ClientCreateTenderPayload() {
 	}
 
 	public ClientCreateTenderPayload(SideType side, long quantity, long price) {
@@ -67,7 +70,7 @@ public class ClientCreateTenderPayload {
 		this.bridgeExpireTime = new BridgeInstant(expire);
 	}
 
-	// Constructor takes interval description
+	// Constructor takes interval description`
 	public ClientCreateTenderPayload(SideType side, long quantity, long price,
 			Instant dtStart, long minutes) {
 		// DEBUG start time and expiration time for test payloads
@@ -82,6 +85,24 @@ public class ClientCreateTenderPayload {
 		this.bridgeExpireTime = new BridgeInstant(expire);
 	}
 
+	// Only purpose is to have a constructor that takes a segmentId
+	public ClientCreateTenderPayload(SideType side, long quantity, long price,
+			Instant dtStart, long minutes, int segmentId) {
+		// DEBUG start time and expiration time for test payloads
+		Instant expire;
+
+		expire = dtStart.plusSeconds(60 * 60 * 11); // DEBUG 11 hours after dtStart
+
+		this.side = side;
+		this.quantity = quantity;
+		this.price = price;
+		this.bridgeInterval = new BridgeInterval(60, dtStart);
+		this.bridgeExpireTime = new BridgeInstant(expire);
+		// TODO For testing purposes, if this field is defined it should be set to 2 to
+		// represent the Auction Market segment
+		this.segmentId = 2;
+	}
+
 	// Constructor takes stream description
 	// May need new constructor
 
@@ -91,8 +112,7 @@ public class ClientCreateTenderPayload {
 		String tempString;
 
 		tempString = (tempSide == SideType.BUY) ? "B" : "S";
-		return (info + " side " + tempString + " quantity " +
-				quantity + " price " + price);
+		return (info + " side " + tempString + " quantity " + quantity + " price " + price + " segmentId " + segmentId);
 	}
 
 	public Interval getInterval() {
@@ -156,6 +176,14 @@ public class ClientCreateTenderPayload {
 
 	public void setBridgeExpireTime(BridgeInstant bridgeExpireTime) {
 		this.bridgeExpireTime = bridgeExpireTime;
+	}
+
+	public int getSegmentId() {
+		return segmentId;
+	}
+
+	public void setSegmentId(int segmentId) {
+		this.segmentId = segmentId;
 	}
 
 	// public boolean isIgnorePosition() {

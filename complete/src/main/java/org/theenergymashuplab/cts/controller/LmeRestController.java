@@ -255,7 +255,7 @@ public class LmeRestController {
 					tempCreateStreamTenderPayload.getTender().getSide(), tenderDetail);
 
 			// Construct the EiCreateTender payload to be forwarded to LMA
-			tempCreate = new EiCreateTenderPayload(tempTender, partyID, counterPartyID);
+			tempCreate = new EiCreateTenderPayload(tempTender, partyID, counterPartyID, 1);
 
 			// set party and counterParty -partyId saved in actorIds, counterParty is
 			// lmePartyId

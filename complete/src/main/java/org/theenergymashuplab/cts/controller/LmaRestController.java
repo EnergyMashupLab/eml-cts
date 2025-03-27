@@ -190,8 +190,7 @@ public class LmaRestController {
 		 * the EiCreateTransactionPayload
 		 */
 
-		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " +
-				tempCreate.toString());
+		logger.trace("tempCreate partyId toString " + tempPartyId.toString() + " " + tempCreate.toString());
 		tempTeuaUri = postLmaToTeuaPartyIdMap.get(tempCreate.getPartyId().value());
 
 		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");

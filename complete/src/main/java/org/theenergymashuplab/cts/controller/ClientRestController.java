@@ -211,8 +211,7 @@ public class ClientRestController {
 		 * Wait for and return the @ReponseBody as received
 		 */
 		System.err.println("/clientCreateTender received " + clientCreateTender.toString());
-		logger.debug("before forwarding CLientCreateTender to TEUA " +
-				tempCreate.toString());
+		logger.debug("before forwarding CLientCreateTender to TEUA " + tempCreate.toString());
 
 		// And forward to the TEUA
 		restTemplate = builder.build();

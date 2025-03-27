@@ -22,52 +22,48 @@ import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.RefIdType;
 
 public class EiCreateTenderPayload {
-	private boolean atMostOne = false;  // EiCreateTenderPayload only carry one tender at a time at the moment, so this isn't actually used
-	private String executionInstructions = "";  // Is not up to the March 2024 spec; executionInstructions behavior not implemented
-	private MarketIdType marketId = new MarketIdType();  // Should be provided externally
-	private int segmentId = 1;  // Assumed to always be one segment, so it's always one at the moment
-	
+	private boolean atMostOne = false; // EiCreateTenderPayload only carry one tender at a time at the moment, so this isn't actually used
+	private String executionInstructions = ""; // Is not up to the March 2024 spec; executionInstructions behavior not implemented
+	private MarketIdType marketId = new MarketIdType(); // Should be provided externally
+	private int segmentId = 1; // 1 for OrderBook market, 2 for Auction market
+
 	private ActorIdType counterPartyId;
 	private ActorIdType partyId;
 	private RefIdType requestId;
 	// TODO The March 2024 standard specifies that EiCreateTenderPayload should have a list of one or more tenders
 	private EiTenderType tender;
-	
+
 	/*
-	@JsonIgnore
-	private final Random rand = new Random();
+	 * @JsonIgnore private final Random rand = new Random();
 	 */
-	
+
 	/*
-	 * Default constructor for JSON deserialization.
-	 * TO DO change to zero Id values in ActorId and RefId constructors
+	 * Default constructor for JSON deserialization. TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCreateTenderPayload()	{		
+	public EiCreateTenderPayload() {
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
 	}
 
-	/* 
-	 * Parallel for EiCreateTransaction, EiCreateTender:
-	 * 		pass in a completed Tender/Transaction which includes through its Tender interval, quantity, price,
-	 * 		or for EiCancelTender only the TenderId.
-	 * 
-	 * Add party, counterParty, and requestId for the message payload.
+	/*
+	 * Parallel for EiCreateTransaction, EiCreateTender: pass in a completed Tender/Transaction which includes through its Tender interval,
+	 * quantity, price, or for EiCancelTender only the TenderId. Add party, counterParty, and requestId for the message payload.
 	 */
 
-	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty) {
+	public EiCreateTenderPayload(EiTenderType tender, ActorIdType party, ActorIdType counterParty, int segmentId) {
 		this.tender = tender;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.requestId = new RefIdType();
+		this.segmentId = segmentId;
 	}
 
 	@Override
 	public String toString() {
-		return "EiCreateTenderPayload [atMostOne=" + atMostOne + ", executionInstructions=" + executionInstructions
-				+ ", marketId=" + marketId + ", segmentId=" + segmentId + ", counterPartyId=" + counterPartyId
-				+ ", partyId=" + partyId + ", requestId=" + requestId + ", tender=" + tender + "]";
+		return "EiCreateTenderPayload [atMostOne=" + atMostOne + ", executionInstructions=" + executionInstructions + ", marketId="
+				+ marketId + ", segmentId=" + segmentId + ", counterPartyId=" + counterPartyId + ", partyId=" + partyId + ", requestId="
+				+ requestId + ", tender=" + tender + "]";
 	}
 
 	public ActorIdType getCounterPartyId() {

@@ -2,7 +2,6 @@
 
 #!/bin/bash
 
-
 read -p "Do you want to build and run[br] or just build[b]? " BUILD_ONLY
 
 # Clean the previous build
@@ -27,7 +26,6 @@ fi
 if [[ ${BUILD_ONLY} = "b" ]]; then
     exit 0
 fi
-
 
 #Starting parity system in a separate window
 echo "Starting parity system"

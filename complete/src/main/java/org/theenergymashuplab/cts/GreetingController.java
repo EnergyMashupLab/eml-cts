@@ -58,7 +58,7 @@ public class GreetingController {
 		EiTenderType tempTender = new RandomEiTender().randomTender();
 		
 		// actor Ids will come from POST RequestBody
-		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType());		
+		return new EiCreateTenderPayload(tempTender, new ActorIdType(), new ActorIdType(), tempTender.getSegmentId());		
 	}
 	
 	/*
