@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,10 +22,6 @@ package org.theenergymashuplab.cts;
  * @created 16-Feb-2025 12:43:48 PM
  */
 
-/* 
- * TBD - integration using NIST_CTS EiResponseType, 
- * EiResponseModel, EiResponseRepository
- */
 public class EiResponseType {
 
 	public InstantType createdDateTime;
@@ -40,8 +36,7 @@ public class EiResponseType {
 		this.responseCode = 0;
 		this.responseDescription = "";
 		this.responseDetail = ResponseDetailType.UNSPECIFIED;
-		
-		
+
 	}
 
 	public EiResponseType(InstantType createdDateTime, RefIdType inResponseTo, long responseCode,
@@ -95,14 +90,13 @@ public class EiResponseType {
 
 	@Override
 	public String toString() {
-	    return "EiResponseType{" +
-	           "createdDateTime=" + createdDateTime +
-	           ", inResponseTo=" + inResponseTo +
-	           ", responseCode=" + responseCode +
-	           ", responseDescription='" + responseDescription + '\'' +
-	           ", responseDetail=" + responseDetail +
-	           '}';
+		return "EiResponseType{" +
+				"createdDateTime=" + createdDateTime +
+				", inResponseTo=" + inResponseTo +
+				", responseCode=" + responseCode +
+				", responseDescription='" + responseDescription + '\'' +
+				", responseDetail=" + responseDetail +
+				'}';
 	}
-
 
 }
