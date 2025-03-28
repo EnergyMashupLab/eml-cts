@@ -24,18 +24,12 @@ import org.theenergymashuplab.cts.EiSubscriptionRequestType;
  * @created 26-Feb-2025 11:30:00 AM
  */
 
-public class EiManageSegmentReferenceDataPayload {
+public class EiManageSegmentReferenceDataPayload extends EiSubscriptionRequestType {
+
+    @Override
+    public String toString() {
+        return "EiManageSegmentReferenceDataPayload {" + "marketId=" + marketId + ", segmentId=" + segmentId
+                + ", subscriptionActionRequested=" + subscriptionActionRequested + ", subscriptionRequestId="
+                + subscriptionRequestId + '}';
+    }
 }
-
-// public class EiManageSegmentReferenceDataPayload extends
-// EiSubscriptionRequestType {
-
-// @Override
-// public String toString() {
-// return "EiManageSegmentReferenceDataPayload {" + "marketId=" + marketId + ",
-// segmentId=" + segmentId
-// + ", subscriptionActionRequested=" + subscriptionActionRequested + ",
-// subscriptionRequestId="
-// + subscriptionRequestId + '}';
-// }
-// }

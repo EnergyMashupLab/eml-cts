@@ -17,48 +17,6 @@
 package org.theenergymashuplab.cts;
 
 public class EiResponseType {
-    public InstantType createdDateTime;
-    public RefIdType inResponseTo;
-    public long responseCode;
-    public String responseDescription;
-    // public ResponseDetailType responseDetail;
-
-    public EiResponseType() {
-
-    }
-
-    public InstantType getCreatedDateTime() {
-        return createdDateTime;
-    }
-
-    public void setCreatedDateTime(InstantType createdDateTime) {
-        this.createdDateTime = createdDateTime;
-    }
-
-    public RefIdType getInResponseTo() {
-        return inResponseTo;
-    }
-
-    public void setInResponseTo(RefIdType inResponseTo) {
-        this.inResponseTo = inResponseTo;
-    }
-
-    public long getResponseCode() {
-        return responseCode;
-    }
-
-    public void setResponseCode(long responseCode) {
-        this.responseCode = responseCode;
-    }
-
-    public String getResponseDescription() {
-        return responseDescription;
-    }
-
-    public void setResponseDescription(String responseDescription) {
-        this.responseDescription = responseDescription;
-    }
-
 	public InstantType createdDateTime;
 	public RefIdType inResponseTo;
 	public long responseCode;
