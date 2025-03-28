@@ -16,16 +16,26 @@
 
 package org.theenergymashuplab.cts;
 
+/**
+ * @author crossover
+ * @version 1.0
+ * @created 18-Feb-2025 11:30:37 AM
+ */
+
 public class RefIdType extends UidType {
 
-	public long value() {
-		return this.myUidId;
-	}
-	
-	@Override
-	public String toString()	{
-		return (String.valueOf(myUidId));
-	}
-	
-	// NEED SETTERS AND GETTERS FOR JSON SERIALIZATION?
+    public RefIdType() {
+
+    }
+
+    public long value() {
+        return this.myUidId;
+    }
+
+    @Override
+    public String toString() {
+        return "RefIdType{" +
+                "myUidId=" + myUidId +
+                '}';
+    }
 }
