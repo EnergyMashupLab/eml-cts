@@ -16,6 +16,7 @@
 
 package org.theenergymashuplab.cts.controller;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -37,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/lme")
@@ -53,8 +55,9 @@ public class LmeRestController {
 	// Add a hashmap for quote driven market implementation
 	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
 
-	// Hashmap for Auction market implementation
-	private static HashMap<Integer, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
+	// Hashmap for Auction market implementation. Tenders only have an expiration time, so that's what is being used in place of
+	// the instrument
+	private static HashMap<Instant, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
 
 	// Correlate subscriptions to their partyIds
 	private static HashMap<SubscriptionIdType, ActorIdType> subscriptionsToPartyMap = new HashMap<>();
@@ -116,7 +119,9 @@ public class LmeRestController {
 	}
 
 	/*
-	 * GET - /lme/party responds with PartyId
+	 * GET - /lme/party
+	 * 
+	 * responds with PartyId
 	 */
 	@GetMapping("/party")
 	public ActorIdType getParty() {
@@ -124,7 +129,21 @@ public class LmeRestController {
 	}
 
 	/*
-	 * POST - /createTender RequestBody is EiCreateTenderPayload from LMA
+	 * GET - /lme/clear
+	 * 
+	 * Clears the auction for the given instrument
+	 * 
+	 * 
+	 */
+	@GetMapping("/clear")
+	public HashMap<Instant, ArrayList<EiTenderType>> clear() {
+		return auctionTenders;
+	}
+
+	/*
+	 * POST - /createTender
+	 * 
+	 * RequestBody is EiCreateTenderPayload from LMA
 	 * 
 	 * ResponseBody is EiCreatedTenderPayload
 	 */
@@ -136,6 +155,8 @@ public class LmeRestController {
 		EiCreateTenderPayload mapPutReturnValue = null;
 		EiCreatedTenderPayload tempCreated;
 		Boolean addQsuccess = false;
+		final int ORDER_BOOK_MARKET_SEGMENT = 1;
+		final int AUCTION_MARKET_SEGMENT = 2;
 
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
@@ -151,9 +172,28 @@ public class LmeRestController {
 		// Conversion to MarketCreateTenderPayload is in LmeSocketClient here
 		// TODO Non-blocking add returns true if OK, false if queue is full
 
-		// TODO switch .add() to blocking .take() after verification
-		addQsuccess = queueFromLme.add(tempCreate);
-		logger.debug("queueFromLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
+		switch (tempTender.getSegmentId()) {
+		case ORDER_BOOK_MARKET_SEGMENT:
+			// TODO switch .add() to blocking .take() after verification
+			addQsuccess = queueFromLme.add(tempCreate);
+			logger.debug("queueFromLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
+			break;
+		case AUCTION_MARKET_SEGMENT:
+			// Add to auction market hashmap
+			ArrayList<EiTenderType> instrumentTenders = auctionTenders.get(tempTender.getExpirationTime());
+
+			if (instrumentTenders == null) {
+				instrumentTenders = new ArrayList<EiTenderType>();
+				instrumentTenders.add(tempTender);
+				auctionTenders.put(tempTender.getExpirationTime(), instrumentTenders);
+				logger.debug("New instrument " + tempTender.getExpirationTime() + " was added to hashmap.");
+			} else {
+				instrumentTenders.add(tempTender);
+				logger.debug("Value " + tempTender.toString() + " was added to instrument " + tempTender.getExpirationTime());
+			}
+
+			break;
+		}
 
 		/*
 		 * TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from Currently,
@@ -288,7 +328,8 @@ public class LmeRestController {
 				// TODO Not up to March 2024 spec:
 				// Retrieve remaining quantity left once canceling tenders is implemented
 
-				// TODO Not up to March 2024 spec: Change to true once canceling tenders has been implemented
+				// TODO Not up to March 2024 spec: Change to true once canceling tenders has
+				// been implemented
 				false);
 
 		tempCanceled = new EICanceledTenderPayload(tempCancel.getPartyId(), tempCancel.getCounterPartyId(),
