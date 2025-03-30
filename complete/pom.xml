@@ -39,6 +39,12 @@ limitations under the License.
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
 		<!-- POM CHANGES FOR MIGRATION TO SPRING BOOT 3 -->
 		<dependency> <!-- FOR SPRING BOOT >=2.3 spring-boot-starter-web no longer comes with this needed dependency by default -->
   			<groupId>org.springframework.boot</groupId>
@@ -128,6 +134,12 @@ Exclude Spring Boot's Default Logging -->
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.14.0</version>
 		</dependency>
 
 	</dependencies>
