@@ -45,7 +45,7 @@ public class DoubleAuctionMatch {
         long remainingBuyAmount = buyDetail.getQuantity();
         long remainingSellAmount = sellDetail.getQuantity();
 
-        while (buyTenders.hasNext() && sellTenders.hasNext()) {
+        while (true) {
             long transactionAmount = Math.min(remainingBuyAmount, remainingSellAmount);
 
             if (transactionAmount > 0) {
@@ -63,6 +63,9 @@ public class DoubleAuctionMatch {
             remainingSellAmount -= transactionAmount;
 
             if (remainingBuyAmount == 0) {
+                if (!buyTenders.hasNext())
+                    break;
+
                 buyTender = buyTenders.next();
                 buyDetail = (TenderIntervalDetail) buyTender.getTenderDetail();
 
@@ -70,6 +73,9 @@ public class DoubleAuctionMatch {
             }
 
             if (remainingSellAmount == 0) {
+                if (!sellTenders.hasNext())
+                    break;
+
                 sellTender = sellTenders.next();
                 sellDetail = (TenderIntervalDetail) sellTender.getTenderDetail();
 
@@ -88,17 +94,17 @@ public class DoubleAuctionMatch {
 
     public static void main(String[] args) {
         List<EiTenderType> inMoneyTenders = List.of(
-            createTestTender(SideType.BUY, 15, 100),
+            createTestTender(SideType.BUY, 15, 200),
             createTestTender(SideType.BUY, 20, 100),
             createTestTender(SideType.BUY, 25, 100),
             createTestTender(SideType.BUY, 30, 100),
-            createTestTender(SideType.BUY, 35, 100),
+            createTestTender(SideType.BUY, 35, 200),
 
-            createTestTender(SideType.SELL, 15, 100),
+            createTestTender(SideType.SELL, 15, 200),
             createTestTender(SideType.SELL, 20, 100),
             createTestTender(SideType.SELL, 25, 100),
             createTestTender(SideType.SELL, 30, 100),
-            createTestTender(SideType.SELL, 35, 100)
+            createTestTender(SideType.SELL, 35, 200)
         );
 
         List<TempTransactionRecord> transactions = matchTransactions(inMoneyTenders, 25);
