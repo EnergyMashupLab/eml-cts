@@ -35,6 +35,7 @@ public class DoubleAuctionMatch {
             return transactions;
         }
 
+        // Reverse-quantity-sorted buy/sells iterated as they run out of quantity in their tender.
         EiTenderType buyTender = buyTenders.next();
         EiTenderType sellTender = sellTenders.next();
 
