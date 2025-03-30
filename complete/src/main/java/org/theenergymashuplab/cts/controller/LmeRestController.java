@@ -153,7 +153,6 @@ public class LmeRestController {
 			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
 			// Demand and supply curves <price, quantity>
 			HashMap<Integer, Integer> demandAtPrice = new HashMap<>();
-			// supplyAtPrice is a slightly misleading title
 			HashMap<Integer, Integer> supplyAtPrice = new HashMap<>();
 
 			// Group into buy and sell tenders
@@ -191,25 +190,28 @@ public class LmeRestController {
 
 			// Reverse aggregate sum of the quantities at each price
 			// Will have decreasing total quantities as you go from left to right (buyers want low prices)
-			Integer[] buyPrices = (Integer[]) demandAtPrice.keySet().toArray();
+			Integer[] buyPrices = demandAtPrice.keySet().toArray(new Integer[demandAtPrice.keySet().size()]);
 			Arrays.sort(buyPrices);
-			for (int i = buyPrices[buyPrices.length - 1]; i > 0; i--) {
-				demandAtPrice.put(buyPrices[i - 1],
-						demandAtPrice.get(buyPrices[i]) + demandAtPrice.getOrDefault(buyPrices[i - 1], 0));
+			for (int i = buyPrices[buyPrices.length - 1]; i > buyPrices[0]; i--) {
+				demandAtPrice.put(i - 1, demandAtPrice.get(i) + demandAtPrice.getOrDefault(i - 1, 0));
 			}
 
 			// Caluclate final clearing price for instrument
+			// Start from the lowest price, then go up until demand <= supply
 			int sellingPrice = buyPrices[0];
-			int demand = demandAtPrice.get(sellingPrice);
+			int demand = demandAtPrice.getOrDefault(sellingPrice, 0);
 			int supply = supplyAtPrice.getOrDefault(sellingPrice, 0);
 			while (demand > supply) {
 				sellingPrice += 1;
-				demand = demandAtPrice.get(sellingPrice);
+				demand = demandAtPrice.getOrDefault(sellingPrice, 0);
 				supply += supplyAtPrice.getOrDefault(sellingPrice, 0);
+				logger.debug("selling price: " + sellingPrice + "\tdemand: " + demand + "\tsupply: " + supply);
 			}
 
 			int finalClearingPrice = sellingPrice;
 			instrumentClearingPrices.put(instrument, finalClearingPrice);
+
+			logger.debug(finalClearingPrice);
 		}
 
 		return instrumentClearingPrices;
