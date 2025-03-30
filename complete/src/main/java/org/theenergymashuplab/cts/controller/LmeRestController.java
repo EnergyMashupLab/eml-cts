@@ -262,11 +262,13 @@ public class LmeRestController {
 
         // Reverse-quantity-sorted buy/sells iterated as they run out of quantity in their tender.
         EiTenderType buyTender = buyTenders.next();
-        EiTenderType sellTender = sellTenders.next();
-
         TenderIntervalDetail buyDetail = (TenderIntervalDetail) buyTender.getTenderDetail();
+
+        EiTenderType sellTender = sellTenders.next();
         TenderIntervalDetail sellDetail = (TenderIntervalDetail) sellTender.getTenderDetail();
 
+        // Counters for the remaining amount of each tender, when this reaches 0, we need to
+        // grab the next tender to either accept or provide more energy
         long remainingBuyAmount = buyDetail.getQuantity();
         long remainingSellAmount = sellDetail.getQuantity();
 
@@ -274,7 +276,42 @@ public class LmeRestController {
             long transactionAmount = Math.min(remainingBuyAmount, remainingSellAmount);
 
             if (transactionAmount > 0) {
-                // TODO: Create a transaction payload
+                // The buy and sell payloads contain information regarding the parties involved
+                // in each tender, so we need them for the transactions
+
+                EiCreateTenderPayload buyPayload =
+                        LmeRestController.ctsTenderIdToCreateTenderMap.get(buyTender.getTenderId().value());
+                EiCreateTenderPayload sellPayload =
+                        LmeRestController.ctsTenderIdToCreateTenderMap.get(sellTender.getTenderId().value());
+
+                ActorIdType buyPartyId = buyPayload.getPartyId();
+                ActorIdType sellPartyId = sellPayload.getPartyId();
+
+                // The price and quantity may change from the original tender, so we need
+                // to create modified tenders for the transactions.
+
+                TenderIntervalDetail buyModifiedDetail = new TenderIntervalDetail(
+                        buyDetail.getInterval(), clearingPrice, transactionAmount);
+                TenderIntervalDetail sellModifiedDetail = new TenderIntervalDetail(
+                        sellDetail.getInterval(), clearingPrice, transactionAmount);
+
+                EiTenderType buyModifiedTender = new EiTenderType(
+                        buyTender.getExpirationTime(), buyTender.getSide(), buyModifiedDetail);
+                EiTenderType sellModifiedTender = new EiTenderType(
+                        sellTender.getExpirationTime(), sellTender.getSide(), sellModifiedDetail);
+
+                EiTransaction buyTransaction = new EiTransaction(buyModifiedTender);
+                EiTransaction sellTransaction = new EiTransaction(sellModifiedTender);
+
+                // Finally, create the transaction payloads from the modified tenders
+
+                EiCreateTransactionPayload buyCreateTransactionPayload = new EiCreateTransactionPayload(
+                        buyTransaction, buyPartyId, buyPayload.getCounterPartyId(), new TransactionIdType());
+                EiCreateTransactionPayload sellCreateTransactionPayload = new EiCreateTransactionPayload(
+                        sellTransaction, sellPartyId, buyPartyId, new TransactionIdType());
+
+                transactions.add(buyCreateTransactionPayload);
+                transactions.add(sellCreateTransactionPayload);
             }
 
             remainingBuyAmount -= transactionAmount;
