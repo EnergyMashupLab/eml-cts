@@ -243,7 +243,7 @@ public class LmeRestController {
             TenderIntervalDetail d1 = (TenderIntervalDetail) t1.getTenderDetail();
             TenderIntervalDetail d2 = (TenderIntervalDetail) t2.getTenderDetail();
 
-            return Long.compare(d1.getQuantity(), d2.getQuantity());
+            return Long.compare(d2.getQuantity(), d1.getQuantity());
         };
 
         List<EiCreateTransactionPayload> transactions = new ArrayList<>();
@@ -272,17 +272,20 @@ public class LmeRestController {
         long remainingBuyAmount = buyDetail.getQuantity();
         long remainingSellAmount = sellDetail.getQuantity();
 
-        while (buyTenders.hasNext() && sellTenders.hasNext()) {
+        while (true) {
             long transactionAmount = Math.min(remainingBuyAmount, remainingSellAmount);
 
             if (transactionAmount > 0) {
-                // TODO: Create a transaction
+                // TODO: Create a transaction payload
             }
 
             remainingBuyAmount -= transactionAmount;
             remainingSellAmount -= transactionAmount;
 
             if (remainingBuyAmount == 0) {
+                if (!buyTenders.hasNext())
+                    break;
+
                 buyTender = buyTenders.next();
                 buyDetail = (TenderIntervalDetail) buyTender.getTenderDetail();
 
@@ -290,6 +293,9 @@ public class LmeRestController {
             }
 
             if (remainingSellAmount == 0) {
+                if (!sellTenders.hasNext())
+                    break;
+
                 sellTender = sellTenders.next();
                 sellDetail = (TenderIntervalDetail) sellTender.getTenderDetail();
 

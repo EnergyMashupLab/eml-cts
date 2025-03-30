@@ -15,7 +15,7 @@ public class DoubleAuctionMatch {
         TenderIntervalDetail d1 = (TenderIntervalDetail) t1.getTenderDetail();
         TenderIntervalDetail d2 = (TenderIntervalDetail) t2.getTenderDetail();
 
-        return Long.compare(d1.getQuantity(), d2.getQuantity());
+        return Long.compare(d2.getQuantity(), d1.getQuantity());
     }
 
     public static List<TempTransactionRecord> matchTransactions(final List<EiTenderType> inMoneyTenders, final int clearingPrice) {
