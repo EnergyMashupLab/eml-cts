@@ -23,6 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
 
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+
 import org.springframework.boot.rsocket.server.RSocketServer.Transport;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.antlr.v4.runtime.misc.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -145,8 +149,11 @@ public class LmeRestController {
 			ArrayList<EiTenderType> tenders = auctionTenders.get(instrument);
 			ArrayList<EiTenderType> buyTenders = new ArrayList<>();
 			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
-			// Key is price, value is quantity differential. Positive means more supply, negative means more demand
-			HashMap<Integer, Integer> supplyDemandCurve = new HashMap<>();
+
+			// Using linked hash maps to preserve key insertion order
+			// Demand and supply curves <price, quantity>
+			HashMap<Integer, Integer> cumulativeDemand = new HashMap<>();
+			HashMap<Integer, Integer> cumulativeSupply = new HashMap<>();
 
 			for (EiTenderType tender : tenders) {
 				if (tender.getSide() == SideType.BUY) {
@@ -156,16 +163,45 @@ public class LmeRestController {
 				}
 			}
 
-			// Buy tenders are sorted in ascending (technically nondecreasing) order
-			buyTenders.sort((left, right) -> {
-				return ((TenderIntervalDetail) left.getTenderDetail())
-						.getPrice() < ((TenderIntervalDetail) right.getTenderDetail()).getPrice() ? -1 : 1;
-			});
-			// Sell tenders are sorted in descending (technically nonincreasing) order
-			sellTenders.sort((left, right) -> {
-				return ((TenderIntervalDetail) left.getTenderDetail())
-						.getPrice() > ((TenderIntervalDetail) right.getTenderDetail()).getPrice() ? -1 : 1;
-			});
+			for (EiTenderType tender : buyTenders) {
+				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
+				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
+
+				if (cumulativeDemand.get(price) == null) {
+					cumulativeDemand.put(price, quantity);
+				} else {
+					cumulativeDemand.put(price, cumulativeDemand.get(price) + quantity);
+				}
+			}
+
+			for (EiTenderType tender : sellTenders) {
+				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
+				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
+
+				if (cumulativeSupply.get(price) == null) {
+					cumulativeSupply.put(price, quantity);
+				} else {
+					cumulativeSupply.put(price, cumulativeSupply.get(price) + quantity);
+				}
+			}
+
+			// Reverse prefix sum of the quantities at each price
+			// Will have decreasing total quantities as you go from left to right (buyers want low prices)
+			Integer[] buyPrices = (Integer[]) cumulativeDemand.keySet().toArray();
+			Arrays.sort(buyPrices);
+			for (int i = buyPrices.length - 1; i > 0; i--) {
+				cumulativeDemand.put(buyPrices[i - 1],
+						cumulativeDemand.get(buyPrices[i]) + cumulativeDemand.get(buyPrices[i - 1]));
+			}
+
+			// Normal prefix sum
+			// Will have increasing total quantities from left to right (sellers want high prices)
+			Integer[] sellPrices = (Integer[]) cumulativeDemand.keySet().toArray();
+			Arrays.sort(sellPrices);
+			for (int i = 0; i < sellPrices.length - 1; i++) {
+				cumulativeDemand.put(sellPrices[i + 1],
+						cumulativeDemand.get(sellPrices[i]) + cumulativeDemand.get(buyPrices[i + 1]));
+			}
 
 			// For debugging purposes
 			// String buyPrices = "";
