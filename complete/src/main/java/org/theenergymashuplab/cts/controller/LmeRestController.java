@@ -142,12 +142,11 @@ public class LmeRestController {
 	 * 
 	 */
 	@GetMapping("/clear")
-	public HashMap<Instant, Integer> clear() {
+	public HashMap<Instant, List<EiCreateTransactionPayload>> clear() {
 		logger.debug("/clear was called");
 		Set<Instant> instruments = auctionTenders.keySet();
 		// <instrument, clearing price>
-		HashMap<Instant, Integer> instrumentClearingPrices = new HashMap<>();
-        List<EiCreateTransactionPayload> transactions = new ArrayList<>();
+		HashMap<Instant, List<EiCreateTransactionPayload>> instrumentClearingMatches = new HashMap<>();
 
 		// Clears for every instrument. Will later take a parameter to clear a specific instrument.
 		for (Instant instrument : instruments) {
@@ -214,7 +213,6 @@ public class LmeRestController {
 			}
 
 			int finalClearingPrice = sellingPrice;
-			instrumentClearingPrices.put(instrument, finalClearingPrice);
 
 			for (EiTenderType tender : tenders) {
 				if (tender.getSide() == SideType.BUY
@@ -223,7 +221,6 @@ public class LmeRestController {
 				} else if (tender.getSide() == SideType.SELL
 						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() <= finalClearingPrice) {
 					inTheMoneyTenders.add(tender);
-
 				} else {
 					residuals.add(tender);
 				}
@@ -232,10 +229,11 @@ public class LmeRestController {
 			logger.debug(finalClearingPrice);
 
             // Match buy and sell tenders
-            transactions = matchBuySellTenders(inTheMoneyTenders, finalClearingPrice);
-		}
+            List<EiCreateTransactionPayload> matches = matchBuySellTenders(inTheMoneyTenders, finalClearingPrice);
+            instrumentClearingMatches.put(instrument, matches);
+        }
 
-		return instrumentClearingPrices;
+		return instrumentClearingMatches;
 	}
 
     private List<EiCreateTransactionPayload> matchBuySellTenders(List<EiTenderType> inMoneyTenders, int clearingPrice) {
