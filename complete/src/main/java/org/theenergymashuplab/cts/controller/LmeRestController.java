@@ -151,6 +151,8 @@ public class LmeRestController {
 			ArrayList<EiTenderType> tenders = auctionTenders.get(instrument);
 			ArrayList<EiTenderType> buyTenders = new ArrayList<>();
 			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
+			ArrayList<EiTenderType> inTheMoneyTenders = new ArrayList<>();
+			ArrayList<EiTenderType> residuals = new ArrayList<>();
 			// Demand and supply curves <price, quantity>
 			HashMap<Integer, Integer> demandAtPrice = new HashMap<>();
 			HashMap<Integer, Integer> supplyAtPrice = new HashMap<>();
@@ -210,6 +212,19 @@ public class LmeRestController {
 
 			int finalClearingPrice = sellingPrice;
 			instrumentClearingPrices.put(instrument, finalClearingPrice);
+
+			for (EiTenderType tender : tenders) {
+				if (tender.getSide() == SideType.BUY
+						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() >= finalClearingPrice) {
+					inTheMoneyTenders.add(tender);
+				} else if (tender.getSide() == SideType.SELL
+						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() <= finalClearingPrice) {
+					inTheMoneyTenders.add(tender);
+
+				} else {
+					residuals.add(tender);
+				}
+			}
 
 			logger.debug(finalClearingPrice);
 		}
