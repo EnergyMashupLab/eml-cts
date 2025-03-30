@@ -140,21 +140,23 @@ public class LmeRestController {
 	 * 
 	 */
 	@GetMapping("/clear")
-	public HashMap<Instant, ArrayList<EiTenderType>> clear() {
+	public HashMap<Instant, Integer> clear() {
 		logger.debug("/clear was called");
 		Set<Instant> instruments = auctionTenders.keySet();
+		// <instrument, clearing price>
+		HashMap<Instant, Integer> instrumentClearingPrices = new HashMap<>();
 
 		// Clears for every instrument. Will later take a parameter to clear a specific instrument.
 		for (Instant instrument : instruments) {
 			ArrayList<EiTenderType> tenders = auctionTenders.get(instrument);
 			ArrayList<EiTenderType> buyTenders = new ArrayList<>();
 			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
-
-			// Using linked hash maps to preserve key insertion order
 			// Demand and supply curves <price, quantity>
-			HashMap<Integer, Integer> cumulativeDemand = new HashMap<>();
-			HashMap<Integer, Integer> cumulativeSupply = new HashMap<>();
+			HashMap<Integer, Integer> demandAtPrice = new HashMap<>();
+			// supplyAtPrice is a slightly misleading title
+			HashMap<Integer, Integer> supplyAtPrice = new HashMap<>();
 
+			// Group into buy and sell tenders
 			for (EiTenderType tender : tenders) {
 				if (tender.getSide() == SideType.BUY) {
 					buyTenders.add(tender);
@@ -163,63 +165,54 @@ public class LmeRestController {
 				}
 			}
 
+			// Sum up total quantities of buyTenders at a given price
 			for (EiTenderType tender : buyTenders) {
 				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
 				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
 
-				if (cumulativeDemand.get(price) == null) {
-					cumulativeDemand.put(price, quantity);
+				if (demandAtPrice.get(price) == null) {
+					demandAtPrice.put(price, quantity);
 				} else {
-					cumulativeDemand.put(price, cumulativeDemand.get(price) + quantity);
+					demandAtPrice.put(price, demandAtPrice.get(price) + quantity);
 				}
 			}
 
+			// Sum up total quantities of sellTenders at a given price
 			for (EiTenderType tender : sellTenders) {
 				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
 				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
 
-				if (cumulativeSupply.get(price) == null) {
-					cumulativeSupply.put(price, quantity);
+				if (supplyAtPrice.get(price) == null) {
+					supplyAtPrice.put(price, quantity);
 				} else {
-					cumulativeSupply.put(price, cumulativeSupply.get(price) + quantity);
+					supplyAtPrice.put(price, supplyAtPrice.get(price) + quantity);
 				}
 			}
 
-			// Reverse prefix sum of the quantities at each price
+			// Reverse aggregate sum of the quantities at each price
 			// Will have decreasing total quantities as you go from left to right (buyers want low prices)
-			Integer[] buyPrices = (Integer[]) cumulativeDemand.keySet().toArray();
+			Integer[] buyPrices = (Integer[]) demandAtPrice.keySet().toArray();
 			Arrays.sort(buyPrices);
-			for (int i = buyPrices.length - 1; i > 0; i--) {
-				cumulativeDemand.put(buyPrices[i - 1],
-						cumulativeDemand.get(buyPrices[i]) + cumulativeDemand.get(buyPrices[i - 1]));
+			for (int i = buyPrices[buyPrices.length - 1]; i > 0; i--) {
+				demandAtPrice.put(buyPrices[i - 1],
+						demandAtPrice.get(buyPrices[i]) + demandAtPrice.getOrDefault(buyPrices[i - 1], 0));
 			}
 
-			// Normal prefix sum
-			// Will have increasing total quantities from left to right (sellers want high prices)
-			Integer[] sellPrices = (Integer[]) cumulativeDemand.keySet().toArray();
-			Arrays.sort(sellPrices);
-			for (int i = 0; i < sellPrices.length - 1; i++) {
-				cumulativeDemand.put(sellPrices[i + 1],
-						cumulativeDemand.get(sellPrices[i]) + cumulativeDemand.get(buyPrices[i + 1]));
+			// Caluclate final clearing price for instrument
+			int sellingPrice = buyPrices[0];
+			int demand = demandAtPrice.get(sellingPrice);
+			int supply = supplyAtPrice.getOrDefault(sellingPrice, 0);
+			while (demand > supply) {
+				sellingPrice += 1;
+				demand = demandAtPrice.get(sellingPrice);
+				supply += supplyAtPrice.getOrDefault(sellingPrice, 0);
 			}
 
-			// For debugging purposes
-			// String buyPrices = "";
-			// for (EiTenderType t : buyTenders) {
-			// // getTenderDetail() returns a object of TenderDetail type, so it has to be casted to the TenderIntervalDetail
-			// // type to use the .getPrice() method
-			// buyPrices += ((TenderIntervalDetail) t.getTenderDetail()).getPrice() + " ";
-			// }
-			// logger.debug("Buy tenders sorted by price " + buyPrices);
-			// String sellPrices = "";
-			// for (EiTenderType t : sellTenders) {
-			// sellPrices += ((TenderIntervalDetail) t.getTenderDetail()).getPrice() + " ";
-			// }
-			// logger.debug("Sell tenders sorted by price " + sellPrices);
-
+			int finalClearingPrice = sellingPrice;
+			instrumentClearingPrices.put(instrument, finalClearingPrice);
 		}
 
-		return auctionTenders;
+		return instrumentClearingPrices;
 	}
 
 	/*
