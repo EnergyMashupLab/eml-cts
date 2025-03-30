@@ -226,7 +226,7 @@ public class LmeRestController {
 				}
 			}
 
-			logger.debug(finalClearingPrice);
+			logger.debug("Final Clearing Price: {}", finalClearingPrice);
 
             // Match buy and sell tenders
             List<EiCreateTransactionPayload> matches = matchBuySellTenders(inTheMoneyTenders, finalClearingPrice);
@@ -243,6 +243,12 @@ public class LmeRestController {
 
             return Long.compare(d2.getQuantity(), d1.getQuantity());
         };
+
+        logger.debug("Matching Tenders Received: ");
+
+        for (EiTenderType tender : inMoneyTenders) {
+            logger.debug("Tender: {}\n Tender Detail: {}", tender.toString(), tender.getTenderDetail().toString());
+        }
 
         List<EiCreateTransactionPayload> transactions = new ArrayList<>();
 
@@ -306,9 +312,12 @@ public class LmeRestController {
                 // Finally, create the transaction payloads from the modified tenders
 
                 EiCreateTransactionPayload buyCreateTransactionPayload = new EiCreateTransactionPayload(
-                        buyTransaction, buyPartyId, buyPayload.getCounterPartyId(), new TransactionIdType());
+                        buyTransaction, buyPartyId, sellPartyId, new TransactionIdType());
                 EiCreateTransactionPayload sellCreateTransactionPayload = new EiCreateTransactionPayload(
                         sellTransaction, sellPartyId, buyPartyId, new TransactionIdType());
+
+                logger.debug("Buy Transaction Created: {}\n Tender Details: {}", buyCreateTransactionPayload.toString(), buyModifiedDetail.toString());
+                logger.debug("Sell Transaction Created: {}\n Tender Details: {}", sellCreateTransactionPayload.toString(), sellModifiedDetail.toString());
 
                 transactions.add(buyCreateTransactionPayload);
                 transactions.add(sellCreateTransactionPayload);
