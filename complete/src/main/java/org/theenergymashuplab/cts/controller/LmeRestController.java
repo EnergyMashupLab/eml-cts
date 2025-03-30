@@ -20,14 +20,15 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.theenergymashuplab.cts.*;
+import org.theenergymashuplab.cts.controller.payloads.*;
+
 import org.springframework.boot.rsocket.server.RSocketServer.Transport;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.theenergymashuplab.cts.*;
-import org.theenergymashuplab.cts.controller.payloads.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -133,10 +134,55 @@ public class LmeRestController {
 	 * 
 	 * Clears the auction for the given instrument
 	 * 
-	 * 
 	 */
 	@GetMapping("/clear")
 	public HashMap<Instant, ArrayList<EiTenderType>> clear() {
+		logger.debug("/clear was called");
+		Set<Instant> instruments = auctionTenders.keySet();
+
+		// Clears for every instrument. Will later take a parameter to clear a specific instrument.
+		for (Instant instrument : instruments) {
+			ArrayList<EiTenderType> tenders = auctionTenders.get(instrument);
+			ArrayList<EiTenderType> buyTenders = new ArrayList<>();
+			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
+			// Key is price, value is quantity differential. Positive means more supply, negative means more demand
+			HashMap<Integer, Integer> supplyDemandCurve = new HashMap<>();
+
+			for (EiTenderType tender : tenders) {
+				if (tender.getSide() == SideType.BUY) {
+					buyTenders.add(tender);
+				} else if (tender.getSide() == SideType.SELL) {
+					sellTenders.add(tender);
+				}
+			}
+
+			// Buy tenders are sorted in ascending (technically nondecreasing) order
+			buyTenders.sort((left, right) -> {
+				return ((TenderIntervalDetail) left.getTenderDetail())
+						.getPrice() < ((TenderIntervalDetail) right.getTenderDetail()).getPrice() ? -1 : 1;
+			});
+			// Sell tenders are sorted in descending (technically nonincreasing) order
+			sellTenders.sort((left, right) -> {
+				return ((TenderIntervalDetail) left.getTenderDetail())
+						.getPrice() > ((TenderIntervalDetail) right.getTenderDetail()).getPrice() ? -1 : 1;
+			});
+
+			// For debugging purposes
+			// String buyPrices = "";
+			// for (EiTenderType t : buyTenders) {
+			// // getTenderDetail() returns a object of TenderDetail type, so it has to be casted to the TenderIntervalDetail
+			// // type to use the .getPrice() method
+			// buyPrices += ((TenderIntervalDetail) t.getTenderDetail()).getPrice() + " ";
+			// }
+			// logger.debug("Buy tenders sorted by price " + buyPrices);
+			// String sellPrices = "";
+			// for (EiTenderType t : sellTenders) {
+			// sellPrices += ((TenderIntervalDetail) t.getTenderDetail()).getPrice() + " ";
+			// }
+			// logger.debug("Sell tenders sorted by price " + sellPrices);
+
+		}
+
 		return auctionTenders;
 	}
 
