@@ -2,11 +2,9 @@ package org.theenergymashuplab.cts.sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.*;
+import org.theenergymashuplab.cts.ResourceDesignatorType;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
-import org.theenergymashuplab.cts.generated_files.BooleanType;
-import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadDecoder;
-import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadEncoder;
-import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
+import org.theenergymashuplab.cts.generated_files.*;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -131,12 +129,138 @@ public class EiCreateTransactionPayloadEncoderDecoder {
         }
     }
 
-    public static int decode(EiCreateTransactionPayloadDecoder decoder,
-                             UnsafeBuffer unsafeBuffer,
-                             int bufferOffset,
-                             int actingBlockLength,
-                             int actingVersion) {
+    public static EiCreateTransactionPayload decode(EiCreateTransactionPayloadDecoder decoder,
+                                                    UnsafeBuffer unsafeBuffer,
+                                                    int bufferOffset,
+                                                    int actingBlockLength,
+                                                    int actingVersion) {
 
-        return -1;
+        decoder.wrap(unsafeBuffer, bufferOffset, actingBlockLength, actingVersion);
+
+        EiCreateTransactionPayload payload = new EiCreateTransactionPayload();
+
+        // id types
+        ActorIdType counterPartyId = new ActorIdType();
+        counterPartyId.setMyUidId(decoder.counterPartyId());
+
+        TransactionIdType marketTransactionId = new TransactionIdType();
+        marketTransactionId.setMyUidId(decoder.marketTransactionId());
+
+        ActorIdType partyId = new ActorIdType();
+        partyId.setMyUidId(decoder.marketTransactionId());
+
+        RefIdType requestId = new RefIdType();
+        requestId.setMyUidId(decoder.requestId());
+
+        payload.setCounterPartyId(counterPartyId);
+        payload.setMarketTransactionId(marketTransactionId);
+        payload.setPartyId(partyId);
+        payload.setRequestId(requestId);
+
+        // transaction
+        TransactionIdType marketTransactionId2 = new TransactionIdType();
+        marketTransactionId2.setMyUidId(decoder.marketTransactionId());
+
+        long expirationTimeSeconds = decoder.transaction().tender().tenderBase().expirationTime().seconds();
+        int expirationTimeNano = (int) decoder.transaction().tender().tenderBase().expirationTime().nano();
+
+        Instant expirationTime = Instant.ofEpochSecond(expirationTimeSeconds, expirationTimeNano);
+
+        TenderIntervalDetailDecoder tenderDetailDecoder = decoder.transaction().tender().tenderBase().tenderDetail();
+
+        TenderDetail tenderDetail = null;
+
+        if (tenderDetailDecoder != null) {
+            long price = tenderDetailDecoder.price();
+            long quantity = tenderDetailDecoder.quantity();
+
+            Interval interval = new Interval();
+            interval.setDtStart(Instant.ofEpochSecond(tenderDetailDecoder.interval().dtStart().seconds(),
+                    tenderDetailDecoder.interval().dtStart().nano()));
+            interval.setDuration(Duration.ofSeconds(tenderDetailDecoder.interval().duration().seconds(),
+                    tenderDetailDecoder.interval().duration().nano()));
+
+            TenderIntervalDetail tenderIntervalDetail = new TenderIntervalDetail(interval, price, quantity);
+            tenderDetail = tenderIntervalDetail;
+        }
+
+        org.theenergymashuplab.cts.SideType side;
+        if (decoder.transaction().tender().tenderBase()
+                .side() == org.theenergymashuplab.cts.generated_files.SideType.BUY) {
+            side = org.theenergymashuplab.cts.SideType.BUY;
+        } else if (decoder.transaction().tender().tenderBase()
+                .side() == org.theenergymashuplab.cts.generated_files.SideType.SELL) {
+            side = org.theenergymashuplab.cts.SideType.SELL;
+        } else {
+            throw new IllegalArgumentException(
+                    "Unknown side type: " + decoder.transaction().tender().tenderBase().side());
+        }
+
+        MarketOrderIdType marketOrderId = new MarketOrderIdType();
+        marketOrderId.setMyUidId(decoder.transaction().tender().marketOrderId());
+        EiTenderType eiTenderType = new EiTenderType(expirationTime, side, tenderDetail, marketOrderId);
+
+        MarketIdType marketId = new MarketIdType();
+        marketId.setMyUidId(decoder.transaction().tender().tenderBase().marketId());
+
+        eiTenderType.setMarketId(marketId);
+
+        BooleanType allOrNone = decoder.transaction().tender().tenderBase().allOrNone();
+        eiTenderType.setAllOrNone(allOrNone == BooleanType.TRUE);
+
+        int priceScale = (int) decoder.transaction().tender().tenderBase().priceScale();
+
+        eiTenderType.setPriceScale(priceScale);
+
+        int quantityScale = (int) decoder.transaction().tender().tenderBase().quantityScale();
+
+        eiTenderType.setQuantityScale(quantityScale);
+
+        org.theenergymashuplab.cts.generated_files.ResourceDesignatorType generatedResourceDesignator = decoder.transaction().tender().tenderBase().resourceDesignator();
+        org.theenergymashuplab.cts.ResourceDesignatorType resourceDesignator;
+
+        switch (generatedResourceDesignator) {
+            case POWER:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.POWER;
+                break;
+            case ENERGY:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.ENERGY;
+                break;
+            case TRANSPORT:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.TRANSPORT;
+                break;
+            case WATER_PRESSURE:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.WATER_PRESSURE;
+                break;
+            case WATER_FLOW:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.WATER_FLOW;
+                break;
+            case GAS_PRESSURE:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.GAS_PRESSURE;
+                break;
+            case GAS_FLOW:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.GAS_FLOW;
+                break;
+            case BANDWIDTH:
+                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.BANDWIDTH;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid ResourceDesignator: " + generatedResourceDesignator);
+        }
+
+        eiTenderType.setResourceDesignator(resourceDesignator);
+
+        int segmentId = (int) decoder.transaction().tender().tenderBase().segmentId();
+        eiTenderType.setSegmentId(segmentId);
+
+        long decodedWarrantsValue = decoder.transaction().tender().tenderBase().warrants();
+        WarrantIdType warrants = new WarrantIdType(decodedWarrantsValue);
+        eiTenderType.setWarrants(warrants);
+
+        EiTransaction eiTransaction = new EiTransaction();
+        payload.setTransaction(eiTransaction);
+
+        return payload;
     }
+
 }
