@@ -322,5 +322,45 @@ public class TradingDataDTO {
     public void setUnitStatus(String unitStatus) {
         this.unitStatus = unitStatus;
     }
+    @Override
+    public String toString() {
+        return "TradingDataDTO{" +
+                "hDayTrading='" + hDayTrading + "'" +
+                ", intervalMasked=" + intervalMasked +
+                ", leadParticipantIDMasked='" + leadParticipantIDMasked + "'" +
+                ", assetIDMasked='" + assetIDMasked + "'" +
+                ", mustTakeEnergy=" + mustTakeEnergy +
+                ", maximumDailyEnergyAvailable=" + maximumDailyEnergyAvailable +
+                ", economicMaximum=" + economicMaximum +
+                ", economicMinimum=" + economicMinimum +
+                ", coldStartupPrice=" + coldStartupPrice +
+                ", intermediateStartupPrice=" + intermediateStartupPrice +
+                ", hotStartupPrice=" + hotStartupPrice +
+                ", noLoadPrice=" + noLoadPrice +
+                ", segment1Price=" + segment1Price +
+                ", segment1MW=" + segment1MW +
+                ", segment2Price=" + segment2Price +
+                ", segment2MW=" + segment2MW +
+                ", segment3Price=" + segment3Price +
+                ", segment3MW=" + segment3MW +
+                ", segment4Price=" + segment4Price +
+                ", segment4MW=" + segment4MW +
+                ", segment5Price=" + segment5Price +
+                ", segment5MW=" + segment5MW +
+                ", segment6Price=" + segment6Price +
+                ", segment6MW=" + segment6MW +
+                ", segment7Price=" + segment7Price +
+                ", segment7MW=" + segment7MW +
+                ", segment8Price=" + segment8Price +
+                ", segment8MW=" + segment8MW +
+                ", segment9Price=" + segment9Price +
+                ", segment9MW=" + segment9MW +
+                ", segment10Price=" + segment10Price +
+                ", segment10MW=" + segment10MW +
+                ", claim10=" + claim10 +
+                ", claim30=" + claim30 +
+                ", unitStatus='" + unitStatus + "'" +
+                '}';
+    }
 
 } 

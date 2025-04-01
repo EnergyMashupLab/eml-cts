@@ -146,6 +146,11 @@ Exclude Spring Boot's Default Logging -->
 
 	<build>
 		<finalName>eml-cts</finalName>
+		<testResources>
+			<testResource>
+				<directory>${project.basedir}/src/test/resources</directory>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
