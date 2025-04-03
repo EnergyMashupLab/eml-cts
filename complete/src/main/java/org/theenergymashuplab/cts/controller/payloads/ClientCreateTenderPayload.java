@@ -43,7 +43,7 @@ public class ClientCreateTenderPayload {
 
 	// Uses BridgeInterval to avoid serialization issues
 	
-	ClientCreateTenderPayload()	{	// json
+	public ClientCreateTenderPayload()	{	// json
 	}
 	
 	public ClientCreateTenderPayload(SideType side, long quantity, long price)	{

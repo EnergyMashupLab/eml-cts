@@ -25,11 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
-import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadEncoder;
-import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadDecoder;
-import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
-import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
-import org.theenergymashuplab.cts.sbe.EiTenderEncoderDecoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,14 +38,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.naming.TransactionRef;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-
-import org.agrona.concurrent.UnsafeBuffer;
-
 //For RestTemplate
 @RestController
 @RequestMapping("/teua")	// use dynamic URIs - this supports one
@@ -62,15 +49,6 @@ public class TeuaRestController {
 	private static final Logger logger = LogManager.getLogger(
 			TeuaRestController.class);
 	
-	
-	 MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
-   	 EiCreateTenderPayloadEncoder eiCreateTenderPayloadEncoder = new EiCreateTenderPayloadEncoder();
-	 ByteBuffer bbf = ByteBuffer.allocate(4096);
-	 UnsafeBuffer buffer = new UnsafeBuffer(bbf);	
-	 
-	 
-	 MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
-	 EiCreatedTenderPayloadDecoder eiCreatedTenderPayloadDecoder = new EiCreatedTenderPayloadDecoder();
     /*
 	 *	Two arrays use teua/{id}/... and matching client/{id} to give the
 	 *	Actor ID and the URI string to which to post.postLmaToTeuaByPartyId
@@ -388,60 +366,19 @@ public class TeuaRestController {
 		
 		logger.trace("TEUA sending EiCreateTender to LMA " +
 				eiCreateTender.toString());
-		
-		//
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Content-Type", "application/octet-stream");
-
-		int encodingLengthPlusHeader = EiTenderEncoderDecoder.eiCreateTenderEncode(eiCreateTenderPayloadEncoder, buffer, messageHeaderEncoder, eiCreateTender);
-
-		HttpEntity<byte[]> eiCreateTenderByteArray = new HttpEntity<>(buffer.byteArray(), headers);
 			
-		
-		//
 		//	And forward to the LMA
-//		restTemplate = builder.build();
-//		EiCreatedTenderPayload result = restTemplate.postForObject
-//			("http://localhost:8080/lma/createTender", eiCreateTender,
-//					EiCreatedTenderPayload.class);
+		restTemplate = builder.build();
+		EiCreatedTenderPayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/createTender", eiCreateTender,
+					EiCreatedTenderPayload.class);
 		
-		/* Default Spring serialization is JSON; the default code is commented out below */
-		byte[] eiCreatedTenderByteArray = restTemplate.postForObject
-			("http://localhost:8080/lma/createTender", eiCreateTenderByteArray,
-					byte[].class);
-
-
-		//Decode EiCreatedTenderPayload
-		int bufferOffset_lengthToRead = messageHeaderDecoder.encodedLength();
-		buffer.putBytes(0, eiCreatedTenderByteArray, 0, bufferOffset_lengthToRead);
-		messageHeaderDecoder.wrap(buffer, 0);
-
-		//We have got the id, Now based on ID we will use correct decoder
-		int templateId = messageHeaderDecoder.templateId();
-
-		//Length encoded message
-		int actingBlockLength = messageHeaderDecoder.blockLength();
-
-
-		//Length encoded message
-		int actingVersion = messageHeaderDecoder.version();
-
-
-		buffer.putBytes(0, eiCreatedTenderByteArray, bufferOffset_lengthToRead, actingBlockLength);
-
-//		EiCreatedTenderPayload eiCreatedTenderResponse = EiTenderEncoderDecoder.
-//				eiCreatedTenderPayloadDecoder(eiCreatedTenderPayloadDecoder, buffer, bufferOffset_lengthToRead, actingBlockLength, actingVersion);
-//				
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
 		
-//		// and put CtsTenderId in ClientCreatedTenderPayload
-//		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-//		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
-//				tempReturn.toString());
-//		
-//		return result;
-		//return eiCreatedTenderResponse;
-		return null;
+		return result;
 	}
 	
 	@PostMapping("{teuaId}/clientCreateStreamTender")

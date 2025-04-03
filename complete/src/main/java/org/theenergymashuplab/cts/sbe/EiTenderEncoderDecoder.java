@@ -1,61 +1,46 @@
 package org.theenergymashuplab.cts.sbe;
 
-import java.awt.JobAttributes.SidesType;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 
 import org.agrona.concurrent.UnsafeBuffer;
-import org.hibernate.type.descriptor.java.BooleanJavaType;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
-import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.generated_files.*;
-import org.theenergymashuplab.cts.generated_files.ResourceDesignatorType;
-
-//import baseline.*;
 
 public class EiTenderEncoderDecoder {
-
+	//ENCODER
 	public static int eiCreateTenderEncode(EiCreateTenderPayloadEncoder eiCreateTenderPayloadEncoder,
 			UnsafeBuffer directBuffer, MessageHeaderEncoder messageHeaderEncoder,
 			EiCreateTenderPayload eiCreateTenderPayload) {
 		eiCreateTenderPayloadEncoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder);
 
-		// At Most One field
+		//encode At Most One field
 		eiCreateTenderPayloadEncoder
 				.atMostOne(eiCreateTenderPayload.isAtMostOne() ? BooleanType.TRUE : BooleanType.FALSE);
-
+		
+		//encode Market Id field
 		eiCreateTenderPayloadEncoder.marketId(eiCreateTenderPayload.getMarketId().value());
 
-		// Counter Party Id field
+		//encode Counter Party Id field
 		eiCreateTenderPayloadEncoder.counterPartyId(eiCreateTenderPayload.getCounterPartyId().getMyUidId());
 
-		// executionInstructions field
-
-		ByteBuffer byteBuffer = ByteBuffer.allocate(128);
-		UnsafeBuffer buffer = new UnsafeBuffer(byteBuffer);
-
-		VarStringEncodingEncoder encoder = new VarStringEncodingEncoder();
-		int offset = 0;
-		encoder.wrap(buffer, offset);
-
-		String executionInstructions = eiCreateTenderPayload.getExecutionInstructions();
+		//encode executionInstructions field
 		eiCreateTenderPayloadEncoder.executionInstructions(0L);
-
+		//currently executionInstructions string is typicall just an empty string. Changed to uint64 and pass 0.
 
 		//encoding the party Id Field
 		eiCreateTenderPayloadEncoder.partyId(eiCreateTenderPayload.getPartyId().getMyUidId());
 
-		// request Id field
+		//encode request Id field
 		eiCreateTenderPayloadEncoder.requestId(eiCreateTenderPayload.getRequestId().getMyUidId());
 
-		// segmentId field
+		//encode segmentId field
 		eiCreateTenderPayloadEncoder.segmentId(eiCreateTenderPayload.getSegmentId());
 
 //-------------------------------------------------------------------------------------------
 		// EiTenderType
+		
 		// MarketOrderID
 		eiCreateTenderPayloadEncoder.tender()
 				.marketOrderId(eiCreateTenderPayload.getTender().getMarketOrderId().value());
@@ -123,7 +108,7 @@ public class EiTenderEncoderDecoder {
 		// encode segmentId
 		eiCreateTenderPayloadEncoder.tender().tenderBase().segmentId(eiCreateTenderPayload.getSegmentId());
 
-		// sideType
+		// encode sideType
 		if (eiCreateTenderPayload.getTender().getSide() == org.theenergymashuplab.cts.SideType.BUY) {
 			eiCreateTenderPayloadEncoder.tender().tenderBase()
 					.side(org.theenergymashuplab.cts.generated_files.SideType.BUY);
@@ -131,9 +116,9 @@ public class EiTenderEncoderDecoder {
 			eiCreateTenderPayloadEncoder.tender().tenderBase()
 					.side(org.theenergymashuplab.cts.generated_files.SideType.SELL);
 		}
+		//it's important to distinguish the two SideTypes, the one we use, and the one the encoder understands
 
 		//ENCODE TENDER DETAIL
-		var tenderEncoder = eiCreateTenderPayloadEncoder.tender();
 		TenderDetail tenderDetail = eiCreateTenderPayload.getTender().getTenderDetail();
 
 		if (tenderDetail instanceof TenderIntervalDetail) {
@@ -148,12 +133,12 @@ public class EiTenderEncoderDecoder {
 
 			Instant dtStart = interval.getDtStart();
 			Duration duration = interval.getDuration();
-
+			//extract and decode DtStart
 			eiCreateTenderPayloadEncoder.tender().tenderBase().tenderDetail()
 			    .interval().dtStart()
 			        .seconds(dtStart.getEpochSecond())
 			        .nano(dtStart.getNano());
-
+			//extract and decode Duration
 			eiCreateTenderPayloadEncoder.tender().tenderBase().tenderDetail()
 			    .interval().duration()
 			        .seconds(duration.getSeconds())
@@ -167,7 +152,6 @@ public class EiTenderEncoderDecoder {
 				.warrants(eiCreateTenderPayload.getTender().getWarrants().value());
 
 		// instantEncoder.expirationTime()
-
 		System.out.println("");
 		System.out.println("-------------------------------------------------------------------------");
 		System.out.println("EiCreateTenderPayload Encoded :-");
@@ -176,7 +160,11 @@ public class EiTenderEncoderDecoder {
 		return messageHeaderEncoder.ENCODED_LENGTH + eiCreateTenderPayloadEncoder.encodedLength();
 
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	//DECODER
 	public static EiCreateTenderPayload eiCreateTenderPayloadDecode(
 			EiCreateTenderPayloadDecoder eiCreateTenderPayloadDecoder, UnsafeBuffer directBuffer, int bufferOffset,
 			int actingBlockLength, int actingVersion) throws Exception {
@@ -199,7 +187,8 @@ public class EiTenderEncoderDecoder {
 		// Decode the 'counterPartyId' (ActorIdType)
 		ActorIdType counterPartyId = new ActorIdType();
 		counterPartyId.setMyUidId(eiCreateTenderPayloadDecoder.counterPartyId());
-
+		
+		// Decode the executionInstructions, check if 0
 		long execInstr = eiCreateTenderPayloadDecoder.executionInstructions();
 		String executionInstructions = (execInstr == 0) ? "" : String.valueOf(execInstr);
 		eiCreateTenderPayload.setExecutionInstructions(executionInstructions);
@@ -263,8 +252,6 @@ public class EiTenderEncoderDecoder {
 
 		}
 		
-
-		
 		// Decode (SideType)
 		org.theenergymashuplab.cts.SideType side;
 		if (eiCreateTenderPayloadDecoder.tender().tenderBase()
@@ -284,7 +271,6 @@ public class EiTenderEncoderDecoder {
 		// Decode the 'marketId' (MarketIdType)
 		MarketIdType marketId = new MarketIdType();
 		marketId.setMyUidId(eiCreateTenderPayloadDecoder.tender().tenderBase().marketId());
-
 		eiTenderType.setMarketId(marketId);
 
 		// Decode 'AllOrNone' (Boolean)
@@ -294,12 +280,10 @@ public class EiTenderEncoderDecoder {
 		// Decode price scale (e.g., price scale could be a numeric value like an
 		// integer or long)
 		int priceScale = (int) eiCreateTenderPayloadDecoder.tender().tenderBase().priceScale();
-		
 		eiTenderType.setPriceScale(priceScale);
 
 		// Decode quantity scale (e.g., quantity scale could be a numeric value)
 		int quantityScale = (int) eiCreateTenderPayloadDecoder.tender().tenderBase().quantityScale();
-		
 		eiTenderType.setQuantityScale(quantityScale); // Set the decoded quantity scale
 		
 		//decode the resourceDesignator
@@ -334,7 +318,6 @@ public class EiTenderEncoderDecoder {
 		    default:
 		        throw new IllegalArgumentException("Invalid ResourceDesignator: " + generatedResourceDesignator);
 		}
-
 		// Now you can set the resourceDesignator of the tender
 		eiTenderType.setResourceDesignator(resourceDesignator);
 
@@ -356,78 +339,4 @@ public class EiTenderEncoderDecoder {
 		// Return the fully decoded payload
 		return eiCreateTenderPayload;
 	}
-
-//	
-//	  public static int eiCreatedTenderEncode(EiCreatedTenderPayloadEncoder
-//	  eiCreatedTenderPayloadEncoder, UnsafeBuffer directBuffer,
-//	  MessageHeaderEncoder messageHeaderEncoder, EiCreatedTenderPayload
-//	  eiCreatedTenderPayload) {
-//	  
-//	  eiCreatedTenderPayloadEncoder.wrapAndApplyHeader(directBuffer, 0,
-//	  messageHeaderEncoder);
-//	  
-//	  eiCreatedTenderPayloadEncoder.counterPartyId()
-//	  .value(eiCreatedTenderPayload.getCounterPartyId().getMyUidId());
-//	  
-//	  
-//	  eiCreatedTenderPayloadEncoder.partyId()
-//	  .value(eiCreatedTenderPayload.getPartyId().getMyUidId());
-//	  
-//	  
-//	  eiCreatedTenderPayloadEncoder.refId()
-//	  .value(eiCreatedTenderPayload.getRefId().getMyUidId());
-//	  
-//	  eiCreatedTenderPayloadEncoder.tenderId()
-//	  .value(eiCreatedTenderPayload.getTenderId().getMyUidId());
-//	  
-//	  eiCreatedTenderPayloadEncoder.response() .responseCode(200)
-//	  .responseDescription();
-//	  
-//	  System.out.println(""); System.out.println(
-//	  "-------------------------------------------------------------------------");
-//	  System.out.println("EiCreatedTenderPayload Encoded :-");
-//	  System.out.println(eiCreatedTenderPayloadEncoder.toString());
-//	  
-//	  return messageHeaderEncoder.ENCODED_LENGTH +
-//	  eiCreatedTenderPayloadEncoder.encodedLength();
-//	  
-//	  }
-//	  
-//	  
-//	  public static EiCreatedTenderPayload eiCreatedTenderPayloadDecoder(
-//	  EiCreatedTenderPayloadDecoder eiCreatedTenderPayloadDecoder , UnsafeBuffer
-//	  directBuffer, int bufferOffset, int actingBlockLength, int actingVersion)
-//	  throws Exception{
-//	  
-//	  eiCreatedTenderPayloadDecoder.wrap(directBuffer, 0, actingBlockLength,
-//	  actingVersion);
-//	  
-//	  System.out.println(""); System.out.println(
-//	  "-------------------------------------------------------------------------");
-//	  System.out.println("EiCreatedTenderPayload Decoded :-");
-//	  System.out.println(eiCreatedTenderPayloadDecoder.toString());
-//	  
-//	  EiCreatedTenderPayload eiCreatedTenderPayload = new EiCreatedTenderPayload();
-//	  
-//	  ActorIdType counterPartyId = new ActorIdType();
-//	  counterPartyId.setMyUidId(eiCreatedTenderPayloadDecoder.counterPartyId().
-//	  value()); eiCreatedTenderPayload.setCounterPartyId(counterPartyId);
-//	  
-//	  ActorIdType partyId = new ActorIdType();
-//	  partyId.setMyUidId(eiCreatedTenderPayloadDecoder.partyId().value());
-//	  eiCreatedTenderPayload.setPartyId(partyId);
-//	  
-//	  EiResponse response = new EiResponse();
-//	  response.setResponseCode(eiCreatedTenderPayloadDecoder.response().
-//	  responseCode()); response.setResponseDescription("Successfull");
-//	  eiCreatedTenderPayload.setResponse(response);
-//	  
-//	  TenderIdType tenderId = new TenderIdType();
-//	  tenderId.setMyUidId(eiCreatedTenderPayloadDecoder.tenderId().value());
-//	  eiCreatedTenderPayload.setTenderId(tenderId);
-//	  
-//	  return eiCreatedTenderPayload;
-//	  
-//	  }
-//	 
 }

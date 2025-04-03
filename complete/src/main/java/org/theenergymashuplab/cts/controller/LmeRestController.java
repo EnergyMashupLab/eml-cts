@@ -27,23 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
-import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadDecoder;
-import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
-import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
-import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
-import org.theenergymashuplab.cts.sbe.EiTenderEncoderDecoder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.agrona.concurrent.UnsafeBuffer;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.nio.ByteBuffer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 
 import java.util.concurrent.*;
 
@@ -102,15 +93,7 @@ public class LmeRestController {
 	private static final Logger logger = LogManager.getLogger(
 			LmeRestController.class);
 	
-	  MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
- 	  EiCreateTenderPayloadDecoder eiCreateTenderPayloadDecoder = new EiCreateTenderPayloadDecoder();
- 	  ByteBuffer bbf = ByteBuffer.allocate(4096);
- 	  UnsafeBuffer buffer = new UnsafeBuffer(bbf);
- 	  
- 	  MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
- 	  EiCreatedTenderPayloadEncoder eiCreatedTenderPayloadEncoder = new EiCreatedTenderPayloadEncoder();
- 	
- 	  LmeRestController()	{
+	LmeRestController()	{
 		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
 		
 		//	Start thread to read createTransactionQ and send
