@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
+ * Copyright 2019-2025 The Energy Mashup Lab
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,6 @@
 		random BUY SELL
  * 
  * William Cox 202003
- * 
- * Apache 2.0 license - will be included in NIST-CTS-Agents
- * 
  */
 
 package org.theenergymashuplab.cts;

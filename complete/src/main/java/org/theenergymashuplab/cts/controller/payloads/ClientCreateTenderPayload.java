@@ -49,10 +49,34 @@ public class ClientCreateTenderPayload {
 	public ClientCreateTenderPayload(SideType side, long quantity, long price)	{
 		// DEBUG start time and expiration time for test payloads
 		Instant expire = null;
-		Instant dtStart = Instant.parse("2020-05-31T10:00:00.00Z");	
+		// Earlier generated tenders used 2020-05-31T10:00:00.00Z; updated for Spring 2025 to 2025-06-20
+		Instant dtStart = Instant.parse("2025-06-20T00:00:00.00Z");	
 		expire = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
 		// System.err.println("ClientCreateTenderPayload: expire " +
 		//		expire.toString());
+		
+		this.side = side;
+		this.quantity = quantity;
+		this.price = price;
+//		this.ignorePosition = true;	// TODO hook and use in TeuaRestController
+		// DEBUG this.expireTime = expire;
+		this.bridgeInterval = new BridgeInterval(60, dtStart);
+		this.bridgeExpireTime = new BridgeInstant(expire);
+	}
+	
+	/*
+	 * TODO add segment attribute to constructor
+	 */
+	
+	public ClientCreateTenderPayload(int hour, SideType side, long quantity, long price)	{
+		// DEBUG start time and expiration time for test payloads
+		// This constructor uses a fixed date plus the hour parameter as dtStart
+		Instant expire = null;
+		// Earlier generated tenders used 2020-05-31T10:00:00.00Z; updated for Spring 2025 to 2025-06-20
+		Instant dtStart = Instant.parse("2025-06-20T00:00:00.00Z");	
+		dtStart = dtStart.plusSeconds(hour * 60 * 60);	// adjust to the hour within the canonical day
+		
+		expire = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
 		
 		this.side = side;
 		this.quantity = quantity;
@@ -77,6 +101,22 @@ public class ClientCreateTenderPayload {
 		this.bridgeInterval = new BridgeInterval(60, dtStart);
 		this.bridgeExpireTime = new BridgeInstant(expire);
 	}
+	
+	// Constructor takes interval description
+		public ClientCreateTenderPayload(int hour, SideType side, long quantity, long price,
+				Instant dtStart, long minutes)	{
+			// DEBUG start time and expiration time for test payloads
+			Instant expire;
+
+			dtStart = dtStart.plusSeconds(hour * 60 * 60);
+			expire = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
+			
+			this.side = side;
+			this.quantity = quantity;
+			this.price = price;
+			this.bridgeInterval = new BridgeInterval(60, dtStart);
+			this.bridgeExpireTime = new BridgeInstant(expire);
+		}
 
 	// Constructor takes stream description
 	//May need new constructor

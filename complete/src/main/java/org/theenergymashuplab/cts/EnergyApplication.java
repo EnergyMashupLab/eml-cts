@@ -66,13 +66,27 @@ public class EnergyApplication {
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
 			logger.info("In CommandLineRunner before getForObject");
-//			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(500);
+			
+			/*
+			 * For random generation of tenders, quotes, stream tenders or stream quotes uncomment the appropriate line.
+			 * See EML-CTS project wiki at 
+			 * 		https://github.com/EnergyMashupLab/eml-cts/wiki/Generation-of-Random-Instruments-for-Testing
+			 * 
+			 * December 2024 specific numbers were 500 for RandomCreateClientTender and RandomCreateClientQuote. Using 
+			 */
+			//	RandomCreateClientTender randomClientTender = new RandomCreateClientTender(20);
+			/*
+			 * Version with start time and range
+			 * RandomCreateClientTender(int hour, int howMany, int priceLower, int priceUpper, int quantityLower, int quantityUpper)
+			 */
+			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(13, 20, 0, 100, 10, 300);
+			
 //			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(25,24,5,50,22,122);
-			RandomCreateClientQuote randomClientQuote = new RandomCreateClientQuote(500);
+//			RandomCreateClientQuote randomClientQuote = new RandomCreateClientQuote(500);
 //			randomClientQuote = new RandomCreateClientQuote(3);
 //			randomClientQuote = new RandomCreateClientQuote(11,22,33,11,66);
 //			RandomCreateClientStreamQuote randomClientStreamQuote = new RandomCreateClientStreamQuote();
-			RandomAcceptClientQuote randomClientAccept = new RandomAcceptClientQuote();
+//			RandomAcceptClientQuote randomClientAccept = new RandomAcceptClientQuote();
 //			while (true) {
 //				System.out.println("Generate how many random ClientCreateTenderPayload objects?");
 //				String userInput = myObj.nextLine();
