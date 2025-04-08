@@ -77,9 +77,10 @@ public class EnergyApplication {
 			//	RandomCreateClientTender randomClientTender = new RandomCreateClientTender(20);
 			/*
 			 * Version with start time and range
-			 * RandomCreateClientTender(int hour, int howMany, int priceLower, int priceUpper, int quantityLower, int quantityUpper)
+			 * RandomCreateClientTender(int hour, int howMany, int priceLower, int priceUpper,
+			 * 		int quantityLower, int quantityUpper, int segmentId)
 			 */
-			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(13, 20, 0, 100, 10, 300);
+			RandomCreateClientTender randomClientTender = new RandomCreateClientTender(13, 50, -50, 100, 10, 300, 3);
 			
 //			RandomCreateClientStreamTender randomClientStreamTender = new RandomCreateClientStreamTender(25,24,5,50,22,122);
 //			RandomCreateClientQuote randomClientQuote = new RandomCreateClientQuote(500);

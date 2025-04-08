@@ -30,6 +30,7 @@ public class ClientCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
+	private int segmentId = 1; // Default 1 for order  book for backwards compatability
 	/*
 	 * We can see either interval tenders or stream tenders with the latest September 2024 standard. To support this, 
 	 * we'll set these attributes initially to be null and allow the JSON serialization to populate them if they appear 
@@ -68,7 +69,7 @@ public class ClientCreateTenderPayload {
 	 * TODO add segment attribute to constructor
 	 */
 	
-	public ClientCreateTenderPayload(int hour, SideType side, long quantity, long price)	{
+	public ClientCreateTenderPayload(int hour, SideType side, long quantity, long price, int segmentId)	{
 		// DEBUG start time and expiration time for test payloads
 		// This constructor uses a fixed date plus the hour parameter as dtStart
 		Instant expire = null;
@@ -89,7 +90,7 @@ public class ClientCreateTenderPayload {
 	
 	// Constructor takes interval description
 	public ClientCreateTenderPayload(SideType side, long quantity, long price,
-			Instant dtStart, long minutes)	{
+			Instant dtStart, long minutes, int segmentId)	{
 		// DEBUG start time and expiration time for test payloads
 		Instant expire;
 
@@ -100,11 +101,12 @@ public class ClientCreateTenderPayload {
 		this.price = price;
 		this.bridgeInterval = new BridgeInterval(60, dtStart);
 		this.bridgeExpireTime = new BridgeInstant(expire);
+		this.segmentId = segmentId;
 	}
 	
 	// Constructor takes interval description
 		public ClientCreateTenderPayload(int hour, SideType side, long quantity, long price,
-				Instant dtStart, long minutes)	{
+				Instant dtStart, long minutes,int segmentId)	{
 			// DEBUG start time and expiration time for test payloads
 			Instant expire;
 
@@ -116,6 +118,7 @@ public class ClientCreateTenderPayload {
 			this.price = price;
 			this.bridgeInterval = new BridgeInterval(60, dtStart);
 			this.bridgeExpireTime = new BridgeInstant(expire);
+			this.segmentId = segmentId;
 		}
 
 	// Constructor takes stream description
@@ -131,6 +134,14 @@ public class ClientCreateTenderPayload {
 				quantity + " price " + price);
 	}
 	
+	public int getSegmentId() {
+		return segmentId;
+	}
+
+	public void setSegmentId(int segmentId) {
+		this.segmentId = segmentId;
+	}
+
 	public Interval getInterval()	{
 		// converts internal representation to a CTS Interval
 		Interval tempInterval = 

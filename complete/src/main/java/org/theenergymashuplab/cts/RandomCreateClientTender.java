@@ -36,6 +36,7 @@ public class RandomCreateClientTender {
 	@JsonIgnore
 	final static Random rand = new Random();
 	final boolean DEBUG_JSON = true;
+	final int AUCTION_SEGMENT = 3;
 	final int priceScale=100;	// one unit price is 1/100 of the base currency
 	final int quantityScale=10;	// one unit quantity is 1/10h of the base unit
 	
@@ -102,7 +103,8 @@ public class RandomCreateClientTender {
 		
 	}
 	
-	RandomCreateClientTender(int hour, int howMany, int priceLower, int priceUpper, int quantityLower, int quantityUpper) {
+	RandomCreateClientTender(int hour, int howMany, int priceLower, int priceUpper,
+				int quantityLower, int quantityUpper, int segment) {
 		/*
 		 *	Produces a specified ClientCreateTenderPayload objects and prints to System.out.
 		 *	Hour is the hour of the day and shared by  all instruments.
@@ -194,7 +196,7 @@ public class RandomCreateClientTender {
 		//	print the json
 		for (int i = 0; i < howMany; i++) {
 			clientTenders[i] = randomTender(priceLower, priceUpper, quantityLower, quantityUpper);
-			teuaController.postClientCreateTender("1", clientTenders[i]);
+//			teuaController.postClientCreateTender("1", clientTenders[i]);
 			try {
 				json[i] = mapper.writeValueAsString(clientTenders[i]);
 			} catch (JsonProcessingException e) {
@@ -242,7 +244,8 @@ public class RandomCreateClientTender {
 				randQuantity, 
 				price, 
 				startTime, 
-				60*60);
+				60*60,
+				AUCTION_SEGMENT);
 		return randTender;
 	}
 
@@ -250,7 +253,8 @@ public class RandomCreateClientTender {
 	 * Adjust random value generators in this method.
 	 * Use values after priceScale and quantityScale have been applied.
 	 */
-	public ClientCreateTenderPayload randomTenderStart(Instant start, int priceLower, int priceUpper, int quantityLower, int quantityUpper)	{
+	public ClientCreateTenderPayload randomTenderStart(Instant start, int priceLower, int priceUpper,
+				int quantityLower, int quantityUpper)	{
 		long randQuantity = 1;
 		long randPrice = 1;
 		ClientCreateTenderPayload randTender;
@@ -260,7 +264,7 @@ public class RandomCreateClientTender {
 		randQuantity = 	quantityScale * (quantityLower + rand.nextInt((quantityUpper - quantityLower) + 1));
 
 		SideType side = SideType.BUY;
-		if (rand.nextInt(2) > 0)	{    // Why not `rand.nextInt(2) > 0` ?
+		if (rand.nextInt(2) > 0)	{
 			side = SideType.SELL;
 		}
 
@@ -279,7 +283,8 @@ public class RandomCreateClientTender {
 				randQuantity, 
 				randPrice, 
 				start, 
-				60);
+				60,
+				AUCTION_SEGMENT);
 		return randTender;
 	}
 
