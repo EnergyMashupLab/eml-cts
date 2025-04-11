@@ -16,7 +16,7 @@ public class EiCreatedStreamTenderPayload{
 	private List<Long> createdTenders;
 	
 	// Need clarification as to what this attribute refers to before changing or deleting
-	private final RefIdType refId = new RefIdType();
+	private RefIdType refId ;
 	private RefIdType inResponseTo;  // May be more prudent to rename and use refID instead of this new attribute 
 
 	/*

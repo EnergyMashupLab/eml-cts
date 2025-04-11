@@ -28,7 +28,7 @@ public class EiCreatedTransactionPayload {
 	public ActorIdType partyId;
 	// Should be RecipientTransactionIdType, but the class does not exist
 	public TransactionIdType recipientTransactionId;
-	public final RefIdType refId = new RefIdType();
+	public RefIdType refId ;
 	public EiResponseType response;
 	public TransactionIdType transactionId;
 
@@ -125,5 +125,9 @@ public class EiCreatedTransactionPayload {
 
 	public void setMarketTransactionId(MarketTransactionIdType marketTransactionId) {
 		this.marketTransactionId = marketTransactionId;
+	}
+
+	public void setRefId(RefIdType refId) {
+		this.refId = refId;
 	}
 }

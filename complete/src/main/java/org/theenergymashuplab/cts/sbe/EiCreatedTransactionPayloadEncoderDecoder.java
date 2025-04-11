@@ -5,7 +5,6 @@ import java.time.Instant;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiResponseType;
-import org.theenergymashuplab.cts.InstantType;
 import org.theenergymashuplab.cts.MarketTransactionIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TransactionIdType;
@@ -44,38 +43,33 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		// RefId field
 		eiCreatedTransactionPayloadEncoder.refId(eiCreatedTransactionPayload.getRefId().getMyUidId());
 
-		{
-			// Response field ----
-			// Response -> Created Date Time ---
-			// How should this be handled?
-			InstantType responseCreatedDateTime = eiCreatedTransactionPayload.getResponse()
-					.getCreatedDateTime();
-			responseCreatedDateTime.getTime();
-			eiCreatedTransactionPayloadEncoder.response().createdDateTime().seconds(0).nano(0);
+		// Response field ----
+		// Response -> Created Date Time ---
+		Instant responseCreatedDateTime = eiCreatedTransactionPayload.getResponse()
+				.getCreatedDateTime();
+		eiCreatedTransactionPayloadEncoder.response().createdDateTime()
+				.seconds(responseCreatedDateTime.getEpochSecond());
+		eiCreatedTransactionPayloadEncoder.response().createdDateTime().nano(responseCreatedDateTime.getNano());
 
-			// Response-> inResponseTo (there is no inResponseTo method)
-			eiCreatedTransactionPayloadEncoder.response().inResponseTo(
-					eiCreatedTransactionPayload.getResponse().getInResponseTo().getMyUidId());
+		// ---
 
-			// Response -> Response Code
-			eiCreatedTransactionPayloadEncoder.response()
-					.responseCode(eiCreatedTransactionPayload.getResponse().getResponseCode());
+		// Response-> inResponseTo
+		eiCreatedTransactionPayloadEncoder.response().inResponseTo(
+				eiCreatedTransactionPayload.getResponse().getInResponseTo().getMyUidId());
 
-			// Response -> Description ---
-			// Response -> Description -> Length
-			eiCreatedTransactionPayloadEncoder.response().responseDescription()
-					.length(eiCreatedTransactionPayload.getResponse().getResponseDescription()
-							.length());
+		// Response -> Response Code
+		eiCreatedTransactionPayloadEncoder.response()
+				.responseCode(eiCreatedTransactionPayload.getResponse().getResponseCode());
 
-			// Response -> Description -> varData (there is no varData attribute)
-			// eiCreatedTransactionPayloadEncoder.response().responseDescription().varData(eiCreatedTransactionPayload.getResponse().getResponseDescription());
+		// Response -> Description
+		// eiCreatedTransactionPayloadEncoder.response().responseDescription().wrap(directBuffer,
+		// 0);
 
-			// Response -> Response Detail (there is no response detail attribute in
-			// EiResponse)
-			// eiCreatedTransactionPayloadEncoder.response().responseDetail(eiCreatedTransactionPayload.getResponse().getResponseDetail());
+		// Response -> Response Detail
+		eiCreatedTransactionPayloadEncoder.response()
+				.responseDetail(eiCreatedTransactionPayload.getResponse().getResponseDetail());
 
-			// ----
-		}
+		// ----
 
 		// Transaction Id field
 		eiCreatedTransactionPayloadEncoder
@@ -100,38 +94,43 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		System.out.println("EiCreatedTransactionDecode Decoded :-");
 		System.out.println(eiCreatedTransactionDecoder.toString());
 
+		// CounterPartyId
 		ActorIdType counterPartyId = new ActorIdType();
 		counterPartyId.setMyUidId(eiCreatedTransactionDecoder.counterPartyId());
 
+		// MarketTransactionId
 		MarketTransactionIdType marketTransactionId = new MarketTransactionIdType();
 		marketTransactionId.setMyUidId(eiCreatedTransactionDecoder.marketTransactionId());
 
+		// PartyId
 		ActorIdType partyId = new ActorIdType();
 		partyId.setMyUidId(eiCreatedTransactionDecoder.partyId());
 
-		// RecipientTransactionIdType
+		// RecipientTransactionId
 		TransactionIdType recipientTransactionId = new TransactionIdType();
 		recipientTransactionId.setMyUidId(eiCreatedTransactionDecoder.recipientTransactionId());
 
+		// RefId
 		RefIdType refId = new RefIdType();
 		refId.setMyUidId(eiCreatedTransactionDecoder.refId());
 
-		// response---------------------------------------
+		// Response---------------------------------------
 		EiResponseType response = new EiResponseType();
-		// response created date time
-
 		RefIdType inResponseTo = new RefIdType();
 		inResponseTo.setMyUidId(eiCreatedTransactionDecoder.response().inResponseTo());
 
 		ResponseDetailType responseDetail = eiCreatedTransactionDecoder.response().responseDetail();
 
-		response.setCreatedDateTime(null);
+		response.setCreatedDateTime(
+				Instant.ofEpochSecond(eiCreatedTransactionDecoder.response().createdDateTime().seconds(),
+						eiCreatedTransactionDecoder.response().createdDateTime().nano()));
 		response.setInResponseTo(inResponseTo);
 		response.setResponseCode(eiCreatedTransactionDecoder.response().responseCode());
 		response.setResponseDescription(String.valueOf(eiCreatedTransactionDecoder.response().responseDescription()));
-		// response.setResponseDetails(responseDetail);
+		response.setResponseDetail(responseDetail);
 		// --------------------------------------------
-
+		
+		// TransactionId
 		TransactionIdType transactionId = new TransactionIdType();
 		transactionId.setMyUidId(eiCreatedTransactionDecoder.transactionId());
 
@@ -140,8 +139,7 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		eiCreatedTransactionPayload.setMarketTransactionId(marketTransactionId);
 		eiCreatedTransactionPayload.setPartyId(partyId);
 		eiCreatedTransactionPayload.setRecipientTransactionId(recipientTransactionId);
-		// this is final, is it supposed to be set?
-		// eiCreatedTransactionPayload.setRefId(refId);
+		eiCreatedTransactionPayload.setRefId(refId);
 		eiCreatedTransactionPayload.setResponse(response);
 		eiCreatedTransactionPayload.setTransactionId(transactionId);
 

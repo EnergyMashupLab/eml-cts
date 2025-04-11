@@ -16,6 +16,10 @@
 
 package org.theenergymashuplab.cts;
 
+import java.time.Instant;
+
+import org.theenergymashuplab.cts.generated_files.ResponseDetailType;
+
 /* 
  * TBD - integration using NIST_CTS EiResponseType, 
  * EiResponseModel, EiResponseRepository
@@ -23,21 +27,21 @@ package org.theenergymashuplab.cts;
  * TODO
  */
 public class EiResponseType {
-    public InstantType createdDateTime;
+    public Instant createdDateTime;
     public RefIdType inResponseTo;
     public long responseCode;
     public String responseDescription;
-    // public ResponseDetailType responseDetail;
+    public ResponseDetailType responseDetail;
 
     public EiResponseType() {
 
     }
 
-    public InstantType getCreatedDateTime() {
+    public Instant getCreatedDateTime() {
         return createdDateTime;
     }
 
-    public void setCreatedDateTime(InstantType createdDateTime) {
+    public void setCreatedDateTime(Instant createdDateTime) {
         this.createdDateTime = createdDateTime;
     }
 
@@ -64,5 +68,15 @@ public class EiResponseType {
     public void setResponseDescription(String responseDescription) {
         this.responseDescription = responseDescription;
     }
+
+    
+    public ResponseDetailType getResponseDetail() {
+        return responseDetail;
+    }
+
+    public void setResponseDetail(ResponseDetailType responseDetail) {
+        this.responseDetail = responseDetail;
+    }
+
 
 }
