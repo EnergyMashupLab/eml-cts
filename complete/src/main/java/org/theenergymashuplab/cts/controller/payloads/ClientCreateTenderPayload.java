@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,47 +30,46 @@ public class ClientCreateTenderPayload {
 	private long quantity;
 	private long price;
 	private long ctsTenderId;
+	private int segmentId = 1; // Set to 1 for orderbook by default for backwards compatability
+
 	/*
-	 * We can see either interval tenders or stream tenders with the latest September 2024 standard. To support this, 
-	 * we'll set these attributes initially to be null and allow the JSON serialization to populate them if they appear 
-	 * in the payload. For example, in the POST request, if we see a ctsStream object in the JSON, bridgeInterval and
-	 * bridgeExpireTime will remain null whilst ctsStream is nonNull(if all goes well). This should allow us to take
-	 * action based on what kind of tender we have.
+	 * We can see either interval tenders or stream tenders with the latest September 2024 standard. To support this, we'll set
+	 * these attributes initially to be null and allow the JSON serialization to populate them if they appear in the payload. For
+	 * example, in the POST request, if we see a ctsStream object in the JSON, bridgeInterval and bridgeExpireTime will remain
+	 * null whilst ctsStream is nonNull(if all goes well). This should allow us to take action based on what kind of tender we
+	 * have.
 	 */
 	private BridgeInterval bridgeInterval;
-	private BridgeInstant bridgeExpireTime;	
-//	private boolean ignorePosition; TODO 1.01	
+	private BridgeInstant bridgeExpireTime;
+	// private boolean ignorePosition; TODO 1.01
 
 	// Uses BridgeInterval to avoid serialization issues
-	
-	ClientCreateTenderPayload()	{	// json
-	}
-	
-	public ClientCreateTenderPayload(SideType side, long quantity, long price)	{
+
+	ClientCreateTenderPayload() {}
+
+	public ClientCreateTenderPayload(SideType side, long quantity, long price) {
 		// DEBUG start time and expiration time for test payloads
 		Instant expire = null;
-		Instant dtStart = Instant.parse("2020-05-31T10:00:00.00Z");	
-		expire = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
-		// System.err.println("ClientCreateTenderPayload: expire " +
-		//		expire.toString());
-		
+		Instant dtStart = Instant.parse("2020-05-31T10:00:00.00Z");
+		expire = dtStart.plusSeconds(60 * 60 * 11); // DEBUG 11 hours after dtStart
+		// System.err.println("ClientCreateTenderPayload: expire " + expire.toString());
+
 		this.side = side;
 		this.quantity = quantity;
 		this.price = price;
-//		this.ignorePosition = true;	// TODO hook and use in TeuaRestController
+		// this.ignorePosition = true; // TODO hook and use in TeuaRestController
 		// DEBUG this.expireTime = expire;
 		this.bridgeInterval = new BridgeInterval(60, dtStart);
 		this.bridgeExpireTime = new BridgeInstant(expire);
 	}
-	
-	// Constructor takes interval description
-	public ClientCreateTenderPayload(SideType side, long quantity, long price,
-			Instant dtStart, long minutes)	{
+
+	// Constructor takes interval description`
+	public ClientCreateTenderPayload(SideType side, long quantity, long price, Instant dtStart, long minutes) {
 		// DEBUG start time and expiration time for test payloads
 		Instant expire;
 
-		expire = dtStart.plusSeconds(60*60*11);	// DEBUG 11 hours after dtStart
-		
+		expire = dtStart.plusSeconds(60 * 60 * 11); // DEBUG 11 hours after dtStart
+
 		this.side = side;
 		this.quantity = quantity;
 		this.price = price;
@@ -78,28 +77,43 @@ public class ClientCreateTenderPayload {
 		this.bridgeExpireTime = new BridgeInstant(expire);
 	}
 
+	// Only purpose is to have a constructor that takes a segmentId
+	public ClientCreateTenderPayload(SideType side, long quantity, long price, Instant dtStart, long minutes, int segmentId) {
+		// DEBUG start time and expiration time for test payloads
+		Instant expire;
+
+		expire = dtStart.plusSeconds(60 * 60 * 11); // DEBUG 11 hours after dtStart
+
+		this.side = side;
+		this.quantity = quantity;
+		this.price = price;
+		this.bridgeInterval = new BridgeInterval(60, dtStart);
+		this.bridgeExpireTime = new BridgeInstant(expire);
+		// TODO For testing purposes, if this field is defined it should be set to 2 to
+		// represent the Auction Market segment
+		this.segmentId = 2;
+	}
+
 	// Constructor takes stream description
-	//May need new constructor
-	
+	// May need new constructor
+
 	@Override
-	public String toString()	{
+	public String toString() {
 		SideType tempSide = this.side;
 		String tempString;
 
-		tempString = (tempSide == SideType.BUY)? "B" : "S";	
-		return (info + " side " + tempString + " quantity " +
-				quantity + " price " + price);
+		tempString = (tempSide == SideType.BUY) ? "B" : "S";
+		return (info + " side " + tempString + " quantity " + quantity + " price " + price + " segmentId " + segmentId);
 	}
-	
-	public Interval getInterval()	{
+
+	public Interval getInterval() {
 		// converts internal representation to a CTS Interval
-		Interval tempInterval = 
-				new Interval(this.bridgeInterval.getDurationInMinutes(),
+		Interval tempInterval = new Interval(this.bridgeInterval.getDurationInMinutes(),
 				this.bridgeInterval.getDtStart().asInstant());
 		return tempInterval;
 	}
 
-	public String getInfo() { 
+	public String getInfo() {
 		return info;
 	}
 
@@ -110,7 +124,6 @@ public class ClientCreateTenderPayload {
 	public SideType getSide() {
 		return side;
 	}
-
 
 	public void setSide(SideType side) {
 		this.side = side;
@@ -156,12 +169,20 @@ public class ClientCreateTenderPayload {
 		this.bridgeExpireTime = bridgeExpireTime;
 	}
 
-//	public boolean isIgnorePosition() {
-//		return ignorePosition;
-//	}
-//
-//	public void setIgnorePosition(boolean ignorePosition) {
-//		this.ignorePosition = ignorePosition;
-//	}
-//	
+	public int getSegmentId() {
+		return segmentId;
+	}
+
+	public void setSegmentId(int segmentId) {
+		this.segmentId = segmentId;
+	}
+
+	// public boolean isIgnorePosition() {
+	// return ignorePosition;
+	// }
+	//
+	// public void setIgnorePosition(boolean ignorePosition) {
+	// this.ignorePosition = ignorePosition;
+	// }
+	//
 }

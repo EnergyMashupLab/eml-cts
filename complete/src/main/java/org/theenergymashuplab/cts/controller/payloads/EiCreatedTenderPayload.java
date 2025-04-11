@@ -24,29 +24,23 @@ import org.theenergymashuplab.cts.TenderIdType;
 
 public class EiCreatedTenderPayload {
 	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
-	
+
 	private TenderIdType tenderId;
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
 	public EiResponse response;
-//	public ArrayofResponses responses; NOT USED
-	
+	// public ArrayofResponses responses; NOT USED
+
 	// Need clarification as to what this attribute refers to before changing or deleting
 	private final RefIdType refId = new RefIdType();
-	private RefIdType inResponseTo;  // May be more prudent to rename and use refID instead of this new attribute 
+	private RefIdType inResponseTo; // May be more prudent to rename and use refID instead of this new attribute
 
 	/*
-	 * Default constructor for JSON deserialization.
-	 * TO DO change to zero Id values in ActorId and RefId constructors
+	 * Default constructor for JSON deserialization. TO DO change to zero Id values in ActorId and RefId constructors
 	 */
-	public EiCreatedTenderPayload()	{		
-	}
-	
-	public EiCreatedTenderPayload(
-			TenderIdType tenderId,
-			ActorIdType partyId,
-			ActorIdType counterPartyId,
-			EiResponse response,
+	public EiCreatedTenderPayload() {}
+
+	public EiCreatedTenderPayload(TenderIdType tenderId, ActorIdType partyId, ActorIdType counterPartyId, EiResponse response,
 			RefIdType inResponseTo) {
 
 		this.tenderId = tenderId;
@@ -60,17 +54,17 @@ public class EiCreatedTenderPayload {
 		return tenderId.value();
 	}
 
-	public void print() {		
+	public void print() {
 		System.err.println(this);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "EiCreatedTenderPayload [marketOrderId=" + marketOrderId + ", tenderId=" + tenderId + ", partyId="
-				+ partyId + ", counterPartyId=" + counterPartyId + ", response=" + response + ", refId=" + refId
-				+ ", inResponseTo=" + inResponseTo + "]";
+		return "EiCreatedTenderPayload [marketOrderId=" + marketOrderId + ", tenderId=" + tenderId + ", partyId=" + partyId
+				+ ", counterPartyId=" + counterPartyId + ", response=" + response + ", refId=" + refId + ", inResponseTo="
+				+ inResponseTo + "]";
 	}
-	
+
 	public EiResponse getResponse() {
 		return response;
 	}

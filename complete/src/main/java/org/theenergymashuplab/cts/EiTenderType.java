@@ -21,34 +21,42 @@ package org.theenergymashuplab.cts;
 import java.time.*;
 
 public class EiTenderType extends TenderBase {
-	private final TenderIdType tenderId = new TenderIdType();	// new tender id on construction
-	private MarketOrderIdType referencedQuoteId = null;  // Will be unused until development of Negotiation Facet
-	/* TODO Not up to March 2024 spec. This ought to be provided by the market (parity)
-	but parity does not provide its parity order id at this moment. Thus a new cts-generated id is used
-	in the time being */ 
+	private final TenderIdType tenderId = new TenderIdType(); // new tender id on construction
+	private MarketOrderIdType referencedQuoteId = null; // Will be unused until development of Negotiation Facet
+	/*
+	 * TODO Not up to March 2024 spec. This ought to be provided by the market (parity) but parity does not provide its parity
+	 * order id at this moment. Thus a new cts-generated id is used in the time being
+	 */
 	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
-	public static final long EMPTY_MARKET_ORDER_ID = -1;  // Market orders ids need to be filled in by parity, so this will be the default value until it's filled by parity
-	
+	public static final long EMPTY_MARKET_ORDER_ID = -1; // Market orders ids need to be filled in by parity, so this
+															// will be the default value until it's filled by parity
+
 	// Needed for JSON deserialization by Jackson
 	public EiTenderType() {
 		super(null, null, null);
 		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
 	}
-	
-	//Already have constructor that could be used with streams
+
+	// Already have constructor that could be used with streams
 	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail) {
 		super(expirationTime, side, tenderDetail);
 		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
 	}
 
-	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail,
-			MarketOrderIdType marketOrderId) {
+	// Constructor that takes a segmentId for the Auction market implementation
+	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail, int segmentId) {
+		super(expirationTime, side, tenderDetail);
+		this.setSegmentId(segmentId);
+		marketOrderId.setMyUidId(EMPTY_MARKET_ORDER_ID);
+	}
+
+	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail, MarketOrderIdType marketOrderId) {
 		super(expirationTime, side, tenderDetail);
 		this.marketOrderId = marketOrderId;
 	}
-	
-	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail,
-			MarketOrderIdType referencedQuoteId, MarketOrderIdType marketOrderId) {
+
+	public EiTenderType(Instant expirationTime, SideType side, TenderDetail tenderDetail, MarketOrderIdType referencedQuoteId,
+			MarketOrderIdType marketOrderId) {
 		super(expirationTime, side, tenderDetail);
 		this.referencedQuoteId = referencedQuoteId;
 		this.marketOrderId = marketOrderId;
@@ -57,10 +65,9 @@ public class EiTenderType extends TenderBase {
 	@Override
 	public String toString() {
 		return "EiTenderType [tenderId=" + tenderId + ", referencedQuoteId=" + referencedQuoteId + ", marketOrderId="
-				+ marketOrderId + ", allOrNone=" + isAllOrNone() + ", executionInstructions="
-				+ getExecutionInstructions() + ", marketId=" + getMarketId() + ", priceScale="
-				+ getPriceScale() + ", quantityScale=" + getQuantityScale() + ", resourceDesignator="
-				+ getResourceDesignator() + ", tnderDetail=" + getTenderDetail() + ", warrants="
+				+ marketOrderId + ", allOrNone=" + isAllOrNone() + ", executionInstructions=" + getExecutionInstructions()
+				+ ", marketId=" + getMarketId() + ", priceScale=" + getPriceScale() + ", quantityScale=" + getQuantityScale()
+				+ ", resourceDesignator=" + getResourceDesignator() + ", tnderDetail=" + getTenderDetail() + ", warrants="
 				+ getWarrants() + "]";
 	}
 
@@ -83,5 +90,5 @@ public class EiTenderType extends TenderBase {
 	public void setMarketOrderId(MarketOrderIdType marketOrderId) {
 		this.marketOrderId = marketOrderId;
 	}
-	
+
 }

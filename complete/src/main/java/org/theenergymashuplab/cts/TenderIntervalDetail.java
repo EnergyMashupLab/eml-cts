@@ -4,7 +4,7 @@ public class TenderIntervalDetail extends TenderDetail {
 	private Interval interval;
 	private long price;
 	private long quantity;
-	
+
 	public TenderIntervalDetail(Interval interval, long price, long quantity) {
 		this.interval = interval;
 		this.price = price;
