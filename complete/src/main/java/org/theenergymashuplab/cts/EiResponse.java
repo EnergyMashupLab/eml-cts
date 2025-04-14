@@ -24,6 +24,7 @@ public class EiResponse {
 	public String responseDescription;
 	private RefIdType refId = new RefIdType();
 	private Instant createdDateTime = Instant.now();
+	public ResponseDetailType responseDetailType;
 	
 	/*
 	 * PROBABLY NO LONGER USED due to id inheritance
@@ -44,6 +45,17 @@ public class EiResponse {
 		responseDescription = description;
 	}
 	 
+	 
+	 /*
+	  * TO-DO, MIGRATE ALL CREATIONS TO USE NEW CONTRUCTOR WITH NEW CLASS: ResponseDetailType, See ResposeDetailType.java
+	  */
+	 public EiResponse(long code, String description, ResponseDetailType detailType) {
+		    this.responseCode = code;
+		    this.responseDescription = description;
+		    this.responseDetailType = detailType;
+		}
+
+	 
 	 /*
 	  * No parameters - for JSON serialization
 	  */
@@ -57,7 +69,8 @@ public class EiResponse {
 			return ("EIResponse responseCode " + responseCode + 
 					" responseDescription " + responseDescription +
 					" refId " + refId.toString() +
-					" createdDateTime " + createdDateTime.toString());
+					" createdDateTime " + createdDateTime.toString() +
+					" responseDetailType " + responseDetailType.toString());
 }
 
 	public long getResponseCode() {
@@ -91,4 +104,13 @@ public class EiResponse {
 	public void setCreatedDateTime(Instant createdDateTime) {
 		this.createdDateTime = createdDateTime;
 	}
+	
+	public ResponseDetailType getResponseDetailType() {
+	    return responseDetailType;
+	}
+
+	public void setResponseDetailType(ResponseDetailType responseDetailType) {
+	    this.responseDetailType = responseDetailType;
+	}
+
 }

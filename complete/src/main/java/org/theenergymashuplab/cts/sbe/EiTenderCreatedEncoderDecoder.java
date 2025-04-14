@@ -70,33 +70,80 @@ public class EiTenderCreatedEncoderDecoder {
     encoder.partyId(payload.getPartyId().getMyUidId());
 
     // Encode composite: EiResponseType
-    EiCreatedTenderPayloadEncoder.ResponseEncoder responseEncoder = encoder.response();
+    EiResponseTypeEncoder responseEncoder = encoder.response();
 
     Instant createdDateTime = payload.getResponse().getCreatedDateTime();
     responseEncoder.createdDateTime()
         .seconds(createdDateTime.getEpochSecond())
         .nano(createdDateTime.getNano());
 
-    responseEncoder.inResponseTo(payload.getResponse().getInResponseTo().getMyUidId());
+    responseEncoder.inResponseTo(payload.getResponse().getRefId().getMyUidId());
+    //	inResponseTo of type RefID in WD32 UML
+    
     responseEncoder.responseCode(payload.getResponse().getResponseCode());
 
     String description = payload.getResponse().getResponseDescription();
-    MutableDirectBuffer descBuffer = new UnsafeBuffer(description.getBytes(StandardCharsets.UTF_8));
-    responseEncoder.putResponseDescription(descBuffer, 0, descBuffer.capacity());
+    byte[] descBytes = description.getBytes(StandardCharsets.UTF_8);
+    MutableDirectBuffer descBuffer = new UnsafeBuffer(descBytes);
 
+ // First write the length
+    responseEncoder.responseDescription().length(descBytes.length);
+ // Write the UTF-8 bytes directly
+    responseEncoder.responseDescription().buffer().putBytes(
+        responseEncoder.responseDescription().offset() + 4, 
+        descBuffer, 
+        0, 
+        descBytes.length
+    );
+    
     // Encode enum: ResponseDetailType
     org.theenergymashuplab.cts.generated_files.ResponseDetailType encodedEnum;
-    switch (payload.getResponse().getResponseDetail()) {
-        case Success:
-            encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.Success;
-            break;
-        case NotAuthorized:
-            encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.NotAuthorized;
-            break;
-        // add all other cases...
-        default:
-            throw new IllegalArgumentException("Unhandled ResponseDetail: " + payload.getResponse().getResponseDetail());
-    }
+    switch (payload.getResponse().getResponseDetailType()) {
+    case UNSPECIFIED:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.Unspecified;
+        break;
+    case RULES_VIOLATION:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.RulesViolation;
+        break;
+    case INVALID_REFERENCE:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidReference;
+        break;
+    case DUPLICATE:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.Duplicate;
+        break;
+    case TRADING_CLOSED:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.TradingClosed;
+        break;
+    case PARTY_RESTRICTED:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.PartyRestricted;
+        break;
+    case INVALID_INSTRUMENT:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidInstrument;
+        break;
+    case FORCE_MAJEURE:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.ForceMajeure;
+        break;
+    case INVALID_MARKET:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidMarket;
+        break;
+    case INVALID_SEGMENT:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidInstrument;
+        break;
+    case SUCCESS:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.Success;
+        break;
+    case NOT_AUTHORIZED:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.NotAuthorized;
+        break;
+    case INVALID_ARTIFACT:
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidArtifact;
+        break;
+    default:
+        throw new IllegalArgumentException(
+            "Unhandled ResponseDetailType: " + payload.getResponse().getResponseDetailType());
+}
+
+responseEncoder.responseDetail(encodedEnum);
 
     responseEncoder.responseDetail(encodedEnum);
 
@@ -186,7 +233,6 @@ public class EiTenderCreatedEncoderDecoder {
 		eiResponse.setResponseCode(responseDecoder.responseCode());
 
 		// Decode responseDescription
-		// Currently not implementing varStringEncoding decoding logic
 		// Assuming responseDescription is unused and set as empty string ""
 		eiResponse.setResponseDescription("");
 //		// Decode responseDescription
@@ -194,7 +240,7 @@ public class EiTenderCreatedEncoderDecoder {
 //		eiResponse.setResponseDescription(responseDescription);
 
 		// Decode responseDetail Enum
-		eiResponse.setResponseDetail(org.theenergymashuplab.cts.ResponseDetailType.valueOf(responseDecoder.responseDetail().name()));
+		eiResponse.setResponseDetailType(org.theenergymashuplab.cts.ResponseDetailType.valueOf(responseDecoder.responseDetail().name()));
 
 		// Set the decoded response
 		eiCreatedTenderPayload.setResponse(eiResponse);
