@@ -1,4 +1,4 @@
-package org.theenergymashuplab.cts.random_generator;
+package org.theenergymashuplab.cts.generatePostmanCollection;
 
 import java.time.Instant;
 import java.util.Random;
@@ -15,9 +15,14 @@ public class GeneratePostmanCollection {
     public static void main(String[] args) {
         int numberOfTenders = 100;
         // Header for postman collection
-        String jsonOutput = "{\"info\":{\"_postman_id\":\"5ea37b54-c932-4a9f-bd39-0558328a3e5c\",\"name\":\"Auction Market Testing\",\"schema\":\"https://schema.getpostman.com/json/collection/v2.1.0/collection.json\",\"_exporter_id\":\"43509160\",\"_collection_link\":\"https://tu-1178092.postman.co/workspace/tu's-Workspace~dce8cdc0-ff20-4400-8b41-d8f1264df5ae/collection/43509160-5ea37b54-c932-4a9f-bd39-0558328a3e5c?action=share&source=collection_link&creator=43509160\"},\"item\":[";
-        String item = "";
-        String raw = "";
+        String jsonOutput = "{\"info\":{\"_postman_id\":\"5ea37b54-c932-4a9f-bd39-0558328a3e5c\",\"name\":\"Auction Market Testing\",\"schema\":\"https://schema.getpostman.com/json/collection/v2.1.0/collection.json\",\"_exporter_id\":\"43509160\"},\"item\":[";
+        // This makes the first request in the collection the auction clear request
+        jsonOutput += "{\"name\": \"Clear Auction Market\",\"request\": {\"auth\": {"
+                + "\"type\": \"noauth\"},\"method\": \"GET\",\"header\": [],\"url\": {"
+                + "\"raw\": \"http://localhost:8080/lme/clear\",\"protocol\": \"http\",\"host\": [\"localhost\""
+                + "],\"port\": \"8080\",\"path\": [\"lme\",\"clear\"]}},\"response\": []},";
+        String item;
+        String raw;
         for (int i = 0; i < numberOfTenders; i++) {
             ClientCreateTenderPayload tender = randomTender();
             item = "{\"name\":\"" + tender.getSide() + " " + tender.getQuantity() + " at " + tender.getPrice()
@@ -46,7 +51,7 @@ public class GeneratePostmanCollection {
         jsonOutput += "]}";
 
         try {
-            String path = "complete/Postman Collection.json";
+            String path = "complete/src/main/java/org/theenergymashuplab/cts/generatePostmanCollection/Generated_Postman_Collection.json";
             File file = new File(path);
             file.createNewFile();
 
