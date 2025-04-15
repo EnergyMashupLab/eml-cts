@@ -45,7 +45,8 @@ public class ClientCreateTenderPayload {
 
 	// Uses BridgeInterval to avoid serialization issues
 
-	ClientCreateTenderPayload() {}
+	ClientCreateTenderPayload() {
+	}
 
 	public ClientCreateTenderPayload(SideType side, long quantity, long price) {
 		// DEBUG start time and expiration time for test payloads
@@ -89,9 +90,7 @@ public class ClientCreateTenderPayload {
 		this.price = price;
 		this.bridgeInterval = new BridgeInterval(60, dtStart);
 		this.bridgeExpireTime = new BridgeInstant(expire);
-		// TODO For testing purposes, if this field is defined it should be set to 2 to
-		// represent the Auction Market segment
-		this.segmentId = 2;
+		this.segmentId = segmentId;
 	}
 
 	// Constructor takes stream description
