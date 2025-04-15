@@ -94,7 +94,7 @@ public class BridgeInterval {
 	}
 
 	public String toString() {
-		return "\"durationInMinutes\":" + this.getDurationInMinutes() + ",\"dtStart\":{\"instantString\":\""
-				+ this.getDtStart().getInstantString() + "\"}";
+		return "\\\"durationInMinutes\\\":" + this.getDurationInMinutes() + ",\\\"dtStart\\\":{\\\"instantString\\\":\\\""
+				+ this.getDtStart().getInstantString() + "\\\"}";
 	}
 }

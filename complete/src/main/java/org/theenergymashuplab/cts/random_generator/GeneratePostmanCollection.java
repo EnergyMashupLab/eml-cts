@@ -12,7 +12,7 @@ public class GeneratePostmanCollection {
     static Random rand = new Random();
 
     public static void main(String[] args) {
-        int numberOfTenders = 4;
+        int numberOfTenders = 1;
         // Header for postman collection
         String jsonOutput = "{\"info\":{\"_postman_id\":\"5ea37b54-c932-4a9f-bd39-0558328a3e5c\",\"name\":\"AuctionMarketTesting\",\"schema\":\"https://schema.getpostman.com/json/collection/v2.1.0/collection.json\",\"_exporter_id\":\"43509160\",\"_collection_link\":\"https://tu-1178092.postman.co/workspace/tu's-Workspace~dce8cdc0-ff20-4400-8b41-d8f1264df5ae/collection/43509160-5ea37b54-c932-4a9f-bd39-0558328a3e5c?action=share&source=collection_link&creator=43509160\"},\"item\":[";
         String item = "";
@@ -22,9 +22,10 @@ public class GeneratePostmanCollection {
             item = "{\"name\":\"" + tender.getSide() + " " + tender.getQuantity() + " at " + tender.getPrice()
                     + "\",\"request\":{\"method\":\"POST\",\"header\":[],\"body\":{\"mode\":\"raw\",\"raw\":";
 
-            raw = "{\"info\":\"" + tender.getInfo() + "\",\"side\":\"" + tender.getSide() + "\",\"quantity\":"
-                    + tender.getQuantity() + ",\"price\":" + tender.getPrice() + ",\"ctsTenderId\":0,\"bridgeInterval\":{"
-                    + tender.getBridgeInterval().toString() + "},\"segmentId\":" + tender.getSegmentId() + "},";
+            raw = "\"{\\\"info\\\":\\\"" + tender.getInfo() + "\\\",\\\"side\\\":\\\"" + tender.getSide()
+                    + "\\\",\\\"quantity\\\":" + tender.getQuantity() + ",\\\"price\\\":" + tender.getPrice()
+                    + ",\\\"ctsTenderId\\\":0,\\\"bridgeInterval\\\":{" + tender.getBridgeInterval().toString()
+                    + "},\\\"segmentId\\\":" + tender.getSegmentId() + "}\",";
 
             item += raw;
 
