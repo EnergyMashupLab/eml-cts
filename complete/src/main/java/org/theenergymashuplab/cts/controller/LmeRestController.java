@@ -367,7 +367,7 @@ public class LmeRestController {
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
-		logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
+		// logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
 		logger.debug("lme/createTender " + eiCreateTender.toString());
 
 		/*
