@@ -66,7 +66,7 @@ public class RandomEiTender {
 	private EiTenderType randTender;
 	Interval interval = new Interval(60, dtStart); // 60 minute interval at dtStart
 
-	RandomEiTender() {
+	public RandomEiTender() {
 		// initialize random generator in class attributes
 		// Local instance variable initializers and instance initializers are executed
 		// after the constructor is invoked
