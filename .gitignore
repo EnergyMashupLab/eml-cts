@@ -143,4 +143,4 @@ hs_err_pid*
 .idea/
 
 # Generated Postman Collection
-/complete/src/main/java/org/theenergymashuplab/cts/generatePostmanCollection/Generated Postman Collection.json
+/complete/src/main/resources/Generated_Postman_Collection.json

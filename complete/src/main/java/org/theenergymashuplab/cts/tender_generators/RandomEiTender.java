@@ -37,11 +37,17 @@
  * 
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.tender_generators;
 
 import java.time.Instant;
 import java.time.Duration;
 import java.util.Random;
+
+import org.theenergymashuplab.cts.EiTenderType;
+import org.theenergymashuplab.cts.Interval;
+import org.theenergymashuplab.cts.SideType;
+import org.theenergymashuplab.cts.TenderDetail;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

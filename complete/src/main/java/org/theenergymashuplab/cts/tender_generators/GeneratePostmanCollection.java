@@ -1,4 +1,4 @@
-package org.theenergymashuplab.cts.generatePostmanCollection;
+package org.theenergymashuplab.cts.tender_generators;
 
 import java.time.Instant;
 import java.util.Random;
@@ -8,6 +8,12 @@ import java.io.IOException;
 
 import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.controller.payloads.ClientCreateTenderPayload;
+
+/*
+ * This class' main function is run to generate a postman collection at path /complete/src/main/resources
+ * 
+ * The number of create tender requests to generate is defined by the numberOfTenders variable in the main function
+ */
 
 public class GeneratePostmanCollection {
     static Random rand = new Random();
@@ -51,7 +57,7 @@ public class GeneratePostmanCollection {
         jsonOutput += "]}";
 
         try {
-            String path = "complete/src/main/java/org/theenergymashuplab/cts/generatePostmanCollection/Generated_Postman_Collection.json";
+            String path = "complete/src/main/resources/Generated_Postman_Collection.json";
             File file = new File(path);
             file.createNewFile();
 
