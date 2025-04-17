@@ -95,5 +95,4 @@ public class EiResponseType {
 	public void setResponseDetail(ResponseDetailType responseDetail) {
 		this.responseDetail = responseDetail;
 	}
-
 }

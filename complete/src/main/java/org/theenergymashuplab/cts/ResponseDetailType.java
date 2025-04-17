@@ -17,17 +17,17 @@
 package org.theenergymashuplab.cts;
 
 public enum ResponseDetailType {
-    Unspecified,
-    RulesViolation,
-    InvalidReference,
-    Duplicate,
-    TradingClosed,
-    PartyRestricted,
-    InvalidInstrument,
-    ForceMajeure,
-    InvalidMarket,
-    InvalidSegment,
-    Success,
-    NotAuthorized,
-    InvalidArtifact
+    UNSPECIFIED,
+    RULES_VIOLATION,
+    INVALID_REFERENCE,
+    DUPLICATE,
+    TRADING_CLOSED,
+    PARTY_RESTRICTED,
+    INVALID_INSTRUMENT,
+    FORCE_MAJEURE,
+    INVALID_MARKET,
+    INVALID_SEGMENT,
+    SUCCESS,
+    NOT_AUTHORIZED,
+    INVALID_ARTIFACT;
 }
