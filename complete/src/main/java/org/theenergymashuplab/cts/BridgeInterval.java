@@ -41,7 +41,7 @@ package org.theenergymashuplab.cts;
 		 * minutes, converted in the constructor
 		 */
 
-		BridgeInterval() {
+		public BridgeInterval() {
 			dtStart = new BridgeInstant(Instant.now()); // a reasonable default
 		}
 
@@ -50,7 +50,7 @@ package org.theenergymashuplab.cts;
 			this.dtStart = new BridgeInstant(dtStart);
 		}
 
-		BridgeInterval(Interval ctsInterval) {
+		public BridgeInterval(Interval ctsInterval) {
 			this.durationInMinutes = ctsInterval.getDuration().toMinutes();
 			this.dtStart = new BridgeInstant(ctsInterval.dtStart);
 		}

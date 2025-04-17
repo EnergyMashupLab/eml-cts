@@ -20,54 +20,75 @@ import java.time.Instant;
 
 import org.theenergymashuplab.cts.generated_files.ResponseDetailType;
 
-/* 
- * TBD - integration using NIST_CTS EiResponseType, 
- * EiResponseModel, EiResponseRepository
- * 
- * TODO
- */
+
 public class EiResponseType {
-    public Instant createdDateTime;
-    public RefIdType inResponseTo;
-    public long responseCode;
-    public String responseDescription;
-    public ResponseDetailType responseDetail;
+	public InstantType createdDateTime;
+	public RefIdType inResponseTo;
+	public long responseCode;
+	public String responseDescription;
+	public ResponseDetailType responseDetail;
 
-    public EiResponseType() {
+	public EiResponseType() {
+		this.createdDateTime = new InstantType();
+		this.inResponseTo = new RefIdType();
+		this.responseCode = 0;
+		this.responseDescription = "";
+		this.responseDetail = ResponseDetailType.Unspecified;
+	}
 
-    }
+	public EiResponseType(InstantType createdDateTime, RefIdType inResponseTo, long responseCode,
+			String responseDescription, ResponseDetailType responseDetail) {
+		this.createdDateTime = createdDateTime;
+		this.inResponseTo = inResponseTo;
+		this.responseCode = responseCode;
+		this.responseDescription = responseDescription;
+		this.responseDetail = responseDetail;
+	}
 
-    public Instant getCreatedDateTime() {
-        return createdDateTime;
-    }
 
-    public void setCreatedDateTime(Instant createdDateTime) {
-        this.createdDateTime = createdDateTime;
-    }
+	public InstantType getCreatedDateTime() {
+		return createdDateTime;
+	}
 
-    public RefIdType getInResponseTo() {
-        return inResponseTo;
-    }
+	public void setCreatedDateTime(InstantType createdDateTime) {
+		this.createdDateTime = createdDateTime;
+	}
 
-    public void setInResponseTo(RefIdType inResponseTo) {
-        this.inResponseTo = inResponseTo;
-    }
+	public RefIdType getInResponseTo() {
+		return inResponseTo;
+	}
 
-    public long getResponseCode() {
-        return responseCode;
-    }
+	public void setInResponseTo(RefIdType inResponseTo) {
+		this.inResponseTo = inResponseTo;
+	}
 
-    public void setResponseCode(long responseCode) {
-        this.responseCode = responseCode;
-    }
+	public long getResponseCode() {
+		return responseCode;
+	}
 
-    public String getResponseDescription() {
-        return responseDescription;
-    }
+	public void setResponseCode(long responseCode) {
+		this.responseCode = responseCode;
+	}
 
-    public void setResponseDescription(String responseDescription) {
-        this.responseDescription = responseDescription;
-    }
+	public String getResponseDescription() {
+		return responseDescription;
+	}
+
+	public void setResponseDescription(String responseDescription) {
+		this.responseDescription = responseDescription;
+	}
+
+
+	@Override
+	public String toString() {
+		return "EiResponseType{" +
+				"createdDateTime=" + createdDateTime +
+				", inResponseTo=" + inResponseTo +
+				", responseCode=" + responseCode +
+				", responseDescription='" + responseDescription + '\'' +
+				", responseDetail=" + responseDetail +
+				'}';
+	}
 
     
     public ResponseDetailType getResponseDetail() {

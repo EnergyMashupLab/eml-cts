@@ -78,8 +78,8 @@ public class LmaRestController {
 	 * 		ResponseBody is EiCreatedTender
 	 */
 	@PostMapping("/createTender")
-	public byte[] 	postEiCreateTender(
-			@RequestBody Byte[] eiCreateTenderByteArr)	{
+	public EiCreatedTenderPayload 	postEiCreateTender(
+			@RequestBody EiCreateTenderPayload eiCreateTender)	{
 
 		EiCreateTenderPayload tempCreate;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
@@ -91,17 +91,19 @@ public class LmaRestController {
     	restTemplate = builder.build();
     	
 		// save CreateTender message as sent by TEUA
-		//tempCreate = eiCreateTender;	
+		tempCreate = eiCreateTender;	
 		
-		//logger.debug("postEiCreateTender to LME. TenderId " + tempCreate.getTender().getTenderId().toString());
+		logger.debug("postEiCreateTender to LME. TenderId " +
+				tempCreate.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		byte[] EiCreatedTenderByteArr = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
- 				eiCreateTenderByteArr, 
- 				byte[].class);
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
+				tempCreate, 
+				EiCreatedTenderPayload.class);
 		
-		logger.trace("LMA after forward to LME and before return " + eiCreateTenderByteArr.toString());		
+		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+		
 		/*
 		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
 				tempCreate.getPartyId(),
@@ -109,8 +111,8 @@ public class LmaRestController {
 				new EiResponse(200, "OK"));
 		*/
 		
-		return EiCreatedTenderByteArr;
-		}
+		return tempPostResponse;
+	}
 	
 	/*
 	 * POST - /createTransaction - comes from LME based on market matches

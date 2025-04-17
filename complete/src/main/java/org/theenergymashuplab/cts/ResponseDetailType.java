@@ -16,18 +16,23 @@
 
 package org.theenergymashuplab.cts;
 
-public class MeasurementPointIdType extends UidType {
-
-	public MeasurementPointIdType() {
-
-	}
-
-	public long value() {
-		return this.myUidId;
-	}
-
-	@Override
-	public String toString() {
-		return String.valueOf(this.myUidId);
-	}
+/**
+ * @author crossover
+ * @version 1.0
+ * @created 18-Feb-2025 11:30:38 AM
+ */
+public enum ResponseDetailType {
+    UNSPECIFIED,
+    RULES_VIOLATION,
+    INVALID_REFERENCE,
+    DUPLICATE,
+    TRADING_CLOSED,
+    PARTY_RESTRICTED,
+    INVALID_INSTRUMENT,
+    FORCE_MAJEURE,
+    INVALID_MARKET,
+    INVALID_SEGMENT,
+    SUCCESS,
+    NOT_AUTHORIZED,
+    INVALID_ARTIFACT;
 }
