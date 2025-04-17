@@ -10,24 +10,24 @@ import org.theenergymashuplab.cts.RefIdType;
  */
 public class EiRejectedQuotePayload {
 
-	public EiResponseType eiResponseType;
-	public RefIdType inResponseTo;
+	EiResponseType eiResponse;
+	RefIdType inResponseTo;
 
 	public EiRejectedQuotePayload() {
 
 	}
 
-	public EiRejectedQuotePayload(EiResponseType eiResponseType, RefIdType inResponseTo) {
-		this.eiResponseType = eiResponseType;
+	public EiRejectedQuotePayload(EiResponseType eiResponse, RefIdType inResponseTo) {
+		this.eiResponse = eiResponse;
 		this.inResponseTo = inResponseTo;
 	}
 
 	public EiResponseType getEiResponseType() {
-		return eiResponseType;
+		return eiResponse;
 	}
 
-	public void setEiResponseType(EiResponseType eiResponseType) {
-		this.eiResponseType = eiResponseType;
+	public void setEiResponseType(EiResponseType eiResponse) {
+		this.eiResponse = eiResponse;
 	}
 
 	public RefIdType getInResponseTo() {
@@ -40,6 +40,6 @@ public class EiRejectedQuotePayload {
 
 	@Override
 	public String toString() {
-		return "EiRejectedQuotePayload{" + "eiResponseType=" + eiResponseType + ", inResponseTo=" + inResponseTo + '}';
+		return "EiRejectedQuotePayload{" + "eiResponse=" + eiResponse + ", inResponseTo=" + inResponseTo + '}';
 	}
 }
