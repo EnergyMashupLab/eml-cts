@@ -21,14 +21,14 @@ import org.theenergymashuplab.cts.Interval;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.CtsStreamType;
-import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.EiResponseType;
 
 public class EiReplyPositionPayload {
     private Interval boundingInterval;
     private ActorIdType positionParty;
     private CtsStreamType positions;
     private ActorIdType requestor;
-    private EiResponse response;
+    private EiResponseType response;
 
 
     // Default initializer for JSON serialization
@@ -36,10 +36,10 @@ public class EiReplyPositionPayload {
         this.positionParty = new ActorIdType();
         this.positions = new CtsStreamType();
         this.requestor = new ActorIdType();
-        this.response = new EiResponse();
+        this.response = new EiResponseType();
     }
 
-    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStreamType positions, ActorIdType requestor, EiResponse response) {
+    public EiReplyPositionPayload(Interval boundingInterval, ActorIdType positionParty, CtsStreamType positions, ActorIdType requestor, EiResponseType response) {
         this.boundingInterval = boundingInterval;
         this.positionParty = positionParty;
         this.positions = positions;
@@ -79,11 +79,11 @@ public class EiReplyPositionPayload {
         return requestor;
     }
 
-    public void setResponse(EiResponse response) {
+    public void setResponse(EiResponseType response) {
         this.response = response;
     }
     
-    public EiResponse getResponse() {
+    public EiResponseType getResponse() {
         return response;
     }
 }

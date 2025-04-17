@@ -1,6 +1,5 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
-
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
 
@@ -14,7 +13,7 @@ public class EiRejectedQuotePayload {
 	public EiResponseType eiResponseType;
 	public RefIdType inResponseTo;
 
-	public EiRejectedQuotePayload(){
+	public EiRejectedQuotePayload() {
 
 	}
 
@@ -41,9 +40,6 @@ public class EiRejectedQuotePayload {
 
 	@Override
 	public String toString() {
-		return "EiRejectedQuotePayload{" +
-				"eiResponseType=" + eiResponseType +
-				", inResponseTo=" + inResponseTo +
-				'}';
+		return "EiRejectedQuotePayload{" + "eiResponseType=" + eiResponseType + ", inResponseTo=" + inResponseTo + '}';
 	}
 }

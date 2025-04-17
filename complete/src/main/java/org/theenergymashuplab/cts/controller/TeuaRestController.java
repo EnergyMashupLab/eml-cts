@@ -221,7 +221,7 @@ public class TeuaRestController {
 				tempTransaction.getTransactionId(),
 				tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(),
-				new EiResponse(200, "OK"),
+				new EiResponseType(200, "OK"),
 				new TransactionIdType());
 		
 		logger.debug("tempCreated constructed before return " + tempCreated.toString());
@@ -257,7 +257,7 @@ public class TeuaRestController {
 		tempCanceled = new EICanceledTenderPayload(
 				tempCancel.getPartyId(),
 				tempCancel.getCounterPartyId(),
-				new EiResponse(200, "OK"),
+				new EiResponseType(200, "OK"),
 				eiCanceledResponse,
 				eiCancelTender.getRequestId()
 			);

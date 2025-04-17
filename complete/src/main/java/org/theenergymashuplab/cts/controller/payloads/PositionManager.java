@@ -21,7 +21,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.CtsStreamIntervalType;
 import org.theenergymashuplab.cts.CtsStreamType;
-import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ResourceDesignator;
 
@@ -162,7 +162,7 @@ public class PositionManager {
 		CtsStreamType ctsStreamType = convertPositionsToStream(queryResult, interval);
 
 		//TODO: Update EiResponse if there are any errors
-		EiReplyPositionPayload replyPositionPayload = new EiReplyPositionPayload(interval, requestPositionPayload.getPositionParty(), ctsStreamType, requestPositionPayload.getRequestor(), new EiResponse(200, "OK"));
+		EiReplyPositionPayload replyPositionPayload = new EiReplyPositionPayload(interval, requestPositionPayload.getPositionParty(), ctsStreamType, requestPositionPayload.getRequestor(), new EiResponseType(200, "OK"));
 		return replyPositionPayload;
 	}
 	

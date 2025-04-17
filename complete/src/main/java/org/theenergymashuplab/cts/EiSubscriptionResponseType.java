@@ -1,6 +1,5 @@
 package org.theenergymashuplab.cts;
 
-
 /**
  * @author crossover
  * @version 1.0
@@ -13,11 +12,12 @@ public abstract class EiSubscriptionResponseType {
 	public SubscriptionActionType subscriptionActionTaken;
 	public RefIdType subscriptionRequestId;
 
-	public EiSubscriptionResponseType(){
+	public EiSubscriptionResponseType() {
 
 	}
 
-	public EiSubscriptionResponseType(String multicastListenReference, SubscriptionActionType subscriptionActionTaken, EiResponseType response, RefIdType subscriptionRequestId) {
+	public EiSubscriptionResponseType(String multicastListenReference, SubscriptionActionType subscriptionActionTaken,
+			EiResponseType response, RefIdType subscriptionRequestId) {
 		this.multicastListenReference = multicastListenReference;
 		this.subscriptionActionTaken = subscriptionActionTaken;
 		this.response = response;
@@ -58,11 +58,8 @@ public abstract class EiSubscriptionResponseType {
 
 	@Override
 	public String toString() {
-		return "EiSubscriptionResponseType{" +
-				"multicastListenReference='" + multicastListenReference + '\'' +
-				", response=" + response +
-				", subscriptionActionTaken=" + subscriptionActionTaken +
-				", subscriptionRequestId=" + subscriptionRequestId +
-				'}';
+		return "EiSubscriptionResponseType{" + "multicastListenReference='" + multicastListenReference + '\''
+				+ ", response=" + response + ", subscriptionActionTaken=" + subscriptionActionTaken
+				+ ", subscriptionRequestId=" + subscriptionRequestId + '}';
 	}
 }
