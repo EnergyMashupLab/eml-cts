@@ -20,6 +20,7 @@ import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.ResponseDetailType;
 
 public class EICanceledTenderPayload {
 	private final ActorIdType partyId;
@@ -27,8 +28,8 @@ public class EICanceledTenderPayload {
 	private EiResponseType response;
 	private EiCanceledResponseType eiCanceledResponse;
 	private RefIdType inResponseTo;
-//	public ArrayofResponses responses; NOT USED
-//	refId is in the EiResponse
+	// public ArrayofResponses responses; NOT USED
+	// refId is in the EiResponse
 
 	public EICanceledTenderPayload(ActorIdType partyId, ActorIdType counterPartyId, EiResponseType response,
 			EiCanceledResponseType eiCanceledResponse, RefIdType inResponseTo) {
@@ -39,17 +40,17 @@ public class EICanceledTenderPayload {
 		this.inResponseTo = inResponseTo;
 	}
 
-	//Default constructor for JSON serialization
-	public EICanceledTenderPayload()	{
+	// Default constructor for JSON serialization
+	public EICanceledTenderPayload() {
 		this.partyId = new ActorIdType();
 		this.counterPartyId = new ActorIdType();
-		this.response = new EiResponseType(200, "OK");
+		this.response = new EiResponseType(200, "OK", ResponseDetailType.SUCCESS);
 	}
 
 	public void print() {
 		System.err.println(this);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "EICanceledTenderPayload [partyId=" + partyId + ", counterPartyId=" + counterPartyId + ", response="

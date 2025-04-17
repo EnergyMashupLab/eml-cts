@@ -164,7 +164,8 @@ public class LmeRestController {
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		// TODO consider return value if value already in map
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(), tempCreate.getPartyId(),
-				tempCreate.getCounterPartyId(), new EiResponseType(200, "OK"), tempCreate.getRequestId());
+				tempCreate.getCounterPartyId(), new EiResponseType(200, "OK", ResponseDetailType.SUCCESS),
+				tempCreate.getRequestId());
 
 		return tempCreated;
 	}
@@ -251,7 +252,7 @@ public class LmeRestController {
 		/* ================================================================ */
 
 		response.setPartyId(partyID);
-		response.setResponse(new EiResponseType(200, "OK"));
+		response.setResponse(new EiResponseType(200, "OK", ResponseDetailType.SUCCESS));
 		response.setCounterPartyId(counterPartyID);
 		response.setCreatedTenders(createdTenders);
 
@@ -286,7 +287,8 @@ public class LmeRestController {
 		);
 
 		tempCanceled = new EICanceledTenderPayload(tempCancel.getPartyId(), tempCancel.getCounterPartyId(),
-				new EiResponseType(200, "OK"), eiCanceledResponse, tempCancel.getRequestId());
+				new EiResponseType(200, "OK", ResponseDetailType.SUCCESS), eiCanceledResponse,
+				tempCancel.getRequestId());
 
 		return tempCanceled;
 	}
@@ -395,7 +397,7 @@ public class LmeRestController {
 		/* ================================================================ */
 
 		response.setPartyId(partyID);
-		response.setResponse(new EiResponseType(200, "Stream Quote Creation Succeeded"));
+		response.setResponse(new EiResponseType(200, "Stream Quote Creation Succeeded", ResponseDetailType.SUCCESS));
 		response.setCounterPartyId(counterPartyID);
 		response.setCreatedQuotes(createdQuotes);
 		// Currently not in use
@@ -448,7 +450,8 @@ public class LmeRestController {
 		}
 
 		tempCreated = new EiCreatedQuotePayload(tempCreate.getCounterPartyId(), tempQuote.getMarketQuoteId(),
-				tempCreate.getPartyId(), tempQuote.getQuoteId(), new EiResponseType(200, "OK"));
+				tempCreate.getPartyId(), tempQuote.getQuoteId(),
+				new EiResponseType(200, "OK", ResponseDetailType.SUCCESS));
 
 		tempCreated.setCounterPartyId(tempCreated.getCounterPartyId());
 		tempCreated.setInResponseTo(new RefIdType());
@@ -486,10 +489,12 @@ public class LmeRestController {
 
 		// Set response accordingly
 		if (numberFound == cancelQuote.getMarketQuoteIds().size()) {
-			canceledQuote.setEiResponse(new EiResponseType(200, "All quotes cancelled successfully"));
+			canceledQuote.setEiResponse(
+					new EiResponseType(200, "All quotes cancelled successfully", ResponseDetailType.SUCCESS));
 			canceledQuote.setEiCanceledResponse(new EiCanceledResponseType());
 		} else {
-			canceledQuote.setEiResponse(new EiResponseType(500, "One or more quotes failed to be canceled"));
+			canceledQuote.setEiResponse(new EiResponseType(500, "One or more quotes failed to be canceled",
+					ResponseDetailType.UNSPECIFIED));
 			canceledQuote.setEiCanceledResponse(new EiCanceledResponseType());
 		}
 
@@ -592,7 +597,8 @@ public class LmeRestController {
 						+ tempQuote.getMarketQuoteId().toString() + "will now exit");
 
 				// Set a bad response to send out
-				response.setResponse(new EiResponseType(500, "Referenced Quote ID does not exist in the QDM"));
+				response.setResponse(new EiResponseType(500, "Referenced Quote ID does not exist in the QDM",
+						ResponseDetailType.INVALID_REFERENCE));
 
 				// Set the transactions here as bad so that the recipients know
 				buyerTransaction.setTransaction(new EiTransaction(badBuyerTender));
@@ -624,14 +630,16 @@ public class LmeRestController {
 				 */
 				if (tempQuantity > quoteQuantity || tempPrice < quotePrice) {
 					// Flag that this is bad with a bad response
-					response.setResponse(new EiResponseType(500, "Quote not accepted due to price/quantity mismatch"));
+					response.setResponse(new EiResponseType(500, "Quote not accepted due to price/quantity mismatch",
+							ResponseDetailType.INVALID_ARTIFACT));
 
 					// Set the transactions here as bad so that the recipients know
 					buyerTransaction.setTransaction(new EiTransaction(badBuyerTender));
 					sellerTransaction.setTransaction(new EiTransaction(badSellerTender));
 
 					// Set a bad response to send out
-					response.setResponse(new EiResponseType(500, "Bad Quantity or price"));
+					response.setResponse(
+							new EiResponseType(500, "Bad Quantity or price", ResponseDetailType.INVALID_ARTIFACT));
 
 				} else {
 					// Update the quantity that we currently have available
@@ -655,7 +663,7 @@ public class LmeRestController {
 					logger.trace("Quote Accepted");
 
 					// Set a bad response to send out
-					response.setResponse(new EiResponseType(200, "Quote Accepted"));
+					response.setResponse(new EiResponseType(200, "Quote Accepted", ResponseDetailType.SUCCESS));
 
 					// Set this flag for later on
 					accepted = true;

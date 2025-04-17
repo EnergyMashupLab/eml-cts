@@ -25,21 +25,10 @@ public class EiResponseType {
 	public String responseDescription;
 	public ResponseDetailType responseDetail;
 
-	/*
-	 * PROBABLY NO LONGER USED due to id inheritance Three parameters - response code, description string refId
-	 */
-	// public EiResponseType (long code, String description, long rid) {
-	// responseCode = code;
-	// responseDescription = description;
-	// refId = new RefIdType();
-	// }
-
-	/*
-	 * Two parameters - response code and description e.g. 200 "OK"
-	 */
-	public EiResponseType(long code, String description) {
-		responseCode = code;
-		responseDescription = description;
+	public EiResponseType(long responseCode, String responseDescription, ResponseDetailType responseDetail) {
+		this.responseCode = responseCode;
+		this.responseDescription = responseDescription;
+		this.responseDetail = responseDetail;
 	}
 
 	/*
