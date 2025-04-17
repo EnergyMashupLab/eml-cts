@@ -3,7 +3,6 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiCanceledResponseType;
 import org.theenergymashuplab.cts.EiResponseType;
-import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
 
 /**
