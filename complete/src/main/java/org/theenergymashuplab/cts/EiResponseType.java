@@ -38,6 +38,7 @@ public class EiResponseType {
 	public EiResponseType() {
 		responseCode = 0;
 		responseDescription = "";
+		responseDetail = ResponseDetailType.UNSPECIFIED;
 	}
 
 	public String toString() {
