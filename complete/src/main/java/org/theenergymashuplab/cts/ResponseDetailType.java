@@ -16,11 +16,6 @@
 
 package org.theenergymashuplab.cts;
 
-/**
- * @author crossover
- * @version 1.0
- * @created 18-Feb-2025 11:30:38 AM
- */
 public enum ResponseDetailType {
     UNSPECIFIED,
     RULES_VIOLATION,

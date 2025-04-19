@@ -17,7 +17,7 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.MarketTransactionIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TransactionIdType;
@@ -29,7 +29,7 @@ public class EiCreatedTransactionPayload {
 	// Should be RecipientTransactionIdType, but the class does not exist
 	public TransactionIdType recipientTransactionId;
 	public final RefIdType refId = new RefIdType();
-	public EiResponse response;
+	public EiResponseType response;
 	public TransactionIdType transactionId;
 
 	// Default initializer for JSON serialization
@@ -57,7 +57,7 @@ public class EiCreatedTransactionPayload {
 			TransactionIdType transactionId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,
-			EiResponse response,
+			EiResponseType response,
 			TransactionIdType recipientTransactionId) {
 
 		this.transactionId = transactionId;
@@ -91,11 +91,11 @@ public class EiCreatedTransactionPayload {
 				" recipientTransactionId " + recipientTransactionId.toString());
 	}
 
-	public EiResponse getResponse() {
+	public EiResponseType getResponse() {
 		return response;
 	}
 
-	public void setResponse(EiResponse response) {
+	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
 

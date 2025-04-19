@@ -69,11 +69,8 @@ public abstract class EiSubscriptionResponseType {
 
 	@Override
 	public String toString() {
-		return "EiSubscriptionResponseType{" +
-				"multicastListenReference='" + multicastListenReference + '\'' +
-				", response=" + response +
-				", subscriptionActionTaken=" + subscriptionActionTaken +
-				", subscriptionRequestId=" + subscriptionRequestId +
-				'}';
+		return "EiSubscriptionResponseType{" + "multicastListenReference='" + multicastListenReference + '\''
+				+ ", response=" + response + ", subscriptionActionTaken=" + subscriptionActionTaken
+				+ ", subscriptionRequestId=" + subscriptionRequestId + '}';
 	}
 }

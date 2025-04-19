@@ -17,7 +17,7 @@
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
@@ -28,7 +28,7 @@ public class EiCreatedTenderPayload {
 	private TenderIdType tenderId;
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
-	public EiResponse response;
+	public EiResponseType response;
 //	public ArrayofResponses responses; NOT USED
 	
 	// Need clarification as to what this attribute refers to before changing or deleting
@@ -46,7 +46,7 @@ public class EiCreatedTenderPayload {
 			TenderIdType tenderId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,
-			EiResponse response,
+			EiResponseType response,
 			RefIdType inResponseTo) {
 
 		this.tenderId = tenderId;
@@ -71,11 +71,11 @@ public class EiCreatedTenderPayload {
 				+ ", inResponseTo=" + inResponseTo + "]";
 	}
 	
-	public EiResponse getResponse() {
+	public EiResponseType getResponse() {
 		return response;
 	}
 
-	public void setResponse(EiResponse response) {
+	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
 

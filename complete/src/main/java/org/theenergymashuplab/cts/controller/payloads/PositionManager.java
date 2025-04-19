@@ -21,9 +21,10 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.CtsStreamIntervalType;
 import org.theenergymashuplab.cts.CtsStreamType;
-import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.ResourceDesignator;
+import org.theenergymashuplab.cts.ResponseDetailType;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -47,7 +48,6 @@ import org.theenergymashuplab.cts.dao.PositionService;
 import org.theenergymashuplab.cts.model.PositionManagerModel;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @RestController
 public class PositionManager {
 	private static final Logger logger = LogManager.getLogger(PositionManager.class);
@@ -58,33 +58,27 @@ public class PositionManager {
 	@PostMapping("/position/{positionParty}/add")
 	// add to a position
 	public String createPosition(@PathVariable(value = "positionParty") long positionParty,
-			@RequestBody PositionAddPayload posPayload,
-			HttpServletResponse response) {
+			@RequestBody PositionAddPayload posPayload, HttpServletResponse response) {
 
 		// Creating temporary position manager model instance.
-		PositionManagerModel posadd = new PositionManagerModel(
-				positionParty,
-				0,
-				posPayload.getQuantity(),
-				1, //TODO: In future versions, marketId will not default to 1, this will instead have to match the marketId of the payload
-				posPayload.getInterval().getDtStart(),
-				posPayload.getInterval().getDuration().getSeconds(),
+		PositionManagerModel posadd = new PositionManagerModel(positionParty, 0, posPayload.getQuantity(), 1,
+				// TODO: In future versions, marketId will not default to 1, this will instead have to match the
+				// marketId of the payload
+				posPayload.getInterval().getDtStart(), posPayload.getInterval().getDuration().getSeconds(),
 				ResourceDesignator.ENERGY);
-		//TODO: In future versions, change this to have the resource designator match the position payload.
-		//As of this commit, energy is the only intended resource designator
+		// TODO: In future versions, change this to have the resource designator match the position payload.
+		// As of this commit, energy is the only intended resource designator
 
-		List<PositionManagerModel> queryresult = posDao.getPositionforUpdate(
-				positionParty,
-				posPayload.getInterval().getDtStart(),
-				posPayload.getInterval().getDuration().getSeconds());
-		
+		List<PositionManagerModel> queryresult = posDao.getPositionforUpdate(positionParty,
+				posPayload.getInterval().getDtStart(), posPayload.getInterval().getDuration().getSeconds());
+
 		logger.debug("/position/add (signed) " + posadd.toString());
 
 		if (queryresult.isEmpty()) {
 			// New row to be added.
 			// Saving the position.
 			PositionManagerModel temp = null;
-			temp = posDao.save(posadd);	// invoke native
+			temp = posDao.save(posadd); // invoke native
 
 			// Return output decider.
 			if (temp != null) {
@@ -98,22 +92,17 @@ public class PositionManager {
 			// Updating existing row.
 			// Saving the position.
 			int temp = 0;
-			temp = posDao.updatePositionforDuration(
-					positionParty,
-					posPayload.getInterval().getDtStart(),
-					posPayload.getInterval().getDuration().getSeconds(),
-					posPayload.getQuantity());
+			temp = posDao.updatePositionforDuration(positionParty, posPayload.getInterval().getDtStart(),
+					posPayload.getInterval().getDuration().getSeconds(), posPayload.getQuantity());
 
 			// Return output decider.
 			if (temp == 1) {
 				response.setStatus(HttpServletResponse.SC_OK);
 				return "OK";
-			} 
-			else if(temp > 1) {
+			} else if (temp > 1) {
 				response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
 				return "Multiple Rows affected.";
-			}
-			else {
+			} else {
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				return "ERROR: Not able to store the data.";
 			}
@@ -129,9 +118,8 @@ public class PositionManager {
 		// Querying for data.
 		List<PositionManagerModel> queryresult = posDao.getPositionforDuration(positionParty, interval.getDtStart(),
 				interval.getDuration().getSeconds());
-		
-		logger.info("/position/" + positionParty +"/getPosition: " +
-				"Interval " + interval.toString());
+
+		logger.info("/position/" + positionParty + "/getPosition: " + "Interval " + interval.toString());
 
 		// Generating response list.
 		PositionGetPayload tpayload = null;
@@ -155,20 +143,21 @@ public class PositionManager {
 
 		List<PositionManagerModel> queryResult = posDao.getPositionforDuration(positionParty, interval.getDtStart(),
 				interval.getDuration().getSeconds());
-		
-		logger.info("/position/requestPosition " +
-				"Interval " + interval.toString());
+
+		logger.info("/position/requestPosition " + "Interval " + interval.toString());
 
 		CtsStreamType ctsStreamType = convertPositionsToStream(queryResult, interval);
 
-		//TODO: Update EiResponse if there are any errors
-		EiReplyPositionPayload replyPositionPayload = new EiReplyPositionPayload(interval, requestPositionPayload.getPositionParty(), ctsStreamType, requestPositionPayload.getRequestor(), new EiResponse(200, "OK"));
+		// TODO: Update EiResponse if there are any errors
+		EiReplyPositionPayload replyPositionPayload = new EiReplyPositionPayload(interval,
+				requestPositionPayload.getPositionParty(), ctsStreamType, requestPositionPayload.getRequestor(),
+				new EiResponseType(200, "OK", ResponseDetailType.SUCCESS));
 		return replyPositionPayload;
 	}
-	
+
 	/*
-	 * Returns a list of Instants between `startTime` and `endTime` with `duration` amount of time
-	 * between each consecutive interval
+	 * Returns a list of Instants between `startTime` and `endTime` with `duration` amount of time between each
+	 * consecutive interval
 	 */
 	private List<Instant> divideInterval(Instant startTime, Instant endTime, Duration duration) {
 		List<Instant> instants = new ArrayList<>();
@@ -183,35 +172,30 @@ public class PositionManager {
 
 	/* Returns the smallest duration present in the list of models */
 	private Duration findMinDuration(List<PositionManagerModel> models) {
-		return models.stream()
-			.map(m -> Duration.between(m.getStartTime(), m.getEndTime()))
-			.min((d1, d2) -> d1.compareTo(d2))
-			.orElse(Duration.ZERO);
+		return models.stream().map(m -> Duration.between(m.getStartTime(), m.getEndTime()))
+				.min((d1, d2) -> d1.compareTo(d2)).orElse(Duration.ZERO);
 	}
 
 	/* Combines all the quantities for each given time slot present in the models */
 	private Map<Instant, Long> mergePositions(List<PositionManagerModel> models) {
 		Map<Instant, Long> mergedPositions = new HashMap<>();
 		Duration minDuration = findMinDuration(models);
-		for (PositionManagerModel model: models) {
+		for (PositionManagerModel model : models) {
 			List<Instant> instants = divideInterval(model.getStartTime(), model.getEndTime(), minDuration);
-			instants.stream()
-				.forEach(i -> mergedPositions.merge(i, model.getQuantity(), Math::addExact));
+			instants.stream().forEach(i -> mergedPositions.merge(i, model.getQuantity(), Math::addExact));
 		}
 
 		return mergedPositions;
 	}
 
 	private CtsStreamType convertPositionsToStream(List<PositionManagerModel> models, Interval boundingInterval) {
-		/* If no positions within the bounding interval, then send back a stream with the same duration
-		 * as the bounding interval and with a single stream interval with a zero quantity
+		/*
+		 * If no positions within the bounding interval, then send back a stream with the same duration as the bounding
+		 * interval and with a single stream interval with a zero quantity
 		 */
 		if (models.isEmpty()) {
-			return new CtsStreamType(
-				boundingInterval,
-				List.of(new CtsStreamIntervalType(0, 0, 0)),
-				boundingInterval.dtStart
-			);
+			return new CtsStreamType(boundingInterval, List.of(new CtsStreamIntervalType(0, 0, 0)),
+					boundingInterval.dtStart);
 		}
 
 		List<CtsStreamIntervalType> streamIntervals = new ArrayList<>();
@@ -229,7 +213,8 @@ public class PositionManager {
 			curTime = curTime.plus(minDuration);
 		}
 
-		CtsStreamType stream = new CtsStreamType(new Interval(minDuration.toMinutes(), startTime), streamIntervals, startTime);
+		CtsStreamType stream = new CtsStreamType(new Interval(minDuration.toMinutes(), startTime), streamIntervals,
+				startTime);
 		return stream;
 	}
 }
