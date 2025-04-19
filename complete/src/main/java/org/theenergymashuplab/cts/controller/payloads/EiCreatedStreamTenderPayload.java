@@ -3,7 +3,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 import java.util.List;
 
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIdType;
@@ -12,7 +12,7 @@ public class EiCreatedStreamTenderPayload{
 	private MarketOrderIdType marketOrderId = new MarketOrderIdType();
 	private ActorIdType partyId;
 	private ActorIdType counterPartyId;
-	public EiResponse response;
+	public EiResponseType response;
 	private List<Long> createdTenders;
 	
 	// Need clarification as to what this attribute refers to before changing or deleting
@@ -30,7 +30,7 @@ public class EiCreatedStreamTenderPayload{
 			TenderIdType tenderId,
 			ActorIdType partyId,
 			ActorIdType counterPartyId,
-			EiResponse response,
+			EiResponseType response,
 			RefIdType inResponseTo) {
 
 		this.partyId = partyId;
@@ -59,11 +59,11 @@ public class EiCreatedStreamTenderPayload{
 				+ ", inResponseTo=" + inResponseTo +  ", createdTenders=" + createdTenders + "]";
 	}
 	
-	public EiResponse getResponse() {
+	public EiResponseType getResponse() {
 		return response;
 	}
 
-	public void setResponse(EiResponse response) {
+	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
 

@@ -61,8 +61,7 @@ public class EiManagedTickerSubscriptionPayload extends EiSubscriptionResponseTy
 
 	@Override
 	public String toString() {
-		return "EiManagedTickerSubscriptionPayload: [" +
-				"tickerType=" + this.tickerType.toString() + "]";
+		return "EiManagedTickerSubscriptionPayload: [" + "tickerType=" + this.tickerType.toString() + "]";
 	}
 
 }

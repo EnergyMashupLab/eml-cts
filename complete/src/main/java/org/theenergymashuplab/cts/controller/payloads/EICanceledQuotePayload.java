@@ -2,7 +2,6 @@ package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.ActorIdType;
 import org.theenergymashuplab.cts.EiCanceledResponseType;
-import org.theenergymashuplab.cts.EiResponse;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
 
@@ -15,17 +14,17 @@ public class EICanceledQuotePayload {
 
 	public ActorIdType counterPartyId;
 	public EiCanceledResponseType eiCanceledResponse;
-	public EiResponse eiResponse;
+	public EiResponseType eiResponse;
 	public RefIdType inResponseTo;
 	public ActorIdType partyId;
 
-
-	//JSON
-	public EICanceledQuotePayload(){
+	// JSON
+	public EICanceledQuotePayload() {
 
 	}
 
-	public EICanceledQuotePayload(ActorIdType counterPartyId, EiCanceledResponseType eiCanceledResponse, EiResponse eiResponse, RefIdType inResponseTo, ActorIdType partyId){
+	public EICanceledQuotePayload(ActorIdType counterPartyId, EiCanceledResponseType eiCanceledResponse,
+			EiResponseType eiResponse, RefIdType inResponseTo, ActorIdType partyId) {
 		this.counterPartyId = counterPartyId;
 		this.eiCanceledResponse = eiCanceledResponse;
 		this.eiResponse = eiResponse;
@@ -33,54 +32,50 @@ public class EICanceledQuotePayload {
 		this.partyId = partyId;
 	}
 
-	
-	public ActorIdType getCounterPartyId(){
+	public ActorIdType getCounterPartyId() {
 		return this.counterPartyId;
 	}
 
-	public void setCounterPartyId(ActorIdType counterPartyId){
+	public void setCounterPartyId(ActorIdType counterPartyId) {
 		this.counterPartyId = counterPartyId;
 	}
 
-	public EiCanceledResponseType getEiCanceledResponse(){
+	public EiCanceledResponseType getEiCanceledResponse() {
 		return this.eiCanceledResponse;
 	}
 
-	public void setEiCanceledResponse(EiCanceledResponseType eiCanceledResponse){
+	public void setEiCanceledResponse(EiCanceledResponseType eiCanceledResponse) {
 		this.eiCanceledResponse = eiCanceledResponse;
 	}
-	
-	public EiResponse getEiResponse(){
+
+	public EiResponseType getEiResponse() {
 		return this.eiResponse;
 	}
 
-	public void setEiResponse(EiResponse eiResponse){
+	public void setEiResponse(EiResponseType eiResponse) {
 		this.eiResponse = eiResponse;
 	}
 
-	public RefIdType getInResponseTo(){
+	public RefIdType getInResponseTo() {
 		return this.inResponseTo;
 	}
 
-	public void setInResponseTo(RefIdType inResponseTo){
+	public void setInResponseTo(RefIdType inResponseTo) {
 		this.inResponseTo = inResponseTo;
 	}
 
-	public ActorIdType getPartyId(){
+	public ActorIdType getPartyId() {
 		return this.partyId;
 	}
 
-	public void setPartyId(ActorIdType partyId){
+	public void setPartyId(ActorIdType partyId) {
 		this.partyId = partyId;
 	}
 
 	@Override
-	public String toString(){
-		return "EICanceledQuotePayload [" +
-				"counterPartyId=" + this.counterPartyId.toString() +
-				", eiCanceledResponse=" + this.eiCanceledResponse.toString() +
-				", eiResponse=" + this.eiResponse.toString() +
-				", inResponseTo=" + this.inResponseTo.toString() +
-				", partyId=" + this.partyId.toString() + "]";
+	public String toString() {
+		return "EICanceledQuotePayload [" + "counterPartyId=" + this.counterPartyId.toString() + ", eiCanceledResponse="
+				+ this.eiCanceledResponse.toString() + ", eiResponse=" + this.eiResponse.toString() + ", inResponseTo="
+				+ this.inResponseTo.toString() + ", partyId=" + this.partyId.toString() + "]";
 	}
 }

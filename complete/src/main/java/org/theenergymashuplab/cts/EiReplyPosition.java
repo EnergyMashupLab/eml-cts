@@ -25,7 +25,7 @@ public class EiReplyPosition {
 	private RefIdType request;
 	private ArrayList<EiPosition> positionList = new ArrayList<EiPosition>();
 	private RefIdType requestId = new RefIdType();
-	public EiResponse response;
+	public EiResponseType response;
 	
 	// Superceded by updated PositionManager - delete in future release
 	
@@ -39,7 +39,7 @@ public class EiReplyPosition {
 		// attrubutes left as initialized to null
 	}
 	
-	EiReplyPosition(Interval boundingInterval, ArrayList<EiPosition> positionList, EiResponse response)	{
+	EiReplyPosition(Interval boundingInterval, ArrayList<EiPosition> positionList, EiResponseType response)	{
 		// will have a list of positions passed in as an ArrayList<EiPosition>
 		this.boundingInterval = boundingInterval;
 		this.positionList = positionList;
@@ -105,11 +105,11 @@ public class EiReplyPosition {
 		this.requestId = requestId;
 	}
 
-	public EiResponse getResponse() {
+	public EiResponseType getResponse() {
 		return response;
 	}
 
-	public void setResponse(EiResponse response) {
+	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
 	
