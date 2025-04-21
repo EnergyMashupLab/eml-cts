@@ -7,31 +7,31 @@ package org.theenergymashuplab.cts.generated_files;
  */
 public enum ResponseDetailType
 {
-    Unspecified((short)1),
+    UNSPECIFIED((short)1),
 
-    RulesViolation((short)2),
+    RULES_VIOLATION((short)2),
 
-    InvalidReference((short)3),
+    INVALID_REFERENCE((short)3),
 
-    Duplicate((short)4),
+    DUPLICATE((short)4),
 
-    TradingClosed((short)5),
+    TRADING_CLOSED((short)5),
 
-    PartyRestricted((short)6),
+    PARTY_RESTRICTED((short)6),
 
-    InvalidInstrument((short)7),
+    INVALID_INSTRUMENT((short)7),
 
-    ForceMajeure((short)8),
+    FORCE_MAJEURE((short)8),
 
-    InvalidMarket((short)9),
+    INVALID_MARKET((short)9),
 
-    InvalidSegment((short)10),
+    INVALID_SEGMENT((short)10),
 
-    Success((short)11),
+    SUCCESS((short)11),
 
-    NotAuthorized((short)12),
+    NOT_AUTHORIZED((short)12),
 
-    InvalidArtifact((short)13),
+    INVALID_ARTIFACT((short)13),
 
     /**
      * To be used to represent not present or null.
@@ -54,19 +54,19 @@ public enum ResponseDetailType
     {
         switch (value)
         {
-            case 1: return Unspecified;
-            case 2: return RulesViolation;
-            case 3: return InvalidReference;
-            case 4: return Duplicate;
-            case 5: return TradingClosed;
-            case 6: return PartyRestricted;
-            case 7: return InvalidInstrument;
-            case 8: return ForceMajeure;
-            case 9: return InvalidMarket;
-            case 10: return InvalidSegment;
-            case 11: return Success;
-            case 12: return NotAuthorized;
-            case 13: return InvalidArtifact;
+            case 1: return UNSPECIFIED;
+            case 2: return RULES_VIOLATION;
+            case 3: return INVALID_REFERENCE;
+            case 4: return DUPLICATE;
+            case 5: return TRADING_CLOSED;
+            case 6: return PARTY_RESTRICTED;
+            case 7: return INVALID_INSTRUMENT;
+            case 8: return FORCE_MAJEURE;
+            case 9: return INVALID_MARKET;
+            case 10: return INVALID_SEGMENT;
+            case 11: return SUCCESS;
+            case 12: return NOT_AUTHORIZED;
+            case 13: return INVALID_ARTIFACT;
             case 255: return NULL_VAL;
         }
 

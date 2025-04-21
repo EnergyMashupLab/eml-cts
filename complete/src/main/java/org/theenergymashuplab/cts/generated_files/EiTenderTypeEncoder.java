@@ -12,7 +12,7 @@ public class EiTenderTypeEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 107;
+    public static final int ENCODED_LENGTH = 115;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -118,9 +118,41 @@ public class EiTenderTypeEncoder
     }
 
 
-    public static int tenderBaseEncodingOffset()
+    public static int referencedQuoteIdEncodingOffset()
     {
         return 16;
+    }
+
+    public static int referencedQuoteIdEncodingLength()
+    {
+        return 8;
+    }
+
+    public static long referencedQuoteIdNullValue()
+    {
+        return 0xffffffffffffffffL;
+    }
+
+    public static long referencedQuoteIdMinValue()
+    {
+        return 0x0L;
+    }
+
+    public static long referencedQuoteIdMaxValue()
+    {
+        return 0xfffffffffffffffeL;
+    }
+
+    public EiTenderTypeEncoder referencedQuoteId(final long value)
+    {
+        buffer.putLong(offset + 16, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return this;
+    }
+
+
+    public static int tenderBaseEncodingOffset()
+    {
+        return 24;
     }
 
     public static int tenderBaseEncodingLength()
@@ -137,7 +169,7 @@ public class EiTenderTypeEncoder
      */
     public TenderBaseEncoder tenderBase()
     {
-        tenderBase.wrap(buffer, offset + 16);
+        tenderBase.wrap(buffer, offset + 24);
         return tenderBase;
     }
 

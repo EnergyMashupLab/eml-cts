@@ -5,20 +5,20 @@ import org.agrona.MutableDirectBuffer;
 
 
 /**
- * See EiTransactionType.java
+ * See Interval.java
  */
 @SuppressWarnings("all")
-public class EiTransactionTypeEncoder
+public class IntervalEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 123;
+    public static final int ENCODED_LENGTH = 24;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
     private MutableDirectBuffer buffer;
 
-    public EiTransactionTypeEncoder wrap(final MutableDirectBuffer buffer, final int offset)
+    public IntervalEncoder wrap(final MutableDirectBuffer buffer, final int offset)
     {
         if (buffer != this.buffer)
         {
@@ -54,59 +54,50 @@ public class EiTransactionTypeEncoder
         return SCHEMA_VERSION;
     }
 
-    public static int marketTransactionIdEncodingOffset()
+    public static int durationEncodingOffset()
     {
         return 0;
     }
 
-    public static int marketTransactionIdEncodingLength()
+    public static int durationEncodingLength()
     {
-        return 8;
+        return 12;
     }
 
-    public static long marketTransactionIdNullValue()
-    {
-        return 0xffffffffffffffffL;
-    }
-
-    public static long marketTransactionIdMinValue()
-    {
-        return 0x0L;
-    }
-
-    public static long marketTransactionIdMaxValue()
-    {
-        return 0xfffffffffffffffeL;
-    }
-
-    public EiTransactionTypeEncoder marketTransactionId(final long value)
-    {
-        buffer.putLong(offset + 0, value, java.nio.ByteOrder.LITTLE_ENDIAN);
-        return this;
-    }
-
-
-    public static int tenderEncodingOffset()
-    {
-        return 8;
-    }
-
-    public static int tenderEncodingLength()
-    {
-        return 115;
-    }
-
-    private final EiTenderTypeEncoder tender = new EiTenderTypeEncoder();
+    private final DurationEncoder duration = new DurationEncoder();
 
     /**
-     * See EiTenderType.java
+     * See java.time.Duration. In seconds (signed) and nanoseconds (unsiqned)
      *
-     * @return EiTenderTypeEncoder : See EiTenderType.java
+     * @return DurationEncoder : See java.time.Duration. In seconds (signed) and nanoseconds (unsiqned)
      */
-    public EiTenderTypeEncoder tender()
+    public DurationEncoder duration()
     {
-        tender.wrap(buffer, offset + 8);
-        return tender;
+        duration.wrap(buffer, offset + 0);
+        return duration;
+    }
+
+    public static int dtStartEncodingOffset()
+    {
+        return 12;
+    }
+
+    public static int dtStartEncodingLength()
+    {
+        return 12;
+    }
+
+    private final InstantEncoder dtStart = new InstantEncoder();
+
+    /**
+     * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     *
+     * @return InstantEncoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     */
+    public InstantEncoder dtStart()
+    {
+        dtStart.wrap(buffer, offset + 12);
+        return dtStart;
     }
 
     public String toString()
@@ -126,7 +117,7 @@ public class EiTransactionTypeEncoder
             return builder;
         }
 
-        final EiTransactionTypeDecoder decoder = new EiTransactionTypeDecoder();
+        final IntervalDecoder decoder = new IntervalDecoder();
         decoder.wrap(buffer, offset);
 
         return decoder.appendTo(builder);

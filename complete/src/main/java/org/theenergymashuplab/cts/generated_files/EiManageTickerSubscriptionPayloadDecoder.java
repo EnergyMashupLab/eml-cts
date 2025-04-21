@@ -5,18 +5,18 @@ import org.agrona.DirectBuffer;
 
 
 /**
- * See EiCreateTransactionPayload
+ * See EiManageTickerSubscriptionPayload
  */
 @SuppressWarnings("all")
-public class EiCreateTransactionPayloadDecoder
+public class EiManageTickerSubscriptionPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 155;
-    public static final int TEMPLATE_ID = 7;
+    public static final int BLOCK_LENGTH = 20;
+    public static final int TEMPLATE_ID = 9;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
-    private final EiCreateTransactionPayloadDecoder parentMessage = this;
+    private final EiManageTickerSubscriptionPayloadDecoder parentMessage = this;
     private DirectBuffer buffer;
     private int initialOffset;
     private int offset;
@@ -64,7 +64,7 @@ public class EiCreateTransactionPayloadDecoder
         return offset;
     }
 
-    public EiCreateTransactionPayloadDecoder wrap(
+    public EiManageTickerSubscriptionPayloadDecoder wrap(
         final DirectBuffer buffer,
         final int offset,
         final int actingBlockLength,
@@ -98,27 +98,27 @@ public class EiCreateTransactionPayloadDecoder
         this.limit = limit;
     }
 
-    public static int counterPartyIdId()
+    public static int tickerTypeId()
     {
         return 1;
     }
 
-    public static int counterPartyIdSinceVersion()
+    public static int tickerTypeSinceVersion()
     {
         return 0;
     }
 
-    public static int counterPartyIdEncodingOffset()
+    public static int tickerTypeEncodingOffset()
     {
         return 0;
     }
 
-    public static int counterPartyIdEncodingLength()
+    public static int tickerTypeEncodingLength()
     {
-        return 8;
+        return 1;
     }
 
-    public static String counterPartyIdMetaAttribute(final MetaAttribute metaAttribute)
+    public static String tickerTypeMetaAttribute(final MetaAttribute metaAttribute)
     {
         if (MetaAttribute.PRESENCE == metaAttribute)
         {
@@ -128,48 +128,38 @@ public class EiCreateTransactionPayloadDecoder
         return "";
     }
 
-    public static long counterPartyIdNullValue()
+    public short tickerTypeRaw()
     {
-        return 0xffffffffffffffffL;
+        return ((short)(buffer.getByte(offset + 0) & 0xFF));
     }
 
-    public static long counterPartyIdMinValue()
+    public TickerType tickerType()
     {
-        return 0x0L;
-    }
-
-    public static long counterPartyIdMaxValue()
-    {
-        return 0xfffffffffffffffeL;
-    }
-
-    public long counterPartyId()
-    {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return TickerType.get(((short)(buffer.getByte(offset + 0) & 0xFF)));
     }
 
 
-    public static int marketTransactionIdId()
+    public static int marketIdId()
     {
         return 2;
     }
 
-    public static int marketTransactionIdSinceVersion()
+    public static int marketIdSinceVersion()
     {
         return 0;
     }
 
-    public static int marketTransactionIdEncodingOffset()
+    public static int marketIdEncodingOffset()
+    {
+        return 1;
+    }
+
+    public static int marketIdEncodingLength()
     {
         return 8;
     }
 
-    public static int marketTransactionIdEncodingLength()
-    {
-        return 8;
-    }
-
-    public static String marketTransactionIdMetaAttribute(final MetaAttribute metaAttribute)
+    public static String marketIdMetaAttribute(final MetaAttribute metaAttribute)
     {
         if (MetaAttribute.PRESENCE == metaAttribute)
         {
@@ -179,48 +169,48 @@ public class EiCreateTransactionPayloadDecoder
         return "";
     }
 
-    public static long marketTransactionIdNullValue()
+    public static long marketIdNullValue()
     {
         return 0xffffffffffffffffL;
     }
 
-    public static long marketTransactionIdMinValue()
+    public static long marketIdMinValue()
     {
         return 0x0L;
     }
 
-    public static long marketTransactionIdMaxValue()
+    public static long marketIdMaxValue()
     {
         return 0xfffffffffffffffeL;
     }
 
-    public long marketTransactionId()
+    public long marketId()
     {
-        return buffer.getLong(offset + 8, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 1, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
-    public static int partyIdId()
+    public static int segmentIdId()
     {
         return 3;
     }
 
-    public static int partyIdSinceVersion()
+    public static int segmentIdSinceVersion()
     {
         return 0;
     }
 
-    public static int partyIdEncodingOffset()
+    public static int segmentIdEncodingOffset()
     {
-        return 16;
+        return 9;
     }
 
-    public static int partyIdEncodingLength()
+    public static int segmentIdEncodingLength()
     {
-        return 8;
+        return 2;
     }
 
-    public static String partyIdMetaAttribute(final MetaAttribute metaAttribute)
+    public static String segmentIdMetaAttribute(final MetaAttribute metaAttribute)
     {
         if (MetaAttribute.PRESENCE == metaAttribute)
         {
@@ -230,48 +220,48 @@ public class EiCreateTransactionPayloadDecoder
         return "";
     }
 
-    public static long partyIdNullValue()
+    public static short segmentIdNullValue()
     {
-        return 0xffffffffffffffffL;
+        return (short)-32768;
     }
 
-    public static long partyIdMinValue()
+    public static short segmentIdMinValue()
     {
-        return 0x0L;
+        return (short)-32767;
     }
 
-    public static long partyIdMaxValue()
+    public static short segmentIdMaxValue()
     {
-        return 0xfffffffffffffffeL;
+        return (short)32767;
     }
 
-    public long partyId()
+    public short segmentId()
     {
-        return buffer.getLong(offset + 16, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getShort(offset + 9, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
-    public static int requestIdId()
+    public static int subscriptionActionRequestedId()
     {
         return 4;
     }
 
-    public static int requestIdSinceVersion()
+    public static int subscriptionActionRequestedSinceVersion()
     {
         return 0;
     }
 
-    public static int requestIdEncodingOffset()
+    public static int subscriptionActionRequestedEncodingOffset()
     {
-        return 24;
+        return 11;
     }
 
-    public static int requestIdEncodingLength()
+    public static int subscriptionActionRequestedEncodingLength()
     {
-        return 8;
+        return 1;
     }
 
-    public static String requestIdMetaAttribute(final MetaAttribute metaAttribute)
+    public static String subscriptionActionRequestedMetaAttribute(final MetaAttribute metaAttribute)
     {
         if (MetaAttribute.PRESENCE == metaAttribute)
         {
@@ -281,48 +271,38 @@ public class EiCreateTransactionPayloadDecoder
         return "";
     }
 
-    public static long requestIdNullValue()
+    public short subscriptionActionRequestedRaw()
     {
-        return 0xffffffffffffffffL;
+        return ((short)(buffer.getByte(offset + 11) & 0xFF));
     }
 
-    public static long requestIdMinValue()
+    public SubscriptionActionType subscriptionActionRequested()
     {
-        return 0x0L;
-    }
-
-    public static long requestIdMaxValue()
-    {
-        return 0xfffffffffffffffeL;
-    }
-
-    public long requestId()
-    {
-        return buffer.getLong(offset + 24, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return SubscriptionActionType.get(((short)(buffer.getByte(offset + 11) & 0xFF)));
     }
 
 
-    public static int transactionId()
+    public static int subscriptionRequestIdId()
     {
         return 5;
     }
 
-    public static int transactionSinceVersion()
+    public static int subscriptionRequestIdSinceVersion()
     {
         return 0;
     }
 
-    public static int transactionEncodingOffset()
+    public static int subscriptionRequestIdEncodingOffset()
     {
-        return 32;
+        return 12;
     }
 
-    public static int transactionEncodingLength()
+    public static int subscriptionRequestIdEncodingLength()
     {
-        return 123;
+        return 8;
     }
 
-    public static String transactionMetaAttribute(final MetaAttribute metaAttribute)
+    public static String subscriptionRequestIdMetaAttribute(final MetaAttribute metaAttribute)
     {
         if (MetaAttribute.PRESENCE == metaAttribute)
         {
@@ -332,13 +312,26 @@ public class EiCreateTransactionPayloadDecoder
         return "";
     }
 
-    private final EiTransactionTypeDecoder transaction = new EiTransactionTypeDecoder();
-
-    public EiTransactionTypeDecoder transaction()
+    public static long subscriptionRequestIdNullValue()
     {
-        transaction.wrap(buffer, offset + 32);
-        return transaction;
+        return 0xffffffffffffffffL;
     }
+
+    public static long subscriptionRequestIdMinValue()
+    {
+        return 0x0L;
+    }
+
+    public static long subscriptionRequestIdMaxValue()
+    {
+        return 0xfffffffffffffffeL;
+    }
+
+    public long subscriptionRequestId()
+    {
+        return buffer.getLong(offset + 12, java.nio.ByteOrder.LITTLE_ENDIAN);
+    }
+
 
     public String toString()
     {
@@ -347,7 +340,7 @@ public class EiCreateTransactionPayloadDecoder
             return "";
         }
 
-        final EiCreateTransactionPayloadDecoder decoder = new EiCreateTransactionPayloadDecoder();
+        final EiManageTickerSubscriptionPayloadDecoder decoder = new EiManageTickerSubscriptionPayloadDecoder();
         decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
@@ -362,7 +355,7 @@ public class EiCreateTransactionPayloadDecoder
 
         final int originalLimit = limit();
         limit(initialOffset + actingBlockLength);
-        builder.append("[EiCreateTransactionPayload](sbeTemplateId=");
+        builder.append("[EiManageTickerSubscriptionPayload](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
         builder.append(SCHEMA_ID);
@@ -381,28 +374,20 @@ public class EiCreateTransactionPayloadDecoder
         }
         builder.append(BLOCK_LENGTH);
         builder.append("):");
-        builder.append("counterPartyId=");
-        builder.append(counterPartyId());
+        builder.append("tickerType=");
+        builder.append(tickerType());
         builder.append('|');
-        builder.append("marketTransactionId=");
-        builder.append(marketTransactionId());
+        builder.append("marketId=");
+        builder.append(marketId());
         builder.append('|');
-        builder.append("partyId=");
-        builder.append(partyId());
+        builder.append("segmentId=");
+        builder.append(segmentId());
         builder.append('|');
-        builder.append("requestId=");
-        builder.append(requestId());
+        builder.append("subscriptionActionRequested=");
+        builder.append(subscriptionActionRequested());
         builder.append('|');
-        builder.append("transaction=");
-        final EiTransactionTypeDecoder transaction = transaction();
-        if (transaction != null)
-        {
-            transaction.appendTo(builder);
-        }
-        else
-        {
-            builder.append("null");
-        }
+        builder.append("subscriptionRequestId=");
+        builder.append(subscriptionRequestId());
 
         limit(originalLimit);
 

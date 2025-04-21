@@ -12,7 +12,7 @@ public class EiTenderTypeDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 107;
+    public static final int ENCODED_LENGTH = 115;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -126,9 +126,45 @@ public class EiTenderTypeDecoder
     }
 
 
-    public static int tenderBaseEncodingOffset()
+    public static int referencedQuoteIdEncodingOffset()
     {
         return 16;
+    }
+
+    public static int referencedQuoteIdEncodingLength()
+    {
+        return 8;
+    }
+
+    public static int referencedQuoteIdSinceVersion()
+    {
+        return 0;
+    }
+
+    public static long referencedQuoteIdNullValue()
+    {
+        return 0xffffffffffffffffL;
+    }
+
+    public static long referencedQuoteIdMinValue()
+    {
+        return 0x0L;
+    }
+
+    public static long referencedQuoteIdMaxValue()
+    {
+        return 0xfffffffffffffffeL;
+    }
+
+    public long referencedQuoteId()
+    {
+        return buffer.getLong(offset + 16, java.nio.ByteOrder.LITTLE_ENDIAN);
+    }
+
+
+    public static int tenderBaseEncodingOffset()
+    {
+        return 24;
     }
 
     public static int tenderBaseEncodingLength()
@@ -150,7 +186,7 @@ public class EiTenderTypeDecoder
      */
     public TenderBaseDecoder tenderBase()
     {
-        tenderBase.wrap(buffer, offset + 16);
+        tenderBase.wrap(buffer, offset + 24);
         return tenderBase;
     }
 
@@ -177,6 +213,9 @@ public class EiTenderTypeDecoder
         builder.append('|');
         builder.append("tenderId=");
         builder.append(tenderId());
+        builder.append('|');
+        builder.append("referencedQuoteId=");
+        builder.append(referencedQuoteId());
         builder.append('|');
         builder.append("tenderBase=");
         final TenderBaseDecoder tenderBase = tenderBase();

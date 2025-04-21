@@ -5,20 +5,20 @@ import org.agrona.MutableDirectBuffer;
 
 
 /**
- * See TenderIntervalDetail.java
+ * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
  */
 @SuppressWarnings("all")
-public class TenderIntervalDetailEncoder
+public class InstantEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 40;
+    public static final int ENCODED_LENGTH = 12;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
     private MutableDirectBuffer buffer;
 
-    public TenderIntervalDetailEncoder wrap(final MutableDirectBuffer buffer, final int offset)
+    public InstantEncoder wrap(final MutableDirectBuffer buffer, final int offset)
     {
         if (buffer != this.buffer)
         {
@@ -54,89 +54,66 @@ public class TenderIntervalDetailEncoder
         return SCHEMA_VERSION;
     }
 
-    public static int intervalEncodingOffset()
+    public static int secondsEncodingOffset()
     {
         return 0;
     }
 
-    public static int intervalEncodingLength()
-    {
-        return 24;
-    }
-
-    private final IntervalEncoder interval = new IntervalEncoder();
-
-    /**
-     * See Interval.java
-     *
-     * @return IntervalEncoder : See Interval.java
-     */
-    public IntervalEncoder interval()
-    {
-        interval.wrap(buffer, offset + 0);
-        return interval;
-    }
-
-    public static int priceEncodingOffset()
-    {
-        return 24;
-    }
-
-    public static int priceEncodingLength()
+    public static int secondsEncodingLength()
     {
         return 8;
     }
 
-    public static long priceNullValue()
+    public static long secondsNullValue()
     {
         return -9223372036854775808L;
     }
 
-    public static long priceMinValue()
+    public static long secondsMinValue()
     {
         return -9223372036854775807L;
     }
 
-    public static long priceMaxValue()
+    public static long secondsMaxValue()
     {
         return 9223372036854775807L;
     }
 
-    public TenderIntervalDetailEncoder price(final long value)
+    public InstantEncoder seconds(final long value)
     {
-        buffer.putLong(offset + 24, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 0, value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
 
-    public static int quantityEncodingOffset()
-    {
-        return 32;
-    }
-
-    public static int quantityEncodingLength()
+    public static int nanoEncodingOffset()
     {
         return 8;
     }
 
-    public static long quantityNullValue()
+    public static int nanoEncodingLength()
     {
-        return -9223372036854775808L;
+        return 4;
     }
 
-    public static long quantityMinValue()
+    public static long nanoNullValue()
     {
-        return -9223372036854775807L;
+        return 4294967295L;
     }
 
-    public static long quantityMaxValue()
+    public static long nanoMinValue()
     {
-        return 9223372036854775807L;
+        return 0L;
     }
 
-    public TenderIntervalDetailEncoder quantity(final long value)
+    public static long nanoMaxValue()
     {
-        buffer.putLong(offset + 32, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return 4294967294L;
+    }
+
+    public InstantEncoder nano(final long value)
+    {
+        buffer.putInt(offset + 8, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
@@ -158,7 +135,7 @@ public class TenderIntervalDetailEncoder
             return builder;
         }
 
-        final TenderIntervalDetailDecoder decoder = new TenderIntervalDetailDecoder();
+        final InstantDecoder decoder = new InstantDecoder();
         decoder.wrap(buffer, offset);
 
         return decoder.appendTo(builder);

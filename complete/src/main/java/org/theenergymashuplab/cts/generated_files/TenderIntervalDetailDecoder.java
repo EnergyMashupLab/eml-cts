@@ -69,14 +69,14 @@ public class TenderIntervalDetailDecoder
         return 0;
     }
 
-    private final IntervalTypeDecoder interval = new IntervalTypeDecoder();
+    private final IntervalDecoder interval = new IntervalDecoder();
 
     /**
-     * See IntervaTypel.java
+     * See Interval.java
      *
-     * @return IntervalTypeDecoder : See IntervaTypel.java
+     * @return IntervalDecoder : See Interval.java
      */
-    public IntervalTypeDecoder interval()
+    public IntervalDecoder interval()
     {
         interval.wrap(buffer, offset + 0);
         return interval;
@@ -173,7 +173,7 @@ public class TenderIntervalDetailDecoder
 
         builder.append('(');
         builder.append("interval=");
-        final IntervalTypeDecoder interval = interval();
+        final IntervalDecoder interval = interval();
         if (interval != null)
         {
             interval.appendTo(builder);

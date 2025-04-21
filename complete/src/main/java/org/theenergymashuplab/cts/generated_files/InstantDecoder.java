@@ -5,20 +5,20 @@ import org.agrona.DirectBuffer;
 
 
 /**
- * See EiTransactionType.java
+ * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
  */
 @SuppressWarnings("all")
-public class EiTransactionTypeDecoder
+public class InstantDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 123;
+    public static final int ENCODED_LENGTH = 12;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
     private DirectBuffer buffer;
 
-    public EiTransactionTypeDecoder wrap(final DirectBuffer buffer, final int offset)
+    public InstantDecoder wrap(final DirectBuffer buffer, final int offset)
     {
         if (buffer != this.buffer)
         {
@@ -54,69 +54,77 @@ public class EiTransactionTypeDecoder
         return SCHEMA_VERSION;
     }
 
-    public static int marketTransactionIdEncodingOffset()
+    public static int secondsEncodingOffset()
     {
         return 0;
     }
 
-    public static int marketTransactionIdEncodingLength()
+    public static int secondsEncodingLength()
     {
         return 8;
     }
 
-    public static int marketTransactionIdSinceVersion()
+    public static int secondsSinceVersion()
     {
         return 0;
     }
 
-    public static long marketTransactionIdNullValue()
+    public static long secondsNullValue()
     {
-        return 0xffffffffffffffffL;
+        return -9223372036854775808L;
     }
 
-    public static long marketTransactionIdMinValue()
+    public static long secondsMinValue()
     {
-        return 0x0L;
+        return -9223372036854775807L;
     }
 
-    public static long marketTransactionIdMaxValue()
+    public static long secondsMaxValue()
     {
-        return 0xfffffffffffffffeL;
+        return 9223372036854775807L;
     }
 
-    public long marketTransactionId()
+    public long seconds()
     {
         return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
     }
 
 
-    public static int tenderEncodingOffset()
+    public static int nanoEncodingOffset()
     {
         return 8;
     }
 
-    public static int tenderEncodingLength()
+    public static int nanoEncodingLength()
     {
-        return 115;
+        return 4;
     }
 
-    public static int tenderSinceVersion()
+    public static int nanoSinceVersion()
     {
         return 0;
     }
 
-    private final EiTenderTypeDecoder tender = new EiTenderTypeDecoder();
-
-    /**
-     * See EiTenderType.java
-     *
-     * @return EiTenderTypeDecoder : See EiTenderType.java
-     */
-    public EiTenderTypeDecoder tender()
+    public static long nanoNullValue()
     {
-        tender.wrap(buffer, offset + 8);
-        return tender;
+        return 4294967295L;
     }
+
+    public static long nanoMinValue()
+    {
+        return 0L;
+    }
+
+    public static long nanoMaxValue()
+    {
+        return 4294967294L;
+    }
+
+    public long nano()
+    {
+        return (buffer.getInt(offset + 8, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+    }
+
 
     public String toString()
     {
@@ -136,19 +144,11 @@ public class EiTransactionTypeDecoder
         }
 
         builder.append('(');
-        builder.append("marketTransactionId=");
-        builder.append(marketTransactionId());
+        builder.append("seconds=");
+        builder.append(seconds());
         builder.append('|');
-        builder.append("tender=");
-        final EiTenderTypeDecoder tender = tender();
-        if (tender != null)
-        {
-            tender.appendTo(builder);
-        }
-        else
-        {
-            builder.append("null");
-        }
+        builder.append("nano=");
+        builder.append(nano());
         builder.append(')');
 
         return builder;

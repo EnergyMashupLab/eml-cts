@@ -77,7 +77,7 @@ public class EiTenderCreatedEncoderDecoder {
         .seconds(createdDateTime.getEpochSecond())
         .nano(createdDateTime.getNano());
 
-    responseEncoder.inResponseTo(payload.getResponse().getRefId().getMyUidId());
+    responseEncoder.inResponseTo(payload.getResponse().getInResponseTo().getMyUidId());
     //	inResponseTo of type RefID in WD32 UML
     
     responseEncoder.responseCode(payload.getResponse().getResponseCode());
@@ -98,49 +98,49 @@ public class EiTenderCreatedEncoderDecoder {
     
     // Encode enum: ResponseDetailType
     org.theenergymashuplab.cts.generated_files.ResponseDetailType encodedEnum;
-    switch (payload.getResponse().getResponseDetailType()) {
+    switch (payload.getResponse().getResponseDetail()) {
     case UNSPECIFIED:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.Unspecified;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.UNSPECIFIED;
         break;
     case RULES_VIOLATION:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.RulesViolation;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.RULES_VIOLATION;
         break;
     case INVALID_REFERENCE:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidReference;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_REFERENCE;
         break;
     case DUPLICATE:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.Duplicate;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.DUPLICATE;
         break;
     case TRADING_CLOSED:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.TradingClosed;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.TRADING_CLOSED;
         break;
     case PARTY_RESTRICTED:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.PartyRestricted;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.PARTY_RESTRICTED;
         break;
     case INVALID_INSTRUMENT:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidInstrument;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_INSTRUMENT;
         break;
     case FORCE_MAJEURE:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.ForceMajeure;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.FORCE_MAJEURE;
         break;
     case INVALID_MARKET:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidMarket;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_MARKET;
         break;
     case INVALID_SEGMENT:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidInstrument;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_SEGMENT;
         break;
     case SUCCESS:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.Success;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.SUCCESS;
         break;
     case NOT_AUTHORIZED:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.NotAuthorized;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.NOT_AUTHORIZED;
         break;
     case INVALID_ARTIFACT:
-        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.InvalidArtifact;
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_ARTIFACT;
         break;
     default:
         throw new IllegalArgumentException(
-            "Unhandled ResponseDetailType: " + payload.getResponse().getResponseDetailType());
+            "Unhandled ResponseDetailType: " + payload.getResponse().getResponseDetail());
 }
 
 responseEncoder.responseDetail(encodedEnum);
@@ -216,7 +216,7 @@ responseEncoder.responseDetail(encodedEnum);
 		eiCreatedTenderPayload.setTenderId(tenderId);
 
 		// DECODE NESTED RESPONSE COMPOSITE
-		EiResponse eiResponse = new EiResponse();
+		EiResponseType eiResponse = new EiResponseType();
 		EiResponseTypeDecoder responseDecoder = eiCreatedTenderPayloadDecoder.response();
 
 		// Decode createdDateTime
@@ -227,7 +227,7 @@ responseEncoder.responseDetail(encodedEnum);
 		// Decode inResponseTo
 		RefIdType responseInResponseTo = new RefIdType();
 		responseInResponseTo.setMyUidId(responseDecoder.inResponseTo());
-		eiResponse.setRefId(responseInResponseTo);
+		eiResponse.setInResponseTo(responseInResponseTo);
 
 		// Decode responseCode
 		eiResponse.setResponseCode(responseDecoder.responseCode());
@@ -240,7 +240,7 @@ responseEncoder.responseDetail(encodedEnum);
 //		eiResponse.setResponseDescription(responseDescription);
 
 		// Decode responseDetail Enum
-		eiResponse.setResponseDetailType(org.theenergymashuplab.cts.ResponseDetailType.valueOf(responseDecoder.responseDetail().name()));
+		eiResponse.setResponseDetail(org.theenergymashuplab.cts.ResponseDetailType.valueOf(responseDecoder.responseDetail().name()));
 
 		// Set the decoded response
 		eiCreatedTenderPayload.setResponse(eiResponse);
