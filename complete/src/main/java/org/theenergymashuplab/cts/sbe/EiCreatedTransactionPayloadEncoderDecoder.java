@@ -64,9 +64,13 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		// Response -> Description
 		eiCreatedTransactionPayloadEncoder.response().responseDescription().wrap(directBuffer,0);
 
-		// Response -> Response Detail
-		eiCreatedTransactionPayloadEncoder.response()
-				.responseDetail(eiCreatedTransactionPayload.getResponse().getResponseDetail());
+		org.theenergymashuplab.cts.ResponseDetailType appEnum =
+			    eiCreatedTransactionPayload.getResponse().getResponseDetail();
+
+			org.theenergymashuplab.cts.generated_files.ResponseDetailType encodedEnum =
+			    org.theenergymashuplab.cts.generated_files.ResponseDetailType.valueOf(appEnum.name());
+
+			eiCreatedTransactionPayloadEncoder.response().responseDetail(encodedEnum);
 
 		// ----
 
@@ -118,7 +122,11 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		RefIdType inResponseTo = new RefIdType();
 		inResponseTo.setMyUidId(eiCreatedTransactionDecoder.response().inResponseTo());
 
-		ResponseDetailType responseDetail = eiCreatedTransactionDecoder.response().responseDetail();
+		org.theenergymashuplab.cts.generated_files.ResponseDetailType generatedDetail =
+			    eiCreatedTransactionDecoder.response().responseDetail();
+
+			org.theenergymashuplab.cts.ResponseDetailType responseDetail =
+			    org.theenergymashuplab.cts.ResponseDetailType.valueOf(generatedDetail.name());
 
 		response.setCreatedDateTime(
 				Instant.ofEpochSecond(eiCreatedTransactionDecoder.response().createdDateTime().seconds(),

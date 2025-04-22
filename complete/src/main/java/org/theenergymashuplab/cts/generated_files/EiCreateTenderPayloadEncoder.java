@@ -10,7 +10,7 @@ import org.agrona.MutableDirectBuffer;
 @SuppressWarnings("all")
 public class EiCreateTenderPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 152;
+    public static final int BLOCK_LENGTH = 160;
     public static final int TEMPLATE_ID = 5;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -468,7 +468,7 @@ public class EiCreateTenderPayloadEncoder
 
     public static int tenderEncodingLength()
     {
-        return 107;
+        return 115;
     }
 
     public static String tenderMetaAttribute(final MetaAttribute metaAttribute)

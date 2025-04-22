@@ -64,14 +64,14 @@ public class EiResponseTypeEncoder
         return 12;
     }
 
-    private final InstantTypeEncoder createdDateTime = new InstantTypeEncoder();
+    private final InstantEncoder createdDateTime = new InstantEncoder();
 
     /**
      * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      *
-     * @return InstantTypeEncoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     * @return InstantEncoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      */
-    public InstantTypeEncoder createdDateTime()
+    public InstantEncoder createdDateTime()
     {
         createdDateTime.wrap(buffer, offset + 0);
         return createdDateTime;

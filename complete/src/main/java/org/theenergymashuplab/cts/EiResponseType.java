@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2025 The Energy Mashup Lab
- * 
+ * Copyright 2019-2020 The Energy Mashup Lab
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +15,7 @@
  */
 
 package org.theenergymashuplab.cts;
-
 import java.time.Instant;
-
-import org.theenergymashuplab.cts.generated_files.ResponseDetailType;
-
 /* 
  * TBD - integration using NIST_CTS EiResponseType, 
  * EiResponseModel, EiResponseRepository
@@ -33,14 +29,31 @@ public class EiResponseType {
     public String responseDescription;
     public ResponseDetailType responseDetail;
 
-    public EiResponseType() {
+	public EiResponseType(long responseCode, String responseDescription, ResponseDetailType responseDetail) {
+		this.responseCode = responseCode;
+		this.responseDescription = responseDescription;
+		this.responseDetail = responseDetail;
+	}
 
-    }
+	/*
+	 * No parameters - for JSON serialization
+	 */
 
-    public Instant getCreatedDateTime() {
-        return createdDateTime;
-    }
+	public EiResponseType() {
+		responseCode = 0;
+		responseDescription = "";
+		responseDetail = ResponseDetailType.UNSPECIFIED;
+	}
 
+	public String toString() {
+		return ("EIResponse responseCode " + responseCode + " responseDescription " + responseDescription
+				+ " createdDateTime " + createdDateTime.toString());
+	}
+
+	public Instant getCreatedDateTime() {
+		return createdDateTime;
+	}
+	
     public void setCreatedDateTime(Instant createdDateTime) {
         this.createdDateTime = createdDateTime;
     }
@@ -74,9 +87,7 @@ public class EiResponseType {
         return responseDetail;
     }
 
-    public void setResponseDetail(ResponseDetailType responseDetail) {
-        this.responseDetail = responseDetail;
-    }
-
-
+	public void setResponseDetail(ResponseDetailType responseDetail) {
+		this.responseDetail = responseDetail;
+	}
 }

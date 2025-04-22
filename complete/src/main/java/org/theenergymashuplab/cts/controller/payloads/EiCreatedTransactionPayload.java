@@ -28,7 +28,7 @@ public class EiCreatedTransactionPayload {
 	public ActorIdType partyId;
 	// Should be RecipientTransactionIdType, but the class does not exist
 	public TransactionIdType recipientTransactionId;
-	public RefIdType refId ;
+	public RefIdType refId = new RefIdType();
 	public EiResponseType response;
 	public TransactionIdType transactionId;
 

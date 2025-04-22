@@ -225,7 +225,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 		<!-- 	executionInstructions set to uint64 instead of VarStringEncoding
 				as the string typically a couple of  Char or "" -->
 		<type name="executionInstructions" primitiveType="uint64" />
-		<ref name="expirationTime" type="Instant" />
+		<ref name="expirationTime" type="InstantType" />
 		<ref name="marketId" type="MarketIdType" />
 		<type name="priceScale" primitiveType="uint32" />
 		<type name="quantityScale" primitiveType="uint32" />
@@ -260,6 +260,10 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 		<ref name="tickerType" type="TickerType" />
 	</composite>
 	
+	<composite name="QuoteTicker" description="See QuoteTickerType.jav">
+		<ref name="quote" type="EiQuoteType"  />
+	</composite>
+	
 	<composite name="EiQuoteType" description="See EiQuoteType.java">
 		<ref name="marketQuoteId" type="MarketOrderIdType"	/>
 		<ref name="privateQuote" type="BooleanType" 	/>
@@ -270,7 +274,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	</composite>
 	
 	<composite name="EiResponseType" description="See EiResponseType.java">
-		<ref name="createdDateTime" type="Instant" />  
+		<ref name="createdDateTime" type="InstantType" />  
 		<ref name="inResponseTo" type="RefIdType" />   
 		<type name="responseCode" primitiveType="uint64" />  
 		<ref name="responseDescription" type="varStringEncoding"/>
@@ -402,7 +406,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	<field name="transaction" id="6" type="EiTransactionType"/>
 </sbe:message>
 
-<sbe:message name="EiAcceptedQuotePayload" id="12"	description="See EiAcceptedQuotePayload">
+<sbe:message name="EiAcceptedQuotePayload" id="8"	description="See EiAcceptedQuotePayload">
 	<field name="counterPartyId" id="1" type="ActorIdType"/>
 	<field name="marketTransactionId" id="2" type="MarketTransactionIdType"  />
 	<field name="partyId" id="3" type="ActorIdType"/>

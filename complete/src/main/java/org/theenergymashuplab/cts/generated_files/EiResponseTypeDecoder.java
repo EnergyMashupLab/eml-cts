@@ -69,14 +69,14 @@ public class EiResponseTypeDecoder
         return 0;
     }
 
-    private final InstantTypeDecoder createdDateTime = new InstantTypeDecoder();
+    private final InstantDecoder createdDateTime = new InstantDecoder();
 
     /**
      * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      *
-     * @return InstantTypeDecoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     * @return InstantDecoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      */
-    public InstantTypeDecoder createdDateTime()
+    public InstantDecoder createdDateTime()
     {
         createdDateTime.wrap(buffer, offset + 0);
         return createdDateTime;
@@ -227,7 +227,7 @@ public class EiResponseTypeDecoder
 
         builder.append('(');
         builder.append("createdDateTime=");
-        final InstantTypeDecoder createdDateTime = createdDateTime();
+        final InstantDecoder createdDateTime = createdDateTime();
         if (createdDateTime != null)
         {
             createdDateTime.appendTo(builder);

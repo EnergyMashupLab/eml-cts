@@ -112,14 +112,14 @@ public class TenderBaseEncoder
         return 12;
     }
 
-    private final InstantTypeEncoder expirationTime = new InstantTypeEncoder();
+    private final InstantEncoder expirationTime = new InstantEncoder();
 
     /**
      * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      *
-     * @return InstantTypeEncoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     * @return InstantEncoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      */
-    public InstantTypeEncoder expirationTime()
+    public InstantEncoder expirationTime()
     {
         expirationTime.wrap(buffer, offset + 9);
         return expirationTime;

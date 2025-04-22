@@ -5,20 +5,20 @@ import org.agrona.DirectBuffer;
 
 
 /**
- * See EiTransactionType.java
+ * See Interval.java
  */
 @SuppressWarnings("all")
-public class EiTransactionTypeDecoder
+public class IntervalDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 123;
+    public static final int ENCODED_LENGTH = 24;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
     private DirectBuffer buffer;
 
-    public EiTransactionTypeDecoder wrap(final DirectBuffer buffer, final int offset)
+    public IntervalDecoder wrap(final DirectBuffer buffer, final int offset)
     {
         if (buffer != this.buffer)
         {
@@ -54,68 +54,60 @@ public class EiTransactionTypeDecoder
         return SCHEMA_VERSION;
     }
 
-    public static int marketTransactionIdEncodingOffset()
+    public static int durationEncodingOffset()
     {
         return 0;
     }
 
-    public static int marketTransactionIdEncodingLength()
+    public static int durationEncodingLength()
     {
-        return 8;
+        return 12;
     }
 
-    public static int marketTransactionIdSinceVersion()
-    {
-        return 0;
-    }
-
-    public static long marketTransactionIdNullValue()
-    {
-        return 0xffffffffffffffffL;
-    }
-
-    public static long marketTransactionIdMinValue()
-    {
-        return 0x0L;
-    }
-
-    public static long marketTransactionIdMaxValue()
-    {
-        return 0xfffffffffffffffeL;
-    }
-
-    public long marketTransactionId()
-    {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
-    }
-
-
-    public static int tenderEncodingOffset()
-    {
-        return 8;
-    }
-
-    public static int tenderEncodingLength()
-    {
-        return 115;
-    }
-
-    public static int tenderSinceVersion()
+    public static int durationSinceVersion()
     {
         return 0;
     }
 
-    private final EiTenderTypeDecoder tender = new EiTenderTypeDecoder();
+    private final DurationDecoder duration = new DurationDecoder();
 
     /**
-     * See EiTenderType.java
+     * See java.time.Duration. In seconds (signed) and nanoseconds (unsiqned)
      *
-     * @return EiTenderTypeDecoder : See EiTenderType.java
+     * @return DurationDecoder : See java.time.Duration. In seconds (signed) and nanoseconds (unsiqned)
      */
-    public EiTenderTypeDecoder tender()
+    public DurationDecoder duration()
     {
-        tender.wrap(buffer, offset + 8);
-        return tender;
+        duration.wrap(buffer, offset + 0);
+        return duration;
+    }
+
+    public static int dtStartEncodingOffset()
+    {
+        return 12;
+    }
+
+    public static int dtStartEncodingLength()
+    {
+        return 12;
+    }
+
+    public static int dtStartSinceVersion()
+    {
+        return 0;
+    }
+
+    private final InstantDecoder dtStart = new InstantDecoder();
+
+    /**
+     * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     *
+     * @return InstantDecoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     */
+    public InstantDecoder dtStart()
+    {
+        dtStart.wrap(buffer, offset + 12);
+        return dtStart;
     }
 
     public String toString()
@@ -136,14 +128,22 @@ public class EiTransactionTypeDecoder
         }
 
         builder.append('(');
-        builder.append("marketTransactionId=");
-        builder.append(marketTransactionId());
-        builder.append('|');
-        builder.append("tender=");
-        final EiTenderTypeDecoder tender = tender();
-        if (tender != null)
+        builder.append("duration=");
+        final DurationDecoder duration = duration();
+        if (duration != null)
         {
-            tender.appendTo(builder);
+            duration.appendTo(builder);
+        }
+        else
+        {
+            builder.append("null");
+        }
+        builder.append('|');
+        builder.append("dtStart=");
+        final InstantDecoder dtStart = dtStart();
+        if (dtStart != null)
+        {
+            dtStart.appendTo(builder);
         }
         else
         {

@@ -131,14 +131,14 @@ public class TenderBaseDecoder
         return 0;
     }
 
-    private final InstantTypeDecoder expirationTime = new InstantTypeDecoder();
+    private final InstantDecoder expirationTime = new InstantDecoder();
 
     /**
      * See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      *
-     * @return InstantTypeDecoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
+     * @return InstantDecoder : See java.time.Instant. Seconds (signed) and nanoseconds (unsiqned)
      */
-    public InstantTypeDecoder expirationTime()
+    public InstantDecoder expirationTime()
     {
         expirationTime.wrap(buffer, offset + 9);
         return expirationTime;
@@ -429,7 +429,7 @@ public class TenderBaseDecoder
         builder.append(executionInstructions());
         builder.append('|');
         builder.append("expirationTime=");
-        final InstantTypeDecoder expirationTime = expirationTime();
+        final InstantDecoder expirationTime = expirationTime();
         if (expirationTime != null)
         {
             expirationTime.appendTo(builder);
