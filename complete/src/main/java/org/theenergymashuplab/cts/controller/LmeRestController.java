@@ -234,6 +234,9 @@ public class LmeRestController {
 		return instrumentClearingMatches;
 	}
 
+	/*
+	 * Helper function for clearing the market. Matches buyers and sellers when given a list of tenders and a clearing price
+	 */
 	private List<EiCreateTransactionPayload> matchBuySellTenders(List<EiTenderType> inMoneyTenders, int clearingPrice) {
 		final Comparator<EiTenderType> tenderComparator = (t1, t2) -> {
 			TenderIntervalDetail d1 = (TenderIntervalDetail) t1.getTenderDetail();
