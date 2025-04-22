@@ -62,8 +62,7 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 				.responseCode(eiCreatedTransactionPayload.getResponse().getResponseCode());
 
 		// Response -> Description
-		// eiCreatedTransactionPayloadEncoder.response().responseDescription().wrap(directBuffer,
-		// 0);
+		eiCreatedTransactionPayloadEncoder.response().responseDescription().wrap(directBuffer,0);
 
 		// Response -> Response Detail
 		eiCreatedTransactionPayloadEncoder.response()
