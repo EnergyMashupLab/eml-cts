@@ -12,7 +12,6 @@ import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayloa
 import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
-import org.theenergymashuplab.cts.generated_files.ResponseDetailType;
 
 public class EiCreatedTransactionPayloadEncoderDecoder {
 
@@ -62,7 +61,7 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 				.responseCode(eiCreatedTransactionPayload.getResponse().getResponseCode());
 
 		// Response -> Description
-		eiCreatedTransactionPayloadEncoder.response().responseDescription().wrap(directBuffer,0);
+		eiCreatedTransactionPayloadEncoder.response().responseDescription();
 
 		org.theenergymashuplab.cts.ResponseDetailType appEnum =
 			    eiCreatedTransactionPayload.getResponse().getResponseDetail();
