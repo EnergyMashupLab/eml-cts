@@ -1,3 +1,16 @@
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS"
+ * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+
 package org.theenergymashuplab.cts.sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
@@ -22,11 +35,10 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 				.tickerType(ConvertTickerType(eiManagedTickerSubscriptionPayload.getTickerType()));
 
 		// TODO: fix
-		int length = eiManagedTickerSubscriptionPayload.getMulticastListenReference().length();
-		String multicastListenReference = eiManagedTickerSubscriptionPayload.getMulticastListenReference();
 
-		eiManagedTickerSubscriptionEncoder.multicastListenReference().buffer().putStringUtf8(0,
-				multicastListenReference, length);
+		eiManagedTickerSubscriptionEncoder.multicastListenReference().buffer().putStringUtf8(
+				eiManagedTickerSubscriptionEncoder.multicastListenReference().offset(),
+				eiManagedTickerSubscriptionPayload.getMulticastListenReference());
 
 		EiResponseTypeEncoderDecoder.Encode(eiManagedTickerSubscriptionEncoder.response(),
 				eiManagedTickerSubscriptionPayload.getResponse());
@@ -69,8 +81,14 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 				.setTickerType(ConvertTickerType(eiManagedTickerSubscriptionPayloadDecoder.tickerType()));
 
 		// TODO: fix
-		eiManagedTickerSubscriptionPayload.setMulticastListenReference(
-				eiManagedTickerSubscriptionPayloadDecoder.multicastListenReference().buffer().getStringUtf8(0));
+		eiManagedTickerSubscriptionPayload
+				.setMulticastListenReference(
+						eiManagedTickerSubscriptionPayloadDecoder
+								.multicastListenReference()
+								.buffer()
+								.getStringUtf8(eiManagedTickerSubscriptionPayloadDecoder
+										.multicastListenReference()
+										.offset()));
 
 		eiManagedTickerSubscriptionPayload.setResponse(eiResponse);
 
