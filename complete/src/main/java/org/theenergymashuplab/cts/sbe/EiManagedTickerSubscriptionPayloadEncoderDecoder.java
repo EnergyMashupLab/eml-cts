@@ -1,6 +1,7 @@
 package org.theenergymashuplab.cts.sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.controller.payloads.EiManagedTickerSubscriptionPayload;
 import org.theenergymashuplab.cts.generated_files.EiManagedTickerSubscriptionPayloadDecoder;
@@ -23,7 +24,8 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 		// TODO: fix
 		eiManagedTickerSubscriptionEncoder.multicastListenReference();
 
-		// eiManagedTickerSubscriptionEncoder.response((short)
+		EiResponseTypeEncoderDecoder.Encode(eiManagedTickerSubscriptionEncoder.response(),
+				eiManagedTickerSubscriptionPayload.getResponse());
 
 		eiManagedTickerSubscriptionEncoder.subscriptionActionTaken(
 				ConvertSubscriptionActionType(eiManagedTickerSubscriptionPayload.getSubscriptionActionTaken()));
@@ -52,6 +54,8 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 		System.out.println(eiManagedTickerSubscriptionPayloadDecoder.toString());
 
 		RefIdType subscriptionRequestId = new RefIdType();
+		EiResponseType eiResponse = EiResponseTypeEncoderDecoder
+				.Decode(eiManagedTickerSubscriptionPayloadDecoder.response());
 
 		subscriptionRequestId.setMyUidId(eiManagedTickerSubscriptionPayloadDecoder.subscriptionRequestId());
 
@@ -63,7 +67,8 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 		// TODO: fix
 		eiManagedTickerSubscriptionPayload.setMulticastListenReference(null);
 
-		// eiManagedTickerSubscriptionPayload.setResponse(null);
+		eiManagedTickerSubscriptionPayload.setResponse(eiResponse);
+
 		eiManagedTickerSubscriptionPayload.setSubscriptionActionTaken(
 				ConvertSubscriptionActionType(eiManagedTickerSubscriptionPayloadDecoder.subscriptionActionTaken()));
 
