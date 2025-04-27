@@ -18,7 +18,10 @@ public class EiResponseTypeEncoderDecoder {
         eiResponseTypeEncoder.responseCode(eiResponse.getResponseCode());
 
         // TODO: fix
-        eiResponseTypeEncoder.responseDescription();
+        int length = eiResponse.getResponseDescription().length();
+        String description = eiResponse.getResponseDescription();
+
+        eiResponseTypeEncoder.responseDescription().buffer().putStringUtf8(0, description, length);
 
         eiResponseTypeEncoder.responseDetail(ConvertResponseDetailType(eiResponse.getResponseDetail()));
     }
@@ -38,7 +41,7 @@ public class EiResponseTypeEncoderDecoder {
         eiResponse.setResponseCode(eiResponseTypeDecoder.responseCode());
 
         // TODO: fix
-        eiResponse.setResponseDescription(String.valueOf(eiResponseTypeDecoder.responseDescription()));
+        eiResponse.setResponseDescription(eiResponseTypeDecoder.responseDescription().buffer().getStringUtf8(0));
 
         eiResponse.setResponseDetail(ConvertResponseDetailType(eiResponseTypeDecoder.responseDetail()));
 

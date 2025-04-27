@@ -22,7 +22,11 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 				.tickerType(ConvertTickerType(eiManagedTickerSubscriptionPayload.getTickerType()));
 
 		// TODO: fix
-		eiManagedTickerSubscriptionEncoder.multicastListenReference();
+		int length = eiManagedTickerSubscriptionPayload.getMulticastListenReference().length();
+		String multicastListenReference = eiManagedTickerSubscriptionPayload.getMulticastListenReference();
+
+		eiManagedTickerSubscriptionEncoder.multicastListenReference().buffer().putStringUtf8(0,
+				multicastListenReference, length);
 
 		EiResponseTypeEncoderDecoder.Encode(eiManagedTickerSubscriptionEncoder.response(),
 				eiManagedTickerSubscriptionPayload.getResponse());
@@ -65,7 +69,8 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 				.setTickerType(ConvertTickerType(eiManagedTickerSubscriptionPayloadDecoder.tickerType()));
 
 		// TODO: fix
-		eiManagedTickerSubscriptionPayload.setMulticastListenReference(null);
+		eiManagedTickerSubscriptionPayload.setMulticastListenReference(
+				eiManagedTickerSubscriptionPayloadDecoder.multicastListenReference().buffer().getStringUtf8(0));
 
 		eiManagedTickerSubscriptionPayload.setResponse(eiResponse);
 
