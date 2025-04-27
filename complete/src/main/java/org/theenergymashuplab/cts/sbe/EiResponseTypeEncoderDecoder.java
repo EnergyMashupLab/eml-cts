@@ -8,9 +8,7 @@ import org.theenergymashuplab.cts.generated_files.EiResponseTypeDecoder;
 import org.theenergymashuplab.cts.generated_files.EiResponseTypeEncoder;
 
 public class EiResponseTypeEncoderDecoder {
-    public static void EiResponseTypeEncode(
-            EiResponseTypeEncoder eiResponseTypeEncoder,
-            EiResponseType eiResponse) {
+    public static void Encode(EiResponseTypeEncoder eiResponseTypeEncoder, EiResponseType eiResponse) {
 
         eiResponseTypeEncoder.createdDateTime().seconds(eiResponse.getCreatedDateTime().getEpochSecond());
         eiResponseTypeEncoder.createdDateTime().nano(eiResponse.getCreatedDateTime().getNano());
@@ -25,8 +23,7 @@ public class EiResponseTypeEncoderDecoder {
         eiResponseTypeEncoder.responseDetail(ConvertResponseDetailType(eiResponse.getResponseDetail()));
     }
 
-    public static EiResponseType EiResponseTypeDecode(
-            EiResponseTypeDecoder eiResponseTypeDecoder) {
+    public static EiResponseType Decode(EiResponseTypeDecoder eiResponseTypeDecoder) {
 
         EiResponseType eiResponse = new EiResponseType();
 
