@@ -37,11 +37,17 @@
  * 
  */
 
-package org.theenergymashuplab.cts;
+package org.theenergymashuplab.cts.tender_generators;
 
 import java.time.Instant;
 import java.time.Duration;
 import java.util.Random;
+
+import org.theenergymashuplab.cts.EiTenderType;
+import org.theenergymashuplab.cts.Interval;
+import org.theenergymashuplab.cts.SideType;
+import org.theenergymashuplab.cts.TenderDetail;
+import org.theenergymashuplab.cts.TenderIntervalDetail;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -60,7 +66,7 @@ public class RandomEiTender {
 	private EiTenderType randTender;
 	Interval interval = new Interval(60, dtStart); // 60 minute interval at dtStart
 
-	RandomEiTender() {
+	public RandomEiTender() {
 		// initialize random generator in class attributes
 		// Local instance variable initializers and instance initializers are executed
 		// after the constructor is invoked

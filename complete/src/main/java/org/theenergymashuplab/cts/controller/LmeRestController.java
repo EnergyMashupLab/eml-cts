@@ -140,11 +140,11 @@ public class LmeRestController {
 	 * 
 	 */
 	@GetMapping("/clear")
-	public HashMap<Instant, Integer> clear() {
+	public HashMap<Instant, List<EiCreateTransactionPayload>> clear() {
 		logger.debug("/clear was called");
 		Set<Instant> instruments = auctionTenders.keySet();
 		// <instrument, clearing price>
-		HashMap<Instant, Integer> instrumentClearingPrices = new HashMap<>();
+		HashMap<Instant, List<EiCreateTransactionPayload>> instrumentClearingMatches = new HashMap<>();
 
 		// Clears for every instrument. Will later take a parameter to clear a specific instrument.
 		for (Instant instrument : instruments) {
@@ -211,7 +211,6 @@ public class LmeRestController {
 			}
 
 			int finalClearingPrice = sellingPrice;
-			instrumentClearingPrices.put(instrument, finalClearingPrice);
 
 			for (EiTenderType tender : tenders) {
 				if (tender.getSide() == SideType.BUY
@@ -220,16 +219,137 @@ public class LmeRestController {
 				} else if (tender.getSide() == SideType.SELL
 						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() <= finalClearingPrice) {
 					inTheMoneyTenders.add(tender);
-
 				} else {
 					residuals.add(tender);
 				}
 			}
 
-			logger.debug(finalClearingPrice);
+			// Remove all tenders aside from the residuals
+			auctionTenders.put(instrument, residuals);
+
+			logger.debug("Final Clearing Price: {}", finalClearingPrice);
+
+			// Match buy and sell tenders
+			List<EiCreateTransactionPayload> matches = matchBuySellTenders(inTheMoneyTenders, finalClearingPrice);
+			instrumentClearingMatches.put(instrument, matches);
 		}
 
-		return instrumentClearingPrices;
+		return instrumentClearingMatches;
+	}
+
+	/*
+	 * Helper function for clearing the market. Matches buyers and sellers when given a list of tenders and a clearing price
+	 */
+	private List<EiCreateTransactionPayload> matchBuySellTenders(List<EiTenderType> inMoneyTenders, int clearingPrice) {
+		final Comparator<EiTenderType> tenderComparator = (t1, t2) -> {
+			TenderIntervalDetail d1 = (TenderIntervalDetail) t1.getTenderDetail();
+			TenderIntervalDetail d2 = (TenderIntervalDetail) t2.getTenderDetail();
+
+			return Long.compare(d2.getQuantity(), d1.getQuantity());
+		};
+
+		logger.debug("Matching Tenders Received: ");
+
+		for (EiTenderType tender : inMoneyTenders) {
+			logger.debug("Tender: {}\n Tender Detail: {}", tender.toString(), tender.getTenderDetail().toString());
+		}
+
+		List<EiCreateTransactionPayload> transactions = new ArrayList<>();
+
+		Iterator<EiTenderType> buyTenders = inMoneyTenders.stream().filter(tender -> tender.getSide() == SideType.BUY)
+				.sorted(tenderComparator).iterator();
+		Iterator<EiTenderType> sellTenders = inMoneyTenders.stream().filter(tender -> tender.getSide() == SideType.SELL)
+				.sorted(tenderComparator).iterator();
+
+		// If there are either no buy or sell offers, no matches can be made
+		if (!buyTenders.hasNext() || !sellTenders.hasNext()) {
+			return transactions;
+		}
+
+		// Reverse-quantity-sorted buy/sells iterated as they run out of quantity in their tender.
+		EiTenderType buyTender = buyTenders.next();
+		TenderIntervalDetail buyDetail = (TenderIntervalDetail) buyTender.getTenderDetail();
+
+		EiTenderType sellTender = sellTenders.next();
+		TenderIntervalDetail sellDetail = (TenderIntervalDetail) sellTender.getTenderDetail();
+
+		// Counters for the remaining amount of each tender, when this reaches 0, we need to
+		// grab the next tender to either accept or provide more energy
+		long remainingBuyAmount = buyDetail.getQuantity();
+		long remainingSellAmount = sellDetail.getQuantity();
+
+		while (true) {
+			long transactionAmount = Math.min(remainingBuyAmount, remainingSellAmount);
+
+			if (transactionAmount > 0) {
+				// The buy and sell payloads contain information regarding the parties involved
+				// in each tender, so we need them for the transactions
+
+				EiCreateTenderPayload buyPayload = LmeRestController.ctsTenderIdToCreateTenderMap
+						.get(buyTender.getTenderId().value());
+				EiCreateTenderPayload sellPayload = LmeRestController.ctsTenderIdToCreateTenderMap
+						.get(sellTender.getTenderId().value());
+
+				ActorIdType buyPartyId = buyPayload.getPartyId();
+				ActorIdType sellPartyId = sellPayload.getPartyId();
+
+				// The price and quantity may change from the original tender, so we need
+				// to create modified tenders for the transactions.
+
+				TenderIntervalDetail buyModifiedDetail = new TenderIntervalDetail(buyDetail.getInterval(), clearingPrice,
+						transactionAmount);
+				TenderIntervalDetail sellModifiedDetail = new TenderIntervalDetail(sellDetail.getInterval(), clearingPrice,
+						transactionAmount);
+
+				EiTenderType buyModifiedTender = new EiTenderType(buyTender.getExpirationTime(), buyTender.getSide(),
+						buyModifiedDetail);
+				EiTenderType sellModifiedTender = new EiTenderType(sellTender.getExpirationTime(), sellTender.getSide(),
+						sellModifiedDetail);
+
+				EiTransaction buyTransaction = new EiTransaction(buyModifiedTender);
+				EiTransaction sellTransaction = new EiTransaction(sellModifiedTender);
+
+				// Finally, create the transaction payloads from the modified tenders
+
+				EiCreateTransactionPayload buyCreateTransactionPayload = new EiCreateTransactionPayload(buyTransaction,
+						buyPartyId, sellPartyId, new TransactionIdType());
+				EiCreateTransactionPayload sellCreateTransactionPayload = new EiCreateTransactionPayload(sellTransaction,
+						sellPartyId, buyPartyId, new TransactionIdType());
+
+				logger.debug("Buy Transaction Created: {}\n Tender Details: {}", buyCreateTransactionPayload.toString(),
+						buyModifiedDetail.toString());
+				logger.debug("Sell Transaction Created: {}\n Tender Details: {}", sellCreateTransactionPayload.toString(),
+						sellModifiedDetail.toString());
+
+				transactions.add(buyCreateTransactionPayload);
+				transactions.add(sellCreateTransactionPayload);
+			}
+
+			remainingBuyAmount -= transactionAmount;
+			remainingSellAmount -= transactionAmount;
+
+			if (remainingBuyAmount == 0) {
+				if (!buyTenders.hasNext())
+					break;
+
+				buyTender = buyTenders.next();
+				buyDetail = (TenderIntervalDetail) buyTender.getTenderDetail();
+
+				remainingBuyAmount = buyDetail.getQuantity();
+			}
+
+			if (remainingSellAmount == 0) {
+				if (!sellTenders.hasNext())
+					break;
+
+				sellTender = sellTenders.next();
+				sellDetail = (TenderIntervalDetail) sellTender.getTenderDetail();
+
+				remainingSellAmount = sellDetail.getQuantity();
+			}
+		}
+
+		return transactions;
 	}
 
 	/*
@@ -253,7 +373,7 @@ public class LmeRestController {
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
-		logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
+		// logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
 		logger.debug("lme/createTender " + eiCreateTender.toString());
 
 		/*
