@@ -1,6 +1,17 @@
-package org.theenergymashuplab.cts.sbe;
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS"
+ * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
-import java.time.Instant;
+package org.theenergymashuplab.cts.sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.ActorIdType;
@@ -12,7 +23,6 @@ import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayloa
 import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
-import org.theenergymashuplab.cts.generated_files.ResponseDetailType;
 
 public class EiCreatedTransactionPayloadEncoderDecoder {
 
@@ -44,36 +54,8 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		eiCreatedTransactionPayloadEncoder.refId(eiCreatedTransactionPayload.getRefId().getMyUidId());
 
 		// Response field ----
-		// Response -> Created Date Time ---
-		Instant responseCreatedDateTime = eiCreatedTransactionPayload.getResponse()
-				.getCreatedDateTime();
-		eiCreatedTransactionPayloadEncoder.response().createdDateTime()
-				.seconds(responseCreatedDateTime.getEpochSecond());
-		eiCreatedTransactionPayloadEncoder.response().createdDateTime().nano(responseCreatedDateTime.getNano());
-
-		// ---
-
-		// Response-> inResponseTo
-		eiCreatedTransactionPayloadEncoder.response().inResponseTo(
-				eiCreatedTransactionPayload.getResponse().getInResponseTo().getMyUidId());
-
-		// Response -> Response Code
-		eiCreatedTransactionPayloadEncoder.response()
-				.responseCode(eiCreatedTransactionPayload.getResponse().getResponseCode());
-
-		// Response -> Description
-		// eiCreatedTransactionPayloadEncoder.response().responseDescription().wrap(directBuffer,
-		// 0);
-
-		org.theenergymashuplab.cts.ResponseDetailType appEnum =
-			    eiCreatedTransactionPayload.getResponse().getResponseDetail();
-
-			org.theenergymashuplab.cts.generated_files.ResponseDetailType encodedEnum =
-			    org.theenergymashuplab.cts.generated_files.ResponseDetailType.valueOf(appEnum.name());
-
-			eiCreatedTransactionPayloadEncoder.response().responseDetail(encodedEnum);
-
-		// ----
+		EiResponseTypeEncoderDecoder.Encode(eiCreatedTransactionPayloadEncoder.response(),
+				eiCreatedTransactionPayload.getResponse());
 
 		// Transaction Id field
 		eiCreatedTransactionPayloadEncoder
@@ -118,26 +100,9 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		RefIdType refId = new RefIdType();
 		refId.setMyUidId(eiCreatedTransactionDecoder.refId());
 
-		// Response---------------------------------------
-		EiResponseType response = new EiResponseType();
-		RefIdType inResponseTo = new RefIdType();
-		inResponseTo.setMyUidId(eiCreatedTransactionDecoder.response().inResponseTo());
+		// Response
+		EiResponseType response = EiResponseTypeEncoderDecoder.Decode(eiCreatedTransactionDecoder.response());
 
-		org.theenergymashuplab.cts.generated_files.ResponseDetailType generatedDetail =
-			    eiCreatedTransactionDecoder.response().responseDetail();
-
-			org.theenergymashuplab.cts.ResponseDetailType responseDetail =
-			    org.theenergymashuplab.cts.ResponseDetailType.valueOf(generatedDetail.name());
-
-		response.setCreatedDateTime(
-				Instant.ofEpochSecond(eiCreatedTransactionDecoder.response().createdDateTime().seconds(),
-						eiCreatedTransactionDecoder.response().createdDateTime().nano()));
-		response.setInResponseTo(inResponseTo);
-		response.setResponseCode(eiCreatedTransactionDecoder.response().responseCode());
-		response.setResponseDescription(String.valueOf(eiCreatedTransactionDecoder.response().responseDescription()));
-		response.setResponseDetail(responseDetail);
-		// --------------------------------------------
-		
 		// TransactionId
 		TransactionIdType transactionId = new TransactionIdType();
 		transactionId.setMyUidId(eiCreatedTransactionDecoder.transactionId());
