@@ -224,6 +224,9 @@ public class LmeRestController {
 				}
 			}
 
+			// Remove all tenders aside from the residuals
+			auctionTenders.put(instrument, residuals);
+
 			logger.debug("Final Clearing Price: {}", finalClearingPrice);
 
 			// Match buy and sell tenders
