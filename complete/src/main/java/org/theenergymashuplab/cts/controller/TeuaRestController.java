@@ -19,24 +19,36 @@ package org.theenergymashuplab.cts.controller;
 //import java.util.Random;
 //import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
+import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.agrona.concurrent.UnsafeBuffer;
 import org.antlr.v4.runtime.misc.TestRig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.naming.TransactionRef;
+
+import org.theenergymashuplab.cts.sbe.*;
 
 //For RestTemplate
 @RestController
@@ -48,7 +60,7 @@ public class TeuaRestController {
 
 	private static final Logger logger = LogManager.getLogger(TeuaRestController.class);
 
-	/*
+/*
 	 * Two arrays use teua/{id}/... and matching client/{id} to give the Actor ID and the URI string to which to
 	 * post.postLmaToTeuaByPartyId will be copied to the LMA so the LMA knows where to post an
 	 * EiCreateTransactionPayload directly TODO verify on use that the {id} string is convertable to int
@@ -153,7 +165,15 @@ public class TeuaRestController {
 		ClientCreatedTransactionPayload clientCreated;
 		ClientCreateTransactionPayload clientCreate;
 		Integer numericTeuaId = -1;
-
+		
+		MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+		EiCreateTenderPayloadEncoder eiCreateTenderPayloadEncoder = new EiCreateTenderPayloadEncoder();
+		ByteBuffer bbfBuffer = ByteBuffer.allocate(4096);
+		UnsafeBuffer buffer = new UnsafeBuffer(bbfBuffer);
+		
+		MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+		EiCreateTransactionPayloadEncoder eiCreateTransactionPayloadEncoder = new EiCreateTransactionPayloadEncoder();
+		
 		// Is class scope OK for builder?
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTransactionPayload
@@ -187,6 +207,14 @@ public class TeuaRestController {
 		numericTeuaId = Integer.valueOf(teuaId);
 		logger.debug(" Forwarding ClientCreateTransaction to " + postClientCreateTransactionUri[numericTeuaId]);
 
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/octet-stream");
+		
+		int encodingLengthPlusHeader = EiCreateTransactionPayloadEncoderDecoder.encode(eiCreateTransactionPayloadEncoder, buffer, messageHeaderEncoder, eiCreateTransactionPayload);
+		byte[] validBytes = new byte[encodingLengthPlusHeader];
+		buffer.getBytes(0, validBytes);
+		HttpEntity<byte[]> eiCreateTransactionArray = new HttpEntity<>(validBytes, headers);
+		
 		clientCreated = restTemplate.postForObject(postClientCreateTransactionUri[numericTeuaId], clientCreate,
 				ClientCreatedTransactionPayload.class);
 
@@ -247,15 +275,125 @@ public class TeuaRestController {
 	 * go from the client's position (energy already bought or sold, netted) to the Full Requirements amount for
 	 * Interval.
 	 */
+	
+	@PostMapping("{teuaId}/jsonclientCreateTender")
+	public EiCreatedTenderPayload postClientCreateTenderJSON(
+			@PathVariable String teuaId,
+			@RequestBody ClientCreateTenderPayload clientCreateTender)	{
+		ClientCreateTenderPayload tempClientCreateTender;	
+		ClientCreatedTenderPayload tempReturn;
+		EiTenderType tender;
+		EiCreateTenderPayload eiCreateTender;	
+		Integer numericTeuaId = -1;
+		String positionUri;
+		
+		
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		// scope is function postEiCreateTender
+		RestTemplate restTemplate = builder.build();
+				
+		if (lmePartyId == null)	{
+			// builder = new RestTemplateBuilder();
+			restTemplate = builder.build();
+			lmePartyId = restTemplate.getForObject(
+					"http://localhost:8080/lme/party",
+					ActorIdType.class);
+		}
+		
+		numericTeuaId = Integer.valueOf(teuaId);
+		
+		
+		//convert to URI for position manager
+		positionUri = "/position/" 
+				 + actorIds[numericTeuaId] +
+				"/getPosition";
+		logger.debug("positionUri is " + positionUri);
+		
+		logger.debug("numericTeuaId is " + numericTeuaId +" String is " + teuaId);		
+		logger.debug("postEiCreateTender teuaId " +
+			teuaId +
+			" actorNumericIds[teuaId] " +
+			actorIds[numericTeuaId].toString());
+		
+		tempClientCreateTender = clientCreateTender;	// save the parameter
+														
+
+		/*
+		 * Create a new EiTender using the interval, quantity, price,and expiration
+		 * time  sent by the Client/SC, and insert it via the constructor in a
+		 * new EiCreateTenderPayload.
+		 * 
+		 * partyId is in actorNumericIds[] , counterPartyId is the LME representing
+		 * the market and the POST is to the LMA.
+		 * 
+		 * if Building sends to /teua/7 that means it's client 7
+		 */
+		
+		// TODO Currently not up to the March 2024 standard: This will need to be changed when clients become capable of sending stream tenders 
+		
+		TenderDetail tenderDetail;
+
+
+		/*
+		 * We assume that everything that is in here is an interval tender
+		 */
+		 tenderDetail = new TenderIntervalDetail(
+				tempClientCreateTender.getInterval(),
+				tempClientCreateTender.getPrice(),
+				tempClientCreateTender.getQuantity()
+			);
+
+		tender = new EiTenderType(
+				tempClientCreateTender.getBridgeExpireTime().asInstant(),
+				tempClientCreateTender.getSide(),
+				tenderDetail
+		);
+		
+		// 	Construct the EiCreateTender payload to be forwarded to LMA
+		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId],
+				this.lmePartyId);
+		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
+		eiCreateTender.setCounterPartyId(lmePartyId);
+		
+		logger.trace("TEUA sending EiCreateTender to LMA " +
+				eiCreateTender.toString());
+			
+		//	And forward to the LMA
+		restTemplate = builder.build();
+		EiCreatedTenderPayload result = restTemplate.postForObject
+			("http://localhost:8080/lma/jsoncreateTender", eiCreateTender,
+					EiCreatedTenderPayload.class);
+		
+		// and put CtsTenderId in ClientCreatedTenderPayload
+		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
+		logger.trace("TEUA before return ClientCreatedTender to Client/SC " +
+				tempReturn.toString());
+		
+		return result;
+	}
+	
+	
 	@PostMapping("{teuaId}/clientCreateTender")
 	public EiCreatedTenderPayload postClientCreateTender(@PathVariable String teuaId,
-			@RequestBody ClientCreateTenderPayload clientCreateTender) {
+			@RequestBody ClientCreateTenderPayload clientCreateTender) throws Exception {
 		ClientCreateTenderPayload tempClientCreateTender;
 		ClientCreatedTenderPayload tempReturn;
 		EiTenderType tender;
 		EiCreateTenderPayload eiCreateTender;
 		Integer numericTeuaId = -1;
 		String positionUri;
+		
+		MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+		EiCreateTenderPayloadEncoder eiCreateTenderPayloadEncoder = new EiCreateTenderPayloadEncoder();
+		ByteBuffer bbfBuffer = ByteBuffer.allocate(4096);
+		UnsafeBuffer buffer = new UnsafeBuffer(bbfBuffer);
+		
+		 MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+		 EiCreatedTenderPayloadDecoder eiCreatedTenderPayloadDecoder = new EiCreatedTenderPayloadDecoder();
+		
+		EiCreateTenderPayloadEncoderDecoder sbe;
+		  
 
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
@@ -293,7 +431,6 @@ public class TeuaRestController {
 		// sending stream tenders
 
 		TenderDetail tenderDetail;
-
 		/*
 		 * We assume that everything that is in here is an interval tender
 		 */
@@ -308,19 +445,48 @@ public class TeuaRestController {
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateTender.setCounterPartyId(lmePartyId);
-
+		
+		//USING ENERGY AS RESOURCE DESIGNATOR TYPE
+		eiCreateTender.getTender().setResourceDesignator(ResourceDesignatorType.ENERGY);
+		
 		logger.trace("TEUA sending EiCreateTender to LMA " + eiCreateTender.toString());
-
+		/*SBE*/
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/octet-stream");
+		
+		logger.trace(eiCreateTender.toString());
+		
+		int encodingLengthPlusHeader = EiCreateTenderPayloadEncoderDecoder.eiCreateTenderEncode(eiCreateTenderPayloadEncoder,buffer,messageHeaderEncoder,eiCreateTender);
+		byte[] validBytes = new byte[encodingLengthPlusHeader];
+		buffer.getBytes(0, validBytes);
+		HttpEntity<byte[]> eiCreateTenderByteArray = new HttpEntity<>(validBytes, headers);
+		
 		// And forward to the LMA
 		restTemplate = builder.build();
-		EiCreatedTenderPayload result = restTemplate.postForObject("http://localhost:8080/lma/createTender",
-				eiCreateTender, EiCreatedTenderPayload.class);
+		
+		byte[] eiCreatedTenderByteArray = restTemplate.postForObject
+				("http://localhost:8080/lma/createTender", eiCreateTenderByteArray,
+						byte[].class);		
+		//Decode here
+		// Copy FULL response bytes into the buffer at once
+		buffer.putBytes(0, eiCreatedTenderByteArray, 0, eiCreatedTenderByteArray.length);
 
-		// and put CtsTenderId in ClientCreatedTenderPayload
-		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-		logger.trace("TEUA before return ClientCreatedTender to Client/SC " + tempReturn.toString());
+		// Wrap and decode header
+		messageHeaderDecoder.wrap(buffer, 0);
+		int templateId = messageHeaderDecoder.templateId();
+		int actingBlockLength = messageHeaderDecoder.blockLength();
+		int actingVersion = messageHeaderDecoder.version();
 
-		return result;
+		// Now decode the payload starting *after* the header
+		EiCreatedTenderPayload eiCreatedTenderResponse = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderPayloadDecode(
+		    eiCreatedTenderPayloadDecoder, 
+		    buffer, 
+		    messageHeaderDecoder.encodedLength(), // <=== Start after header
+		    actingBlockLength,
+		    actingVersion
+		);
+
+		return eiCreatedTenderResponse;
 	}
 
 	@PostMapping("{teuaId}/clientCreateStreamTender")

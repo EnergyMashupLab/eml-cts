@@ -2,20 +2,28 @@ package org.theenergymashuplab.cts.sbe;
 
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.ActorIdType;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.Interval;
 import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.MarketOrderIdType;
+import org.theenergymashuplab.cts.MarketTransactionIdType;
 import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.ResourceDesignatorType;
 import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.TenderIdType;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
+import org.theenergymashuplab.cts.TransactionIdType;
 import org.theenergymashuplab.cts.WarrantIdType;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
+import org.theenergymashuplab.cts.controller.payloads.EiCreatedTransactionPayload;
 import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 
@@ -26,7 +34,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 public class ExampleCreateTender {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         try {
 
     	EiCreateTenderPayloadEncoder eiCreateTenderPayloadEncoder = new EiCreateTenderPayloadEncoder();
@@ -97,7 +105,7 @@ public class ExampleCreateTender {
         tender.setTenderDetail(tenderDetail);
         payload.setTender(tender);
         
-        int encodedLength = EiTenderEncoderDecoder.eiCreateTenderEncode(eiCreateTenderPayloadEncoder, directBuffer, messageHeaderEncoder, payload);
+        int encodedLength = EiCreateTenderPayloadEncoderDecoder.eiCreateTenderEncode(eiCreateTenderPayloadEncoder, directBuffer, messageHeaderEncoder, payload);
 
         byte[] encodedBytes = new byte[encodedLength];
         directBuffer.getBytes(0, encodedBytes);
@@ -117,7 +125,7 @@ public class ExampleCreateTender {
         int actingBlockLength = messageHeaderDecoder.blockLength();
         int actingVersion = messageHeaderDecoder.version();
 
-        EiCreateTenderPayload decoded = EiTenderEncoderDecoder.eiCreateTenderPayloadDecode(
+        EiCreateTenderPayload decoded = EiCreateTenderPayloadEncoderDecoder.eiCreateTenderPayloadDecode(
             eiCreateTenderPayloadDecoder,
             directBuffer,
             headerLength,
@@ -132,6 +140,170 @@ public class ExampleCreateTender {
     } catch (Exception e) {
         e.printStackTrace();
     }
+        
+        System.out.println("\n======================= START CREATED TENDER TEST =======================");
+
+     // Set up buffer and encoders
+     EiCreatedTenderPayloadEncoder eiCreatedTenderPayloadEncoder = new EiCreatedTenderPayloadEncoder();
+     MessageHeaderEncoder tenderHeaderEncoder = new MessageHeaderEncoder();
+     UnsafeBuffer tenderBuffer = new UnsafeBuffer(ByteBuffer.allocate(512));
+
+     // Create the EiCreatedTenderPayload object manually
+     EiCreatedTenderPayload tenderPayload = new EiCreatedTenderPayload();
+
+     // Set simple fields
+     ActorIdType counterPartyIdTender = new ActorIdType();
+     counterPartyIdTender.setMyUidId(1001);
+     tenderPayload.setCounterPartyId(counterPartyIdTender);
+
+     RefIdType inResponseTo = new RefIdType();
+     inResponseTo.setMyUidId(2002);
+     tenderPayload.setInResponseTo(inResponseTo);
+
+     MarketOrderIdType marketOrderId = new MarketOrderIdType();
+     marketOrderId.setMyUidId(3003);
+     tenderPayload.setMarketOrderId(marketOrderId);
+
+     ActorIdType partyIdTender = new ActorIdType();
+     partyIdTender.setMyUidId(4004);
+     tenderPayload.setPartyId(partyIdTender);
+
+     TenderIdType tenderId = new TenderIdType();
+     tenderId.setMyUidId(5005);
+     tenderPayload.setTenderId(tenderId);
+
+     // Build nested EiResponseType
+     EiResponseType tenderResponse = new EiResponseType();
+     tenderResponse.setCreatedDateTime(Instant.now());
+
+     RefIdType tenderResponseInResponseTo = new RefIdType();
+     tenderResponseInResponseTo.setMyUidId(6006);
+     tenderResponse.setInResponseTo(tenderResponseInResponseTo);
+
+     tenderResponse.setResponseCode(200);
+     tenderResponse.setResponseDescription("Tender created successfully");
+     tenderResponse.setResponseDetail(org.theenergymashuplab.cts.ResponseDetailType.SUCCESS);
+
+     tenderPayload.setResponse(tenderResponse);
+
+	// Encode
+     int encodedTenderLength = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderEncode(
+         eiCreatedTenderPayloadEncoder,
+         tenderBuffer,
+         tenderHeaderEncoder,
+         tenderPayload
+     );
+
+     // Print encoded hex
+     System.out.println("Encoded CreatedTender Hex Dump:");
+     printHexDump(tenderBuffer, encodedTenderLength);
+
+     // Decode
+     MessageHeaderDecoder tenderHeaderDecoder = new MessageHeaderDecoder();
+     EiCreatedTenderPayloadDecoder tenderPayloadDecoder = new EiCreatedTenderPayloadDecoder();
+
+     tenderHeaderDecoder.wrap(tenderBuffer, 0);
+     int tenderHeaderLength = tenderHeaderDecoder.encodedLength();
+     int tenderActingBlockLength = tenderHeaderDecoder.blockLength();
+     int tenderActingVersion = tenderHeaderDecoder.version();
+
+     EiCreatedTenderPayload decodedTenderPayload = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderPayloadDecode(
+         tenderPayloadDecoder,
+         tenderBuffer,
+         tenderHeaderLength,
+         tenderActingBlockLength,
+         tenderActingVersion
+     );
+     
+
+     // Print decoded payload
+     System.out.println("\nDecoded CreatedTender Payload:");
+     System.out.println(decodedTenderPayload.toString());
+     System.out.println("======================= END CREATED TENDER TEST =======================");
+
+        
+     // Add this AFTER your Tender test inside ExampleCreateTender.java
+
+        System.out.println("\n======================= START CREATE TRANSACTION TEST =======================");
+
+        // Create encoders and buffer
+        EiCreatedTransactionPayloadEncoder eiCreatedTransactionPayloadEncoder = new EiCreatedTransactionPayloadEncoder();
+        MessageHeaderEncoder transactionHeaderEncoder = new MessageHeaderEncoder();
+        UnsafeBuffer transactionBuffer = new UnsafeBuffer(ByteBuffer.allocate(512));
+
+        // Build CreateTransaction payload manually
+        EiCreatedTransactionPayload transactionPayload = new EiCreatedTransactionPayload();
+
+        ActorIdType counterPartyIdTx = new ActorIdType();
+        counterPartyIdTx.setMyUidId(1001);
+        transactionPayload.setCounterPartyId(counterPartyIdTx);
+
+        MarketTransactionIdType marketTransactionId = new MarketTransactionIdType();
+        marketTransactionId.setMyUidId(2001);
+        transactionPayload.setMarketTransactionId(marketTransactionId);
+
+        ActorIdType partyIdTx = new ActorIdType();
+        partyIdTx.setMyUidId(3001);
+        transactionPayload.setPartyId(partyIdTx);
+
+        TransactionIdType recipientTransactionId = new TransactionIdType();
+        recipientTransactionId.setMyUidId(4001);
+        transactionPayload.setRecipientTransactionId(recipientTransactionId);
+
+        RefIdType refIdTx = new RefIdType();
+        refIdTx.setMyUidId(5001);
+        transactionPayload.setRefId(refIdTx);
+
+        EiResponseType responseTx = new EiResponseType();
+        responseTx.setCreatedDateTime(Instant.now());
+        RefIdType inResponseToTx = new RefIdType();
+        inResponseToTx.setMyUidId(6001);
+        responseTx.setInResponseTo(inResponseToTx);
+        responseTx.setResponseCode(200);
+        responseTx.setResponseDescription("1234567890");
+        responseTx.setResponseDetail(org.theenergymashuplab.cts.ResponseDetailType.SUCCESS);
+        transactionPayload.setResponse(responseTx);
+
+        TransactionIdType transactionIdTx = new TransactionIdType();
+        transactionIdTx.setMyUidId(7001);
+        transactionPayload.setTransactionId(transactionIdTx);
+
+        // Encode CreateTransaction payload
+        int transactionEncodedLength = EiCreatedTransactionPayloadEncoderDecoder.eiCreatedTransactionEncode(
+            eiCreatedTransactionPayloadEncoder,
+            transactionBuffer,
+            transactionHeaderEncoder,
+            transactionPayload
+        );
+        System.out.println(transactionPayload.toString());
+
+        // Print encoded buffer
+        System.out.println("Encoded CreateTransaction Hex Dump:");
+        printHexDump(transactionBuffer, transactionEncodedLength);
+
+        // Decode CreateTransaction payload
+        MessageHeaderDecoder transactionHeaderDecoder = new MessageHeaderDecoder();
+        EiCreatedTransactionPayloadDecoder transactionPayloadDecoder = new EiCreatedTransactionPayloadDecoder();
+
+        transactionHeaderDecoder.wrap(transactionBuffer, 0);
+        int transactionHeaderLength = transactionHeaderDecoder.encodedLength();
+        int transactionActingBlockLength = transactionHeaderDecoder.blockLength();
+        int transactionActingVersion = transactionHeaderDecoder.version();
+
+        EiCreatedTransactionPayload decodedTransaction = EiCreatedTransactionPayloadEncoderDecoder.eiCreatedTransactionDecode(
+            transactionPayloadDecoder,
+            transactionBuffer,
+            transactionHeaderLength,
+            transactionActingBlockLength,
+            transactionActingVersion
+        );
+
+        // Print decoded CreateTransaction
+        System.out.println("\nDecoded CreateTransaction Payload:");
+        System.out.println(decodedTransaction.toString());
+
+        System.out.println("======================= END CREATE TRANSACTION TEST =======================");
+
     	
     }
     

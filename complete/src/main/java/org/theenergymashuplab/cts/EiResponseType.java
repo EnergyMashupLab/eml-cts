@@ -24,7 +24,7 @@ import java.time.Instant;
  */
 public class EiResponseType {
     public Instant createdDateTime;
-    public RefIdType inResponseTo;
+    public RefIdType inResponseTo = new RefIdType();
     public long responseCode;
     public String responseDescription;
     public ResponseDetailType responseDetail;

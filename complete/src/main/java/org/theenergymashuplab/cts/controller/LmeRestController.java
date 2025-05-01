@@ -16,6 +16,8 @@
 
 package org.theenergymashuplab.cts.controller;
 
+import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,12 +29,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
+import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.theenergymashuplab.cts.sbe.*;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.agrona.concurrent.UnsafeBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,6 +94,7 @@ public class LmeRestController {
 
 	private static final Logger logger = LogManager.getLogger(LmeRestController.class);
 
+	  
 	LmeRestController() {
 		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
 
@@ -121,20 +130,102 @@ public class LmeRestController {
 	/*
 	 * POST - /createTender RequestBody is EiCreateTenderPayload from LMA ResponseBody is EiCreatedTenderPayload
 	 */
+	@PostMapping("/jsoncreateTender")
+	public EiCreatedTenderPayload 	postEiCreateTender(
+			@RequestBody EiCreateTenderPayload eiCreateTender)	{
+		EiTenderType tempTender;
+		EiCreateTenderPayload tempCreate = null;
+		EiCreateTenderPayload mapPutReturnValue = null;
+		EiCreatedTenderPayload tempCreated;
+		Boolean addQsuccess = false;
+		
+		tempCreate = eiCreateTender;
+		tempTender = eiCreateTender.getTender();
 
+		logger.debug("LmeController before constructor for EiCreatedTender " +
+				tempTender.toString());
+		logger.debug("lme/createTender " + eiCreateTender.toString());
+		
+		/*	ResponseBody
+			public EiCreatedTender(
+				TenderId tenderId,
+				ActorId partyId,queueF
+				EiResponse response)
+		 */
+		
+		// Forward to market
+		// Conversion to MarketCreateTenderPayload is in LmeSocketClient here
+		// TODO Non-blocking add returns true if OK, false if queue is full
+		
+		// TODO switch .add() to blocking .take() after verification
+		addQsuccess = queueFromLme.add(tempCreate);
+		logger.debug("queueFomLme addQsuccess " + addQsuccess +
+				" TenderId " + tempTender.getTenderId());
+
+		/* TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
+		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted.
+		 * The only place where parity sends back it's assigned market order id is after the tender has been matched
+		 * with a different tender, leading to a transaction
+		 * 
+		 * In short, this isn't where the market order id should be set, it should be retrieved from parity */
+		tempTender.setMarketOrderId(new MarketOrderIdType());
+		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
+		// from MarketCreateTransaction
+		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(),
+				tempCreate);
+		
+		// Decouple orderEntered insertion from market with immediate return to LMA
+		//	TODO consider return value if value already in map
+		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(),
+				tempCreate.getPartyId(),
+				tempCreate.getCounterPartyId(),
+				new EiResponseType(200, "OK", ResponseDetailType.SUCCESS),
+				tempCreate.getRequestId());
+		
+		tempCreated.response.setCreatedDateTime(Instant.now());
+
+		return tempCreated;
+	}
+	
 	@PostMapping("/createTender")
-	public EiCreatedTenderPayload postEiCreateTender(@RequestBody EiCreateTenderPayload eiCreateTender) {
+	public byte[] postEiCreateTender(@RequestBody byte[] eiCreateTenderByteArr) throws Exception {
 		EiTenderType tempTender;
 		EiCreateTenderPayload tempCreate = null;
 		EiCreateTenderPayload mapPutReturnValue = null;
 		EiCreatedTenderPayload tempCreated;
 		Boolean addQsuccess = false;
 
-		tempCreate = eiCreateTender;
-		tempTender = eiCreateTender.getTender();
+		  MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+		  EiCreateTenderPayloadDecoder eiCreateTenderPayloadDecoder = new EiCreateTenderPayloadDecoder();
+		  ByteBuffer bbf = ByteBuffer.allocate(4096);
+		  UnsafeBuffer buffer = new UnsafeBuffer(bbf);
+		  
+		  MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+		  EiCreatedTenderPayloadEncoder eiCreatedTenderPayloadEncoder = new EiCreatedTenderPayloadEncoder();
+		
+//		tempCreate = eiCreateTender;
+//		tempTender = eiCreateTender.getTender();
+		
+		//Decode EiCreateTenderPayload
+		  buffer.putBytes(0, eiCreateTenderByteArr, 0, eiCreateTenderByteArr.length);
+		  messageHeaderDecoder.wrap(buffer, 0);
 
-		logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
-		logger.debug("lme/createTender " + eiCreateTender.toString());
+		  // Now start decoding the body from the correct offset
+		  int templateId = messageHeaderDecoder.templateId();
+		  int actingBlockLength = messageHeaderDecoder.blockLength();
+		  int actingVersion = messageHeaderDecoder.version();
+
+		  EiCreateTenderPayload EiCreateTenderResponse = EiCreateTenderPayloadEncoderDecoder.eiCreateTenderPayloadDecode(
+		      eiCreateTenderPayloadDecoder, 
+		      buffer, 
+		      messageHeaderDecoder.encodedLength(), // <=== Start decoding body *AFTER* header
+		      actingBlockLength, 
+		      actingVersion
+		  );
+
+
+		//logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
+		logger.debug("lme/createTender " + EiCreateTenderResponse.toString());
 
 		/*
 		 * ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
@@ -145,8 +236,8 @@ public class LmeRestController {
 		// TODO Non-blocking add returns true if OK, false if queue is full
 
 		// TODO switch .add() to blocking .take() after verification
-		addQsuccess = queueFromLme.add(tempCreate);
-		logger.debug("queueFomLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
+		addQsuccess = queueFromLme.add(EiCreateTenderResponse);
+		logger.debug("queueFomLme addQsuccess " + addQsuccess + " TenderId " + EiCreateTenderResponse.getTender().getTenderId());
 
 		/*
 		 * TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
@@ -156,18 +247,35 @@ public class LmeRestController {
 		 * 
 		 * In short, this isn't where the market order id should be set, it should be retrieved from parity
 		 */
-		tempTender.setMarketOrderId(new MarketOrderIdType());
+		EiCreateTenderResponse.getTender().setMarketOrderId(new MarketOrderIdType());
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
-		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(), tempCreate);
+		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(EiCreateTenderResponse.getTender().getTenderId().value(), EiCreateTenderResponse);
 
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		// TODO consider return value if value already in map
-		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(), tempCreate.getPartyId(),
-				tempCreate.getCounterPartyId(), new EiResponseType(200, "OK", ResponseDetailType.SUCCESS),
-				tempCreate.getRequestId());
+		tempCreated = new EiCreatedTenderPayload(EiCreateTenderResponse.getTender().getTenderId(), 
+				EiCreateTenderResponse.getPartyId(),
+				EiCreateTenderResponse.getCounterPartyId(), 
+				new EiResponseType(200, "OK", ResponseDetailType.SUCCESS),
+				EiCreateTenderResponse.getRequestId());
+		
+		tempCreated.response.setCreatedDateTime(Instant.now());
 
-		return tempCreated;
+		//int encodingLengthPlusHeader = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderEncode(eiCreatedTenderPayloadEncoder, buffer, messageHeaderEncoder, tempCreated);
+		buffer.wrap(new byte[4096]); // Or clear your existing buffer safely
+
+		int encodingLengthPlusHeader = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderEncode(
+		    eiCreatedTenderPayloadEncoder,
+		    buffer,
+		    messageHeaderEncoder,
+		    tempCreated
+		);
+
+		byte[] responseBytes = new byte[encodingLengthPlusHeader];
+		buffer.getBytes(0, responseBytes);
+
+		return responseBytes;
 	}
 
 	@PostMapping("/createStreamTender")

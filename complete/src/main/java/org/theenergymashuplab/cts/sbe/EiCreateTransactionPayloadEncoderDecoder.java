@@ -3,6 +3,7 @@ package org.theenergymashuplab.cts.sbe;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.ResourceDesignatorType;
+import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTransactionPayload;
 import org.theenergymashuplab.cts.generated_files.*;
 
@@ -29,7 +30,6 @@ public class EiCreateTransactionPayloadEncoderDecoder {
         long marketTransactionId = payload.getMarketTransactionId().getMyUidId();
         long partyId = payload.getPartyId().getMyUidId();
         long requestId = payload.getRequestId().getMyUidId();
-
         encoder.counterPartyId(counterPartyId);
         encoder.marketTransactionId(marketTransactionId);
         encoder.partyId(partyId);
@@ -47,8 +47,6 @@ public class EiCreateTransactionPayloadEncoderDecoder {
         long tenderId = transaction.getTender().getTenderId().value();
         BooleanType allOrNone = transaction.getTender().isAllOrNone() ? BooleanType.TRUE : BooleanType.FALSE;
         Instant expirationTime = transaction.getTender().getExpirationTime();
-        org.theenergymashuplab.cts.generated_files.ResourceDesignatorType encodedResourceDesignator =
-                getResourceDesignatorType(transaction.getTender().getResourceDesignator());
 
         encoder.transaction().marketTransactionId(marketTransactionId);
         encoder.transaction().tender().marketOrderId(marketOrderId);
@@ -58,16 +56,11 @@ public class EiCreateTransactionPayloadEncoderDecoder {
         encoder.transaction().tender().tenderBase().marketId(transaction.getTender().getMarketId().value());
         encoder.transaction().tender().tenderBase().priceScale(transaction.getTender().getPriceScale());
         encoder.transaction().tender().tenderBase().quantityScale(transaction.getTender().getQuantityScale());
-        encoder.transaction().tender().tenderBase().resourceDesignator(encodedResourceDesignator);
+        encoder.transaction().tender().tenderBase().resourceDesignator(org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.get(
+	            payload.getTransaction().getTender().getResourceDesignator().getValue()));
         encoder.transaction().tender().tenderBase().segmentId(transaction.getTender().getSegmentId());
 
-        if (transaction.getTender().getSide() == org.theenergymashuplab.cts.SideType.BUY) {
-            encoder.transaction().tender().tenderBase()
-                    .side(org.theenergymashuplab.cts.generated_files.SideType.BUY);
-        } else {
-            encoder.transaction().tender().tenderBase()
-                    .side(org.theenergymashuplab.cts.generated_files.SideType.SELL);
-        }
+		encoder.transaction().tender().tenderBase().side(org.theenergymashuplab.cts.generated_files.SideType.get(payload.getTransaction().getTender().getSide().getValue()));
 
         TenderDetail tenderDetail = transaction.getTender().getTenderDetail();
 
@@ -98,37 +91,7 @@ public class EiCreateTransactionPayloadEncoderDecoder {
         encoder.transaction().tender().tenderBase()
                 .warrants(transaction.getTender().getWarrants().value());
     }
-
-    private static org.theenergymashuplab.cts.generated_files.ResourceDesignatorType getResourceDesignatorType(ResourceDesignatorType type) {
-        switch (type) {
-            case POWER:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.POWER;
-            case ENERGY:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.ENERGY;
-
-            case TRANSPORT:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.TRANSPORT;
-
-            case WATER_PRESSURE:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.WATER_PRESSURE;
-
-            case WATER_FLOW:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.WATER_FLOW;
-
-            case GAS_PRESSURE:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.GAS_PRESSURE;
-
-            case GAS_FLOW:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.GAS_FLOW;
-
-            case BANDWIDTH:
-                return org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.BANDWIDTH;
-
-            default:
-                throw new IllegalArgumentException("Invalid ResourceDesignator: " + type);
-        }
-    }
-
+    
     public static EiCreateTransactionPayload decode(EiCreateTransactionPayloadDecoder decoder,
                                                     UnsafeBuffer unsafeBuffer,
                                                     int bufferOffset,
@@ -184,17 +147,8 @@ public class EiCreateTransactionPayloadEncoderDecoder {
             tenderDetail = tenderIntervalDetail;
         }
 
-        org.theenergymashuplab.cts.SideType side;
-        if (decoder.transaction().tender().tenderBase()
-                .side() == org.theenergymashuplab.cts.generated_files.SideType.BUY) {
-            side = org.theenergymashuplab.cts.SideType.BUY;
-        } else if (decoder.transaction().tender().tenderBase()
-                .side() == org.theenergymashuplab.cts.generated_files.SideType.SELL) {
-            side = org.theenergymashuplab.cts.SideType.SELL;
-        } else {
-            throw new IllegalArgumentException(
-                    "Unknown side type: " + decoder.transaction().tender().tenderBase().side());
-        }
+		SideType side = SideType.fromSbe(decoder.transaction().tender().tenderBase().side());
+
 
         MarketOrderIdType marketOrderId = new MarketOrderIdType();
         marketOrderId.setMyUidId(decoder.transaction().tender().marketOrderId());
@@ -216,39 +170,7 @@ public class EiCreateTransactionPayloadEncoderDecoder {
 
         eiTenderType.setQuantityScale(quantityScale);
 
-        org.theenergymashuplab.cts.generated_files.ResourceDesignatorType generatedResourceDesignator = decoder.transaction().tender().tenderBase().resourceDesignator();
-        org.theenergymashuplab.cts.ResourceDesignatorType resourceDesignator;
-
-        switch (generatedResourceDesignator) {
-            case POWER:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.POWER;
-                break;
-            case ENERGY:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.ENERGY;
-                break;
-            case TRANSPORT:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.TRANSPORT;
-                break;
-            case WATER_PRESSURE:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.WATER_PRESSURE;
-                break;
-            case WATER_FLOW:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.WATER_FLOW;
-                break;
-            case GAS_PRESSURE:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.GAS_PRESSURE;
-                break;
-            case GAS_FLOW:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.GAS_FLOW;
-                break;
-            case BANDWIDTH:
-                resourceDesignator = org.theenergymashuplab.cts.ResourceDesignatorType.BANDWIDTH;
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid ResourceDesignator: " + generatedResourceDesignator);
-        }
-
-        eiTenderType.setResourceDesignator(resourceDesignator);
+		eiTenderType.setResourceDesignator(ResourceDesignatorType.fromSbe(decoder.transaction().tender().tenderBase().resourceDesignator().value()));
 
         int segmentId = (int) decoder.transaction().tender().tenderBase().segmentId();
         eiTenderType.setSegmentId(segmentId);

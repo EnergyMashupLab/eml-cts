@@ -77,7 +77,7 @@ public class LmaRestController {
 	 * 		RequestBody is EiCreateTender
 	 * 		ResponseBody is EiCreatedTender
 	 */
-	@PostMapping("/createTender")
+	@PostMapping("/jsoncreateTender")
 	public EiCreatedTenderPayload 	postEiCreateTender(
 			@RequestBody EiCreateTenderPayload eiCreateTender)	{
 
@@ -98,7 +98,7 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
+		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/jsoncreateTender", 
 				tempCreate, 
 				EiCreatedTenderPayload.class);
 		
@@ -112,6 +112,45 @@ public class LmaRestController {
 		*/
 		
 		return tempPostResponse;
+	}
+	
+	
+	@PostMapping("/createTender")
+	public byte[] 	postEiCreateTender(
+			@RequestBody byte[] eiCreateTenderByteArr)	{
+
+		EiCreateTenderPayload tempCreate;
+		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
+		EiCreatedTenderPayload tempPostResponse; 
+
+		// Is class scope OK for builder?
+		final RestTemplateBuilder builder = new RestTemplateBuilder();
+		RestTemplate restTemplate;	// scope is function postEiCreateTender	
+    	restTemplate = builder.build();
+    	
+		// save CreateTender message as sent by TEUA
+		//tempCreate = eiCreateTender;	
+		 
+//		logger.debug("postEiCreateTender to LME. TenderId " +
+//				tempCreate.getTender().getTenderId().toString());
+		/*
+		 * Pass on to LME and use POST responseBody in reply to origin
+		 */
+		
+		byte[] EiCreatedTenderByteArr = restTemplate.postForObject("http://localhost:8080/lme/createTender", 
+				eiCreateTenderByteArr, 
+				byte[].class);
+		
+		logger.trace("LMA after forward to LME and before return " + eiCreateTenderByteArr.toString());
+		
+		/*
+		tempCreated = new EiCreatedTender(tempTender.getTenderId(),
+				tempCreate.getPartyId(),
+				tempCreate.getCounterPartyId(),
+				new EiResponse(200, "OK"));
+		*/
+		
+		return EiCreatedTenderByteArr;
 	}
 	
 	/*

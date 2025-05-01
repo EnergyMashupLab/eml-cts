@@ -9,7 +9,7 @@ import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.generated_files.*;
 
-public class EiTenderCreatedEncoderDecoder {
+public class EiCreatedTenderPayloadEncoderDecoder {
 
 	/*****************************************************************************************************
 	 * TO-DO: ENCODER FUNCTION
@@ -138,12 +138,10 @@ public class EiTenderCreatedEncoderDecoder {
     case INVALID_ARTIFACT:
         encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_ARTIFACT;
         break;
-    default:
-        throw new IllegalArgumentException(
-            "Unhandled ResponseDetailType: " + payload.getResponse().getResponseDetail());
-}
-
-responseEncoder.responseDetail(encodedEnum);
+    default: 
+        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.UNSPECIFIED; 
+        break;
+        }
 
     responseEncoder.responseDetail(encodedEnum);
 
@@ -184,7 +182,7 @@ responseEncoder.responseDetail(encodedEnum);
 		System.out.println("");
 		System.out.println("-------------------------------------------------------------------------");
 		System.out.println("EiCreatedTenderPayload Decoded :-");
-		System.out.println(eiCreatedTenderPayloadDecoder.toString());
+		//System.out.println(eiCreatedTenderPayloadDecoder.toString());
 
 		// Instantiate the payload to return
 		EiCreatedTenderPayload eiCreatedTenderPayload = new EiCreatedTenderPayload();
@@ -239,8 +237,57 @@ responseEncoder.responseDetail(encodedEnum);
 //		String responseDescription = responseDecoder.responseDescription();
 //		eiResponse.setResponseDescription(responseDescription);
 
-		// Decode responseDetail Enum
-		eiResponse.setResponseDetail(org.theenergymashuplab.cts.ResponseDetailType.valueOf(responseDecoder.responseDetail().name()));
+		// Decode responseDetail Enum using a switch-case
+		org.theenergymashuplab.cts.generated_files.ResponseDetailType decodedEnum = responseDecoder.responseDetail();
+		org.theenergymashuplab.cts.ResponseDetailType responseDetail;
+
+		switch (decodedEnum) {
+		    case UNSPECIFIED:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.UNSPECIFIED;
+		        break;
+		    case RULES_VIOLATION:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.RULES_VIOLATION;
+		        break;
+		    case INVALID_REFERENCE:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.INVALID_REFERENCE;
+		        break;
+		    case DUPLICATE:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.DUPLICATE;
+		        break;
+		    case TRADING_CLOSED:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.TRADING_CLOSED;
+		        break;
+		    case PARTY_RESTRICTED:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.PARTY_RESTRICTED;
+		        break;
+		    case INVALID_INSTRUMENT:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.INVALID_INSTRUMENT;
+		        break;
+		    case FORCE_MAJEURE:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.FORCE_MAJEURE;
+		        break;
+		    case INVALID_MARKET:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.INVALID_MARKET;
+		        break;
+		    case INVALID_SEGMENT:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.INVALID_SEGMENT;
+		        break;
+		    case SUCCESS:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.SUCCESS;
+		        break;
+		    case NOT_AUTHORIZED:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.NOT_AUTHORIZED;
+		        break;
+		    case INVALID_ARTIFACT:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.INVALID_ARTIFACT;
+		        break;
+		    default:
+		        responseDetail = org.theenergymashuplab.cts.ResponseDetailType.UNSPECIFIED;
+		        break;
+		}
+
+		// Set it
+		eiResponse.setResponseDetail(responseDetail);
 
 		// Set the decoded response
 		eiCreatedTenderPayload.setResponse(eiResponse);

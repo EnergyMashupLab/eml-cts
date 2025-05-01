@@ -83,12 +83,15 @@ public class EiCreatedTransactionPayload {
 
 	@Override
 	public String toString() {
-		return ("EiCreatedTransactionPayload transactionId " +
-				transactionId.toString() +
-				" partyId " + partyId.toString() +
-				" counterPartyId " + counterPartyId.toString() +
-				" refId " + refId.toString() +
-				" recipientTransactionId " + recipientTransactionId.toString());
+	    return "EiCreatedTransactionPayload{" +
+	            "transactionId=" + transactionId +
+	            ", partyId=" + partyId +
+	            ", counterPartyId=" + counterPartyId +
+	            ", refId=" + refId +
+	            ", recipientTransactionId=" + recipientTransactionId +
+	            ", marketTransactionId=" + marketTransactionId +
+	            ", response=" + response.toString() +
+	            '}';
 	}
 
 	public EiResponseType getResponse() {

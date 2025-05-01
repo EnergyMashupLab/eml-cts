@@ -1,5 +1,6 @@
 package org.theenergymashuplab.cts.sbe;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 import org.agrona.concurrent.UnsafeBuffer;
@@ -13,77 +14,126 @@ import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadDec
 import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 import org.theenergymashuplab.cts.generated_files.ResponseDetailType;
+import org.theenergymashuplab.cts.generated_files.VarStringEncodingEncoder;
 
 public class EiCreatedTransactionPayloadEncoderDecoder {
 
 	public static int eiCreatedTransactionEncode(
-			EiCreatedTransactionPayloadEncoder eiCreatedTransactionPayloadEncoder,
+			EiCreatedTransactionPayloadEncoder encoder,
 			UnsafeBuffer directBuffer,
 			MessageHeaderEncoder messageHeaderEncoder,
-			EiCreatedTransactionPayload eiCreatedTransactionPayload) {
+			EiCreatedTransactionPayload payload) {
 
-		eiCreatedTransactionPayloadEncoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder);
+		encoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder);
 
 		// Counter Party Id field
-		eiCreatedTransactionPayloadEncoder
-				.counterPartyId(eiCreatedTransactionPayload.getCounterPartyId().getMyUidId());
-
-		// Market Transaction Id field
-		eiCreatedTransactionPayloadEncoder
-				.marketTransactionId(eiCreatedTransactionPayload.getMarketTransactionId().getMyUidId());
-
+		encoder.counterPartyId(payload.getCounterPartyId().getMyUidId());
+		//Market Transaction Id
+		encoder.marketTransactionId(payload.getMarketTransactionId().getMyUidId());
 		// Party Id field
-		eiCreatedTransactionPayloadEncoder.partyId(eiCreatedTransactionPayload.getPartyId().getMyUidId());
-
+		encoder.partyId(payload.getPartyId().getMyUidId());
 		// Recipient Transaction Id field
-		eiCreatedTransactionPayloadEncoder
-				.recipientTransactionId(
-						eiCreatedTransactionPayload.getRecipientTransactionId().getMyUidId());
-
+		encoder.recipientTransactionId(payload.getRecipientTransactionId().getMyUidId());
 		// RefId field
-		eiCreatedTransactionPayloadEncoder.refId(eiCreatedTransactionPayload.getRefId().getMyUidId());
+		encoder.refId(payload.getRefId().getMyUidId());
 
 		// Response field ----
 		// Response -> Created Date Time ---
-		Instant responseCreatedDateTime = eiCreatedTransactionPayload.getResponse()
-				.getCreatedDateTime();
-		eiCreatedTransactionPayloadEncoder.response().createdDateTime()
-				.seconds(responseCreatedDateTime.getEpochSecond());
-		eiCreatedTransactionPayloadEncoder.response().createdDateTime().nano(responseCreatedDateTime.getNano());
-
-		// ---
-
+		Instant responseCreatedDateTime = payload.getResponse().getCreatedDateTime();
+		
+		encoder.response().createdDateTime()
+				.seconds(responseCreatedDateTime.getEpochSecond())
+				.nano(responseCreatedDateTime.getNano());
+		
 		// Response-> inResponseTo
-		eiCreatedTransactionPayloadEncoder.response().inResponseTo(
-				eiCreatedTransactionPayload.getResponse().getInResponseTo().getMyUidId());
+		encoder.response().inResponseTo(payload.getResponse().getInResponseTo().getMyUidId());
 
 		// Response -> Response Code
-		eiCreatedTransactionPayloadEncoder.response()
-				.responseCode(eiCreatedTransactionPayload.getResponse().getResponseCode());
+		encoder.response().responseCode(payload.getResponse().getResponseCode());
 
-		// Response -> Description
-		// eiCreatedTransactionPayloadEncoder.response().responseDescription().wrap(directBuffer,
-		// 0);
+		// Response -> Description		
+		// -- Safe Encoding --
+		String description = payload.getResponse().getResponseDescription();
+		byte[] descBytes = description.getBytes(StandardCharsets.UTF_8);
+		UnsafeBuffer descBuffer = new UnsafeBuffer(descBytes);
 
-		org.theenergymashuplab.cts.ResponseDetailType appEnum =
-			    eiCreatedTransactionPayload.getResponse().getResponseDetail();
+		// Safe - capture encoder object
+		var responseDescriptionEncoder = encoder.response().responseDescription();
 
-			org.theenergymashuplab.cts.generated_files.ResponseDetailType encodedEnum =
-			    org.theenergymashuplab.cts.generated_files.ResponseDetailType.valueOf(appEnum.name());
+		// Safe - calculate starting offset
+		int offset = responseDescriptionEncoder.offset();
 
-			eiCreatedTransactionPayloadEncoder.response().responseDetail(encodedEnum);
+		// 🛠 1. Write length manually into buffer at offset
+		responseDescriptionEncoder.buffer().putInt(offset, descBytes.length);
 
-		// ----
+		// 🛠 2. Write UTF-8 bytes manually at offset+4
+		responseDescriptionEncoder.buffer().putBytes(
+		    offset + 4,
+		    descBuffer,
+		    0,
+		    descBytes.length
+		);
+
+
+
+	    // Encode enum: ResponseDetailType
+	    org.theenergymashuplab.cts.generated_files.ResponseDetailType encodedEnum;
+	    switch (payload.getResponse().getResponseDetail()) {
+	    case UNSPECIFIED:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.UNSPECIFIED;
+	        break;
+	    case RULES_VIOLATION:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.RULES_VIOLATION;
+	        break;
+	    case INVALID_REFERENCE:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_REFERENCE;
+	        break;
+	    case DUPLICATE:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.DUPLICATE;
+	        break;
+	    case TRADING_CLOSED:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.TRADING_CLOSED;
+	        break;
+	    case PARTY_RESTRICTED:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.PARTY_RESTRICTED;
+	        break;
+	    case INVALID_INSTRUMENT:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_INSTRUMENT;
+	        break;
+	    case FORCE_MAJEURE:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.FORCE_MAJEURE;
+	        break;
+	    case INVALID_MARKET:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_MARKET;
+	        break;
+	    case INVALID_SEGMENT:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_SEGMENT;
+	        break;
+	    case SUCCESS:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.SUCCESS;
+	        break;
+	    case NOT_AUTHORIZED:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.NOT_AUTHORIZED;
+	        break;
+	    case INVALID_ARTIFACT:
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.INVALID_ARTIFACT;
+	        break;
+	    default: 
+	        encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.UNSPECIFIED; 
+	        break;
+	        }
+
+	    encoder.response().responseDetail(encodedEnum);
 
 		// Transaction Id field
-		eiCreatedTransactionPayloadEncoder
-				.transactionId(eiCreatedTransactionPayload.getTransactionId().getMyUidId());
+		encoder
+				.transactionId(payload.getTransactionId().getMyUidId());
 
 		System.out.println("\n-------------------------------------------------------------------------");
 		System.out.println("EiCreatedTransactionEncode Encoded :-");
-		System.out.println(eiCreatedTransactionPayloadEncoder.toString());
+		System.out.println(encoder.toString());
 
-		return messageHeaderEncoder.ENCODED_LENGTH + eiCreatedTransactionPayloadEncoder.encodedLength();
+		return messageHeaderEncoder.ENCODED_LENGTH + encoder.encodedLength();
 
 	}
 
@@ -123,20 +173,80 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		RefIdType inResponseTo = new RefIdType();
 		inResponseTo.setMyUidId(eiCreatedTransactionDecoder.response().inResponseTo());
 
-		org.theenergymashuplab.cts.generated_files.ResponseDetailType generatedDetail =
-			    eiCreatedTransactionDecoder.response().responseDetail();
 
-			org.theenergymashuplab.cts.ResponseDetailType responseDetail =
-			    org.theenergymashuplab.cts.ResponseDetailType.valueOf(generatedDetail.name());
+		
+		// Decode enum: ResponseDetailType
+		org.theenergymashuplab.cts.generated_files.ResponseDetailType decodedEnum = eiCreatedTransactionDecoder.response().responseDetail();
+		org.theenergymashuplab.cts.ResponseDetailType appEnum;
 
-		response.setCreatedDateTime(
-				Instant.ofEpochSecond(eiCreatedTransactionDecoder.response().createdDateTime().seconds(),
-						eiCreatedTransactionDecoder.response().createdDateTime().nano()));
+		switch (decodedEnum) {
+		    case UNSPECIFIED:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.UNSPECIFIED;
+		        break;
+		    case RULES_VIOLATION:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.RULES_VIOLATION;
+		        break;
+		    case INVALID_REFERENCE:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.INVALID_REFERENCE;
+		        break;
+		    case DUPLICATE:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.DUPLICATE;
+		        break;
+		    case TRADING_CLOSED:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.TRADING_CLOSED;
+		        break;
+		    case PARTY_RESTRICTED:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.PARTY_RESTRICTED;
+		        break;
+		    case INVALID_INSTRUMENT:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.INVALID_INSTRUMENT;
+		        break;
+		    case FORCE_MAJEURE:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.FORCE_MAJEURE;
+		        break;
+		    case INVALID_MARKET:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.INVALID_MARKET;
+		        break;
+		    case INVALID_SEGMENT:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.INVALID_SEGMENT;
+		        break;
+		    case SUCCESS:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.SUCCESS;
+		        break;
+		    case NOT_AUTHORIZED:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.NOT_AUTHORIZED;
+		        break;
+		    case INVALID_ARTIFACT:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.INVALID_ARTIFACT;
+		        break;
+		    default:
+		        appEnum = org.theenergymashuplab.cts.ResponseDetailType.UNSPECIFIED;
+		        break;
+		}
+
+		// Now set it
+
+			// Decode createdDateTime
+			long seconds = eiCreatedTransactionDecoder.response().createdDateTime().seconds();
+			int nanos = (int) eiCreatedTransactionDecoder.response().createdDateTime().nano();
+			response.setCreatedDateTime(Instant.ofEpochSecond(seconds, nanos));
+			
 		response.setInResponseTo(inResponseTo);
 		response.setResponseCode(eiCreatedTransactionDecoder.response().responseCode());
-		response.setResponseDescription(String.valueOf(eiCreatedTransactionDecoder.response().responseDescription()));
-		response.setResponseDetail(responseDetail);
-		// --------------------------------------------
+		
+		int descriptionLength = (int) eiCreatedTransactionDecoder.response().responseDescription().length();
+		byte[] descriptionBytes = new byte[descriptionLength];
+		eiCreatedTransactionDecoder.response().responseDescription().buffer().getBytes(
+		    eiCreatedTransactionDecoder.response().responseDescription().offset() + 4,
+		    descriptionBytes,
+		    0,
+		    descriptionLength
+		);
+		String decodedDescription = new String(descriptionBytes, StandardCharsets.UTF_8);
+		response.setResponseDescription(decodedDescription);
+
+		response.setResponseDetail(appEnum);
+		//response.setResponseDetail(responseDetail);
 		
 		// TransactionId
 		TransactionIdType transactionId = new TransactionIdType();
