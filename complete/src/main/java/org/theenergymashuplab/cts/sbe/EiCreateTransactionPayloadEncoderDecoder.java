@@ -12,7 +12,7 @@ import java.time.Instant;
 
 public class EiCreateTransactionPayloadEncoderDecoder {
 
-    public static int encode(EiCreateTransactionPayloadEncoder encoder,
+    public static int eiCreateTransactionEncode(EiCreateTransactionPayloadEncoder encoder,
                              UnsafeBuffer unsafeBuffer,
                              MessageHeaderEncoder messageHeaderEncoder,
                              EiCreateTransactionPayload payload) {
@@ -92,7 +92,7 @@ public class EiCreateTransactionPayloadEncoderDecoder {
                 .warrants(transaction.getTender().getWarrants().value());
     }
     
-    public static EiCreateTransactionPayload decode(EiCreateTransactionPayloadDecoder decoder,
+    public static EiCreateTransactionPayload eiCreateTransactionDecode(EiCreateTransactionPayloadDecoder decoder,
                                                     UnsafeBuffer unsafeBuffer,
                                                     int bufferOffset,
                                                     int actingBlockLength,

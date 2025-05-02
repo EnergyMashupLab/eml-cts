@@ -30,14 +30,25 @@ import java.lang.module.ModuleDescriptor.Builder;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.agrona.concurrent.UnsafeBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
+import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
+import org.theenergymashuplab.cts.sbe.EiCreateTransactionPayloadEncoderDecoder;
 
 @RestController
 @RequestMapping("/lma")
@@ -160,9 +171,19 @@ public class LmaRestController {
 	 */
 	
 	@PostMapping("/createTransaction")
-	public EiCreatedTransactionPayload postEiCreateTransactionPayload(
-			@RequestBody EiCreateTransactionPayload eiCreateTransactionPayload)	{
+	public byte[] postEiCreateTransactionPayload(
+			@RequestBody byte[] eiCreateTransactionPayload)	{
 
+        UnsafeBuffer buffer = new UnsafeBuffer(eiCreateTransactionPayload);
+        MessageHeaderDecoder headerDecoder = new MessageHeaderDecoder();
+        EiCreateTransactionPayloadDecoder decoder = new EiCreateTransactionPayloadDecoder();
+
+        headerDecoder.wrap(buffer, 0);
+        int actingBlockLength = headerDecoder.blockLength();
+        int actingVersion = headerDecoder.version();
+        int headerLength = headerDecoder.encodedLength();
+
+		
 		EiTenderType tempTender;
 		ActorIdType tempPartyId;
 		EiCreateTransactionPayload tempCreate;
@@ -185,7 +206,9 @@ public class LmaRestController {
 		 * and party. Rewrite messages so party and counterpary are counter-symmetric
 		 */
 		//	local temporary variables
-		tempCreate = eiCreateTransactionPayload;
+		tempCreate = EiCreateTransactionPayloadEncoderDecoder
+	            .eiCreateTransactionDecode(decoder, buffer, headerLength, actingBlockLength, actingVersion);
+;
 		tempTender = tempCreate.getTransaction().getTender();
 		
 		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
@@ -258,13 +281,30 @@ public class LmaRestController {
 					" counterPartyId " + tempCreate.getCounterPartyId().toString() +
 					" " + tempCreate.getTransaction().toString());
 		}
-		
-		tempPostResponse = restTemplate.postForObject(tempTeuaUri, 
-				tempCreate,
-				EiCreatedTransactionPayload.class);
-				
-		// And send the EiCreatedTransaction from the TEUA back to the LME
-		return tempPostResponse;
+        UnsafeBuffer outBuffer = new UnsafeBuffer(new byte[4096]);
+        MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        EiCreateTransactionPayloadEncoder encoder = new EiCreateTransactionPayloadEncoder();
+
+        int encodedLength = EiCreateTransactionPayloadEncoderDecoder
+            .eiCreateTransactionEncode(encoder, outBuffer, headerEncoder, tempCreate);
+
+        byte[] outgoingBytes = new byte[encodedLength];
+        outBuffer.getBytes(0, outgoingBytes);
+        
+     // Send SBE-encoded payload to TEUA
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        HttpEntity<byte[]> request = new HttpEntity<>(outgoingBytes, headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(
+            tempTeuaUri,
+            HttpMethod.POST,
+            request,
+            byte[].class
+        );
+
+        // Return SBE response bytes back to LME
+        return response.getBody();
 	}
 	
 	

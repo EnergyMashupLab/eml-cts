@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -210,7 +211,7 @@ public class TeuaRestController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Type", "application/octet-stream");
 		
-		int encodingLengthPlusHeader = EiCreateTransactionPayloadEncoderDecoder.encode(eiCreateTransactionPayloadEncoder, buffer, messageHeaderEncoder, eiCreateTransactionPayload);
+		int encodingLengthPlusHeader = EiCreateTransactionPayloadEncoderDecoder.eiCreateTransactionEncode(eiCreateTransactionPayloadEncoder, buffer, messageHeaderEncoder, eiCreateTransactionPayload);
 		byte[] validBytes = new byte[encodingLengthPlusHeader];
 		buffer.getBytes(0, validBytes);
 		HttpEntity<byte[]> eiCreateTransactionArray = new HttpEntity<>(validBytes, headers);
@@ -227,6 +228,7 @@ public class TeuaRestController {
 		tempCreated = new EiCreatedTransactionPayload(tempTransaction.getTransactionId(), tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(), new EiResponseType(200, "OK", ResponseDetailType.SUCCESS),
 				new TransactionIdType());
+		tempCreated.response.setCreatedDateTime(Instant.now());
 
 		logger.debug("tempCreated constructed before return " + tempCreated.toString());
 
