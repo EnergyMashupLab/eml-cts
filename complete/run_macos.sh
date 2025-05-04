@@ -1,5 +1,5 @@
-# EML-CTS Build/Run Script
-# this is the macos run script similar to the linux run script
+# EML-CTS Build/Run Script for macos
+
 #!/bin/bash
 
 read -p "Do you want to build and run [br] or just build [b]? " BUILD_ONLY
@@ -23,20 +23,18 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # We only wanted to build
-if [[ "${BUILD_ONLY,,}" == "b" ]]; then
+if [[ ${BUILD_ONLY} = "b" ]]; then
     exit 0
 fi
 
-# Starting parity system in a separate terminal tab/window
+# Starting parity system in a separate terminal window
 echo "Starting parity system"
-open -a Terminal.app --args -e "java -jar ./system-run/parity-system.jar ./system-run/etc/system0620.conf" &
+open -a Terminal --args bash -c "java -jar ./system-run/parity-system.jar ./system-run/etc/system0620.conf; exec bash"
 
-# Starting parity client in a separate terminal tab/window
+# Starting parity client in a separate terminal window
 echo "Starting parity client"
-open -a Terminal.app --args -e "java -jar ./client-run/parity-client.jar ./client-run/etc/client0620.conf" &
+open -a Terminal --args bash -c "java -jar ./client-run/parity-client.jar ./client-run/etc/client0620.conf; exec bash"
 
 # Start the tomcat server
 echo "Starting Tomcat Server"
 java -jar ./target/eml-cts.jar
-
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home && ./run.sh
