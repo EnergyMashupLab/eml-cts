@@ -1,6 +1,7 @@
 /* Generated SBE (Simple Binary Encoding) message codec. */
 package org.theenergymashuplab.cts.generated_files;
 
+import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
 
 
@@ -10,7 +11,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public final class MarketCreatedTransactionPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 5;
+    public static final int BLOCK_LENGTH = 1;
     public static final int TEMPLATE_ID = 4;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -132,44 +133,6 @@ public final class MarketCreatedTransactionPayloadDecoder
         this.limit = limit;
     }
 
-    public static int infoId()
-    {
-        return 1;
-    }
-
-    public static int infoSinceVersion()
-    {
-        return 0;
-    }
-
-    public static int infoEncodingOffset()
-    {
-        return 0;
-    }
-
-    public static int infoEncodingLength()
-    {
-        return -1;
-    }
-
-    public static String infoMetaAttribute(final MetaAttribute metaAttribute)
-    {
-        if (MetaAttribute.PRESENCE == metaAttribute)
-        {
-            return "required";
-        }
-
-        return "";
-    }
-
-    private final VarStringEncodingDecoder info = new VarStringEncodingDecoder();
-
-    public VarStringEncodingDecoder info()
-    {
-        info.wrap(buffer, offset + 0);
-        return info;
-    }
-
     public static int successId()
     {
         return 2;
@@ -182,7 +145,7 @@ public final class MarketCreatedTransactionPayloadDecoder
 
     public static int successEncodingOffset()
     {
-        return 4;
+        return 0;
     }
 
     public static int successEncodingLength()
@@ -202,14 +165,112 @@ public final class MarketCreatedTransactionPayloadDecoder
 
     public short successRaw()
     {
-        return ((short)(buffer.getByte(offset + 4) & 0xFF));
+        return ((short)(buffer.getByte(offset + 0) & 0xFF));
     }
 
     public BooleanType success()
     {
-        return BooleanType.get(((short)(buffer.getByte(offset + 4) & 0xFF)));
+        return BooleanType.get(((short)(buffer.getByte(offset + 0) & 0xFF)));
     }
 
+
+    public static int infoId()
+    {
+        return 1;
+    }
+
+    public static int infoSinceVersion()
+    {
+        return 0;
+    }
+
+    public static String infoCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String infoMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int infoHeaderLength()
+    {
+        return 4;
+    }
+
+    public int infoLength()
+    {
+        final int limit = parentMessage.limit();
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+    }
+
+    public int skipInfo()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int dataOffset = limit + headerLength;
+        parentMessage.limit(dataOffset + dataLength);
+
+        return dataLength;
+    }
+
+    public int getInfo(final MutableDirectBuffer dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public int getInfo(final byte[] dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public void wrapInfo(final DirectBuffer wrapBuffer)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+        wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
+    }
+
+    public String info()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+
+        if (0 == dataLength)
+        {
+            return "";
+        }
+
+        final byte[] tmp = new byte[dataLength];
+        buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
+
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
+    }
 
     public String toString()
     {
@@ -254,6 +315,9 @@ public final class MarketCreatedTransactionPayloadDecoder
         builder.append("):");
         builder.append("success=");
         builder.append(this.success());
+        builder.append('|');
+        builder.append("info=");
+        builder.append('\'').append(info()).append('\'');
 
         limit(originalLimit);
 
@@ -263,6 +327,7 @@ public final class MarketCreatedTransactionPayloadDecoder
     public MarketCreatedTransactionPayloadDecoder sbeSkip()
     {
         sbeRewind();
+        skipInfo();
 
         return this;
     }

@@ -1,6 +1,7 @@
 /* Generated SBE (Simple Binary Encoding) message codec. */
 package org.theenergymashuplab.cts.generated_files;
 
+import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
 
 
@@ -476,6 +477,104 @@ public final class EiAcceptedQuotePayloadDecoder
     }
 
 
+    public static int responseDescriptionId()
+    {
+        return 8;
+    }
+
+    public static int responseDescriptionSinceVersion()
+    {
+        return 0;
+    }
+
+    public static String responseDescriptionCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String responseDescriptionMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int responseDescriptionHeaderLength()
+    {
+        return 4;
+    }
+
+    public int responseDescriptionLength()
+    {
+        final int limit = parentMessage.limit();
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+    }
+
+    public int skipResponseDescription()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int dataOffset = limit + headerLength;
+        parentMessage.limit(dataOffset + dataLength);
+
+        return dataLength;
+    }
+
+    public int getResponseDescription(final MutableDirectBuffer dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public int getResponseDescription(final byte[] dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public void wrapResponseDescription(final DirectBuffer wrapBuffer)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+        wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
+    }
+
+    public String responseDescription()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+
+        if (0 == dataLength)
+        {
+            return "";
+        }
+
+        final byte[] tmp = new byte[dataLength];
+        buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
+
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
     public String toString()
     {
         if (null == buffer)
@@ -545,6 +644,9 @@ public final class EiAcceptedQuotePayloadDecoder
         builder.append('|');
         builder.append("transactionId=");
         builder.append(this.transactionId());
+        builder.append('|');
+        builder.append("responseDescription=");
+        builder.append('\'').append(responseDescription()).append('\'');
 
         limit(originalLimit);
 
@@ -554,6 +656,7 @@ public final class EiAcceptedQuotePayloadDecoder
     public EiAcceptedQuotePayloadDecoder sbeSkip()
     {
         sbeRewind();
+        skipResponseDescription();
 
         return this;
     }

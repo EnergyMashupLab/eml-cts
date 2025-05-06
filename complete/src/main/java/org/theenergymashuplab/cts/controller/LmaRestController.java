@@ -48,7 +48,7 @@ import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadDeco
 import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
-import org.theenergymashuplab.cts.sbe.EiCreateTransactionPayloadEncoderDecoder;
+import org.theenergymashuplab.cts.sbe.EiTransactionPayloadEncoderDecoder;
 
 @RestController
 @RequestMapping("/lma")
@@ -206,7 +206,7 @@ public class LmaRestController {
 		 * and party. Rewrite messages so party and counterpary are counter-symmetric
 		 */
 		//	local temporary variables
-		tempCreate = EiCreateTransactionPayloadEncoderDecoder
+		tempCreate = EiTransactionPayloadEncoderDecoder
 	            .eiCreateTransactionDecode(decoder, buffer, headerLength, actingBlockLength, actingVersion);
 ;
 		tempTender = tempCreate.getTransaction().getTender();
@@ -285,7 +285,7 @@ public class LmaRestController {
         MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
         EiCreateTransactionPayloadEncoder encoder = new EiCreateTransactionPayloadEncoder();
 
-        int encodedLength = EiCreateTransactionPayloadEncoderDecoder
+        int encodedLength = EiTransactionPayloadEncoderDecoder
             .eiCreateTransactionEncode(encoder, outBuffer, headerEncoder, tempCreate);
 
         byte[] outgoingBytes = new byte[encodedLength];

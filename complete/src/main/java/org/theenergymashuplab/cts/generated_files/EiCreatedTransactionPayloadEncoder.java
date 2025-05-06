@@ -2,6 +2,7 @@
 package org.theenergymashuplab.cts.generated_files;
 
 import org.agrona.MutableDirectBuffer;
+import org.agrona.DirectBuffer;
 
 
 /**
@@ -446,6 +447,82 @@ public final class EiCreatedTransactionPayloadEncoder
         return this;
     }
 
+
+    public static int responseDescriptionId()
+    {
+        return 8;
+    }
+
+    public static String responseDescriptionCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String responseDescriptionMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int responseDescriptionHeaderLength()
+    {
+        return 4;
+    }
+
+    public EiCreatedTransactionPayloadEncoder putResponseDescription(final DirectBuffer src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiCreatedTransactionPayloadEncoder putResponseDescription(final byte[] src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiCreatedTransactionPayloadEncoder responseDescription(final String value)
+    {
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        final int length = bytes.length;
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, bytes, 0, length);
+
+        return this;
+    }
 
     public String toString()
     {

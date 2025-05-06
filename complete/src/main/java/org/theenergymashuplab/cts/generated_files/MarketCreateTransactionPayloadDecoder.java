@@ -1,6 +1,7 @@
 /* Generated SBE (Simple Binary Encoding) message codec. */
 package org.theenergymashuplab.cts.generated_files;
 
+import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
 
 
@@ -10,7 +11,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public final class MarketCreateTransactionPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 25;
+    public static final int BLOCK_LENGTH = 17;
     public static final int TEMPLATE_ID = 3;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -132,44 +133,6 @@ public final class MarketCreateTransactionPayloadDecoder
         this.limit = limit;
     }
 
-    public static int infoId()
-    {
-        return 1;
-    }
-
-    public static int infoSinceVersion()
-    {
-        return 0;
-    }
-
-    public static int infoEncodingOffset()
-    {
-        return 0;
-    }
-
-    public static int infoEncodingLength()
-    {
-        return -1;
-    }
-
-    public static String infoMetaAttribute(final MetaAttribute metaAttribute)
-    {
-        if (MetaAttribute.PRESENCE == metaAttribute)
-        {
-            return "required";
-        }
-
-        return "";
-    }
-
-    private final VarStringEncodingDecoder info = new VarStringEncodingDecoder();
-
-    public VarStringEncodingDecoder info()
-    {
-        info.wrap(buffer, offset + 0);
-        return info;
-    }
-
     public static int sideId()
     {
         return 2;
@@ -182,7 +145,7 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public static int sideEncodingOffset()
     {
-        return 4;
+        return 0;
     }
 
     public static int sideEncodingLength()
@@ -202,12 +165,12 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public byte sideRaw()
     {
-        return buffer.getByte(offset + 4);
+        return buffer.getByte(offset + 0);
     }
 
     public SideType side()
     {
-        return SideType.get(buffer.getByte(offset + 4));
+        return SideType.get(buffer.getByte(offset + 0));
     }
 
 
@@ -223,7 +186,7 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public static int quantityEncodingOffset()
     {
-        return 5;
+        return 1;
     }
 
     public static int quantityEncodingLength()
@@ -258,7 +221,7 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public long quantity()
     {
-        return (buffer.getInt(offset + 5, BYTE_ORDER) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 1, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -274,7 +237,7 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public static int priceEncodingOffset()
     {
-        return 9;
+        return 5;
     }
 
     public static int priceEncodingLength()
@@ -309,7 +272,7 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public long price()
     {
-        return (buffer.getInt(offset + 9, BYTE_ORDER) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 5, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -325,7 +288,7 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public static int ctsTenderIdEncodingOffset()
     {
-        return 13;
+        return 9;
     }
 
     public static int ctsTenderIdEncodingLength()
@@ -360,47 +323,9 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public long ctsTenderId()
     {
-        return (buffer.getInt(offset + 13, BYTE_ORDER) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 9, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
-
-    public static int parityOrderIdId()
-    {
-        return 6;
-    }
-
-    public static int parityOrderIdSinceVersion()
-    {
-        return 0;
-    }
-
-    public static int parityOrderIdEncodingOffset()
-    {
-        return 17;
-    }
-
-    public static int parityOrderIdEncodingLength()
-    {
-        return -1;
-    }
-
-    public static String parityOrderIdMetaAttribute(final MetaAttribute metaAttribute)
-    {
-        if (MetaAttribute.PRESENCE == metaAttribute)
-        {
-            return "required";
-        }
-
-        return "";
-    }
-
-    private final VarStringEncodingDecoder parityOrderId = new VarStringEncodingDecoder();
-
-    public VarStringEncodingDecoder parityOrderId()
-    {
-        parityOrderId.wrap(buffer, offset + 17);
-        return parityOrderId;
-    }
 
     public static int matchNumberId()
     {
@@ -414,7 +339,7 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public static int matchNumberEncodingOffset()
     {
-        return 21;
+        return 13;
     }
 
     public static int matchNumberEncodingLength()
@@ -449,9 +374,205 @@ public final class MarketCreateTransactionPayloadDecoder
 
     public long matchNumber()
     {
-        return (buffer.getInt(offset + 21, BYTE_ORDER) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 13, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
+
+    public static int infoId()
+    {
+        return 1;
+    }
+
+    public static int infoSinceVersion()
+    {
+        return 0;
+    }
+
+    public static String infoCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String infoMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int infoHeaderLength()
+    {
+        return 4;
+    }
+
+    public int infoLength()
+    {
+        final int limit = parentMessage.limit();
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+    }
+
+    public int skipInfo()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int dataOffset = limit + headerLength;
+        parentMessage.limit(dataOffset + dataLength);
+
+        return dataLength;
+    }
+
+    public int getInfo(final MutableDirectBuffer dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public int getInfo(final byte[] dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public void wrapInfo(final DirectBuffer wrapBuffer)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+        wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
+    }
+
+    public String info()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+
+        if (0 == dataLength)
+        {
+            return "";
+        }
+
+        final byte[] tmp = new byte[dataLength];
+        buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
+
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static int parityOrderIdId()
+    {
+        return 6;
+    }
+
+    public static int parityOrderIdSinceVersion()
+    {
+        return 0;
+    }
+
+    public static String parityOrderIdCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String parityOrderIdMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int parityOrderIdHeaderLength()
+    {
+        return 4;
+    }
+
+    public int parityOrderIdLength()
+    {
+        final int limit = parentMessage.limit();
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+    }
+
+    public int skipParityOrderId()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int dataOffset = limit + headerLength;
+        parentMessage.limit(dataOffset + dataLength);
+
+        return dataLength;
+    }
+
+    public int getParityOrderId(final MutableDirectBuffer dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public int getParityOrderId(final byte[] dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public void wrapParityOrderId(final DirectBuffer wrapBuffer)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+        wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
+    }
+
+    public String parityOrderId()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+
+        if (0 == dataLength)
+        {
+            return "";
+        }
+
+        final byte[] tmp = new byte[dataLength];
+        buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
+
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
+    }
 
     public String toString()
     {
@@ -508,6 +629,12 @@ public final class MarketCreateTransactionPayloadDecoder
         builder.append('|');
         builder.append("matchNumber=");
         builder.append(this.matchNumber());
+        builder.append('|');
+        builder.append("info=");
+        builder.append('\'').append(info()).append('\'');
+        builder.append('|');
+        builder.append("parityOrderId=");
+        builder.append('\'').append(parityOrderId()).append('\'');
 
         limit(originalLimit);
 
@@ -517,6 +644,8 @@ public final class MarketCreateTransactionPayloadDecoder
     public MarketCreateTransactionPayloadDecoder sbeSkip()
     {
         sbeRewind();
+        skipInfo();
+        skipParityOrderId();
 
         return this;
     }

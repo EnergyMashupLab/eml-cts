@@ -1,6 +1,7 @@
 /* Generated SBE (Simple Binary Encoding) message codec. */
 package org.theenergymashuplab.cts.generated_files;
 
+import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
 
 
@@ -10,7 +11,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public final class EiManagedTickerSubscriptionPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 1;
+    public static final int BLOCK_LENGTH = 39;
     public static final int TEMPLATE_ID = 10;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -173,44 +174,6 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
     }
 
 
-    public static int multicastListenReferenceId()
-    {
-        return 2;
-    }
-
-    public static int multicastListenReferenceSinceVersion()
-    {
-        return 0;
-    }
-
-    public static int multicastListenReferenceEncodingOffset()
-    {
-        return 1;
-    }
-
-    public static int multicastListenReferenceEncodingLength()
-    {
-        return -1;
-    }
-
-    public static String multicastListenReferenceMetaAttribute(final MetaAttribute metaAttribute)
-    {
-        if (MetaAttribute.PRESENCE == metaAttribute)
-        {
-            return "required";
-        }
-
-        return "";
-    }
-
-    private final VarStringEncodingDecoder multicastListenReference = new VarStringEncodingDecoder();
-
-    public VarStringEncodingDecoder multicastListenReference()
-    {
-        multicastListenReference.wrap(buffer, offset + 1);
-        return multicastListenReference;
-    }
-
     public static int responseId()
     {
         return 3;
@@ -223,7 +186,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int responseEncodingOffset()
     {
-        return -1;
+        return 1;
     }
 
     public static int responseEncodingLength()
@@ -245,7 +208,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public EiResponseTypeDecoder response()
     {
-        response.wrap(buffer, offset + -1);
+        response.wrap(buffer, offset + 1);
         return response;
     }
 
@@ -261,7 +224,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int subscriptionActionTakenEncodingOffset()
     {
-        return -1;
+        return 30;
     }
 
     public static int subscriptionActionTakenEncodingLength()
@@ -281,12 +244,12 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public short subscriptionActionTakenRaw()
     {
-        return ((short)(buffer.getByte(offset + -1) & 0xFF));
+        return ((short)(buffer.getByte(offset + 30) & 0xFF));
     }
 
     public SubscriptionActionType subscriptionActionTaken()
     {
-        return SubscriptionActionType.get(((short)(buffer.getByte(offset + -1) & 0xFF)));
+        return SubscriptionActionType.get(((short)(buffer.getByte(offset + 30) & 0xFF)));
     }
 
 
@@ -302,7 +265,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int subscriptionRequestIdEncodingOffset()
     {
-        return -1;
+        return 31;
     }
 
     public static int subscriptionRequestIdEncodingLength()
@@ -337,9 +300,205 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public long subscriptionRequestId()
     {
-        return buffer.getLong(offset + -1, BYTE_ORDER);
+        return buffer.getLong(offset + 31, BYTE_ORDER);
     }
 
+
+    public static int multicastListenReferenceId()
+    {
+        return 2;
+    }
+
+    public static int multicastListenReferenceSinceVersion()
+    {
+        return 0;
+    }
+
+    public static String multicastListenReferenceCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String multicastListenReferenceMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int multicastListenReferenceHeaderLength()
+    {
+        return 4;
+    }
+
+    public int multicastListenReferenceLength()
+    {
+        final int limit = parentMessage.limit();
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+    }
+
+    public int skipMulticastListenReference()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int dataOffset = limit + headerLength;
+        parentMessage.limit(dataOffset + dataLength);
+
+        return dataLength;
+    }
+
+    public int getMulticastListenReference(final MutableDirectBuffer dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public int getMulticastListenReference(final byte[] dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public void wrapMulticastListenReference(final DirectBuffer wrapBuffer)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+        wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
+    }
+
+    public String multicastListenReference()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+
+        if (0 == dataLength)
+        {
+            return "";
+        }
+
+        final byte[] tmp = new byte[dataLength];
+        buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
+
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static int responseDescriptionId()
+    {
+        return 6;
+    }
+
+    public static int responseDescriptionSinceVersion()
+    {
+        return 0;
+    }
+
+    public static String responseDescriptionCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String responseDescriptionMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int responseDescriptionHeaderLength()
+    {
+        return 4;
+    }
+
+    public int responseDescriptionLength()
+    {
+        final int limit = parentMessage.limit();
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+    }
+
+    public int skipResponseDescription()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int dataOffset = limit + headerLength;
+        parentMessage.limit(dataOffset + dataLength);
+
+        return dataLength;
+    }
+
+    public int getResponseDescription(final MutableDirectBuffer dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public int getResponseDescription(final byte[] dst, final int dstOffset, final int length)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        final int bytesCopied = Math.min(length, dataLength);
+        parentMessage.limit(limit + headerLength + dataLength);
+        buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
+
+        return bytesCopied;
+    }
+
+    public void wrapResponseDescription(final DirectBuffer wrapBuffer)
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+        wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
+    }
+
+    public String responseDescription()
+    {
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
+        parentMessage.limit(limit + headerLength + dataLength);
+
+        if (0 == dataLength)
+        {
+            return "";
+        }
+
+        final byte[] tmp = new byte[dataLength];
+        buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
+
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
+    }
 
     public String toString()
     {
@@ -401,6 +560,12 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
         builder.append('|');
         builder.append("subscriptionRequestId=");
         builder.append(this.subscriptionRequestId());
+        builder.append('|');
+        builder.append("multicastListenReference=");
+        builder.append('\'').append(multicastListenReference()).append('\'');
+        builder.append('|');
+        builder.append("responseDescription=");
+        builder.append('\'').append(responseDescription()).append('\'');
 
         limit(originalLimit);
 
@@ -410,6 +575,8 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
     public EiManagedTickerSubscriptionPayloadDecoder sbeSkip()
     {
         sbeRewind();
+        skipMulticastListenReference();
+        skipResponseDescription();
 
         return this;
     }

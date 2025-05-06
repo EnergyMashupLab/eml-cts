@@ -215,7 +215,7 @@ public class TeuaRestController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Type", "application/octet-stream");
 		
-		int encodingLengthPlusHeader = EiCreateTransactionPayloadEncoderDecoder.eiCreateTransactionEncode(eiCreateTransactionPayloadEncoder, buffer, messageHeaderEncoder, eiCreateTransactionPayload);
+		int encodingLengthPlusHeader = EiTransactionPayloadEncoderDecoder.eiCreateTransactionEncode(eiCreateTransactionPayloadEncoder, buffer, messageHeaderEncoder, eiCreateTransactionPayload);
 		byte[] validBytes = new byte[encodingLengthPlusHeader];
 		buffer.getBytes(0, validBytes);
 		HttpEntity<byte[]> eiCreateTransactionArray = new HttpEntity<>(validBytes, headers);
@@ -966,7 +966,7 @@ public class TeuaRestController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Type", "application/octet-stream");
 		
-		int encodingLengthPlusHeader = EiManageTickerSubscriptionPayloadEncoderDecoder.EiManageTickerSubscriptionEncode(eiManageTickerSubscriptionPayloadEncoder, buffer, messageHeaderEncoder, eiManageTickerSubscriptionPayload);
+		int encodingLengthPlusHeader = EiTickerSubscriptionPayloadEncoderDecoder.EiManageTickerSubscriptionEncode(eiManageTickerSubscriptionPayloadEncoder, buffer, messageHeaderEncoder, eiManageTickerSubscriptionPayload);
 		byte[] validBytes = new byte[encodingLengthPlusHeader];
 		buffer.getBytes(0, validBytes);
 		HttpEntity<byte[]> eiManageTickerSubscriptionArray = new HttpEntity<>(validBytes, headers);
@@ -998,7 +998,7 @@ public class TeuaRestController {
 		System.out.println("Block Length: " + actingBlockLength);
 		System.out.println("Schema Version: " + actingVersion);
 
-		EiManagedTickerSubscriptionPayload eiManagedTickerSubscriptionResponse = EiManagedTickerSubscriptionPayloadEncoderDecoder.EiManagedTickerSubscriptionPayloadDecode(
+		EiManagedTickerSubscriptionPayload eiManagedTickerSubscriptionResponse = EiTickerSubscriptionPayloadEncoderDecoder.EiManagedTickerSubscriptionPayloadDecode(
 				eiManagedTickerSubscriptionPayloadDecoder,
 				buffer,
 				messageHeaderDecoder.encodedLength(),

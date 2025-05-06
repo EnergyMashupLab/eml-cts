@@ -2,6 +2,7 @@
 package org.theenergymashuplab.cts.generated_files;
 
 import org.agrona.MutableDirectBuffer;
+import org.agrona.DirectBuffer;
 
 
 /**
@@ -10,7 +11,7 @@ import org.agrona.MutableDirectBuffer;
 @SuppressWarnings("all")
 public final class EiManagedTickerSubscriptionPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 1;
+    public static final int BLOCK_LENGTH = 39;
     public static final int TEMPLATE_ID = 10;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -133,44 +134,6 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
         return this;
     }
 
-    public static int multicastListenReferenceId()
-    {
-        return 2;
-    }
-
-    public static int multicastListenReferenceSinceVersion()
-    {
-        return 0;
-    }
-
-    public static int multicastListenReferenceEncodingOffset()
-    {
-        return 1;
-    }
-
-    public static int multicastListenReferenceEncodingLength()
-    {
-        return -1;
-    }
-
-    public static String multicastListenReferenceMetaAttribute(final MetaAttribute metaAttribute)
-    {
-        if (MetaAttribute.PRESENCE == metaAttribute)
-        {
-            return "required";
-        }
-
-        return "";
-    }
-
-    private final VarStringEncodingEncoder multicastListenReference = new VarStringEncodingEncoder();
-
-    public VarStringEncodingEncoder multicastListenReference()
-    {
-        multicastListenReference.wrap(buffer, offset + 1);
-        return multicastListenReference;
-    }
-
     public static int responseId()
     {
         return 3;
@@ -183,7 +146,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int responseEncodingOffset()
     {
-        return -1;
+        return 1;
     }
 
     public static int responseEncodingLength()
@@ -205,7 +168,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiResponseTypeEncoder response()
     {
-        response.wrap(buffer, offset + -1);
+        response.wrap(buffer, offset + 1);
         return response;
     }
 
@@ -221,7 +184,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int subscriptionActionTakenEncodingOffset()
     {
-        return -1;
+        return 30;
     }
 
     public static int subscriptionActionTakenEncodingLength()
@@ -241,7 +204,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiManagedTickerSubscriptionPayloadEncoder subscriptionActionTaken(final SubscriptionActionType value)
     {
-        buffer.putByte(offset + -1, (byte)value.value());
+        buffer.putByte(offset + 30, (byte)value.value());
         return this;
     }
 
@@ -257,7 +220,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int subscriptionRequestIdEncodingOffset()
     {
-        return -1;
+        return 31;
     }
 
     public static int subscriptionRequestIdEncodingLength()
@@ -292,10 +255,162 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiManagedTickerSubscriptionPayloadEncoder subscriptionRequestId(final long value)
     {
-        buffer.putLong(offset + -1, value, BYTE_ORDER);
+        buffer.putLong(offset + 31, value, BYTE_ORDER);
         return this;
     }
 
+
+    public static int multicastListenReferenceId()
+    {
+        return 2;
+    }
+
+    public static String multicastListenReferenceCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String multicastListenReferenceMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int multicastListenReferenceHeaderLength()
+    {
+        return 4;
+    }
+
+    public EiManagedTickerSubscriptionPayloadEncoder putMulticastListenReference(final DirectBuffer src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiManagedTickerSubscriptionPayloadEncoder putMulticastListenReference(final byte[] src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiManagedTickerSubscriptionPayloadEncoder multicastListenReference(final String value)
+    {
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        final int length = bytes.length;
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, bytes, 0, length);
+
+        return this;
+    }
+
+    public static int responseDescriptionId()
+    {
+        return 6;
+    }
+
+    public static String responseDescriptionCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String responseDescriptionMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int responseDescriptionHeaderLength()
+    {
+        return 4;
+    }
+
+    public EiManagedTickerSubscriptionPayloadEncoder putResponseDescription(final DirectBuffer src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiManagedTickerSubscriptionPayloadEncoder putResponseDescription(final byte[] src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiManagedTickerSubscriptionPayloadEncoder responseDescription(final String value)
+    {
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        final int length = bytes.length;
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, bytes, 0, length);
+
+        return this;
+    }
 
     public String toString()
     {

@@ -306,35 +306,35 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 </types>
 	
 <sbe:message name="MarketCreateTenderPayload" id="1" description="see MarketCreateTenderPayload.java">
-	<field name="info" id="1" type="varStringEncoding"/>
 	<field name="side" id="2" type="SideType"/>
 	<field name="quantity" id="3" type="uint32"/>
 	<field name="price" id="4" type="uint32"/>
 	<field name="ctsTenderId" id="5" type="uint32"/>
 	<field name="expireTime" id="6" type="BridgeInstant"/>
 	<field name="bridgeInterval" id="7" type="BridgeInterval"/>
+	<data name="info" id="1" type="varStringEncoding"/>
 </sbe:message>
 
 <sbe:message name="MarketCreatedTenderPayload" id="2" description="see MarketCreatedTenderPayload.java">
-	<field name="info" id="1" type="varStringEncoding"/>
 	<field name="success" id="2" type="BooleanType"/>
 	<field name="ctsTenderId" id="3" type="uint32"/>
-	<field name="parityOrderId" id="4" type="varStringEncoding"/>
+	<data name="parityOrderId" id="4" type="varStringEncoding"/>
+	<data name="info" id="1" type="varStringEncoding"/>
 </sbe:message>
 
 <sbe:message name="MarketCreateTransactionPayload" id="3" description="see MarketCreateTransactionPayload.java">
-	<field name="info" id="1" type="varStringEncoding"/>
 	<field name="side" id="2" type="SideType"/>
 	<field name="quantity" id="3" type="uint32"/>
 	<field name="price" id="4" type="uint32"/> <!--System-wide implied decimal point will be applied-->
 	<field name="ctsTenderId" id="5" type="uint32"/>
-	<field name="parityOrderId" id="6" type="varStringEncoding"/> <!--TODO  16 bytes -->
-	<field name="matchNumber" id="7" type="uint32"/>	
+	<field name="matchNumber" id="7" type="uint32"/>
+	<data name="info" id="1" type="varStringEncoding"/>
+	<data name="parityOrderId" id="6" type="varStringEncoding"/> <!--TODO  16 bytes -->
 </sbe:message>
 
 <sbe:message name="MarketCreatedTransactionPayload" id="4" description="see MarketCreatedTransactionPayload.java">
-	<field name="info" id="1" type="varStringEncoding"/>
 	<field name="success" id="2" type="BooleanType"/>
+	<data name="info" id="1" type="varStringEncoding"/>
 </sbe:message>
 
 <sbe:message name="EiCreateTenderPayload" id="5"	description="See EiCreateTenderPayload.java">
@@ -346,6 +346,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	<field name="requestId" id="6" type="RefIdType"/>
 	<field name="segmentId" id="7" type="uint32" />
 	<field name="tender" id="8" type="EiTenderType"/>
+	
 </sbe:message>
 
 <sbe:message name="EiCreatedTenderPayload" id="6"	description="See EiCreatedTenderPayload.java">
@@ -375,6 +376,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	<field name="refId" id="5" type="RefIdType"/>	
 	<field name="response" id="6" type="EiResponseType" />	
 	<field name="transactionId" id="7" type="TransactionIdType"/>
+	<data name="responseDescription" id="8" type="varStringEncoding"/>
 </sbe:message>
 
 <sbe:message name="EiManageTickerSubscriptionPayload" id="9"	description="See EiManageTickerSubscriptionPayload">
@@ -387,10 +389,12 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 
 <sbe:message name="EiManagedTickerSubscriptionPayload" id="10"	description="See EiManagedTickerSubscriptionPayload">
 	<field name="tickerType" id="1" type="TickerType"/>
-	<field name="multicastListenReference" id="2" type="varStringEncoding"  />
 	<field name="response" id="3" type="EiResponseType" />
 	<field name="subscriptionActionTaken" id="4" type="SubscriptionActionType" />
-	<field name="subscriptionRequestId" id="5" type="RefIdType" />	
+	<field name="subscriptionRequestId" id="5" type="RefIdType" />
+	<data name="multicastListenReference" id="2" type="varStringEncoding"  />
+	<data name="responseDescription" id="6" type="varStringEncoding"/>
+		
 </sbe:message>
 
 <sbe:message name="EiAcceptQuotePayload" id="11"	description="See EiAcceptQuotePayload">
@@ -411,6 +415,8 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	<field name="refId" id="5" type="RefIdType"/>	
 	<field name="response" id="6" type="EiResponseType" />	
 	<field name="transactionId" id="7" type="TransactionIdType"/>
+	<data name="responseDescription" id="8" type="varStringEncoding"/>
+	
 </sbe:message>
 
 

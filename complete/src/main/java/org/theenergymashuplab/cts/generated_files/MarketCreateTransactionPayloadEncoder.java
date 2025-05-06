@@ -2,6 +2,7 @@
 package org.theenergymashuplab.cts.generated_files;
 
 import org.agrona.MutableDirectBuffer;
+import org.agrona.DirectBuffer;
 
 
 /**
@@ -10,7 +11,7 @@ import org.agrona.MutableDirectBuffer;
 @SuppressWarnings("all")
 public final class MarketCreateTransactionPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 25;
+    public static final int BLOCK_LENGTH = 17;
     public static final int TEMPLATE_ID = 3;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -97,44 +98,6 @@ public final class MarketCreateTransactionPayloadEncoder
         this.limit = limit;
     }
 
-    public static int infoId()
-    {
-        return 1;
-    }
-
-    public static int infoSinceVersion()
-    {
-        return 0;
-    }
-
-    public static int infoEncodingOffset()
-    {
-        return 0;
-    }
-
-    public static int infoEncodingLength()
-    {
-        return -1;
-    }
-
-    public static String infoMetaAttribute(final MetaAttribute metaAttribute)
-    {
-        if (MetaAttribute.PRESENCE == metaAttribute)
-        {
-            return "required";
-        }
-
-        return "";
-    }
-
-    private final VarStringEncodingEncoder info = new VarStringEncodingEncoder();
-
-    public VarStringEncodingEncoder info()
-    {
-        info.wrap(buffer, offset + 0);
-        return info;
-    }
-
     public static int sideId()
     {
         return 2;
@@ -147,7 +110,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public static int sideEncodingOffset()
     {
-        return 4;
+        return 0;
     }
 
     public static int sideEncodingLength()
@@ -167,7 +130,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public MarketCreateTransactionPayloadEncoder side(final SideType value)
     {
-        buffer.putByte(offset + 4, value.value());
+        buffer.putByte(offset + 0, value.value());
         return this;
     }
 
@@ -183,7 +146,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public static int quantityEncodingOffset()
     {
-        return 5;
+        return 1;
     }
 
     public static int quantityEncodingLength()
@@ -218,7 +181,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public MarketCreateTransactionPayloadEncoder quantity(final long value)
     {
-        buffer.putInt(offset + 5, (int)value, BYTE_ORDER);
+        buffer.putInt(offset + 1, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -235,7 +198,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public static int priceEncodingOffset()
     {
-        return 9;
+        return 5;
     }
 
     public static int priceEncodingLength()
@@ -270,7 +233,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public MarketCreateTransactionPayloadEncoder price(final long value)
     {
-        buffer.putInt(offset + 9, (int)value, BYTE_ORDER);
+        buffer.putInt(offset + 5, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -287,7 +250,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public static int ctsTenderIdEncodingOffset()
     {
-        return 13;
+        return 9;
     }
 
     public static int ctsTenderIdEncodingLength()
@@ -322,48 +285,10 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public MarketCreateTransactionPayloadEncoder ctsTenderId(final long value)
     {
-        buffer.putInt(offset + 13, (int)value, BYTE_ORDER);
+        buffer.putInt(offset + 9, (int)value, BYTE_ORDER);
         return this;
     }
 
-
-    public static int parityOrderIdId()
-    {
-        return 6;
-    }
-
-    public static int parityOrderIdSinceVersion()
-    {
-        return 0;
-    }
-
-    public static int parityOrderIdEncodingOffset()
-    {
-        return 17;
-    }
-
-    public static int parityOrderIdEncodingLength()
-    {
-        return -1;
-    }
-
-    public static String parityOrderIdMetaAttribute(final MetaAttribute metaAttribute)
-    {
-        if (MetaAttribute.PRESENCE == metaAttribute)
-        {
-            return "required";
-        }
-
-        return "";
-    }
-
-    private final VarStringEncodingEncoder parityOrderId = new VarStringEncodingEncoder();
-
-    public VarStringEncodingEncoder parityOrderId()
-    {
-        parityOrderId.wrap(buffer, offset + 17);
-        return parityOrderId;
-    }
 
     public static int matchNumberId()
     {
@@ -377,7 +302,7 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public static int matchNumberEncodingOffset()
     {
-        return 21;
+        return 13;
     }
 
     public static int matchNumberEncodingLength()
@@ -412,10 +337,162 @@ public final class MarketCreateTransactionPayloadEncoder
 
     public MarketCreateTransactionPayloadEncoder matchNumber(final long value)
     {
-        buffer.putInt(offset + 21, (int)value, BYTE_ORDER);
+        buffer.putInt(offset + 13, (int)value, BYTE_ORDER);
         return this;
     }
 
+
+    public static int infoId()
+    {
+        return 1;
+    }
+
+    public static String infoCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String infoMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int infoHeaderLength()
+    {
+        return 4;
+    }
+
+    public MarketCreateTransactionPayloadEncoder putInfo(final DirectBuffer src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public MarketCreateTransactionPayloadEncoder putInfo(final byte[] src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public MarketCreateTransactionPayloadEncoder info(final String value)
+    {
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        final int length = bytes.length;
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, bytes, 0, length);
+
+        return this;
+    }
+
+    public static int parityOrderIdId()
+    {
+        return 6;
+    }
+
+    public static String parityOrderIdCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String parityOrderIdMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int parityOrderIdHeaderLength()
+    {
+        return 4;
+    }
+
+    public MarketCreateTransactionPayloadEncoder putParityOrderId(final DirectBuffer src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public MarketCreateTransactionPayloadEncoder putParityOrderId(final byte[] src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public MarketCreateTransactionPayloadEncoder parityOrderId(final String value)
+    {
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        final int length = bytes.length;
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, bytes, 0, length);
+
+        return this;
+    }
 
     public String toString()
     {

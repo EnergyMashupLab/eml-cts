@@ -833,7 +833,7 @@ public class LmeRestController {
 		  int actingBlockLength = messageHeaderDecoder.blockLength();
 		  int actingVersion = messageHeaderDecoder.version();
 
-		  EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload = EiManageTickerSubscriptionPayloadEncoderDecoder.EiManageTickerSubscriptionPayloadDecode(
+		  EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload = EiTickerSubscriptionPayloadEncoderDecoder.EiManageTickerSubscriptionPayloadDecode(
 		      eiManageTickerSubscriptionPayloadDecoder, 
 		      buffer, 
 		      messageHeaderDecoder.encodedLength(), // <=== Start decoding body *AFTER* header
@@ -886,7 +886,7 @@ public class LmeRestController {
 		//int encodingLengthPlusHeader = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderEncode(eiCreatedTenderPayloadEncoder, buffer, messageHeaderEncoder, tempCreated);
 		buffer.wrap(new byte[4096]); // Or clear your existing buffer safely
 
-		int encodingLengthPlusHeader = EiManagedTickerSubscriptionPayloadEncoderDecoder.EiManagedTickerSubscriptionEncode(
+		int encodingLengthPlusHeader = EiTickerSubscriptionPayloadEncoderDecoder.EiManagedTickerSubscriptionEncode(
 		    eiManagedTickerSubscriptionPayloadEncoder,
 		    buffer,
 		    messageHeaderEncoder,

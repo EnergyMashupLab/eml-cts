@@ -124,6 +124,10 @@ public class EiTenderPayloadEncoderDecoder {
 
 		TenderIdType tenderId = new TenderIdType();
 		tenderId.setMyUidId(tender.tenderId());
+		
+		//currently null
+//		MarketOrderIdType referenceQuoteIdTypeId = new MarketOrderIdType();
+//		referenceQuoteIdTypeId.setMyUidId(tender.referencedQuoteId());
 
 		 Instant expirationTime = Instant.ofEpochSecond(
 		            base.expirationTime().seconds(),
