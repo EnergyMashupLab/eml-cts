@@ -8,17 +8,17 @@ import org.agrona.MutableDirectBuffer;
  * see MarketCreatedTenderPayload.java
  */
 @SuppressWarnings("all")
-public class MarketCreatedTenderPayloadEncoder
+public final class MarketCreatedTenderPayloadEncoder
 {
     public static final int BLOCK_LENGTH = 13;
     public static final int TEMPLATE_ID = 2;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final MarketCreatedTenderPayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +52,6 @@ public class MarketCreatedTenderPayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +63,6 @@ public class MarketCreatedTenderPayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -120,7 +114,7 @@ public class MarketCreatedTenderPayloadEncoder
 
     public static int infoEncodingLength()
     {
-        return 4;
+        return -1;
     }
 
     public static String infoMetaAttribute(final MetaAttribute metaAttribute)
@@ -224,7 +218,7 @@ public class MarketCreatedTenderPayloadEncoder
 
     public MarketCreatedTenderPayloadEncoder ctsTenderId(final long value)
     {
-        buffer.putInt(offset + 5, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 5, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -246,7 +240,7 @@ public class MarketCreatedTenderPayloadEncoder
 
     public static int parityOrderIdEncodingLength()
     {
-        return 4;
+        return -1;
     }
 
     public static String parityOrderIdMetaAttribute(final MetaAttribute metaAttribute)
@@ -285,7 +279,7 @@ public class MarketCreatedTenderPayloadEncoder
         }
 
         final MarketCreatedTenderPayloadDecoder decoder = new MarketCreatedTenderPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

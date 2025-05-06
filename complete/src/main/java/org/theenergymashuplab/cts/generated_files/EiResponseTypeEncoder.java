@@ -8,11 +8,12 @@ import org.agrona.MutableDirectBuffer;
  * See EiResponseType.java
  */
 @SuppressWarnings("all")
-public class EiResponseTypeEncoder
+public final class EiResponseTypeEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 33;
+    public static final String SEMANTIC_VERSION = "2.1";
+    public static final int ENCODED_LENGTH = 29;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -104,7 +105,7 @@ public class EiResponseTypeEncoder
 
     public EiResponseTypeEncoder inResponseTo(final long value)
     {
-        buffer.putLong(offset + 12, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 12, value, BYTE_ORDER);
         return this;
     }
 
@@ -136,37 +137,14 @@ public class EiResponseTypeEncoder
 
     public EiResponseTypeEncoder responseCode(final long value)
     {
-        buffer.putLong(offset + 20, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 20, value, BYTE_ORDER);
         return this;
     }
 
 
-    public static int responseDescriptionEncodingOffset()
-    {
-        return 28;
-    }
-
-    public static int responseDescriptionEncodingLength()
-    {
-        return 4;
-    }
-
-    private final VarStringEncodingEncoder responseDescription = new VarStringEncodingEncoder();
-
-    /**
-     * Variable length UTF-8 String.
-     *
-     * @return VarStringEncodingEncoder : Variable length UTF-8 String.
-     */
-    public VarStringEncodingEncoder responseDescription()
-    {
-        responseDescription.wrap(buffer, offset + 28);
-        return responseDescription;
-    }
-
     public static int responseDetailEncodingOffset()
     {
-        return 32;
+        return 28;
     }
 
     public static int responseDetailEncodingLength()
@@ -176,7 +154,7 @@ public class EiResponseTypeEncoder
 
     public EiResponseTypeEncoder responseDetail(final ResponseDetailType value)
     {
-        buffer.putByte(offset + 32, (byte)value.value());
+        buffer.putByte(offset + 28, (byte)value.value());
         return this;
     }
 

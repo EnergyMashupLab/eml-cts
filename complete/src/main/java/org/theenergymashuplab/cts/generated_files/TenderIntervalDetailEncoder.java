@@ -8,10 +8,11 @@ import org.agrona.MutableDirectBuffer;
  * See TenderIntervalDetail.java
  */
 @SuppressWarnings("all")
-public class TenderIntervalDetailEncoder
+public final class TenderIntervalDetailEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 40;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -104,7 +105,7 @@ public class TenderIntervalDetailEncoder
 
     public TenderIntervalDetailEncoder price(final long value)
     {
-        buffer.putLong(offset + 24, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 24, value, BYTE_ORDER);
         return this;
     }
 
@@ -136,7 +137,7 @@ public class TenderIntervalDetailEncoder
 
     public TenderIntervalDetailEncoder quantity(final long value)
     {
-        buffer.putLong(offset + 32, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 32, value, BYTE_ORDER);
         return this;
     }
 

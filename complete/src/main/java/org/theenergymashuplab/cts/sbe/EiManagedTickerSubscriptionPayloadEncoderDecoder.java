@@ -13,13 +13,21 @@
 
 package org.theenergymashuplab.cts.sbe;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.SubscriptionActionType;
+import org.theenergymashuplab.cts.TickerType;
 import org.theenergymashuplab.cts.controller.payloads.EiManagedTickerSubscriptionPayload;
 import org.theenergymashuplab.cts.generated_files.EiManagedTickerSubscriptionPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiManagedTickerSubscriptionPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
+import org.theenergymashuplab.cts.generated_files.VarStringEncodingDecoder;
+import org.theenergymashuplab.cts.generated_files.VarStringEncodingEncoder;
 
 public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 
@@ -31,20 +39,71 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 
 		eiManagedTickerSubscriptionEncoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder);
 
-		eiManagedTickerSubscriptionEncoder
-				.tickerType(ConvertTickerType(eiManagedTickerSubscriptionPayload.getTickerType()));
+        eiManagedTickerSubscriptionEncoder.tickerType(org.theenergymashuplab.cts.generated_files.TickerType.get(eiManagedTickerSubscriptionPayload.getTickerType().getValue()));
 
-		// TODO: fix
 
-		eiManagedTickerSubscriptionEncoder.multicastListenReference().buffer().putStringUtf8(
-				eiManagedTickerSubscriptionEncoder.multicastListenReference().offset(),
-				eiManagedTickerSubscriptionPayload.getMulticastListenReference());
+//     // 1) Grab your Java string and UTF-8 bytes
+//        String multicastRef = eiManagedTickerSubscriptionPayload.getMulticastListenReference();
+//        byte[] refBytes = multicastRef.getBytes(StandardCharsets.UTF_8);
+//
+//        // 2) Wrap the VarString encoder at its offset
+//        VarStringEncodingEncoder refEnc =
+//            eiManagedTickerSubscriptionEncoder.multicastListenReference();
+//
+//        // 3) Write the 4-byte length prefix (little-endian)
+//        refEnc.length(refBytes.length);
+//
+//        // 4) Compute where the actual data goes, then copy the bytes
+//        int refDataOffset =
+//            refEnc.offset() + VarStringEncodingEncoder.lengthEncodingLength();
+//        refEnc.buffer().putBytes(refDataOffset, refBytes);
+//
+//        // 5) (Optional) track the end offset so you can bump your limit later
+//        int refEnd = refDataOffset + refBytes.length;
 
-		EiResponseTypeEncoderDecoder.Encode(eiManagedTickerSubscriptionEncoder.response(),
-				eiManagedTickerSubscriptionPayload.getResponse());
+        
+		int length = eiManagedTickerSubscriptionPayload.getMulticastListenReference().length();
+		
+	
+ 		String multicastListenReference = eiManagedTickerSubscriptionPayload.getMulticastListenReference();
+ 		eiManagedTickerSubscriptionEncoder.multicastListenReference().buffer().putStringUtf8(0,
+ 				multicastListenReference, length);
+        
+        
+        Instant responseCreatedDateTime = eiManagedTickerSubscriptionPayload.getResponse().getCreatedDateTime();
+        eiManagedTickerSubscriptionEncoder.response().createdDateTime()
+            .seconds(responseCreatedDateTime.getEpochSecond())
+            .nano(responseCreatedDateTime.getNano());
 
-		eiManagedTickerSubscriptionEncoder.subscriptionActionTaken(
-				ConvertSubscriptionActionType(eiManagedTickerSubscriptionPayload.getSubscriptionActionTaken()));
+        eiManagedTickerSubscriptionEncoder.response().inResponseTo(eiManagedTickerSubscriptionPayload.getResponse().getInResponseTo().getMyUidId());
+        
+        eiManagedTickerSubscriptionEncoder.response().responseCode(eiManagedTickerSubscriptionPayload.getResponse().getResponseCode());
+        
+//        
+//        String desc = eiManagedTickerSubscriptionPayload
+//                .getResponse()
+//                .getResponseDescription();
+//byte[] descBytes = desc.getBytes(StandardCharsets.UTF_8);
+//VarStringEncodingEncoder descEnc = 
+//  eiManagedTickerSubscriptionEncoder
+//      .response()
+//      .responseDescription();
+//descEnc.length(descBytes.length);
+//int descDataOffset = descEnc.offset() + VarStringEncodingEncoder.lengthEncodingLength();
+//descEnc.buffer().putBytes(descDataOffset, descBytes);
+//int descEnd = descDataOffset + descBytes.length;
+//
+//eiManagedTickerSubscriptionEncoder.limit(Math.max(refEnd, descEnd));
+
+        short detailShort = eiManagedTickerSubscriptionPayload.getResponse().getResponseDetail().getValue();
+        
+        System.out.println(">>> Encoding ResponseDetailType short: " + detailShort);
+        eiManagedTickerSubscriptionEncoder.response().responseDetail(
+            org.theenergymashuplab.cts.generated_files.ResponseDetailType.get(detailShort)
+        );
+
+        
+        eiManagedTickerSubscriptionEncoder.subscriptionActionTaken(org.theenergymashuplab.cts.generated_files.SubscriptionActionType.get(eiManagedTickerSubscriptionPayload.getSubscriptionActionTaken().getValue()));
 
 		eiManagedTickerSubscriptionEncoder
 				.subscriptionRequestId(eiManagedTickerSubscriptionPayload.getSubscriptionRequestId().getMyUidId());
@@ -56,109 +115,120 @@ public class EiManagedTickerSubscriptionPayloadEncoderDecoder {
 		return messageHeaderEncoder.ENCODED_LENGTH + eiManagedTickerSubscriptionEncoder.encodedLength();
 
 	}
+	
+	
 
 	public static EiManagedTickerSubscriptionPayload EiManagedTickerSubscriptionPayloadDecode(
-			EiManagedTickerSubscriptionPayloadDecoder eiManagedTickerSubscriptionPayloadDecoder,
+			EiManagedTickerSubscriptionPayloadDecoder decoder,
 			UnsafeBuffer directBuffer,
 			int bufferOffset,
-			int actingBlockLength, int actingVersion) throws Exception {
+			int actingBlockLength, 
+			int actingVersion) throws Exception {
 
-		eiManagedTickerSubscriptionPayloadDecoder.wrap(directBuffer, bufferOffset, actingBlockLength, actingVersion);
-
-		System.out.println("\n-------------------------------------------------------------------------");
-		System.out.println("eiManagedTickerSubscriptionPayloadDecode Decoded :-");
-		System.out.println(eiManagedTickerSubscriptionPayloadDecoder.toString());
-
-		RefIdType subscriptionRequestId = new RefIdType();
-		EiResponseType eiResponse = EiResponseTypeEncoderDecoder
-				.Decode(eiManagedTickerSubscriptionPayloadDecoder.response());
-
-		subscriptionRequestId.setMyUidId(eiManagedTickerSubscriptionPayloadDecoder.subscriptionRequestId());
-
+		
+	    MessageHeaderDecoder hdr = new MessageHeaderDecoder();
+	    hdr.wrap(directBuffer, 0);
+	    
+	    decoder.wrap(directBuffer, bufferOffset, actingBlockLength, actingVersion);
 		EiManagedTickerSubscriptionPayload eiManagedTickerSubscriptionPayload = new EiManagedTickerSubscriptionPayload();
 
+//	        
+//		System.out.println("\n-------------------------------------------------------------------------");
+//		System.out.println("eiManagedTickerSubscriptionPayloadDecode Decoded :-");
+//		System.out.println(eiManagedTickerSubscriptionPayloadDecoder.toString());
+//		
+
+		TickerType tickerType = TickerType.fromSbe(decoder.tickerType().value());
+		
+//		// 1️⃣ Get the VarString decoder for multicastListenReference
+//		VarStringEncodingDecoder mDec =
+//		    decoder.multicastListenReference();
+//
+//		// 2️⃣ Read the 4-byte length prefix
+//		int mLen = (int)mDec.length();
+//
+//		// 3️⃣ Allocate a buffer and copy exactly those bytes
+//		byte[] mBuf = new byte[mLen];
+//		directBuffer.getBytes(
+//		    mDec.offset() + VarStringEncodingDecoder.lengthEncodingLength(),
+//		    mBuf, 0, mLen
+//		);
+//
+//		// 4️⃣ Build the Java String
+//		String multicastListenReference =
+//		    new String(mBuf, StandardCharsets.UTF_8);
+
+	    
 		eiManagedTickerSubscriptionPayload
-				.setTickerType(ConvertTickerType(eiManagedTickerSubscriptionPayloadDecoder.tickerType()));
+			.setMulticastListenReference(
+					decoder
+							.multicastListenReference()
+							.buffer()
+							.getStringUtf8(decoder
+									.multicastListenReference()
+									.offset()));
+		
+		
+		SubscriptionActionType actionTaken = SubscriptionActionType.fromSbe(
+				decoder.subscriptionActionTaken().value());
+		
+		RefIdType subscriptionRequestId = new RefIdType();
+		subscriptionRequestId.setMyUidId(decoder.subscriptionRequestId());
+		
+		// Response
+		//EiResponseType response = EiResponseTypeEncoderDecoder.Decode(decoder.response());
+		
+		   var responseDecoder = decoder.response();
+		    EiResponseType response = new EiResponseType();
+		
+        org.theenergymashuplab.cts.ResponseDetailType appEnum = org.theenergymashuplab.cts.ResponseDetailType.valueOf(decoder.response().responseDetail().name());
 
-		// TODO: fix
-		eiManagedTickerSubscriptionPayload
-				.setMulticastListenReference(
-						eiManagedTickerSubscriptionPayloadDecoder
-								.multicastListenReference()
-								.buffer()
-								.getStringUtf8(eiManagedTickerSubscriptionPayloadDecoder
-										.multicastListenReference()
-										.offset()));
+        // Decode createdDateTime
+		// Decode response section
+		//var responseDecoder = decoder.response();
 
-		eiManagedTickerSubscriptionPayload.setResponse(eiResponse);
+		long seconds = responseDecoder.createdDateTime().seconds();
+		int nanos = (int) responseDecoder.createdDateTime().nano();
+		Instant createdDateTime = Instant.ofEpochSecond(seconds, nanos);
 
-		eiManagedTickerSubscriptionPayload.setSubscriptionActionTaken(
-				ConvertSubscriptionActionType(eiManagedTickerSubscriptionPayloadDecoder.subscriptionActionTaken()));
+		RefIdType inResponseTo = new RefIdType();
+		inResponseTo.setMyUidId(responseDecoder.inResponseTo());
 
+		long responseCode = responseDecoder.responseCode();
+        
+
+//	    // 5c) responseDescription (var-string)
+//	    VarStringEncodingDecoder dDec = responseDecoder.responseDescription();
+//	    int    dLen    = (int)dDec.length();
+//	    byte[] dBytes  = new byte[dLen];
+//	    directBuffer.getBytes(
+//	        dDec.offset() + VarStringEncodingDecoder.varDataEncodingOffset(),
+//	        dBytes, 0, dLen
+//	    );
+//	    String description = new String(dBytes, StandardCharsets.UTF_8);
+
+ 
+    	var responseDetail = org.theenergymashuplab.cts.ResponseDetailType.fromSbe(
+    			responseDecoder.responseDetail().value());
+    	
+    	//EiResponseType response = new EiResponseType((int) responseCode, description, responseDetail);
+    	response.setCreatedDateTime(createdDateTime);
+    	response.setInResponseTo(inResponseTo);
+    	response.setResponseCode(responseCode);
+    	//response.setResponseDescription(description);
+    	response.setResponseDetail(responseDetail);
+        
+
+        eiManagedTickerSubscriptionPayload.setTickerType(tickerType);
+		//eiManagedTickerSubscriptionPayload.setMulticastListenReference(multicastListenReference);
 		eiManagedTickerSubscriptionPayload.setSubscriptionRequestId(subscriptionRequestId);
+        eiManagedTickerSubscriptionPayload.setSubscriptionActionTaken(actionTaken);
+		eiManagedTickerSubscriptionPayload.setResponse(response);
+
+
 
 		return eiManagedTickerSubscriptionPayload;
 
-	}
-
-	private static org.theenergymashuplab.cts.generated_files.TickerType ConvertTickerType(
-			org.theenergymashuplab.cts.TickerType tickerType) {
-		switch (tickerType) {
-			case QUOTES:
-				return org.theenergymashuplab.cts.generated_files.TickerType.QUOTES;
-			case RFQS:
-				return org.theenergymashuplab.cts.generated_files.TickerType.RFQS;
-			case TENDERS:
-				return org.theenergymashuplab.cts.generated_files.TickerType.TENDERS;
-			case TRANSACTIONS:
-				return org.theenergymashuplab.cts.generated_files.TickerType.TRANSACTIONS;
-			default:
-				return org.theenergymashuplab.cts.generated_files.TickerType.NULL_VAL;
-		}
-	}
-
-	private static org.theenergymashuplab.cts.TickerType ConvertTickerType(
-			org.theenergymashuplab.cts.generated_files.TickerType tickerType) {
-		switch (tickerType) {
-			case QUOTES:
-				return org.theenergymashuplab.cts.TickerType.QUOTES;
-			case RFQS:
-				return org.theenergymashuplab.cts.TickerType.RFQS;
-			case TENDERS:
-				return org.theenergymashuplab.cts.TickerType.TENDERS;
-			case TRANSACTIONS:
-				return org.theenergymashuplab.cts.TickerType.TRANSACTIONS;
-			default:
-				return null;
-		}
-	}
-
-	private static org.theenergymashuplab.cts.generated_files.SubscriptionActionType ConvertSubscriptionActionType(
-			org.theenergymashuplab.cts.SubscriptionActionType subscriptionActionType) {
-		switch (subscriptionActionType) {
-			case SNAPSHOT:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.SNAPSHOT;
-			case SNAPSHOT_AND_UPDATES:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.SNAPSHOT_AND_UPDATES;
-			case CANCEL:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.CANCEL;
-			default:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.NULL_VAL;
-		}
-	}
-
-	private static org.theenergymashuplab.cts.SubscriptionActionType ConvertSubscriptionActionType(
-			org.theenergymashuplab.cts.generated_files.SubscriptionActionType subscriptionActionType) {
-		switch (subscriptionActionType) {
-			case SNAPSHOT:
-				return org.theenergymashuplab.cts.SubscriptionActionType.SNAPSHOT;
-			case SNAPSHOT_AND_UPDATES:
-				return org.theenergymashuplab.cts.SubscriptionActionType.SNAPSHOT_AND_UPDATES;
-			case CANCEL:
-				return org.theenergymashuplab.cts.SubscriptionActionType.CANCEL;
-			default:
-				return null;
-		}
 	}
 
 }

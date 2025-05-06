@@ -8,17 +8,17 @@ import org.agrona.DirectBuffer;
  * See EiCreatedTransactionPayload
  */
 @SuppressWarnings("all")
-public class EiCreatedTransactionPayloadDecoder
+public final class EiCreatedTransactionPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 81;
+    public static final int BLOCK_LENGTH = 77;
     public static final int TEMPLATE_ID = 8;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiCreatedTransactionPayloadDecoder parentMessage = this;
     private DirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
     int actingBlockLength;
@@ -54,11 +54,6 @@ public class EiCreatedTransactionPayloadDecoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -74,13 +69,52 @@ public class EiCreatedTransactionPayloadDecoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
         limit(offset + actingBlockLength);
 
         return this;
+    }
+
+    public EiCreatedTransactionPayloadDecoder wrapAndApplyHeader(
+        final DirectBuffer buffer,
+        final int offset,
+        final MessageHeaderDecoder headerDecoder)
+    {
+        headerDecoder.wrap(buffer, offset);
+
+        final int templateId = headerDecoder.templateId();
+        if (TEMPLATE_ID != templateId)
+        {
+            throw new IllegalStateException("Invalid TEMPLATE_ID: " + templateId);
+        }
+
+        return wrap(
+            buffer,
+            offset + MessageHeaderDecoder.ENCODED_LENGTH,
+            headerDecoder.blockLength(),
+            headerDecoder.version());
+    }
+
+    public EiCreatedTransactionPayloadDecoder sbeRewind()
+    {
+        return wrap(buffer, offset, actingBlockLength, actingVersion);
+    }
+
+    public int sbeDecodedLength()
+    {
+        final int currentLimit = limit();
+        sbeSkip();
+        final int decodedLength = encodedLength();
+        limit(currentLimit);
+
+        return decodedLength;
+    }
+
+    public int actingVersion()
+    {
+        return actingVersion;
     }
 
     public int encodedLength()
@@ -145,7 +179,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public long counterPartyId()
     {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 0, BYTE_ORDER);
     }
 
 
@@ -196,7 +230,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public long marketTransactionId()
     {
-        return buffer.getLong(offset + 8, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 8, BYTE_ORDER);
     }
 
 
@@ -247,7 +281,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public long partyId()
     {
-        return buffer.getLong(offset + 16, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 16, BYTE_ORDER);
     }
 
 
@@ -298,7 +332,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public long recipientTransactionId()
     {
-        return buffer.getLong(offset + 24, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 24, BYTE_ORDER);
     }
 
 
@@ -349,7 +383,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public long refId()
     {
-        return buffer.getLong(offset + 32, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 32, BYTE_ORDER);
     }
 
 
@@ -370,7 +404,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public static int responseEncodingLength()
     {
-        return 33;
+        return 29;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -403,7 +437,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public static int transactionIdEncodingOffset()
     {
-        return 73;
+        return 69;
     }
 
     public static int transactionIdEncodingLength()
@@ -438,7 +472,7 @@ public class EiCreatedTransactionPayloadDecoder
 
     public long transactionId()
     {
-        return buffer.getLong(offset + 73, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 69, BYTE_ORDER);
     }
 
 
@@ -450,7 +484,7 @@ public class EiCreatedTransactionPayloadDecoder
         }
 
         final EiCreatedTransactionPayloadDecoder decoder = new EiCreatedTransactionPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+        decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
     }
@@ -463,7 +497,7 @@ public class EiCreatedTransactionPayloadDecoder
         }
 
         final int originalLimit = limit();
-        limit(initialOffset + actingBlockLength);
+        limit(offset + actingBlockLength);
         builder.append("[EiCreatedTransactionPayload](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -484,23 +518,23 @@ public class EiCreatedTransactionPayloadDecoder
         builder.append(BLOCK_LENGTH);
         builder.append("):");
         builder.append("counterPartyId=");
-        builder.append(counterPartyId());
+        builder.append(this.counterPartyId());
         builder.append('|');
         builder.append("marketTransactionId=");
-        builder.append(marketTransactionId());
+        builder.append(this.marketTransactionId());
         builder.append('|');
         builder.append("partyId=");
-        builder.append(partyId());
+        builder.append(this.partyId());
         builder.append('|');
         builder.append("recipientTransactionId=");
-        builder.append(recipientTransactionId());
+        builder.append(this.recipientTransactionId());
         builder.append('|');
         builder.append("refId=");
-        builder.append(refId());
+        builder.append(this.refId());
         builder.append('|');
         builder.append("response=");
-        final EiResponseTypeDecoder response = response();
-        if (response != null)
+        final EiResponseTypeDecoder response = this.response();
+        if (null != response)
         {
             response.appendTo(builder);
         }
@@ -510,10 +544,17 @@ public class EiCreatedTransactionPayloadDecoder
         }
         builder.append('|');
         builder.append("transactionId=");
-        builder.append(transactionId());
+        builder.append(this.transactionId());
 
         limit(originalLimit);
 
         return builder;
+    }
+    
+    public EiCreatedTransactionPayloadDecoder sbeSkip()
+    {
+        sbeRewind();
+
+        return this;
     }
 }

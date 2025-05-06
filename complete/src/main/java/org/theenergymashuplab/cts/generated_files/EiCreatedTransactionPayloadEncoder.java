@@ -8,17 +8,17 @@ import org.agrona.MutableDirectBuffer;
  * See EiCreatedTransactionPayload
  */
 @SuppressWarnings("all")
-public class EiCreatedTransactionPayloadEncoder
+public final class EiCreatedTransactionPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 81;
+    public static final int BLOCK_LENGTH = 77;
     public static final int TEMPLATE_ID = 8;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiCreatedTransactionPayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +52,6 @@ public class EiCreatedTransactionPayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +63,6 @@ public class EiCreatedTransactionPayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -150,7 +144,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public EiCreatedTransactionPayloadEncoder counterPartyId(final long value)
     {
-        buffer.putLong(offset + 0, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 0, value, BYTE_ORDER);
         return this;
     }
 
@@ -202,7 +196,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public EiCreatedTransactionPayloadEncoder marketTransactionId(final long value)
     {
-        buffer.putLong(offset + 8, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 8, value, BYTE_ORDER);
         return this;
     }
 
@@ -254,7 +248,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public EiCreatedTransactionPayloadEncoder partyId(final long value)
     {
-        buffer.putLong(offset + 16, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 16, value, BYTE_ORDER);
         return this;
     }
 
@@ -306,7 +300,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public EiCreatedTransactionPayloadEncoder recipientTransactionId(final long value)
     {
-        buffer.putLong(offset + 24, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 24, value, BYTE_ORDER);
         return this;
     }
 
@@ -358,7 +352,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public EiCreatedTransactionPayloadEncoder refId(final long value)
     {
-        buffer.putLong(offset + 32, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 32, value, BYTE_ORDER);
         return this;
     }
 
@@ -380,7 +374,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public static int responseEncodingLength()
     {
-        return 33;
+        return 29;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -413,7 +407,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public static int transactionIdEncodingOffset()
     {
-        return 73;
+        return 69;
     }
 
     public static int transactionIdEncodingLength()
@@ -448,7 +442,7 @@ public class EiCreatedTransactionPayloadEncoder
 
     public EiCreatedTransactionPayloadEncoder transactionId(final long value)
     {
-        buffer.putLong(offset + 73, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 69, value, BYTE_ORDER);
         return this;
     }
 
@@ -471,7 +465,7 @@ public class EiCreatedTransactionPayloadEncoder
         }
 
         final EiCreatedTransactionPayloadDecoder decoder = new EiCreatedTransactionPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

@@ -5,6 +5,7 @@ package org.theenergymashuplab.cts.generated_files;
 /**
  * See TickerType.java
  */
+@SuppressWarnings("all")
 public enum TickerType
 {
     QUOTES((short)1),
@@ -27,11 +28,22 @@ public enum TickerType
         this.value = value;
     }
 
+    /**
+     * The raw encoded value in the Java type representation.
+     *
+     * @return the raw value encoded.
+     */
     public short value()
     {
         return value;
     }
 
+    /**
+     * Lookup the enum value representing the value.
+     *
+     * @param value encoded to be looked up.
+     * @return the enum value representing the value.
+     */
     public static TickerType get(final short value)
     {
         switch (value)

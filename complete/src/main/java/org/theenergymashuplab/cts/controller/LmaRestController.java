@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.springframework.beans.propertyeditors.ByteArrayPropertyEditor;
 // For RestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -539,8 +539,8 @@ public class LmaRestController {
 
 
 	@PostMapping("/manageSubscription")
-	public EiManagedTickerSubscriptionPayload postEiManagedTickerSubscription(
-			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload
+	public byte[] postEiManagedTickerSubscription(
+			@RequestBody byte[] eiManageTickerSubscriptionByteArr
 	){
 		EiManageTickerSubscriptionPayload tempManage;
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
@@ -552,18 +552,18 @@ public class LmaRestController {
 		restTemplate = builder.build();
 
 		// save CreateTender message as sent by TEUA
-		tempManage = eiManageTickerSubscriptionPayload;
+		//tempManage = eiManageTickerSubscriptionPayload;
 
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/manageSubscription",
-				tempManage,
-				EiManagedTickerSubscriptionPayload.class);
+		byte[] EiManagedTickerSubscription = restTemplate.postForObject("http://localhost:8080/lme/manageSubscription",
+				eiManageTickerSubscriptionByteArr,
+				byte[].class);
 
-		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
+		logger.trace("LMA after forward to LME and before return " + EiManagedTickerSubscription.toString());
 
-		return tempPostResponse;
+		return EiManagedTickerSubscription;
 
 	}
 

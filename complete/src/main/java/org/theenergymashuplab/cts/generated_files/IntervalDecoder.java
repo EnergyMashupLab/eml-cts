@@ -8,10 +8,11 @@ import org.agrona.DirectBuffer;
  * See Interval.java
  */
 @SuppressWarnings("all")
-public class IntervalDecoder
+public final class IntervalDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 24;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -129,8 +130,8 @@ public class IntervalDecoder
 
         builder.append('(');
         builder.append("duration=");
-        final DurationDecoder duration = duration();
-        if (duration != null)
+        final DurationDecoder duration = this.duration();
+        if (null != duration)
         {
             duration.appendTo(builder);
         }
@@ -140,8 +141,8 @@ public class IntervalDecoder
         }
         builder.append('|');
         builder.append("dtStart=");
-        final InstantDecoder dtStart = dtStart();
-        if (dtStart != null)
+        final InstantDecoder dtStart = this.dtStart();
+        if (null != dtStart)
         {
             dtStart.appendTo(builder);
         }

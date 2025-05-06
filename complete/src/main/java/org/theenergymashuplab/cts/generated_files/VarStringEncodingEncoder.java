@@ -8,11 +8,12 @@ import org.agrona.MutableDirectBuffer;
  * Variable length UTF-8 String.
  */
 @SuppressWarnings("all")
-public class VarStringEncodingEncoder
+public final class VarStringEncodingEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 4;
+    public static final String SEMANTIC_VERSION = "2.1";
+    public static final int ENCODED_LENGTH = -1;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -81,7 +82,7 @@ public class VarStringEncodingEncoder
 
     public VarStringEncodingEncoder length(final long value)
     {
-        buffer.putInt(offset + 0, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 0, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -93,7 +94,7 @@ public class VarStringEncodingEncoder
 
     public static int varDataEncodingLength()
     {
-        return 0;
+        return -1;
     }
 
     public static short varDataNullValue()

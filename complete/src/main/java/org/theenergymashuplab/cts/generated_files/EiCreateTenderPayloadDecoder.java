@@ -8,17 +8,17 @@ import org.agrona.DirectBuffer;
  * See EiCreateTenderPayload.java
  */
 @SuppressWarnings("all")
-public class EiCreateTenderPayloadDecoder
+public final class EiCreateTenderPayloadDecoder
 {
     public static final int BLOCK_LENGTH = 160;
     public static final int TEMPLATE_ID = 5;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiCreateTenderPayloadDecoder parentMessage = this;
     private DirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
     int actingBlockLength;
@@ -54,11 +54,6 @@ public class EiCreateTenderPayloadDecoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -74,13 +69,52 @@ public class EiCreateTenderPayloadDecoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
         limit(offset + actingBlockLength);
 
         return this;
+    }
+
+    public EiCreateTenderPayloadDecoder wrapAndApplyHeader(
+        final DirectBuffer buffer,
+        final int offset,
+        final MessageHeaderDecoder headerDecoder)
+    {
+        headerDecoder.wrap(buffer, offset);
+
+        final int templateId = headerDecoder.templateId();
+        if (TEMPLATE_ID != templateId)
+        {
+            throw new IllegalStateException("Invalid TEMPLATE_ID: " + templateId);
+        }
+
+        return wrap(
+            buffer,
+            offset + MessageHeaderDecoder.ENCODED_LENGTH,
+            headerDecoder.blockLength(),
+            headerDecoder.version());
+    }
+
+    public EiCreateTenderPayloadDecoder sbeRewind()
+    {
+        return wrap(buffer, offset, actingBlockLength, actingVersion);
+    }
+
+    public int sbeDecodedLength()
+    {
+        final int currentLimit = limit();
+        sbeSkip();
+        final int decodedLength = encodedLength();
+        limit(currentLimit);
+
+        return decodedLength;
+    }
+
+    public int actingVersion()
+    {
+        return actingVersion;
     }
 
     public int encodedLength()
@@ -186,7 +220,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long counterPartyId()
     {
-        return buffer.getLong(offset + 1, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 1, BYTE_ORDER);
     }
 
 
@@ -237,7 +271,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long executionInstructions()
     {
-        return buffer.getLong(offset + 9, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 9, BYTE_ORDER);
     }
 
 
@@ -288,7 +322,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long marketId()
     {
-        return buffer.getLong(offset + 17, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 17, BYTE_ORDER);
     }
 
 
@@ -339,7 +373,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long partyId()
     {
-        return buffer.getLong(offset + 25, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 25, BYTE_ORDER);
     }
 
 
@@ -390,7 +424,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long requestId()
     {
-        return buffer.getLong(offset + 33, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 33, BYTE_ORDER);
     }
 
 
@@ -441,7 +475,7 @@ public class EiCreateTenderPayloadDecoder
 
     public long segmentId()
     {
-        return (buffer.getInt(offset + 41, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 41, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -491,7 +525,7 @@ public class EiCreateTenderPayloadDecoder
         }
 
         final EiCreateTenderPayloadDecoder decoder = new EiCreateTenderPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+        decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
     }
@@ -504,7 +538,7 @@ public class EiCreateTenderPayloadDecoder
         }
 
         final int originalLimit = limit();
-        limit(initialOffset + actingBlockLength);
+        limit(offset + actingBlockLength);
         builder.append("[EiCreateTenderPayload](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -525,29 +559,29 @@ public class EiCreateTenderPayloadDecoder
         builder.append(BLOCK_LENGTH);
         builder.append("):");
         builder.append("atMostOne=");
-        builder.append(atMostOne());
+        builder.append(this.atMostOne());
         builder.append('|');
         builder.append("counterPartyId=");
-        builder.append(counterPartyId());
+        builder.append(this.counterPartyId());
         builder.append('|');
         builder.append("executionInstructions=");
-        builder.append(executionInstructions());
+        builder.append(this.executionInstructions());
         builder.append('|');
         builder.append("marketId=");
-        builder.append(marketId());
+        builder.append(this.marketId());
         builder.append('|');
         builder.append("partyId=");
-        builder.append(partyId());
+        builder.append(this.partyId());
         builder.append('|');
         builder.append("requestId=");
-        builder.append(requestId());
+        builder.append(this.requestId());
         builder.append('|');
         builder.append("segmentId=");
-        builder.append(segmentId());
+        builder.append(this.segmentId());
         builder.append('|');
         builder.append("tender=");
-        final EiTenderTypeDecoder tender = tender();
-        if (tender != null)
+        final EiTenderTypeDecoder tender = this.tender();
+        if (null != tender)
         {
             tender.appendTo(builder);
         }
@@ -559,5 +593,12 @@ public class EiCreateTenderPayloadDecoder
         limit(originalLimit);
 
         return builder;
+    }
+    
+    public EiCreateTenderPayloadDecoder sbeSkip()
+    {
+        sbeRewind();
+
+        return this;
     }
 }

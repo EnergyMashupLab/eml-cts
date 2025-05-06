@@ -8,10 +8,11 @@ import org.agrona.DirectBuffer;
  * See TenderIntervalDetail.java
  */
 @SuppressWarnings("all")
-public class TenderIntervalDetailDecoder
+public final class TenderIntervalDetailDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 40;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -114,7 +115,7 @@ public class TenderIntervalDetailDecoder
 
     public long price()
     {
-        return buffer.getLong(offset + 24, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 24, BYTE_ORDER);
     }
 
 
@@ -150,7 +151,7 @@ public class TenderIntervalDetailDecoder
 
     public long quantity()
     {
-        return buffer.getLong(offset + 32, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 32, BYTE_ORDER);
     }
 
 
@@ -173,8 +174,8 @@ public class TenderIntervalDetailDecoder
 
         builder.append('(');
         builder.append("interval=");
-        final IntervalDecoder interval = interval();
-        if (interval != null)
+        final IntervalDecoder interval = this.interval();
+        if (null != interval)
         {
             interval.appendTo(builder);
         }
@@ -184,10 +185,10 @@ public class TenderIntervalDetailDecoder
         }
         builder.append('|');
         builder.append("price=");
-        builder.append(price());
+        builder.append(this.price());
         builder.append('|');
         builder.append("quantity=");
-        builder.append(quantity());
+        builder.append(this.quantity());
         builder.append(')');
 
         return builder;

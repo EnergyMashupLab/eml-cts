@@ -8,17 +8,17 @@ import org.agrona.MutableDirectBuffer;
  * see MarketCreateTenderPayload.java
  */
 @SuppressWarnings("all")
-public class MarketCreateTenderPayloadEncoder
+public final class MarketCreateTenderPayloadEncoder
 {
     public static final int BLOCK_LENGTH = 29;
     public static final int TEMPLATE_ID = 1;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final MarketCreateTenderPayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +52,6 @@ public class MarketCreateTenderPayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +63,6 @@ public class MarketCreateTenderPayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -120,7 +114,7 @@ public class MarketCreateTenderPayloadEncoder
 
     public static int infoEncodingLength()
     {
-        return 4;
+        return -1;
     }
 
     public static String infoMetaAttribute(final MetaAttribute metaAttribute)
@@ -224,7 +218,7 @@ public class MarketCreateTenderPayloadEncoder
 
     public MarketCreateTenderPayloadEncoder quantity(final long value)
     {
-        buffer.putInt(offset + 5, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 5, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -276,7 +270,7 @@ public class MarketCreateTenderPayloadEncoder
 
     public MarketCreateTenderPayloadEncoder price(final long value)
     {
-        buffer.putInt(offset + 9, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 9, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -328,7 +322,7 @@ public class MarketCreateTenderPayloadEncoder
 
     public MarketCreateTenderPayloadEncoder ctsTenderId(final long value)
     {
-        buffer.putInt(offset + 13, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 13, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -427,7 +421,7 @@ public class MarketCreateTenderPayloadEncoder
         }
 
         final MarketCreateTenderPayloadDecoder decoder = new MarketCreateTenderPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

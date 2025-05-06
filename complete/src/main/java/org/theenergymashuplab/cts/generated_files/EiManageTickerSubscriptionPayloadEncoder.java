@@ -8,17 +8,17 @@ import org.agrona.MutableDirectBuffer;
  * See EiManageTickerSubscriptionPayload
  */
 @SuppressWarnings("all")
-public class EiManageTickerSubscriptionPayloadEncoder
+public final class EiManageTickerSubscriptionPayloadEncoder
 {
     public static final int BLOCK_LENGTH = 20;
     public static final int TEMPLATE_ID = 9;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiManageTickerSubscriptionPayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +52,6 @@ public class EiManageTickerSubscriptionPayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +63,6 @@ public class EiManageTickerSubscriptionPayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -186,7 +180,7 @@ public class EiManageTickerSubscriptionPayloadEncoder
 
     public EiManageTickerSubscriptionPayloadEncoder marketId(final long value)
     {
-        buffer.putLong(offset + 1, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 1, value, BYTE_ORDER);
         return this;
     }
 
@@ -238,7 +232,7 @@ public class EiManageTickerSubscriptionPayloadEncoder
 
     public EiManageTickerSubscriptionPayloadEncoder segmentId(final short value)
     {
-        buffer.putShort(offset + 9, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 9, value, BYTE_ORDER);
         return this;
     }
 
@@ -326,7 +320,7 @@ public class EiManageTickerSubscriptionPayloadEncoder
 
     public EiManageTickerSubscriptionPayloadEncoder subscriptionRequestId(final long value)
     {
-        buffer.putLong(offset + 12, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 12, value, BYTE_ORDER);
         return this;
     }
 
@@ -349,7 +343,7 @@ public class EiManageTickerSubscriptionPayloadEncoder
         }
 
         final EiManageTickerSubscriptionPayloadDecoder decoder = new EiManageTickerSubscriptionPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

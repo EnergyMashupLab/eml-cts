@@ -8,17 +8,17 @@ import org.agrona.DirectBuffer;
  * See EiManagedTickerSubscriptionPayload
  */
 @SuppressWarnings("all")
-public class EiManagedTickerSubscriptionPayloadDecoder
+public final class EiManagedTickerSubscriptionPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 47;
+    public static final int BLOCK_LENGTH = 1;
     public static final int TEMPLATE_ID = 10;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiManagedTickerSubscriptionPayloadDecoder parentMessage = this;
     private DirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
     int actingBlockLength;
@@ -54,11 +54,6 @@ public class EiManagedTickerSubscriptionPayloadDecoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -74,13 +69,52 @@ public class EiManagedTickerSubscriptionPayloadDecoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
         limit(offset + actingBlockLength);
 
         return this;
+    }
+
+    public EiManagedTickerSubscriptionPayloadDecoder wrapAndApplyHeader(
+        final DirectBuffer buffer,
+        final int offset,
+        final MessageHeaderDecoder headerDecoder)
+    {
+        headerDecoder.wrap(buffer, offset);
+
+        final int templateId = headerDecoder.templateId();
+        if (TEMPLATE_ID != templateId)
+        {
+            throw new IllegalStateException("Invalid TEMPLATE_ID: " + templateId);
+        }
+
+        return wrap(
+            buffer,
+            offset + MessageHeaderDecoder.ENCODED_LENGTH,
+            headerDecoder.blockLength(),
+            headerDecoder.version());
+    }
+
+    public EiManagedTickerSubscriptionPayloadDecoder sbeRewind()
+    {
+        return wrap(buffer, offset, actingBlockLength, actingVersion);
+    }
+
+    public int sbeDecodedLength()
+    {
+        final int currentLimit = limit();
+        sbeSkip();
+        final int decodedLength = encodedLength();
+        limit(currentLimit);
+
+        return decodedLength;
+    }
+
+    public int actingVersion()
+    {
+        return actingVersion;
     }
 
     public int encodedLength()
@@ -156,7 +190,7 @@ public class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int multicastListenReferenceEncodingLength()
     {
-        return 4;
+        return -1;
     }
 
     public static String multicastListenReferenceMetaAttribute(final MetaAttribute metaAttribute)
@@ -189,12 +223,12 @@ public class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int responseEncodingOffset()
     {
-        return 5;
+        return -1;
     }
 
     public static int responseEncodingLength()
     {
-        return 33;
+        return 29;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -211,7 +245,7 @@ public class EiManagedTickerSubscriptionPayloadDecoder
 
     public EiResponseTypeDecoder response()
     {
-        response.wrap(buffer, offset + 5);
+        response.wrap(buffer, offset + -1);
         return response;
     }
 
@@ -227,7 +261,7 @@ public class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int subscriptionActionTakenEncodingOffset()
     {
-        return 38;
+        return -1;
     }
 
     public static int subscriptionActionTakenEncodingLength()
@@ -247,12 +281,12 @@ public class EiManagedTickerSubscriptionPayloadDecoder
 
     public short subscriptionActionTakenRaw()
     {
-        return ((short)(buffer.getByte(offset + 38) & 0xFF));
+        return ((short)(buffer.getByte(offset + -1) & 0xFF));
     }
 
     public SubscriptionActionType subscriptionActionTaken()
     {
-        return SubscriptionActionType.get(((short)(buffer.getByte(offset + 38) & 0xFF)));
+        return SubscriptionActionType.get(((short)(buffer.getByte(offset + -1) & 0xFF)));
     }
 
 
@@ -268,7 +302,7 @@ public class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int subscriptionRequestIdEncodingOffset()
     {
-        return 39;
+        return -1;
     }
 
     public static int subscriptionRequestIdEncodingLength()
@@ -303,7 +337,7 @@ public class EiManagedTickerSubscriptionPayloadDecoder
 
     public long subscriptionRequestId()
     {
-        return buffer.getLong(offset + 39, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + -1, BYTE_ORDER);
     }
 
 
@@ -315,7 +349,7 @@ public class EiManagedTickerSubscriptionPayloadDecoder
         }
 
         final EiManagedTickerSubscriptionPayloadDecoder decoder = new EiManagedTickerSubscriptionPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+        decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
     }
@@ -328,7 +362,7 @@ public class EiManagedTickerSubscriptionPayloadDecoder
         }
 
         final int originalLimit = limit();
-        limit(initialOffset + actingBlockLength);
+        limit(offset + actingBlockLength);
         builder.append("[EiManagedTickerSubscriptionPayload](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -349,22 +383,11 @@ public class EiManagedTickerSubscriptionPayloadDecoder
         builder.append(BLOCK_LENGTH);
         builder.append("):");
         builder.append("tickerType=");
-        builder.append(tickerType());
-        builder.append('|');
-        builder.append("multicastListenReference=");
-        final VarStringEncodingDecoder multicastListenReference = multicastListenReference();
-        if (multicastListenReference != null)
-        {
-            multicastListenReference.appendTo(builder);
-        }
-        else
-        {
-            builder.append("null");
-        }
+        builder.append(this.tickerType());
         builder.append('|');
         builder.append("response=");
-        final EiResponseTypeDecoder response = response();
-        if (response != null)
+        final EiResponseTypeDecoder response = this.response();
+        if (null != response)
         {
             response.appendTo(builder);
         }
@@ -374,13 +397,20 @@ public class EiManagedTickerSubscriptionPayloadDecoder
         }
         builder.append('|');
         builder.append("subscriptionActionTaken=");
-        builder.append(subscriptionActionTaken());
+        builder.append(this.subscriptionActionTaken());
         builder.append('|');
         builder.append("subscriptionRequestId=");
-        builder.append(subscriptionRequestId());
+        builder.append(this.subscriptionRequestId());
 
         limit(originalLimit);
 
         return builder;
+    }
+    
+    public EiManagedTickerSubscriptionPayloadDecoder sbeSkip()
+    {
+        sbeRewind();
+
+        return this;
     }
 }

@@ -8,17 +8,17 @@ import org.agrona.MutableDirectBuffer;
  * see MarketCreatedTransactionPayload.java
  */
 @SuppressWarnings("all")
-public class MarketCreatedTransactionPayloadEncoder
+public final class MarketCreatedTransactionPayloadEncoder
 {
     public static final int BLOCK_LENGTH = 5;
     public static final int TEMPLATE_ID = 4;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final MarketCreatedTransactionPayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +52,6 @@ public class MarketCreatedTransactionPayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +63,6 @@ public class MarketCreatedTransactionPayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -120,7 +114,7 @@ public class MarketCreatedTransactionPayloadEncoder
 
     public static int infoEncodingLength()
     {
-        return 4;
+        return -1;
     }
 
     public static String infoMetaAttribute(final MetaAttribute metaAttribute)
@@ -195,7 +189,7 @@ public class MarketCreatedTransactionPayloadEncoder
         }
 
         final MarketCreatedTransactionPayloadDecoder decoder = new MarketCreatedTransactionPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

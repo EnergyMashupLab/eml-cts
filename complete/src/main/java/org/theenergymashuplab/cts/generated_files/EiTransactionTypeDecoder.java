@@ -8,10 +8,11 @@ import org.agrona.DirectBuffer;
  * See EiTransactionType.java
  */
 @SuppressWarnings("all")
-public class EiTransactionTypeDecoder
+public final class EiTransactionTypeDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 123;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -86,7 +87,7 @@ public class EiTransactionTypeDecoder
 
     public long marketTransactionId()
     {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 0, BYTE_ORDER);
     }
 
 
@@ -137,11 +138,11 @@ public class EiTransactionTypeDecoder
 
         builder.append('(');
         builder.append("marketTransactionId=");
-        builder.append(marketTransactionId());
+        builder.append(this.marketTransactionId());
         builder.append('|');
         builder.append("tender=");
-        final EiTenderTypeDecoder tender = tender();
-        if (tender != null)
+        final EiTenderTypeDecoder tender = this.tender();
+        if (null != tender)
         {
             tender.appendTo(builder);
         }

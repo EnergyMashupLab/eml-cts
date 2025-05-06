@@ -5,6 +5,7 @@ package org.theenergymashuplab.cts.generated_files;
 /**
  * See ResponseDetailType.java
  */
+@SuppressWarnings("all")
 public enum ResponseDetailType
 {
     UNSPECIFIED((short)1),
@@ -45,11 +46,22 @@ public enum ResponseDetailType
         this.value = value;
     }
 
+    /**
+     * The raw encoded value in the Java type representation.
+     *
+     * @return the raw value encoded.
+     */
     public short value()
     {
         return value;
     }
 
+    /**
+     * Lookup the enum value representing the value.
+     *
+     * @param value encoded to be looked up.
+     * @return the enum value representing the value.
+     */
     public static ResponseDetailType get(final short value)
     {
         switch (value)

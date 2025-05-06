@@ -8,17 +8,17 @@ import org.agrona.DirectBuffer;
  * See EiManageTickerSubscriptionPayload
  */
 @SuppressWarnings("all")
-public class EiManageTickerSubscriptionPayloadDecoder
+public final class EiManageTickerSubscriptionPayloadDecoder
 {
     public static final int BLOCK_LENGTH = 20;
     public static final int TEMPLATE_ID = 9;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiManageTickerSubscriptionPayloadDecoder parentMessage = this;
     private DirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
     int actingBlockLength;
@@ -54,11 +54,6 @@ public class EiManageTickerSubscriptionPayloadDecoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -74,13 +69,52 @@ public class EiManageTickerSubscriptionPayloadDecoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
         limit(offset + actingBlockLength);
 
         return this;
+    }
+
+    public EiManageTickerSubscriptionPayloadDecoder wrapAndApplyHeader(
+        final DirectBuffer buffer,
+        final int offset,
+        final MessageHeaderDecoder headerDecoder)
+    {
+        headerDecoder.wrap(buffer, offset);
+
+        final int templateId = headerDecoder.templateId();
+        if (TEMPLATE_ID != templateId)
+        {
+            throw new IllegalStateException("Invalid TEMPLATE_ID: " + templateId);
+        }
+
+        return wrap(
+            buffer,
+            offset + MessageHeaderDecoder.ENCODED_LENGTH,
+            headerDecoder.blockLength(),
+            headerDecoder.version());
+    }
+
+    public EiManageTickerSubscriptionPayloadDecoder sbeRewind()
+    {
+        return wrap(buffer, offset, actingBlockLength, actingVersion);
+    }
+
+    public int sbeDecodedLength()
+    {
+        final int currentLimit = limit();
+        sbeSkip();
+        final int decodedLength = encodedLength();
+        limit(currentLimit);
+
+        return decodedLength;
+    }
+
+    public int actingVersion()
+    {
+        return actingVersion;
     }
 
     public int encodedLength()
@@ -186,7 +220,7 @@ public class EiManageTickerSubscriptionPayloadDecoder
 
     public long marketId()
     {
-        return buffer.getLong(offset + 1, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 1, BYTE_ORDER);
     }
 
 
@@ -237,7 +271,7 @@ public class EiManageTickerSubscriptionPayloadDecoder
 
     public short segmentId()
     {
-        return buffer.getShort(offset + 9, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getShort(offset + 9, BYTE_ORDER);
     }
 
 
@@ -329,7 +363,7 @@ public class EiManageTickerSubscriptionPayloadDecoder
 
     public long subscriptionRequestId()
     {
-        return buffer.getLong(offset + 12, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 12, BYTE_ORDER);
     }
 
 
@@ -341,7 +375,7 @@ public class EiManageTickerSubscriptionPayloadDecoder
         }
 
         final EiManageTickerSubscriptionPayloadDecoder decoder = new EiManageTickerSubscriptionPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+        decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
     }
@@ -354,7 +388,7 @@ public class EiManageTickerSubscriptionPayloadDecoder
         }
 
         final int originalLimit = limit();
-        limit(initialOffset + actingBlockLength);
+        limit(offset + actingBlockLength);
         builder.append("[EiManageTickerSubscriptionPayload](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -375,22 +409,29 @@ public class EiManageTickerSubscriptionPayloadDecoder
         builder.append(BLOCK_LENGTH);
         builder.append("):");
         builder.append("tickerType=");
-        builder.append(tickerType());
+        builder.append(this.tickerType());
         builder.append('|');
         builder.append("marketId=");
-        builder.append(marketId());
+        builder.append(this.marketId());
         builder.append('|');
         builder.append("segmentId=");
-        builder.append(segmentId());
+        builder.append(this.segmentId());
         builder.append('|');
         builder.append("subscriptionActionRequested=");
-        builder.append(subscriptionActionRequested());
+        builder.append(this.subscriptionActionRequested());
         builder.append('|');
         builder.append("subscriptionRequestId=");
-        builder.append(subscriptionRequestId());
+        builder.append(this.subscriptionRequestId());
 
         limit(originalLimit);
 
         return builder;
+    }
+    
+    public EiManageTickerSubscriptionPayloadDecoder sbeSkip()
+    {
+        sbeRewind();
+
+        return this;
     }
 }

@@ -8,17 +8,17 @@ import org.agrona.DirectBuffer;
  * See EiAcceptQuotePayload
  */
 @SuppressWarnings("all")
-public class EiAcceptQuotePayloadDecoder
+public final class EiAcceptQuotePayloadDecoder
 {
     public static final int BLOCK_LENGTH = 163;
     public static final int TEMPLATE_ID = 11;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiAcceptQuotePayloadDecoder parentMessage = this;
     private DirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
     int actingBlockLength;
@@ -54,11 +54,6 @@ public class EiAcceptQuotePayloadDecoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -74,13 +69,52 @@ public class EiAcceptQuotePayloadDecoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
         limit(offset + actingBlockLength);
 
         return this;
+    }
+
+    public EiAcceptQuotePayloadDecoder wrapAndApplyHeader(
+        final DirectBuffer buffer,
+        final int offset,
+        final MessageHeaderDecoder headerDecoder)
+    {
+        headerDecoder.wrap(buffer, offset);
+
+        final int templateId = headerDecoder.templateId();
+        if (TEMPLATE_ID != templateId)
+        {
+            throw new IllegalStateException("Invalid TEMPLATE_ID: " + templateId);
+        }
+
+        return wrap(
+            buffer,
+            offset + MessageHeaderDecoder.ENCODED_LENGTH,
+            headerDecoder.blockLength(),
+            headerDecoder.version());
+    }
+
+    public EiAcceptQuotePayloadDecoder sbeRewind()
+    {
+        return wrap(buffer, offset, actingBlockLength, actingVersion);
+    }
+
+    public int sbeDecodedLength()
+    {
+        final int currentLimit = limit();
+        sbeSkip();
+        final int decodedLength = encodedLength();
+        limit(currentLimit);
+
+        return decodedLength;
+    }
+
+    public int actingVersion()
+    {
+        return actingVersion;
     }
 
     public int encodedLength()
@@ -145,7 +179,7 @@ public class EiAcceptQuotePayloadDecoder
 
     public long referencedQuoteId()
     {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 0, BYTE_ORDER);
     }
 
 
@@ -196,7 +230,7 @@ public class EiAcceptQuotePayloadDecoder
 
     public long counterPartyId()
     {
-        return buffer.getLong(offset + 8, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 8, BYTE_ORDER);
     }
 
 
@@ -247,7 +281,7 @@ public class EiAcceptQuotePayloadDecoder
 
     public long marketTransactionId()
     {
-        return buffer.getLong(offset + 16, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 16, BYTE_ORDER);
     }
 
 
@@ -298,7 +332,7 @@ public class EiAcceptQuotePayloadDecoder
 
     public long partyId()
     {
-        return buffer.getLong(offset + 24, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 24, BYTE_ORDER);
     }
 
 
@@ -349,7 +383,7 @@ public class EiAcceptQuotePayloadDecoder
 
     public long requestId()
     {
-        return buffer.getLong(offset + 32, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 32, BYTE_ORDER);
     }
 
 
@@ -399,7 +433,7 @@ public class EiAcceptQuotePayloadDecoder
         }
 
         final EiAcceptQuotePayloadDecoder decoder = new EiAcceptQuotePayloadDecoder();
-        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+        decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
     }
@@ -412,7 +446,7 @@ public class EiAcceptQuotePayloadDecoder
         }
 
         final int originalLimit = limit();
-        limit(initialOffset + actingBlockLength);
+        limit(offset + actingBlockLength);
         builder.append("[EiAcceptQuotePayload](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -433,23 +467,23 @@ public class EiAcceptQuotePayloadDecoder
         builder.append(BLOCK_LENGTH);
         builder.append("):");
         builder.append("referencedQuoteId=");
-        builder.append(referencedQuoteId());
+        builder.append(this.referencedQuoteId());
         builder.append('|');
         builder.append("counterPartyId=");
-        builder.append(counterPartyId());
+        builder.append(this.counterPartyId());
         builder.append('|');
         builder.append("marketTransactionId=");
-        builder.append(marketTransactionId());
+        builder.append(this.marketTransactionId());
         builder.append('|');
         builder.append("partyId=");
-        builder.append(partyId());
+        builder.append(this.partyId());
         builder.append('|');
         builder.append("requestId=");
-        builder.append(requestId());
+        builder.append(this.requestId());
         builder.append('|');
         builder.append("transaction=");
-        final EiTransactionTypeDecoder transaction = transaction();
-        if (transaction != null)
+        final EiTransactionTypeDecoder transaction = this.transaction();
+        if (null != transaction)
         {
             transaction.appendTo(builder);
         }
@@ -461,5 +495,12 @@ public class EiAcceptQuotePayloadDecoder
         limit(originalLimit);
 
         return builder;
+    }
+    
+    public EiAcceptQuotePayloadDecoder sbeSkip()
+    {
+        sbeRewind();
+
+        return this;
     }
 }

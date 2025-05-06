@@ -8,11 +8,12 @@ import org.agrona.DirectBuffer;
  * See EiResponseType.java
  */
 @SuppressWarnings("all")
-public class EiResponseTypeDecoder
+public final class EiResponseTypeDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
-    public static final int ENCODED_LENGTH = 33;
+    public static final String SEMANTIC_VERSION = "2.1";
+    public static final int ENCODED_LENGTH = 29;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -114,7 +115,7 @@ public class EiResponseTypeDecoder
 
     public long inResponseTo()
     {
-        return buffer.getLong(offset + 12, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 12, BYTE_ORDER);
     }
 
 
@@ -150,41 +151,13 @@ public class EiResponseTypeDecoder
 
     public long responseCode()
     {
-        return buffer.getLong(offset + 20, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 20, BYTE_ORDER);
     }
 
-
-    public static int responseDescriptionEncodingOffset()
-    {
-        return 28;
-    }
-
-    public static int responseDescriptionEncodingLength()
-    {
-        return 4;
-    }
-
-    public static int responseDescriptionSinceVersion()
-    {
-        return 0;
-    }
-
-    private final VarStringEncodingDecoder responseDescription = new VarStringEncodingDecoder();
-
-    /**
-     * Variable length UTF-8 String.
-     *
-     * @return VarStringEncodingDecoder : Variable length UTF-8 String.
-     */
-    public VarStringEncodingDecoder responseDescription()
-    {
-        responseDescription.wrap(buffer, offset + 28);
-        return responseDescription;
-    }
 
     public static int responseDetailEncodingOffset()
     {
-        return 32;
+        return 28;
     }
 
     public static int responseDetailEncodingLength()
@@ -199,12 +172,12 @@ public class EiResponseTypeDecoder
 
     public short responseDetailRaw()
     {
-        return ((short)(buffer.getByte(offset + 32) & 0xFF));
+        return ((short)(buffer.getByte(offset + 28) & 0xFF));
     }
 
     public ResponseDetailType responseDetail()
     {
-        return ResponseDetailType.get(((short)(buffer.getByte(offset + 32) & 0xFF)));
+        return ResponseDetailType.get(((short)(buffer.getByte(offset + 28) & 0xFF)));
     }
 
 
@@ -227,8 +200,8 @@ public class EiResponseTypeDecoder
 
         builder.append('(');
         builder.append("createdDateTime=");
-        final InstantDecoder createdDateTime = createdDateTime();
-        if (createdDateTime != null)
+        final InstantDecoder createdDateTime = this.createdDateTime();
+        if (null != createdDateTime)
         {
             createdDateTime.appendTo(builder);
         }
@@ -238,24 +211,13 @@ public class EiResponseTypeDecoder
         }
         builder.append('|');
         builder.append("inResponseTo=");
-        builder.append(inResponseTo());
+        builder.append(this.inResponseTo());
         builder.append('|');
         builder.append("responseCode=");
-        builder.append(responseCode());
-        builder.append('|');
-        builder.append("responseDescription=");
-        final VarStringEncodingDecoder responseDescription = responseDescription();
-        if (responseDescription != null)
-        {
-            responseDescription.appendTo(builder);
-        }
-        else
-        {
-            builder.append("null");
-        }
+        builder.append(this.responseCode());
         builder.append('|');
         builder.append("responseDetail=");
-        builder.append(responseDetail());
+        builder.append(this.responseDetail());
         builder.append(')');
 
         return builder;

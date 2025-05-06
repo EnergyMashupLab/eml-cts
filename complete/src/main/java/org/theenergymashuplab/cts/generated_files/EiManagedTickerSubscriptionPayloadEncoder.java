@@ -8,17 +8,17 @@ import org.agrona.MutableDirectBuffer;
  * See EiManagedTickerSubscriptionPayload
  */
 @SuppressWarnings("all")
-public class EiManagedTickerSubscriptionPayloadEncoder
+public final class EiManagedTickerSubscriptionPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 47;
+    public static final int BLOCK_LENGTH = 1;
     public static final int TEMPLATE_ID = 10;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiManagedTickerSubscriptionPayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +52,6 @@ public class EiManagedTickerSubscriptionPayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +63,6 @@ public class EiManagedTickerSubscriptionPayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -156,7 +150,7 @@ public class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int multicastListenReferenceEncodingLength()
     {
-        return 4;
+        return -1;
     }
 
     public static String multicastListenReferenceMetaAttribute(final MetaAttribute metaAttribute)
@@ -189,12 +183,12 @@ public class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int responseEncodingOffset()
     {
-        return 5;
+        return -1;
     }
 
     public static int responseEncodingLength()
     {
-        return 33;
+        return 29;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -211,7 +205,7 @@ public class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiResponseTypeEncoder response()
     {
-        response.wrap(buffer, offset + 5);
+        response.wrap(buffer, offset + -1);
         return response;
     }
 
@@ -227,7 +221,7 @@ public class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int subscriptionActionTakenEncodingOffset()
     {
-        return 38;
+        return -1;
     }
 
     public static int subscriptionActionTakenEncodingLength()
@@ -247,7 +241,7 @@ public class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiManagedTickerSubscriptionPayloadEncoder subscriptionActionTaken(final SubscriptionActionType value)
     {
-        buffer.putByte(offset + 38, (byte)value.value());
+        buffer.putByte(offset + -1, (byte)value.value());
         return this;
     }
 
@@ -263,7 +257,7 @@ public class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int subscriptionRequestIdEncodingOffset()
     {
-        return 39;
+        return -1;
     }
 
     public static int subscriptionRequestIdEncodingLength()
@@ -298,7 +292,7 @@ public class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiManagedTickerSubscriptionPayloadEncoder subscriptionRequestId(final long value)
     {
-        buffer.putLong(offset + 39, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + -1, value, BYTE_ORDER);
         return this;
     }
 
@@ -321,7 +315,7 @@ public class EiManagedTickerSubscriptionPayloadEncoder
         }
 
         final EiManagedTickerSubscriptionPayloadDecoder decoder = new EiManagedTickerSubscriptionPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

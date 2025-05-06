@@ -5,6 +5,7 @@ package org.theenergymashuplab.cts.generated_files;
 /**
  * See ResourceDesignatorType.java
  */
+@SuppressWarnings("all")
 public enum ResourceDesignatorType
 {
     POWER((short)1),
@@ -35,11 +36,22 @@ public enum ResourceDesignatorType
         this.value = value;
     }
 
+    /**
+     * The raw encoded value in the Java type representation.
+     *
+     * @return the raw value encoded.
+     */
     public short value()
     {
         return value;
     }
 
+    /**
+     * Lookup the enum value representing the value.
+     *
+     * @param value encoded to be looked up.
+     * @return the enum value representing the value.
+     */
     public static ResourceDesignatorType get(final short value)
     {
         switch (value)

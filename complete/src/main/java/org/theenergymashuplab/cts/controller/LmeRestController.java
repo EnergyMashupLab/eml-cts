@@ -31,6 +31,8 @@ import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
 import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiManageTickerSubscriptionPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiManagedTickerSubscriptionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -215,7 +217,7 @@ public class LmeRestController {
 		  int actingBlockLength = messageHeaderDecoder.blockLength();
 		  int actingVersion = messageHeaderDecoder.version();
 
-		  EiCreateTenderPayload EiCreateTenderResponse = EiCreateTenderPayloadEncoderDecoder.eiCreateTenderPayloadDecode(
+		  EiCreateTenderPayload EiCreateTenderResponse = EiTenderPayloadEncoderDecoder.eiCreateTenderDecode(
 		      eiCreateTenderPayloadDecoder, 
 		      buffer, 
 		      messageHeaderDecoder.encodedLength(), // <=== Start decoding body *AFTER* header
@@ -265,7 +267,7 @@ public class LmeRestController {
 		//int encodingLengthPlusHeader = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderEncode(eiCreatedTenderPayloadEncoder, buffer, messageHeaderEncoder, tempCreated);
 		buffer.wrap(new byte[4096]); // Or clear your existing buffer safely
 
-		int encodingLengthPlusHeader = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderEncode(
+		int encodingLengthPlusHeader = EiTenderPayloadEncoderDecoder.eiCreatedTenderEncode(
 		    eiCreatedTenderPayloadEncoder,
 		    buffer,
 		    messageHeaderEncoder,
@@ -806,14 +808,39 @@ public class LmeRestController {
 	}
 
 	@PostMapping("/manageSubscription")
-	public EiManagedTickerSubscriptionPayload postEiManagedTicker(
-			@RequestBody EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload) {
+	public byte[] postEiManagedTicker(
+			@RequestBody byte[] eiManageTickerSubscriptionByteArr) throws Exception {
 		TickerType tempTickerType;
 		SubscriptionActionType tempSubscriptionActionTaken;
 		RefIdType tempSubscriptionRequestId;
 		EiManageTickerSubscriptionPayload tempSubscribe = null;
 		EiManagedTickerSubscriptionPayload tempSubscribed;
+		
+		  MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+		  EiManageTickerSubscriptionPayloadDecoder eiManageTickerSubscriptionPayloadDecoder = new EiManageTickerSubscriptionPayloadDecoder();
+		  ByteBuffer bbf = ByteBuffer.allocate(4096);
+		  UnsafeBuffer buffer = new UnsafeBuffer(bbf);
+		  
+		  MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+		  EiManagedTickerSubscriptionPayloadEncoder eiManagedTickerSubscriptionPayloadEncoder = new EiManagedTickerSubscriptionPayloadEncoder();
+		
+			//Decode EiCreateTenderPayload
+		  buffer.putBytes(0, eiManageTickerSubscriptionByteArr, 0, eiManageTickerSubscriptionByteArr.length);
+		  messageHeaderDecoder.wrap(buffer, 0);
 
+		  // Now start decoding the body from the correct offset
+		  int templateId = messageHeaderDecoder.templateId();
+		  int actingBlockLength = messageHeaderDecoder.blockLength();
+		  int actingVersion = messageHeaderDecoder.version();
+
+		  EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload = EiManageTickerSubscriptionPayloadEncoderDecoder.EiManageTickerSubscriptionPayloadDecode(
+		      eiManageTickerSubscriptionPayloadDecoder, 
+		      buffer, 
+		      messageHeaderDecoder.encodedLength(), // <=== Start decoding body *AFTER* header
+		      actingBlockLength, 
+		      actingVersion
+		  );
+		  
 		tempSubscribe = eiManageTickerSubscriptionPayload;
 		tempTickerType = tempSubscribe.getTickerType();
 		tempSubscriptionActionTaken = tempSubscribe.getSubscriptionActionRequested();
@@ -845,12 +872,35 @@ public class LmeRestController {
 			}
 		}
 
-		tempSubscribed = new EiManagedTickerSubscriptionPayload(message, tempSubscriptionActionTaken,
-				new EiResponseType(), tempSubscriptionRequestId, tempTickerType);
+		tempSubscribed = new EiManagedTickerSubscriptionPayload(
+				message, 
+				tempSubscriptionActionTaken,
+				new EiResponseType(200, "OK", ResponseDetailType.SUCCESS), 
+				tempSubscriptionRequestId, 
+				tempTickerType);
 
 		tempSubscribed.setSubscriptionId(tempSubscribe.getSubscriptionId());
 
-		return tempSubscribed;
+		tempSubscribed.response.setCreatedDateTime(Instant.now());
+
+		//int encodingLengthPlusHeader = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderEncode(eiCreatedTenderPayloadEncoder, buffer, messageHeaderEncoder, tempCreated);
+		buffer.wrap(new byte[4096]); // Or clear your existing buffer safely
+
+		int encodingLengthPlusHeader = EiManagedTickerSubscriptionPayloadEncoderDecoder.EiManagedTickerSubscriptionEncode(
+		    eiManagedTickerSubscriptionPayloadEncoder,
+		    buffer,
+		    messageHeaderEncoder,
+		    tempSubscribed
+		);
+		
+		System.out.println("Decoded templateId: " + templateId);
+
+		
+		byte[] responseBytes = new byte[encodingLengthPlusHeader];
+		buffer.getBytes(0, responseBytes);
+		
+		
+		return responseBytes;
 	}
 
 	/**

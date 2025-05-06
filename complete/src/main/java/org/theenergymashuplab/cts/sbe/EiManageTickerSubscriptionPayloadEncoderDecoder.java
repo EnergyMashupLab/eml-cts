@@ -16,6 +16,8 @@ package org.theenergymashuplab.cts.sbe;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.MarketIdType;
 import org.theenergymashuplab.cts.RefIdType;
+import org.theenergymashuplab.cts.SubscriptionActionType;
+import org.theenergymashuplab.cts.TickerType;
 import org.theenergymashuplab.cts.controller.payloads.EiManageTickerSubscriptionPayload;
 import org.theenergymashuplab.cts.generated_files.EiManageTickerSubscriptionPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiManageTickerSubscriptionPayloadEncoder;
@@ -31,17 +33,15 @@ public class EiManageTickerSubscriptionPayloadEncoderDecoder {
 
 		eiManageTickerSubscriptionEncoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder);
 
-		eiManageTickerSubscriptionEncoder
-				.tickerType(ConvertTickerType(eiManageTickerSubscriptionPayload.getTickerType()));
+		eiManageTickerSubscriptionEncoder.tickerType(org.theenergymashuplab.cts.generated_files.TickerType.get(eiManageTickerSubscriptionPayload.getTickerType().getValue()));
 
 		eiManageTickerSubscriptionEncoder.marketId(eiManageTickerSubscriptionPayload.getMarketId().getMyUidId());
 		// segment id should be short
 		eiManageTickerSubscriptionEncoder.segmentId((short) eiManageTickerSubscriptionPayload.getSegmentId());
 
-		eiManageTickerSubscriptionEncoder.subscriptionActionRequested(
-				ConvertSubscriptionActionType(eiManageTickerSubscriptionPayload.getSubscriptionActionRequested()));
-		eiManageTickerSubscriptionEncoder
-				.subscriptionRequestId(eiManageTickerSubscriptionPayload.getSubscriptionRequestId().getMyUidId());
+		eiManageTickerSubscriptionEncoder.subscriptionActionRequested(org.theenergymashuplab.cts.generated_files.SubscriptionActionType.get(eiManageTickerSubscriptionPayload.getSubscriptionActionRequested().getValue()));
+
+		eiManageTickerSubscriptionEncoder.subscriptionRequestId(eiManageTickerSubscriptionPayload.getSubscriptionRequestId().getMyUidId());
 
 		System.out.println("\n-------------------------------------------------------------------------");
 		System.out.println("EiManageTickerSubscriptionEncode Encoded :-");
@@ -72,74 +72,15 @@ public class EiManageTickerSubscriptionPayloadEncoderDecoder {
 		EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload = new EiManageTickerSubscriptionPayload(
 				marketId,
 				eiManageTickerSubscriptionPayloadDecoder.segmentId(),
-				ConvertSubscriptionActionType(eiManageTickerSubscriptionPayloadDecoder.subscriptionActionRequested()),
+				SubscriptionActionType.fromSbe(
+						eiManageTickerSubscriptionPayloadDecoder.subscriptionActionRequested().value()),
 				subscriptionRequestId,
-				ConvertTickerType(eiManageTickerSubscriptionPayloadDecoder.tickerType()),
+				TickerType.fromSbe(eiManageTickerSubscriptionPayloadDecoder.tickerType().value()),
 				// the decoder does not have partyId
 				null);
 
 		return eiManageTickerSubscriptionPayload;
 
-	}
-
-	private static org.theenergymashuplab.cts.generated_files.TickerType ConvertTickerType(
-			org.theenergymashuplab.cts.TickerType tickerType) {
-		switch (tickerType) {
-			case QUOTES:
-				return org.theenergymashuplab.cts.generated_files.TickerType.QUOTES;
-			case RFQS:
-				return org.theenergymashuplab.cts.generated_files.TickerType.RFQS;
-			case TENDERS:
-				return org.theenergymashuplab.cts.generated_files.TickerType.TENDERS;
-			case TRANSACTIONS:
-				return org.theenergymashuplab.cts.generated_files.TickerType.TRANSACTIONS;
-			default:
-				return org.theenergymashuplab.cts.generated_files.TickerType.NULL_VAL;
-		}
-	}
-
-	private static org.theenergymashuplab.cts.TickerType ConvertTickerType(
-			org.theenergymashuplab.cts.generated_files.TickerType tickerType) {
-		switch (tickerType) {
-			case QUOTES:
-				return org.theenergymashuplab.cts.TickerType.QUOTES;
-			case RFQS:
-				return org.theenergymashuplab.cts.TickerType.RFQS;
-			case TENDERS:
-				return org.theenergymashuplab.cts.TickerType.TENDERS;
-			case TRANSACTIONS:
-				return org.theenergymashuplab.cts.TickerType.TRANSACTIONS;
-			default:
-				return null;
-		}
-	}
-
-	private static org.theenergymashuplab.cts.generated_files.SubscriptionActionType ConvertSubscriptionActionType(
-			org.theenergymashuplab.cts.SubscriptionActionType subscriptionActionType) {
-		switch (subscriptionActionType) {
-			case SNAPSHOT:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.SNAPSHOT;
-			case SNAPSHOT_AND_UPDATES:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.SNAPSHOT_AND_UPDATES;
-			case CANCEL:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.CANCEL;
-			default:
-				return org.theenergymashuplab.cts.generated_files.SubscriptionActionType.NULL_VAL;
-		}
-	}
-
-	private static org.theenergymashuplab.cts.SubscriptionActionType ConvertSubscriptionActionType(
-			org.theenergymashuplab.cts.generated_files.SubscriptionActionType subscriptionActionType) {
-		switch (subscriptionActionType) {
-			case SNAPSHOT:
-				return org.theenergymashuplab.cts.SubscriptionActionType.SNAPSHOT;
-			case SNAPSHOT_AND_UPDATES:
-				return org.theenergymashuplab.cts.SubscriptionActionType.SNAPSHOT_AND_UPDATES;
-			case CANCEL:
-				return org.theenergymashuplab.cts.SubscriptionActionType.CANCEL;
-			default:
-				return null;
-		}
 	}
 
 }

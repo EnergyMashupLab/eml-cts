@@ -8,10 +8,11 @@ import org.agrona.DirectBuffer;
  * See EiTenderType.java
  */
 @SuppressWarnings("all")
-public class EiTenderTypeDecoder
+public final class EiTenderTypeDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 115;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -86,7 +87,7 @@ public class EiTenderTypeDecoder
 
     public long marketOrderId()
     {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 0, BYTE_ORDER);
     }
 
 
@@ -122,7 +123,7 @@ public class EiTenderTypeDecoder
 
     public long tenderId()
     {
-        return buffer.getLong(offset + 8, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 8, BYTE_ORDER);
     }
 
 
@@ -158,7 +159,7 @@ public class EiTenderTypeDecoder
 
     public long referencedQuoteId()
     {
-        return buffer.getLong(offset + 16, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 16, BYTE_ORDER);
     }
 
 
@@ -209,17 +210,17 @@ public class EiTenderTypeDecoder
 
         builder.append('(');
         builder.append("marketOrderId=");
-        builder.append(marketOrderId());
+        builder.append(this.marketOrderId());
         builder.append('|');
         builder.append("tenderId=");
-        builder.append(tenderId());
+        builder.append(this.tenderId());
         builder.append('|');
         builder.append("referencedQuoteId=");
-        builder.append(referencedQuoteId());
+        builder.append(this.referencedQuoteId());
         builder.append('|');
         builder.append("tenderBase=");
-        final TenderBaseDecoder tenderBase = tenderBase();
-        if (tenderBase != null)
+        final TenderBaseDecoder tenderBase = this.tenderBase();
+        if (null != tenderBase)
         {
             tenderBase.appendTo(builder);
         }

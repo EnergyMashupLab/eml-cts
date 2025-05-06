@@ -8,10 +8,11 @@ import org.agrona.MutableDirectBuffer;
  * Message identifiers and length of message root.
  */
 @SuppressWarnings("all")
-public class MessageHeaderEncoder
+public final class MessageHeaderEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 8;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -81,7 +82,7 @@ public class MessageHeaderEncoder
 
     public MessageHeaderEncoder blockLength(final int value)
     {
-        buffer.putShort(offset + 0, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 0, (short)value, BYTE_ORDER);
         return this;
     }
 
@@ -113,7 +114,7 @@ public class MessageHeaderEncoder
 
     public MessageHeaderEncoder templateId(final int value)
     {
-        buffer.putShort(offset + 2, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 2, (short)value, BYTE_ORDER);
         return this;
     }
 
@@ -145,7 +146,7 @@ public class MessageHeaderEncoder
 
     public MessageHeaderEncoder schemaId(final int value)
     {
-        buffer.putShort(offset + 4, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 4, (short)value, BYTE_ORDER);
         return this;
     }
 
@@ -177,7 +178,7 @@ public class MessageHeaderEncoder
 
     public MessageHeaderEncoder version(final int value)
     {
-        buffer.putShort(offset + 6, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 6, (short)value, BYTE_ORDER);
         return this;
     }
 

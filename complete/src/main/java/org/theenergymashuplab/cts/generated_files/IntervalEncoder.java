@@ -8,10 +8,11 @@ import org.agrona.MutableDirectBuffer;
  * See Interval.java
  */
 @SuppressWarnings("all")
-public class IntervalEncoder
+public final class IntervalEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 24;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 

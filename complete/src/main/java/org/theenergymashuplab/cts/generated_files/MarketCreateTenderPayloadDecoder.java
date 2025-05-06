@@ -8,17 +8,17 @@ import org.agrona.DirectBuffer;
  * see MarketCreateTenderPayload.java
  */
 @SuppressWarnings("all")
-public class MarketCreateTenderPayloadDecoder
+public final class MarketCreateTenderPayloadDecoder
 {
     public static final int BLOCK_LENGTH = 29;
     public static final int TEMPLATE_ID = 1;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final MarketCreateTenderPayloadDecoder parentMessage = this;
     private DirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
     int actingBlockLength;
@@ -54,11 +54,6 @@ public class MarketCreateTenderPayloadDecoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -74,13 +69,52 @@ public class MarketCreateTenderPayloadDecoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
         limit(offset + actingBlockLength);
 
         return this;
+    }
+
+    public MarketCreateTenderPayloadDecoder wrapAndApplyHeader(
+        final DirectBuffer buffer,
+        final int offset,
+        final MessageHeaderDecoder headerDecoder)
+    {
+        headerDecoder.wrap(buffer, offset);
+
+        final int templateId = headerDecoder.templateId();
+        if (TEMPLATE_ID != templateId)
+        {
+            throw new IllegalStateException("Invalid TEMPLATE_ID: " + templateId);
+        }
+
+        return wrap(
+            buffer,
+            offset + MessageHeaderDecoder.ENCODED_LENGTH,
+            headerDecoder.blockLength(),
+            headerDecoder.version());
+    }
+
+    public MarketCreateTenderPayloadDecoder sbeRewind()
+    {
+        return wrap(buffer, offset, actingBlockLength, actingVersion);
+    }
+
+    public int sbeDecodedLength()
+    {
+        final int currentLimit = limit();
+        sbeSkip();
+        final int decodedLength = encodedLength();
+        limit(currentLimit);
+
+        return decodedLength;
+    }
+
+    public int actingVersion()
+    {
+        return actingVersion;
     }
 
     public int encodedLength()
@@ -115,7 +149,7 @@ public class MarketCreateTenderPayloadDecoder
 
     public static int infoEncodingLength()
     {
-        return 4;
+        return -1;
     }
 
     public static String infoMetaAttribute(final MetaAttribute metaAttribute)
@@ -224,7 +258,7 @@ public class MarketCreateTenderPayloadDecoder
 
     public long quantity()
     {
-        return (buffer.getInt(offset + 5, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 5, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -275,7 +309,7 @@ public class MarketCreateTenderPayloadDecoder
 
     public long price()
     {
-        return (buffer.getInt(offset + 9, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 9, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -326,7 +360,7 @@ public class MarketCreateTenderPayloadDecoder
 
     public long ctsTenderId()
     {
-        return (buffer.getInt(offset + 13, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 13, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -414,7 +448,7 @@ public class MarketCreateTenderPayloadDecoder
         }
 
         final MarketCreateTenderPayloadDecoder decoder = new MarketCreateTenderPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+        decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
     }
@@ -427,7 +461,7 @@ public class MarketCreateTenderPayloadDecoder
         }
 
         final int originalLimit = limit();
-        limit(initialOffset + actingBlockLength);
+        limit(offset + actingBlockLength);
         builder.append("[MarketCreateTenderPayload](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -447,32 +481,21 @@ public class MarketCreateTenderPayloadDecoder
         }
         builder.append(BLOCK_LENGTH);
         builder.append("):");
-        builder.append("info=");
-        final VarStringEncodingDecoder info = info();
-        if (info != null)
-        {
-            info.appendTo(builder);
-        }
-        else
-        {
-            builder.append("null");
-        }
-        builder.append('|');
         builder.append("side=");
-        builder.append(side());
+        builder.append(this.side());
         builder.append('|');
         builder.append("quantity=");
-        builder.append(quantity());
+        builder.append(this.quantity());
         builder.append('|');
         builder.append("price=");
-        builder.append(price());
+        builder.append(this.price());
         builder.append('|');
         builder.append("ctsTenderId=");
-        builder.append(ctsTenderId());
+        builder.append(this.ctsTenderId());
         builder.append('|');
         builder.append("expireTime=");
-        final BridgeInstantDecoder expireTime = expireTime();
-        if (expireTime != null)
+        final BridgeInstantDecoder expireTime = this.expireTime();
+        if (null != expireTime)
         {
             expireTime.appendTo(builder);
         }
@@ -482,8 +505,8 @@ public class MarketCreateTenderPayloadDecoder
         }
         builder.append('|');
         builder.append("bridgeInterval=");
-        final BridgeIntervalDecoder bridgeInterval = bridgeInterval();
-        if (bridgeInterval != null)
+        final BridgeIntervalDecoder bridgeInterval = this.bridgeInterval();
+        if (null != bridgeInterval)
         {
             bridgeInterval.appendTo(builder);
         }
@@ -495,5 +518,12 @@ public class MarketCreateTenderPayloadDecoder
         limit(originalLimit);
 
         return builder;
+    }
+    
+    public MarketCreateTenderPayloadDecoder sbeSkip()
+    {
+        sbeRewind();
+
+        return this;
     }
 }

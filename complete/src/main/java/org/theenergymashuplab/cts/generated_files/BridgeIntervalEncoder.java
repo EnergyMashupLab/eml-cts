@@ -8,10 +8,11 @@ import org.agrona.MutableDirectBuffer;
  * see BridgeInterval.java
  */
 @SuppressWarnings("all")
-public class BridgeIntervalEncoder
+public final class BridgeIntervalEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 8;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -81,7 +82,7 @@ public class BridgeIntervalEncoder
 
     public BridgeIntervalEncoder durationInMinutes(final long value)
     {
-        buffer.putInt(offset + 0, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 0, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -113,7 +114,7 @@ public class BridgeIntervalEncoder
 
     public BridgeIntervalEncoder length(final long value)
     {
-        buffer.putInt(offset + 4, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 4, (int)value, BYTE_ORDER);
         return this;
     }
 

@@ -8,10 +8,11 @@ import org.agrona.DirectBuffer;
  * See TenderBase.java
  */
 @SuppressWarnings("all")
-public class TenderBaseDecoder
+public final class TenderBaseDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 91;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -112,7 +113,7 @@ public class TenderBaseDecoder
 
     public long executionInstructions()
     {
-        return buffer.getLong(offset + 1, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 1, BYTE_ORDER);
     }
 
 
@@ -176,7 +177,7 @@ public class TenderBaseDecoder
 
     public long marketId()
     {
-        return buffer.getLong(offset + 21, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 21, BYTE_ORDER);
     }
 
 
@@ -212,7 +213,7 @@ public class TenderBaseDecoder
 
     public long priceScale()
     {
-        return (buffer.getInt(offset + 29, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 29, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -248,7 +249,7 @@ public class TenderBaseDecoder
 
     public long quantityScale()
     {
-        return (buffer.getInt(offset + 33, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 33, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -310,7 +311,7 @@ public class TenderBaseDecoder
 
     public long segmentId()
     {
-        return (buffer.getInt(offset + 38, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 38, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -400,7 +401,7 @@ public class TenderBaseDecoder
 
     public long warrants()
     {
-        return buffer.getLong(offset + 83, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 83, BYTE_ORDER);
     }
 
 
@@ -423,14 +424,14 @@ public class TenderBaseDecoder
 
         builder.append('(');
         builder.append("allOrNone=");
-        builder.append(allOrNone());
+        builder.append(this.allOrNone());
         builder.append('|');
         builder.append("executionInstructions=");
-        builder.append(executionInstructions());
+        builder.append(this.executionInstructions());
         builder.append('|');
         builder.append("expirationTime=");
-        final InstantDecoder expirationTime = expirationTime();
-        if (expirationTime != null)
+        final InstantDecoder expirationTime = this.expirationTime();
+        if (null != expirationTime)
         {
             expirationTime.appendTo(builder);
         }
@@ -440,26 +441,26 @@ public class TenderBaseDecoder
         }
         builder.append('|');
         builder.append("marketId=");
-        builder.append(marketId());
+        builder.append(this.marketId());
         builder.append('|');
         builder.append("priceScale=");
-        builder.append(priceScale());
+        builder.append(this.priceScale());
         builder.append('|');
         builder.append("quantityScale=");
-        builder.append(quantityScale());
+        builder.append(this.quantityScale());
         builder.append('|');
         builder.append("resourceDesignator=");
-        builder.append(resourceDesignator());
+        builder.append(this.resourceDesignator());
         builder.append('|');
         builder.append("segmentId=");
-        builder.append(segmentId());
+        builder.append(this.segmentId());
         builder.append('|');
         builder.append("side=");
-        builder.append(side());
+        builder.append(this.side());
         builder.append('|');
         builder.append("tenderDetail=");
-        final TenderIntervalDetailDecoder tenderDetail = tenderDetail();
-        if (tenderDetail != null)
+        final TenderIntervalDetailDecoder tenderDetail = this.tenderDetail();
+        if (null != tenderDetail)
         {
             tenderDetail.appendTo(builder);
         }
@@ -469,7 +470,7 @@ public class TenderBaseDecoder
         }
         builder.append('|');
         builder.append("warrants=");
-        builder.append(warrants());
+        builder.append(this.warrants());
         builder.append(')');
 
         return builder;

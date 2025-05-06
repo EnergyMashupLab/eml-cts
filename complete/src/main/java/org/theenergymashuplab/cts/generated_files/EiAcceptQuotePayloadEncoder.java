@@ -8,17 +8,17 @@ import org.agrona.MutableDirectBuffer;
  * See EiAcceptQuotePayload
  */
 @SuppressWarnings("all")
-public class EiAcceptQuotePayloadEncoder
+public final class EiAcceptQuotePayloadEncoder
 {
     public static final int BLOCK_LENGTH = 163;
     public static final int TEMPLATE_ID = 11;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiAcceptQuotePayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +52,6 @@ public class EiAcceptQuotePayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +63,6 @@ public class EiAcceptQuotePayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -150,7 +144,7 @@ public class EiAcceptQuotePayloadEncoder
 
     public EiAcceptQuotePayloadEncoder referencedQuoteId(final long value)
     {
-        buffer.putLong(offset + 0, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 0, value, BYTE_ORDER);
         return this;
     }
 
@@ -202,7 +196,7 @@ public class EiAcceptQuotePayloadEncoder
 
     public EiAcceptQuotePayloadEncoder counterPartyId(final long value)
     {
-        buffer.putLong(offset + 8, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 8, value, BYTE_ORDER);
         return this;
     }
 
@@ -254,7 +248,7 @@ public class EiAcceptQuotePayloadEncoder
 
     public EiAcceptQuotePayloadEncoder marketTransactionId(final long value)
     {
-        buffer.putLong(offset + 16, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 16, value, BYTE_ORDER);
         return this;
     }
 
@@ -306,7 +300,7 @@ public class EiAcceptQuotePayloadEncoder
 
     public EiAcceptQuotePayloadEncoder partyId(final long value)
     {
-        buffer.putLong(offset + 24, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 24, value, BYTE_ORDER);
         return this;
     }
 
@@ -358,7 +352,7 @@ public class EiAcceptQuotePayloadEncoder
 
     public EiAcceptQuotePayloadEncoder requestId(final long value)
     {
-        buffer.putLong(offset + 32, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 32, value, BYTE_ORDER);
         return this;
     }
 
@@ -419,7 +413,7 @@ public class EiAcceptQuotePayloadEncoder
         }
 
         final EiAcceptQuotePayloadDecoder decoder = new EiAcceptQuotePayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

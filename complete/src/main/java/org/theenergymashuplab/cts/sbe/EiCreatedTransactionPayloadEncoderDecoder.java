@@ -24,6 +24,7 @@ import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadDec
 import org.theenergymashuplab.cts.generated_files.EiCreatedTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 import org.theenergymashuplab.cts.generated_files.ResponseDetailType;
+import org.theenergymashuplab.cts.generated_files.VarStringEncodingDecoder;
 import org.theenergymashuplab.cts.generated_files.VarStringEncodingEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -39,66 +40,45 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		encoder.wrapAndApplyHeader(directBuffer, 0, messageHeaderEncoder);
 
 		// Counter Party Id field
-		encoder.counterPartyId(payload.getCounterPartyId().getMyUidId());
-		//Market Transaction Id
-		encoder.marketTransactionId(payload.getMarketTransactionId().getMyUidId());
-		// Party Id field
-		encoder.partyId(payload.getPartyId().getMyUidId());
-		// Recipient Transaction Id field
-		encoder.recipientTransactionId(payload.getRecipientTransactionId().getMyUidId());
-		// RefId field
-		encoder.refId(payload.getRefId().getMyUidId());
+		encoder.counterPartyId(payload.getCounterPartyId().getMyUidId())
+		.marketTransactionId(payload.getMarketTransactionId().getMyUidId())
+		.partyId(payload.getPartyId().getMyUidId())
+		.recipientTransactionId(payload.getRecipientTransactionId().getMyUidId())
+		.refId(payload.getRefId().getMyUidId());
 
 		// Response field ----
-		// Response -> Created Date Time ---
 		Instant responseCreatedDateTime = payload.getResponse().getCreatedDateTime();
-		
 		encoder.response().createdDateTime()
 				.seconds(responseCreatedDateTime.getEpochSecond())
 				.nano(responseCreatedDateTime.getNano());
 		
-		// Response-> inResponseTo
-		encoder.response().inResponseTo(payload.getResponse().getInResponseTo().getMyUidId());
+		
+		// 1. Encode the description
+//		String descString = payload.getResponse().getResponseDescription();
+//		byte[] descBytes = descString.getBytes(StandardCharsets.UTF_8);
+//
+//		VarStringEncodingEncoder descEnc = encoder.response().responseDescription();
+//		descEnc.length(descBytes.length);
+//
+//		// 2. Write string data after length field
+//		int descDataOffset = descEnc.offset() + VarStringEncodingEncoder.lengthEncodingLength();
+//		descEnc.buffer().putBytes(descDataOffset, descBytes);
 
-		// Response -> Response Code
-		encoder.response().responseCode(payload.getResponse().getResponseCode());
+		// ⚠️ DO NOT blindly set encoder.limit(...) here, let SBE handle this internally
+		// Remove: encoder.limit(descDataOffset + descBytes.length);
 
-		// Response -> Description		
-		// -- Safe Encoding --
-		String description = payload.getResponse().getResponseDescription();
-		byte[] descBytes = description.getBytes(StandardCharsets.UTF_8);
-		UnsafeBuffer descBuffer = new UnsafeBuffer(descBytes);
-
-		// Safe - capture encoder object
-		var responseDescriptionEncoder = encoder.response().responseDescription();
-
-		// Safe - calculate starting offset
-		int offset = responseDescriptionEncoder.offset();
-
-		// 🛠 1. Write length manually into buffer at offset
-		responseDescriptionEncoder.buffer().putInt(offset, descBytes.length);
-
-		// 🛠 2. Write UTF-8 bytes manually at offset+4
-		responseDescriptionEncoder.buffer().putBytes(
-		    offset + 4,
-		    descBuffer,
-		    0,
-		    descBytes.length
-		);
-
-
-
+		    
 	    // Encode enum: ResponseDetailType
-		encoder.response().responseDetail(org.theenergymashuplab.cts.generated_files.ResponseDetailType.valueOf(payload.getResponse().getResponseDetail().name()));
-
+		encoder.response().responseDetail(org.theenergymashuplab.cts.generated_files.ResponseDetailType.valueOf(payload.getResponse().getResponseDetail().name())); 
 		// Transaction Id field
-		encoder
-				.transactionId(payload.getTransactionId().getMyUidId());
+		encoder.transactionId(payload.getTransactionId().getMyUidId());
 
+		
+		
 		System.out.println("\n-------------------------------------------------------------------------");
-		System.out.println("EiCreatedTransactionEncode Encoded :-");
+		System.out.println("EiCreatedTransaction encoded :-");
 		System.out.println(encoder.toString());
-
+		
 		return messageHeaderEncoder.ENCODED_LENGTH + encoder.encodedLength();
 
 	}
@@ -135,8 +115,8 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		refId.setMyUidId(eiCreatedTransactionDecoder.refId());
 
 		// Response
-		EiResponseType response = EiResponseTypeEncoderDecoder.Decode(eiCreatedTransactionDecoder.response());
-
+		//EiResponseType response = EiResponseTypeEncoderDecoder.Decode(eiCreatedTransactionDecoder.response());
+		EiResponseType response = new EiResponseType();
 		
 		org.theenergymashuplab.cts.ResponseDetailType appEnum = org.theenergymashuplab.cts.ResponseDetailType.valueOf(eiCreatedTransactionDecoder.response().responseDetail().name());
 
@@ -146,6 +126,20 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 			int nanos = (int) eiCreatedTransactionDecoder.response().createdDateTime().nano();
 			response.setCreatedDateTime(Instant.ofEpochSecond(seconds, nanos));
 			
+			
+			
+//		    // Decode responseDescription using VarStringEncodingDecoder
+//		    VarStringEncodingDecoder descDec = eiCreatedTransactionDecoder.response().responseDescription();
+//		    int descLength = (int) descDec.length();
+//		    int descOffset = descDec.offset() + VarStringEncodingDecoder.lengthEncodingLength();
+//		    byte[] descBytes = new byte[descLength];
+//		    descDec.buffer().getBytes(descOffset, descBytes);
+//		    String decoded = new String(descBytes, StandardCharsets.UTF_8);
+//		    response.setResponseDescription(decoded);
+
+
+
+			
 		RefIdType inResponseTo= new RefIdType();
 		inResponseTo.setMyUidId(eiCreatedTransactionDecoder.response().inResponseTo());
 	
@@ -153,16 +147,7 @@ public class EiCreatedTransactionPayloadEncoderDecoder {
 		
 		response.setResponseCode(eiCreatedTransactionDecoder.response().responseCode());
 		
-		int descriptionLength = (int) eiCreatedTransactionDecoder.response().responseDescription().length();
-		byte[] descriptionBytes = new byte[descriptionLength];
-		eiCreatedTransactionDecoder.response().responseDescription().buffer().getBytes(
-		    eiCreatedTransactionDecoder.response().responseDescription().offset() + 4,
-		    descriptionBytes,
-		    0,
-		    descriptionLength
-		);
-		String decodedDescription = new String(descriptionBytes, StandardCharsets.UTF_8);
-		response.setResponseDescription(decodedDescription);
+
 
 		response.setResponseDetail(appEnum);
 		//response.setResponseDetail(responseDetail);

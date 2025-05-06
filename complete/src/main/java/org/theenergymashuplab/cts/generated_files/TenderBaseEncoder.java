@@ -8,10 +8,11 @@ import org.agrona.MutableDirectBuffer;
  * See TenderBase.java
  */
 @SuppressWarnings("all")
-public class TenderBaseEncoder
+public final class TenderBaseEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 91;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -97,7 +98,7 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder executionInstructions(final long value)
     {
-        buffer.putLong(offset + 1, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 1, value, BYTE_ORDER);
         return this;
     }
 
@@ -152,7 +153,7 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder marketId(final long value)
     {
-        buffer.putLong(offset + 21, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 21, value, BYTE_ORDER);
         return this;
     }
 
@@ -184,7 +185,7 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder priceScale(final long value)
     {
-        buffer.putInt(offset + 29, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 29, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -216,7 +217,7 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder quantityScale(final long value)
     {
-        buffer.putInt(offset + 33, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 33, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -264,7 +265,7 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder segmentId(final long value)
     {
-        buffer.putInt(offset + 38, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 38, (int)value, BYTE_ORDER);
         return this;
     }
 
@@ -335,7 +336,7 @@ public class TenderBaseEncoder
 
     public TenderBaseEncoder warrants(final long value)
     {
-        buffer.putLong(offset + 83, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 83, value, BYTE_ORDER);
         return this;
     }
 

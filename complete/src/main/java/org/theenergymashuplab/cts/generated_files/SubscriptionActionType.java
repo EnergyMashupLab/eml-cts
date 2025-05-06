@@ -5,6 +5,7 @@ package org.theenergymashuplab.cts.generated_files;
 /**
  * See SubscriptionActionType.java
  */
+@SuppressWarnings("all")
 public enum SubscriptionActionType
 {
     SNAPSHOT((short)1),
@@ -25,11 +26,22 @@ public enum SubscriptionActionType
         this.value = value;
     }
 
+    /**
+     * The raw encoded value in the Java type representation.
+     *
+     * @return the raw value encoded.
+     */
     public short value()
     {
         return value;
     }
 
+    /**
+     * Lookup the enum value representing the value.
+     *
+     * @param value encoded to be looked up.
+     * @return the enum value representing the value.
+     */
     public static SubscriptionActionType get(final short value)
     {
         switch (value)

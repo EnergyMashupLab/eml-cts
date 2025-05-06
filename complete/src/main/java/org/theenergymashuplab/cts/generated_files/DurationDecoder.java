@@ -8,10 +8,11 @@ import org.agrona.DirectBuffer;
  * See java.time.Duration. In seconds (signed) and nanoseconds (unsiqned)
  */
 @SuppressWarnings("all")
-public class DurationDecoder
+public final class DurationDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 12;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -86,7 +87,7 @@ public class DurationDecoder
 
     public long seconds()
     {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 0, BYTE_ORDER);
     }
 
 
@@ -122,7 +123,7 @@ public class DurationDecoder
 
     public long nano()
     {
-        return (buffer.getInt(offset + 8, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 8, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -145,10 +146,10 @@ public class DurationDecoder
 
         builder.append('(');
         builder.append("seconds=");
-        builder.append(seconds());
+        builder.append(this.seconds());
         builder.append('|');
         builder.append("nano=");
-        builder.append(nano());
+        builder.append(this.nano());
         builder.append(')');
 
         return builder;

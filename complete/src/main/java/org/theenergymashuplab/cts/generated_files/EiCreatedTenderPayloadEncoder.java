@@ -2,23 +2,24 @@
 package org.theenergymashuplab.cts.generated_files;
 
 import org.agrona.MutableDirectBuffer;
+import org.agrona.DirectBuffer;
 
 
 /**
  * See EiCreatedTenderPayload.java
  */
 @SuppressWarnings("all")
-public class EiCreatedTenderPayloadEncoder
+public final class EiCreatedTenderPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 73;
+    public static final int BLOCK_LENGTH = 69;
     public static final int TEMPLATE_ID = 6;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final EiCreatedTenderPayloadEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -52,11 +53,6 @@ public class EiCreatedTenderPayloadEncoder
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -68,7 +64,6 @@ public class EiCreatedTenderPayloadEncoder
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -150,7 +145,7 @@ public class EiCreatedTenderPayloadEncoder
 
     public EiCreatedTenderPayloadEncoder counterPartyId(final long value)
     {
-        buffer.putLong(offset + 0, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 0, value, BYTE_ORDER);
         return this;
     }
 
@@ -202,7 +197,7 @@ public class EiCreatedTenderPayloadEncoder
 
     public EiCreatedTenderPayloadEncoder inResponseTo(final long value)
     {
-        buffer.putLong(offset + 8, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 8, value, BYTE_ORDER);
         return this;
     }
 
@@ -254,7 +249,7 @@ public class EiCreatedTenderPayloadEncoder
 
     public EiCreatedTenderPayloadEncoder marketOrderId(final long value)
     {
-        buffer.putLong(offset + 16, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 16, value, BYTE_ORDER);
         return this;
     }
 
@@ -306,7 +301,7 @@ public class EiCreatedTenderPayloadEncoder
 
     public EiCreatedTenderPayloadEncoder partyId(final long value)
     {
-        buffer.putLong(offset + 24, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 24, value, BYTE_ORDER);
         return this;
     }
 
@@ -328,7 +323,7 @@ public class EiCreatedTenderPayloadEncoder
 
     public static int responseEncodingLength()
     {
-        return 33;
+        return 29;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -361,7 +356,7 @@ public class EiCreatedTenderPayloadEncoder
 
     public static int tenderIdEncodingOffset()
     {
-        return 65;
+        return 61;
     }
 
     public static int tenderIdEncodingLength()
@@ -396,10 +391,86 @@ public class EiCreatedTenderPayloadEncoder
 
     public EiCreatedTenderPayloadEncoder tenderId(final long value)
     {
-        buffer.putLong(offset + 65, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 61, value, BYTE_ORDER);
         return this;
     }
 
+
+    public static int responseDescriptionId()
+    {
+        return 7;
+    }
+
+    public static String responseDescriptionCharacterEncoding()
+    {
+        return java.nio.charset.StandardCharsets.UTF_8.name();
+    }
+
+    public static String responseDescriptionMetaAttribute(final MetaAttribute metaAttribute)
+    {
+        if (MetaAttribute.PRESENCE == metaAttribute)
+        {
+            return "required";
+        }
+
+        return "";
+    }
+
+    public static int responseDescriptionHeaderLength()
+    {
+        return 4;
+    }
+
+    public EiCreatedTenderPayloadEncoder putResponseDescription(final DirectBuffer src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiCreatedTenderPayloadEncoder putResponseDescription(final byte[] src, final int srcOffset, final int length)
+    {
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, src, srcOffset, length);
+
+        return this;
+    }
+
+    public EiCreatedTenderPayloadEncoder responseDescription(final String value)
+    {
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        final int length = bytes.length;
+        if (length > 1073741824)
+        {
+            throw new IllegalStateException("length > maxValue for type: " + length);
+        }
+
+        final int headerLength = 4;
+        final int limit = parentMessage.limit();
+        parentMessage.limit(limit + headerLength + length);
+        buffer.putInt(limit, length, BYTE_ORDER);
+        buffer.putBytes(limit + headerLength, bytes, 0, length);
+
+        return this;
+    }
 
     public String toString()
     {
@@ -419,7 +490,7 @@ public class EiCreatedTenderPayloadEncoder
         }
 
         final EiCreatedTenderPayloadDecoder decoder = new EiCreatedTenderPayloadDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

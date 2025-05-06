@@ -8,10 +8,11 @@ import org.agrona.DirectBuffer;
  * String-formatted ISO 8601 timestamp. See BridgeInstant.java
  */
 @SuppressWarnings("all")
-public class BridgeInstantDecoder
+public final class BridgeInstantDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 4;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -86,7 +87,7 @@ public class BridgeInstantDecoder
 
     public long length()
     {
-        return (buffer.getInt(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(offset + 0, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -139,7 +140,7 @@ public class BridgeInstantDecoder
 
         builder.append('(');
         builder.append("length=");
-        builder.append(length());
+        builder.append(this.length());
         builder.append('|');
         builder.append(')');
 

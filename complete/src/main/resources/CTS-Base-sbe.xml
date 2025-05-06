@@ -273,7 +273,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 		<ref name="createdDateTime" type="Instant" />  
 		<ref name="inResponseTo" type="RefIdType" />   
 		<type name="responseCode" primitiveType="uint64" />  
-		<ref name="responseDescription" type="varStringEncoding"/>
+		<!--  <ref name="responseDescription" type="varStringEncoding"/> -->
 		<ref name="responseDetail" type="ResponseDetailType" ></ref>
 	</composite>
 	
@@ -355,6 +355,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	<field name="partyId" id="4" type="ActorIdType"/>
 	<field name="response" id="5" type="EiResponseType" />
 	<field name="tenderId" id="6" type="TenderIdType"/>
+	<data name="responseDescription" id="7" type="varStringEncoding"/>
 </sbe:message>
 
 <sbe:message name="EiCreateTransactionPayload" id="7"	description="See EiCreateTransactionPayload">

@@ -8,10 +8,11 @@ import org.agrona.MutableDirectBuffer;
  * See EiTransactionType.java
  */
 @SuppressWarnings("all")
-public class EiTransactionTypeEncoder
+public final class EiTransactionTypeEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
+    public static final String SEMANTIC_VERSION = "2.1";
     public static final int ENCODED_LENGTH = 123;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -81,7 +82,7 @@ public class EiTransactionTypeEncoder
 
     public EiTransactionTypeEncoder marketTransactionId(final long value)
     {
-        buffer.putLong(offset + 0, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 0, value, BYTE_ORDER);
         return this;
     }
 

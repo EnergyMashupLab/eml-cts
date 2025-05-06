@@ -31,6 +31,10 @@ import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiManageTickerSubscriptionPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiManageTickerSubscriptionPayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiManagedTickerSubscriptionPayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiManagedTickerSubscriptionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -394,7 +398,7 @@ public class TeuaRestController {
 		 MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
 		 EiCreatedTenderPayloadDecoder eiCreatedTenderPayloadDecoder = new EiCreatedTenderPayloadDecoder();
 		
-		EiCreateTenderPayloadEncoderDecoder sbe;
+		EiTenderPayloadEncoderDecoder sbe;
 		  
 
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
@@ -458,7 +462,7 @@ public class TeuaRestController {
 		
 		logger.trace(eiCreateTender.toString());
 		
-		int encodingLengthPlusHeader = EiCreateTenderPayloadEncoderDecoder.eiCreateTenderEncode(eiCreateTenderPayloadEncoder,buffer,messageHeaderEncoder,eiCreateTender);
+		int encodingLengthPlusHeader = EiTenderPayloadEncoderDecoder.eiCreateTenderEncode(eiCreateTenderPayloadEncoder,buffer,messageHeaderEncoder,eiCreateTender);
 		byte[] validBytes = new byte[encodingLengthPlusHeader];
 		buffer.getBytes(0, validBytes);
 		HttpEntity<byte[]> eiCreateTenderByteArray = new HttpEntity<>(validBytes, headers);
@@ -480,7 +484,7 @@ public class TeuaRestController {
 		int actingVersion = messageHeaderDecoder.version();
 
 		// Now decode the payload starting *after* the header
-		EiCreatedTenderPayload eiCreatedTenderResponse = EiCreatedTenderPayloadEncoderDecoder.eiCreatedTenderPayloadDecode(
+		EiCreatedTenderPayload eiCreatedTenderResponse = EiTenderPayloadEncoderDecoder.eiCreatedTenderPayloadDecode(
 		    eiCreatedTenderPayloadDecoder, 
 		    buffer, 
 		    messageHeaderDecoder.encodedLength(), // <=== Start after header
@@ -900,12 +904,20 @@ public class TeuaRestController {
 
 	@PostMapping("{teuaId}/clientManageTickerSubscription")
 	public EiManagedTickerSubscriptionPayload postClientTicker(@PathVariable String teuaId,
-			@RequestBody ClientManageTickerSubscriptionPayload clientManageTickerSubscriptionPayload) {
+			@RequestBody ClientManageTickerSubscriptionPayload clientManageTickerSubscriptionPayload) throws Exception {
 		ClientManageTickerSubscriptionPayload tempClientManageTickerSubscriptionPayload;
 		ClientManagedTickerSubscriptionPayload tempReturn;
 		EiManageTickerSubscriptionPayload eiManageTickerSubscriptionPayload;
 		Integer numericTeuaId = -1;
 
+		MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+		EiManageTickerSubscriptionPayloadEncoder eiManageTickerSubscriptionPayloadEncoder = new EiManageTickerSubscriptionPayloadEncoder();
+		ByteBuffer bbfBuffer = ByteBuffer.allocate(4096);
+		UnsafeBuffer buffer = new UnsafeBuffer(bbfBuffer);
+		
+		 MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+		 EiManagedTickerSubscriptionPayloadDecoder eiManagedTickerSubscriptionPayloadDecoder = new EiManagedTickerSubscriptionPayloadDecoder();
+		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
 		RestTemplate restTemplate = builder.build();
@@ -950,17 +962,50 @@ public class TeuaRestController {
 
 		logger.trace("TEUA sending EiManageTicker to LMA " + eiManageTickerSubscriptionPayload.toString());
 
-		// Send this off to the LMA
+		/*SBE*/
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/octet-stream");
+		
+		int encodingLengthPlusHeader = EiManageTickerSubscriptionPayloadEncoderDecoder.EiManageTickerSubscriptionEncode(eiManageTickerSubscriptionPayloadEncoder, buffer, messageHeaderEncoder, eiManageTickerSubscriptionPayload);
+		byte[] validBytes = new byte[encodingLengthPlusHeader];
+		buffer.getBytes(0, validBytes);
+		HttpEntity<byte[]> eiManageTickerSubscriptionArray = new HttpEntity<>(validBytes, headers);
+		
+		// And forward to the LMA
 		restTemplate = builder.build();
-		EiManagedTickerSubscriptionPayload result = restTemplate.postForObject(
-				"http://localhost:8080/lma/manageSubscription", eiManageTickerSubscriptionPayload,
-				EiManagedTickerSubscriptionPayload.class);
+		
+		byte[] eiManagedTickerSubscriptionArray = restTemplate.postForObject
+				("http://localhost:8080/lma/manageSubscription", eiManageTickerSubscriptionArray,
+						byte[].class);		
 
 		// and put CtsTenderId in ClientCreatedTenderPayload
 		tempReturn = new ClientManagedTickerSubscriptionPayload();
 		logger.trace("TEUA before return ClientManagerTicker to Client/SC " + tempReturn.toString());
 
-		return result;
+		
+		//Decode here
+		// Copy FULL response bytes into the buffer at once
+		buffer.putBytes(0, eiManagedTickerSubscriptionArray, 0, eiManagedTickerSubscriptionArray.length);
+
+		// Wrap and decode header
+		messageHeaderDecoder.wrap(buffer, 0);
+		int templateId = messageHeaderDecoder.templateId();
+		int actingBlockLength = messageHeaderDecoder.blockLength();
+		int actingVersion = messageHeaderDecoder.version();
+
+		System.out.println("Decoded MessageHeader:");
+		System.out.println("Template ID: " + templateId);
+		System.out.println("Block Length: " + actingBlockLength);
+		System.out.println("Schema Version: " + actingVersion);
+
+		EiManagedTickerSubscriptionPayload eiManagedTickerSubscriptionResponse = EiManagedTickerSubscriptionPayloadEncoderDecoder.EiManagedTickerSubscriptionPayloadDecode(
+				eiManagedTickerSubscriptionPayloadDecoder,
+				buffer,
+				messageHeaderDecoder.encodedLength(),
+				actingBlockLength,
+				actingVersion);
+				
+		return eiManagedTickerSubscriptionResponse;
 	}
 
 	@PostMapping("{teuaId}/sendTickerUpdate")
