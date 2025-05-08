@@ -11,7 +11,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public final class EiCreatedTenderPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 69;
+    public static final int BLOCK_LENGTH = 73;
     public static final int TEMPLATE_ID = 6;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -323,7 +323,7 @@ public final class EiCreatedTenderPayloadEncoder
 
     public static int responseEncodingLength()
     {
-        return 29;
+        return 33;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -356,7 +356,7 @@ public final class EiCreatedTenderPayloadEncoder
 
     public static int tenderIdEncodingOffset()
     {
-        return 61;
+        return 65;
     }
 
     public static int tenderIdEncodingLength()
@@ -391,7 +391,7 @@ public final class EiCreatedTenderPayloadEncoder
 
     public EiCreatedTenderPayloadEncoder tenderId(final long value)
     {
-        buffer.putLong(offset + 61, value, BYTE_ORDER);
+        buffer.putLong(offset + 65, value, BYTE_ORDER);
         return this;
     }
 

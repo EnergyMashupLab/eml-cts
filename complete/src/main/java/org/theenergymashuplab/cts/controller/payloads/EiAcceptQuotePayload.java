@@ -3,6 +3,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 import org.theenergymashuplab.cts.EiTenderType;
 import org.theenergymashuplab.cts.EiTransaction;
 import org.theenergymashuplab.cts.MarketOrderIdType;
+import org.theenergymashuplab.cts.RefIdType;
 import org.theenergymashuplab.cts.TenderIntervalDetail;
 import org.theenergymashuplab.cts.TransactionIdType;
 
@@ -30,7 +31,8 @@ public class EiAcceptQuotePayload extends EiCreateTransactionPayload {
 		this.referencedQuoteId = referencedQuoteId;
 		//Set the market transaction
 		this.setMarketTransactionId(new TransactionIdType());
-
+		
+		this.setRequestId(new RefIdType());
 	}
 
 	public MarketOrderIdType getReferencedQuoteId(){

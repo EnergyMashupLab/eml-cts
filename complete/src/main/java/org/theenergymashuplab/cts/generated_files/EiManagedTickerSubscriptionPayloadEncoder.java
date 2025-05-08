@@ -11,7 +11,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public final class EiManagedTickerSubscriptionPayloadEncoder
 {
-    public static final int BLOCK_LENGTH = 39;
+    public static final int BLOCK_LENGTH = 43;
     public static final int TEMPLATE_ID = 10;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -151,7 +151,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int responseEncodingLength()
     {
-        return 29;
+        return 33;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -184,7 +184,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int subscriptionActionTakenEncodingOffset()
     {
-        return 30;
+        return 34;
     }
 
     public static int subscriptionActionTakenEncodingLength()
@@ -204,7 +204,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiManagedTickerSubscriptionPayloadEncoder subscriptionActionTaken(final SubscriptionActionType value)
     {
-        buffer.putByte(offset + 30, (byte)value.value());
+        buffer.putByte(offset + 34, (byte)value.value());
         return this;
     }
 
@@ -220,7 +220,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public static int subscriptionRequestIdEncodingOffset()
     {
-        return 31;
+        return 35;
     }
 
     public static int subscriptionRequestIdEncodingLength()
@@ -255,7 +255,7 @@ public final class EiManagedTickerSubscriptionPayloadEncoder
 
     public EiManagedTickerSubscriptionPayloadEncoder subscriptionRequestId(final long value)
     {
-        buffer.putLong(offset + 31, value, BYTE_ORDER);
+        buffer.putLong(offset + 35, value, BYTE_ORDER);
         return this;
     }
 

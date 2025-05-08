@@ -13,7 +13,7 @@ public final class EiResponseTypeEncoder
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
     public static final String SEMANTIC_VERSION = "2.1";
-    public static final int ENCODED_LENGTH = 29;
+    public static final int ENCODED_LENGTH = 33;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -142,9 +142,32 @@ public final class EiResponseTypeEncoder
     }
 
 
-    public static int responseDetailEncodingOffset()
+    public static int responseDescriptionEncodingOffset()
     {
         return 28;
+    }
+
+    public static int responseDescriptionEncodingLength()
+    {
+        return 4;
+    }
+
+    private final VarStringEncodingEncoder responseDescription = new VarStringEncodingEncoder();
+
+    /**
+     * Variable length UTF-8 String.
+     *
+     * @return VarStringEncodingEncoder : Variable length UTF-8 String.
+     */
+    public VarStringEncodingEncoder responseDescription()
+    {
+        responseDescription.wrap(buffer, offset + 28);
+        return responseDescription;
+    }
+
+    public static int responseDetailEncodingOffset()
+    {
+        return 32;
     }
 
     public static int responseDetailEncodingLength()
@@ -154,7 +177,7 @@ public final class EiResponseTypeEncoder
 
     public EiResponseTypeEncoder responseDetail(final ResponseDetailType value)
     {
-        buffer.putByte(offset + 28, (byte)value.value());
+        buffer.putByte(offset + 32, (byte)value.value());
         return this;
     }
 

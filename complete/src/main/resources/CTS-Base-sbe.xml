@@ -273,7 +273,7 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 		<ref name="createdDateTime" type="Instant" />  
 		<ref name="inResponseTo" type="RefIdType" />   
 		<type name="responseCode" primitiveType="uint64" />  
-		<!--  <ref name="responseDescription" type="varStringEncoding"/> -->
+		<ref name="responseDescription" type="varStringEncoding"/>
 		<ref name="responseDetail" type="ResponseDetailType" ></ref>
 	</composite>
 	
@@ -394,8 +394,8 @@ xsi:schemaLocation="http://fixprotocol.io/2016/sbe http://fixprotocol.io/2016/sb
 	<field name="subscriptionRequestId" id="5" type="RefIdType" />
 	<data name="multicastListenReference" id="2" type="varStringEncoding"  />
 	<data name="responseDescription" id="6" type="varStringEncoding"/>
-		
 </sbe:message>
+
 
 <sbe:message name="EiAcceptQuotePayload" id="11"	description="See EiAcceptQuotePayload">
 	<!--Note that attribute order varies - clean up in eml-cts source-->

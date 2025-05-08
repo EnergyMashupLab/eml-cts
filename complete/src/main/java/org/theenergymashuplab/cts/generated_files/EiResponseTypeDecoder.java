@@ -13,7 +13,7 @@ public final class EiResponseTypeDecoder
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
     public static final String SEMANTIC_VERSION = "2.1";
-    public static final int ENCODED_LENGTH = 29;
+    public static final int ENCODED_LENGTH = 33;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private int offset;
@@ -155,9 +155,37 @@ public final class EiResponseTypeDecoder
     }
 
 
-    public static int responseDetailEncodingOffset()
+    public static int responseDescriptionEncodingOffset()
     {
         return 28;
+    }
+
+    public static int responseDescriptionEncodingLength()
+    {
+        return 4;
+    }
+
+    public static int responseDescriptionSinceVersion()
+    {
+        return 0;
+    }
+
+    private final VarStringEncodingDecoder responseDescription = new VarStringEncodingDecoder();
+
+    /**
+     * Variable length UTF-8 String.
+     *
+     * @return VarStringEncodingDecoder : Variable length UTF-8 String.
+     */
+    public VarStringEncodingDecoder responseDescription()
+    {
+        responseDescription.wrap(buffer, offset + 28);
+        return responseDescription;
+    }
+
+    public static int responseDetailEncodingOffset()
+    {
+        return 32;
     }
 
     public static int responseDetailEncodingLength()
@@ -172,12 +200,12 @@ public final class EiResponseTypeDecoder
 
     public short responseDetailRaw()
     {
-        return ((short)(buffer.getByte(offset + 28) & 0xFF));
+        return ((short)(buffer.getByte(offset + 32) & 0xFF));
     }
 
     public ResponseDetailType responseDetail()
     {
-        return ResponseDetailType.get(((short)(buffer.getByte(offset + 28) & 0xFF)));
+        return ResponseDetailType.get(((short)(buffer.getByte(offset + 32) & 0xFF)));
     }
 
 
@@ -215,6 +243,17 @@ public final class EiResponseTypeDecoder
         builder.append('|');
         builder.append("responseCode=");
         builder.append(this.responseCode());
+        builder.append('|');
+        builder.append("responseDescription=");
+        final VarStringEncodingDecoder responseDescription = this.responseDescription();
+        if (null != responseDescription)
+        {
+            responseDescription.appendTo(builder);
+        }
+        else
+        {
+            builder.append("null");
+        }
         builder.append('|');
         builder.append("responseDetail=");
         builder.append(this.responseDetail());

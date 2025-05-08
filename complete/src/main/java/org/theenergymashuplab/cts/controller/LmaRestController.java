@@ -44,10 +44,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
+import org.theenergymashuplab.cts.generated_files.EiAcceptQuotePayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiAcceptQuotePayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderDecoder;
 import org.theenergymashuplab.cts.generated_files.MessageHeaderEncoder;
+import org.theenergymashuplab.cts.sbe.EiQuotePayloadEncoderDecoder;
 import org.theenergymashuplab.cts.sbe.EiTransactionPayloadEncoderDecoder;
 
 @RestController
@@ -460,8 +463,16 @@ public class LmaRestController {
 	 */
 	@PostMapping("/acceptQuote")
 	public EiAcceptedQuotePayload postEiAcceptQuote(
-			@RequestBody EiAcceptQuotePayload eiAcceptQuote)	{
-		EiAcceptQuotePayload tempAccept;
+			@RequestBody byte[] eiAcceptQuote)	{
+        UnsafeBuffer buffer = new UnsafeBuffer(eiAcceptQuote);
+        MessageHeaderDecoder headerDecoder = new MessageHeaderDecoder();
+        EiAcceptQuotePayloadDecoder decoder = new EiAcceptQuotePayloadDecoder();
+        headerDecoder.wrap(buffer, 0);
+        int actingBlockLength = headerDecoder.blockLength();
+        int actingVersion = headerDecoder.version();
+        int headerLength = headerDecoder.encodedLength();
+
+		EiAcceptQuotePayload tempAccept = EiQuotePayloadEncoderDecoder.decode(decoder, buffer, headerLength, actingBlockLength, actingVersion);
 		// Will pass on eiCreateTender body to LME and return its response tempPostResponse
 		EiAcceptedQuotePayload tempPostResponse; 
 		ActorIdType tempPartyId;
@@ -473,9 +484,7 @@ public class LmaRestController {
 		RestTemplate restTemplate;	// scope is function postEiCreateTender	
     	restTemplate = builder.build();
     	
-		// save CreateTender message as sent by TEUA
-		tempAccept = eiAcceptQuote;	
-		
+		// save CreateTender message as sent by TEUA		
 		logger.debug("postEiAcceptQuote to LME. ReferencedQuoteId: " +
 				tempAccept.getReferencedQuoteId().toString());
 
@@ -488,9 +497,23 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/acceptQuote", 
-				tempAccept, 
-				EiAcceptedQuotePayload.class);
+        UnsafeBuffer outBuffer = new UnsafeBuffer(new byte[4096]);
+        MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        EiAcceptQuotePayloadEncoder encoder = new EiAcceptQuotePayloadEncoder();
+        int encodedLength = EiQuotePayloadEncoderDecoder.encode(encoder, outBuffer, headerEncoder, tempAccept);
+        byte[] outgoingBytes = new byte[encodedLength];
+        outBuffer.getBytes(0, outgoingBytes);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        HttpEntity<byte[]> requestEntity = new HttpEntity<>(outgoingBytes, headers);
+
+        tempPostResponse = restTemplate.postForObject(
+            "http://localhost:8080/lme/acceptQuote",
+            requestEntity,
+            EiAcceptedQuotePayload.class
+        );
+
 		
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 

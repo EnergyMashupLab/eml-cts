@@ -11,7 +11,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public final class EiAcceptedQuotePayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 77;
+    public static final int BLOCK_LENGTH = 81;
     public static final int TEMPLATE_ID = 12;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -405,7 +405,7 @@ public final class EiAcceptedQuotePayloadDecoder
 
     public static int responseEncodingLength()
     {
-        return 29;
+        return 33;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -438,7 +438,7 @@ public final class EiAcceptedQuotePayloadDecoder
 
     public static int transactionIdEncodingOffset()
     {
-        return 69;
+        return 73;
     }
 
     public static int transactionIdEncodingLength()
@@ -473,7 +473,7 @@ public final class EiAcceptedQuotePayloadDecoder
 
     public long transactionId()
     {
-        return buffer.getLong(offset + 69, BYTE_ORDER);
+        return buffer.getLong(offset + 73, BYTE_ORDER);
     }
 
 

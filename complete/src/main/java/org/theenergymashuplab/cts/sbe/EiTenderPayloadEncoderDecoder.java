@@ -1,15 +1,11 @@
 package org.theenergymashuplab.cts.sbe;
 
-import java.time.Duration;
-import java.time.Instant;
-
 import org.agrona.concurrent.UnsafeBuffer;
 import org.theenergymashuplab.cts.*;
-import org.theenergymashuplab.cts.ResourceDesignatorType;
-import org.theenergymashuplab.cts.SideType;
 import org.theenergymashuplab.cts.controller.payloads.EiCreateTenderPayload;
 import org.theenergymashuplab.cts.controller.payloads.EiCreatedTenderPayload;
 import org.theenergymashuplab.cts.generated_files.*;
+import org.theenergymashuplab.cts.sbe.CompositeEncoderDecoder.EiTenderTypeEncoderDecoder;
 
 public class EiTenderPayloadEncoderDecoder {
 
@@ -17,80 +13,35 @@ public class EiTenderPayloadEncoderDecoder {
 	public static int eiCreateTenderEncode(EiCreateTenderPayloadEncoder encoder, UnsafeBuffer buffer,
 			MessageHeaderEncoder header, EiCreateTenderPayload payload) {
 
-		// HEADER
 		encoder.wrapAndApplyHeader(buffer, 0, header);
 
-		EiTenderType payloadTender = payload.getTender();
-		Instant expirationTime = payloadTender.getExpirationTime();
-		TenderIntervalDetail intervalDetail = (TenderIntervalDetail) payloadTender.getTenderDetail();
-		Interval interval = intervalDetail.getInterval();
-		    
-		EiTenderTypeEncoder tenderEncoder = encoder.tender();
-		TenderBaseEncoder base = tenderEncoder.tenderBase();
-		TenderIntervalDetailEncoder detail = base.tenderDetail();
-		IntervalEncoder intervalEncoder = detail.interval();
+		encoder.atMostOne(payload.isAtMostOne() ? BooleanType.TRUE : BooleanType.FALSE)
+				.marketId(payload.getMarketId().getMyUidId()).counterPartyId(payload.getCounterPartyId().getMyUidId())
+				.executionInstructions(0L) // unused
+				.partyId(payload.getPartyId().getMyUidId()).requestId(payload.getRequestId().getMyUidId())
+				.segmentId(payload.getSegmentId());
 
-	    encoder
-        .atMostOne(payload.isAtMostOne() ? BooleanType.TRUE : BooleanType.FALSE)
-        .marketId(payload.getMarketId().getMyUidId())
-        .counterPartyId(payload.getCounterPartyId().getMyUidId())
-        .executionInstructions(0L) // unused
-        .partyId(payload.getPartyId().getMyUidId())
-        .requestId(payload.getRequestId().getMyUidId())
-        .segmentId(payload.getSegmentId());
-
-		// EiTenderType
-	    tenderEncoder
-        .marketOrderId(payloadTender.getMarketOrderId().getMyUidId())
-        .tenderId(payloadTender.getTenderId().getMyUidId())
-        .tenderBase()
-            .allOrNone(payloadTender.isAllOrNone() ? BooleanType.TRUE : BooleanType.FALSE)
-            .expirationTime()
-                .seconds(expirationTime.getEpochSecond())
-                .nano(expirationTime.getNano());
-	    
-	    base
-        .marketId(0) // workaround (null in current payloads)
-        .priceScale(payloadTender.getPriceScale())
-        .quantityScale(payloadTender.getQuantityScale())
-        .resourceDesignator(org.theenergymashuplab.cts.generated_files.ResourceDesignatorType.get(payloadTender.getResourceDesignator().getValue()))
-        .segmentId(payload.getSegmentId())
-        .side(org.theenergymashuplab.cts.generated_files.SideType.get(payloadTender.getSide().getValue()))
-        .warrants(0); // workaround (null in current payloads)
-
-		// ENCODE TENDER DETAIL
-	    detail
-        .price(intervalDetail.getPrice())
-        .quantity(intervalDetail.getQuantity());
-
-	    intervalEncoder
-	        .dtStart()
-	            .seconds(interval.getDtStart().getEpochSecond())
-	            .nano(interval.getDtStart().getNano());
-	    intervalEncoder
-	        .duration()
-	            .seconds(interval.getDuration().getSeconds())
-	            .nano(interval.getDuration().getNano());
+		EiTenderTypeEncoderDecoder.encode(encoder.tender(), payload.getTender());
 
 //		System.out.println("\nEiCreateTenderPayload Encoded :-");
 //		System.out.println(encoder.toString() + "\n");
-	    return header.encodedLength() + encoder.encodedLength();
+
+		// SBE DEMO
+//	    inspectEncodedBuffer(buffer, header.encodedLength() + encoder.encodedLength(), payload);
+		return header.encodedLength() + encoder.encodedLength();
 
 	}
 
 	// DECODER
-	public static EiCreateTenderPayload eiCreateTenderDecode(EiCreateTenderPayloadDecoder decoder,
-			UnsafeBuffer buffer, int offset, int actingBlockLength, int actingVersion) throws Exception {
+	public static EiCreateTenderPayload eiCreateTenderDecode(EiCreateTenderPayloadDecoder decoder, UnsafeBuffer buffer,
+			int offset, int actingBlockLength, int actingVersion) throws Exception {
 
-		// Wrap the decoder to start reading from the provided buffer offset
 		decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
 //		System.out.println("\nEiCreateTenderPayload Decoded :-");
 //		System.out.println(eiCreateTenderPayloadDecoder.toString() + "\n");
 		EiTenderTypeDecoder tender = decoder.tender();
 		TenderBaseDecoder base = tender.tenderBase();
-		TenderIntervalDetailDecoder detail = base.tenderDetail();
-		IntervalDecoder interval = detail.interval();
 
 		EiCreateTenderPayload eiCreateTenderPayload = new EiCreateTenderPayload();
 
@@ -101,7 +52,7 @@ public class EiTenderPayloadEncoderDecoder {
 		counterPartyId.setMyUidId(decoder.counterPartyId());
 		eiCreateTenderPayload.setCounterPartyId(counterPartyId);
 
-		//not currently used, set to empty
+		// not currently used, set to empty
 		eiCreateTenderPayload.setExecutionInstructions("");
 
 		MarketIdType marketIdType = new MarketIdType();
@@ -118,158 +69,168 @@ public class EiTenderPayloadEncoderDecoder {
 
 		int segmentId = (int) decoder.segmentId();
 		eiCreateTenderPayload.setSegmentId(segmentId);
-//TENDER----------------------------------------------------------------------
-		MarketOrderIdType marketOrderId = new MarketOrderIdType();
-		marketOrderId.setMyUidId(tender.marketOrderId());
 
-		TenderIdType tenderId = new TenderIdType();
-		tenderId.setMyUidId(tender.tenderId());
-		
-		//currently null
-//		MarketOrderIdType referenceQuoteIdTypeId = new MarketOrderIdType();
-//		referenceQuoteIdTypeId.setMyUidId(tender.referencedQuoteId());
+		EiTenderType eiTenderType = EiTenderTypeEncoderDecoder.decode(decoder.tender());
+		eiCreateTenderPayload.setTender(eiTenderType);
 
-		 Instant expirationTime = Instant.ofEpochSecond(
-		            base.expirationTime().seconds(),
-		            base.expirationTime().nano()
-		    );
-		 
-		TenderIntervalDetail tenderIntervalDetail = null;
-		if (detail != null) {
-			long price = detail.price();
-			long quantity = detail.quantity();
-			Interval intervalObj = new Interval();
-			intervalObj.setDtStart(Instant.ofEpochSecond(interval.dtStart().seconds(), interval.dtStart().nano()));
-			intervalObj.setDuration(Duration.ofSeconds(interval.duration().seconds(), interval.duration().nano()));
-
-			tenderIntervalDetail = new TenderIntervalDetail(intervalObj, price, quantity);
-		}
-
-		SideType side = SideType.fromSbe(base.side());
-
-		EiTenderType eiTenderType = new EiTenderType(expirationTime, side, tenderIntervalDetail, marketOrderId);
-		
-		MarketIdType marketId = new MarketIdType();
-		marketId.setMyUidId(base.marketId());
-		eiTenderType.setMarketId(marketId);
-
-	    eiTenderType.setAllOrNone(base.allOrNone() == BooleanType.TRUE);
-	    eiTenderType.setPriceScale((int) base.priceScale());
-	    eiTenderType.setQuantityScale((int) base.quantityScale());
-	    eiTenderType.setResourceDesignator(ResourceDesignatorType.fromSbe(base.resourceDesignator().value()));
-	    eiTenderType.setSegmentId((int) base.segmentId());
-
-	    WarrantIdType warrants = new WarrantIdType(base.warrants());
-	    eiTenderType.setWarrants(warrants);
+		WarrantIdType warrants = new WarrantIdType(base.warrants());
+		eiTenderType.setWarrants(warrants);
 
 		// Set the decoded fields back in the payload object
 		eiCreateTenderPayload.setTender(eiTenderType);
 
 		return eiCreateTenderPayload;
 	}
-	
-	public static int eiCreatedTenderEncode(
-	        EiCreatedTenderPayloadEncoder encoder,
-	        UnsafeBuffer buffer,
-	        MessageHeaderEncoder header,
-	        EiCreatedTenderPayload payload) {
+
+	public static int eiCreatedTenderEncode(EiCreatedTenderPayloadEncoder encoder, UnsafeBuffer buffer,
+	        MessageHeaderEncoder header, EiCreatedTenderPayload payload) {
 
 	    encoder.wrapAndApplyHeader(buffer, 0, header);
-	    
 
-		EiResponseType response = payload.getResponse();
-	    Instant createdDateTime = response.getCreatedDateTime();
-	    String description = response.getResponseDescription();
-
-	    EiResponseTypeEncoder responseEncoder = encoder.response();
-
-
-	    encoder.counterPartyId(payload.getCounterPartyId().getMyUidId())
-	    .inResponseTo(payload.getInResponseTo().getMyUidId())
-	    .marketOrderId(payload.getMarketOrderId().getMyUidId())
-	    .partyId(payload.getPartyId().getMyUidId());
-
-
-	    responseEncoder.createdDateTime()
-	        .seconds(createdDateTime.getEpochSecond())
-	        .nano(createdDateTime.getNano());
-
-	    responseEncoder.inResponseTo(response.getInResponseTo().getMyUidId())
-	    .responseCode(response.getResponseCode());
-
-	    encoder.responseDescription(description);
-
-	    short code = payload.getResponse().getResponseDetail().getValue();
-	    org.theenergymashuplab.cts.generated_files.ResponseDetailType encodedEnum = org.theenergymashuplab.cts.generated_files.ResponseDetailType.get(code);
-	    responseEncoder.responseDetail(encodedEnum);
-
+	    encoder.counterPartyId(payload.getCounterPartyId().getMyUidId());
+	    encoder.inResponseTo(payload.getInResponseTo().getMyUidId());
+	    encoder.marketOrderId(payload.getMarketOrderId().getMyUidId());
+	    encoder.partyId(payload.getPartyId().getMyUidId());
 	    encoder.tenderId(payload.getTenderId().getMyUidId());
 
+	    CompositeEncoderDecoder.EiResponseTypeEncoderDecoder.encode(encoder.response(), payload.getResponse());
+
+	    encoder.responseDescription(payload.getResponse().getResponseDescription());
 //	    System.out.println("\nEiCreatedTenderPayload Encoded:");
 //	    System.out.println(encoder.toString() + "\n");
 
 	    return header.encodedLength() + encoder.encodedLength();
 	}
 
-		public static EiCreatedTenderPayload eiCreatedTenderPayloadDecode(
-				EiCreatedTenderPayloadDecoder decoder,
-				UnsafeBuffer buffer,
-				int offset,
-				int actingBlockLength,
-				int actingVersion) throws Exception {
-
-			// Wrap decoder to start reading from the provided buffer
-			decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
+	public static EiCreatedTenderPayload eiCreatedTenderPayloadDecode(EiCreatedTenderPayloadDecoder decoder,
+			UnsafeBuffer buffer, int offset, int actingBlockLength, int actingVersion) throws Exception {
+		decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
 //			System.out.println("\nEiCreatedTenderPayload Decoded :-");
 //			System.out.println(eiCreatedTenderPayloadDecoder.toString() + "\n");
 
-			EiResponseTypeDecoder responseDecoder = decoder.response();
+		EiCreatedTenderPayload eiCreatedTenderPayload = new EiCreatedTenderPayload();
 
-			
-			EiCreatedTenderPayload eiCreatedTenderPayload = new EiCreatedTenderPayload();
+		ActorIdType counterPartyId = new ActorIdType();
+		counterPartyId.setMyUidId(decoder.counterPartyId());
+		eiCreatedTenderPayload.setCounterPartyId(counterPartyId);
 
-			ActorIdType counterPartyId = new ActorIdType();
-			counterPartyId.setMyUidId(decoder.counterPartyId());
-			eiCreatedTenderPayload.setCounterPartyId(counterPartyId);
+		RefIdType inResponseTo = new RefIdType();
+		inResponseTo.setMyUidId(decoder.inResponseTo());
+		eiCreatedTenderPayload.setInResponseTo(inResponseTo);
 
-			RefIdType inResponseTo = new RefIdType();
-			inResponseTo.setMyUidId(decoder.inResponseTo());
-			eiCreatedTenderPayload.setInResponseTo(inResponseTo);
+		MarketOrderIdType marketOrderId = new MarketOrderIdType();
+		marketOrderId.setMyUidId(decoder.marketOrderId());
+		eiCreatedTenderPayload.setMarketOrderId(marketOrderId);
 
-			MarketOrderIdType marketOrderId = new MarketOrderIdType();
-			marketOrderId.setMyUidId(decoder.marketOrderId());
-			eiCreatedTenderPayload.setMarketOrderId(marketOrderId);
+		ActorIdType partyId = new ActorIdType();
+		partyId.setMyUidId(decoder.partyId());
+		eiCreatedTenderPayload.setPartyId(partyId);
 
-			ActorIdType partyId = new ActorIdType();
-			partyId.setMyUidId(decoder.partyId());
-			eiCreatedTenderPayload.setPartyId(partyId);
+		TenderIdType tenderId = new TenderIdType();
+		tenderId.setMyUidId(decoder.tenderId());
+		eiCreatedTenderPayload.setTenderId(tenderId);
 
-			TenderIdType tenderId = new TenderIdType();
-			tenderId.setMyUidId(decoder.tenderId());
-			eiCreatedTenderPayload.setTenderId(tenderId);
+		EiResponseType response = CompositeEncoderDecoder.EiResponseTypeEncoderDecoder.decode(decoder.response());
+		response.setResponseDescription(decoder.responseDescription());
 
-			EiResponseType eiResponse = new EiResponseType();
+		eiCreatedTenderPayload.setResponse(response);
 
-			long seconds = responseDecoder.createdDateTime().seconds();
-			int nanos = (int) responseDecoder.createdDateTime().nano();
-			eiResponse.setCreatedDateTime(Instant.ofEpochSecond(seconds, nanos));
+		return eiCreatedTenderPayload;
+	}
 
-			RefIdType responseInResponseTo = new RefIdType();
-			responseInResponseTo.setMyUidId(responseDecoder.inResponseTo());
-			eiResponse.setInResponseTo(responseInResponseTo);
+	public static void inspectEncodedBuffer(UnsafeBuffer buffer, int totalLength, EiCreateTenderPayload payload) {
+		int bytes = 0;
 
-			eiResponse.setResponseCode(responseDecoder.responseCode());
-			eiResponse.setResponseDescription(decoder.responseDescription());
+		System.out.println("\n-------------------------------------------------------------------------");
+		System.out.println("Payload Object:");
+		System.out.println(payload);
 
-			short sbeValue = responseDecoder.responseDetail().value();
-			org.theenergymashuplab.cts.ResponseDetailType responseDetail = org.theenergymashuplab.cts.ResponseDetailType.fromSbe(sbeValue);
+		System.out.printf("\n%-32s | %-17s | %-55s | %-25s%n", "Field", "Bytes Range", "Bytes", "Value");
+		System.out.println("-".repeat(140));
 
-			eiResponse.setResponseDetail(responseDetail);
-			eiCreatedTenderPayload.setResponse(eiResponse);
+		String[] fieldLabels = new String[] { "Message Header", "atMostOne", "counterPartyId", "executionInstructions",
+				"marketId", "partyId", "requestId", "segmentId", "tender.marketOrderId", "tender.tenderId",
+				"tender.referencedQuoteId", "tenderBase.allOrNone", "tenderBase.executionInstructions",
+				"tenderBase.expirationTime", "tenderBase.marketId", "tenderBase.priceScale", "tenderBase.quantityScale",
+				"tenderBase.resourceDesignator", "tenderBase.segmentId", "tenderBase.side", "interval.duration",
+				"interval.dtStart", "tenderDetail.price", "tenderDetail.quantity", "tenderBase.warrants" };
 
-			// Return the fully decoded payload
-			return eiCreatedTenderPayload;
+		int[] fieldSizes = new int[] { 8, 1, 8, 8, 8, 8, 8, 4, 8, 8, 8, 1, 8, 12, 8, 4, 4, 1, 4, 1, 12, 12, 8, 8, 8 };
+
+		for (int i = 0; i < fieldLabels.length && bytes < totalLength; i++) {
+			int size = fieldSizes[i];
+			int end = bytes + size;
+
+			if (end > totalLength) {
+				System.out.printf("%-32s | Bytes %3d - ???     | [field exceeds buffer length]%n", fieldLabels[i],
+						bytes);
+				break;
+			}
+
+			StringBuilder hexBytes = new StringBuilder();
+			long value = 0;
+
+			for (int j = bytes; j < end; j++) {
+				byte b = buffer.getByte(j);
+				hexBytes.append(String.format("%02X ", b));
+				value |= ((long) (b & 0xFF)) << ((j - bytes) * 8);
+			}
+
+			String display;
+			if (size == 1) {
+				if (fieldLabels[i].equals("tenderBase.side")) {
+					char c = (char) value;
+					display = "'" + c + "' (" + switch (c) {
+					case 'B' -> "BUY";
+					case 'S' -> "SELL";
+					default -> "UNKNOWN";
+					} + ")";
+				} else {
+					display = switch ((int) value) {
+					case 0 -> "FALSE";
+					case 1 -> "TRUE";
+					default -> String.valueOf(value);
+					};
+				}
+			} else if (size == 4) {
+				display = String.valueOf((int) value);
+			} else if (size == 8) {
+				display = String.valueOf(value);
+			} else if (size == 12) {
+				long seconds = 0;
+				int nanos = 0;
+				for (int j = 0; j < 8; j++) {
+					seconds |= ((long) buffer.getByte(bytes + j) & 0xFF) << (j * 8);
+				}
+				for (int j = 0; j < 4; j++) {
+					nanos |= (buffer.getByte(bytes + 8 + j) & 0xFF) << (j * 8);
+				}
+				display = seconds + "s " + nanos + "ns";
+			} else {
+				display = String.valueOf(value);
+			}
+
+			System.out.printf("%-32s | Bytes %3d - %3d | %-55s | %-25s%n", fieldLabels[i], bytes, end - 1,
+					hexBytes.toString().trim(), display);
+
+			bytes = end;
 		}
+
+		if (bytes < totalLength) {
+			System.out.printf("%-32s | Bytes %3d - %3d | Bytes: ", "Remaining Bytes", bytes, totalLength - 1);
+			for (int j = bytes; j < totalLength; j++) {
+				System.out.printf("%02X ", buffer.getByte(j));
+			}
+			System.out.println();
+		}
+
+		System.out.println("\n-------------------------------------------------------------------------");
+		System.out.println("Full Raw Buffer:");
+		for (int i = 0; i < totalLength; i++) {
+			System.out.printf("%02X", buffer.getByte(i));
+		}
+		System.out.println("\n-------------------------------------------------------------------------");
+	}
 
 }

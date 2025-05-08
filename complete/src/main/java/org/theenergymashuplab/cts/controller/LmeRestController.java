@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
+import org.theenergymashuplab.cts.generated_files.EiAcceptQuotePayloadDecoder;
+import org.theenergymashuplab.cts.generated_files.EiAcceptedQuotePayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.EiManageTickerSubscriptionPayloadDecoder;
@@ -621,8 +623,22 @@ public class LmeRestController {
 	 * Accept a quote and make the underlying transaction happen
 	 */
 	@PostMapping("/acceptQuote")
-	public EiAcceptedQuotePayload postEiAcceptQuote(@RequestBody EiAcceptQuotePayload eiAcceptQuote) {
-		// These quotes will be used for the list/quote grabbing
+	public byte[] postEiAcceptQuote(@RequestBody byte[] eiAcceptQuoteBytes) {
+		
+	    UnsafeBuffer buffer = new UnsafeBuffer(eiAcceptQuoteBytes);
+	    MessageHeaderDecoder headerDecoder = new MessageHeaderDecoder();
+	    EiAcceptQuotePayloadDecoder decoder = new EiAcceptQuotePayloadDecoder();
+
+	    headerDecoder.wrap(buffer, 0);
+	    int blockLength = headerDecoder.blockLength();
+	    int version = headerDecoder.version();
+	    int headerLength = headerDecoder.encodedLength();
+
+	    EiAcceptQuotePayload eiAcceptQuote = EiQuotePayloadEncoderDecoder.decode(
+	        decoder, buffer, headerLength, blockLength, version
+	    );
+
+	    // These quotes will be used for the list/quote grabbing
 		EiQuoteType tempQuote = new EiQuoteType();
 		EiQuoteType listQuote = new EiQuoteType();
 
@@ -804,7 +820,22 @@ public class LmeRestController {
 		/**
 		 * The QDM sends an EiAcceptedQuotePayload back to the original sending party
 		 */
-		return response;
+		
+	    UnsafeBuffer outBuffer = new UnsafeBuffer(new byte[4096]);
+	    MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+	    EiAcceptedQuotePayloadEncoder encoder = new EiAcceptedQuotePayloadEncoder();
+
+	    int encodedLength = EiQuotePayloadEncoderDecoder.encode(
+	        encoder,
+	        outBuffer,
+	        headerEncoder,
+	        response
+	    );
+
+	    byte[] encodedResponse = new byte[encodedLength];
+	    outBuffer.getBytes(0, encodedResponse);
+		
+		return encodedResponse;
 	}
 
 	@PostMapping("/manageSubscription")

@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.theenergymashuplab.cts.*;
 import org.theenergymashuplab.cts.controller.payloads.*;
+import org.theenergymashuplab.cts.generated_files.EiAcceptQuotePayloadEncoder;
+import org.theenergymashuplab.cts.generated_files.EiAcceptedQuotePayloadDecoder;
 import org.theenergymashuplab.cts.generated_files.EiCreateTenderPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.EiCreateTransactionPayloadEncoder;
 import org.theenergymashuplab.cts.generated_files.EiCreatedTenderPayloadDecoder;
@@ -451,7 +453,6 @@ public class TeuaRestController {
 		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
 		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateTender.setCounterPartyId(lmePartyId);
-		
 		//USING ENERGY AS RESOURCE DESIGNATOR TYPE
 		eiCreateTender.getTender().setResourceDesignator(ResourceDesignatorType.ENERGY);
 		
@@ -769,12 +770,21 @@ public class TeuaRestController {
 	@PostMapping("{teuaId}/clientAcceptQuote")
 	public EiCreatedQuotePayload postClientAcceptQuote(@PathVariable String teuaId,
 			@RequestBody ClientAcceptQuotePayload clientAcceptQuote) {
+		
 		ClientAcceptQuotePayload tempClientAcceptQuote;
 		ClientAcceptedQuotePayload tempReturn;
 		EiAcceptQuotePayload eiAcceptQuote;
 		Integer numericTeuaId = -1;
 		String positionUri;
-
+		
+		MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
+		EiAcceptQuotePayloadEncoder eiAcceptQuotePayloadEncoder = new EiAcceptQuotePayloadEncoder();
+		ByteBuffer bbfBuffer = ByteBuffer.allocate(4096);
+		UnsafeBuffer buffer = new UnsafeBuffer(bbfBuffer);
+		
+		MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();
+		EiAcceptedQuotePayloadDecoder eiAcceptedQuotePayloadDecoder = new EiAcceptedQuotePayloadDecoder();
+		
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
 		RestTemplate restTemplate = builder.build();
@@ -811,19 +821,36 @@ public class TeuaRestController {
 		// These will be flipped on an accept quote
 		eiAcceptQuote.setCounterPartyId(actorIds[numericTeuaId]);
 		eiAcceptQuote.setPartyId(lmePartyId);
+		
+		
+		//TEMPORARY FIX TO PREVENT NULL VALS
+		EiTenderType tender = new EiTenderType();
+		tender.setExpirationTime(Instant.now().plusSeconds(3600)); //1 hour from now
+		tender.setResourceDesignator(ResourceDesignatorType.ENERGY);
+		eiAcceptQuote.getTransaction().setTender(tender);
 
 		logger.trace("TEUA sending EiAcceptQuote to LMA " + eiAcceptQuote.toString());
-
+		/*SBE*/
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Type", "application/octet-stream");
+		
+		System.out.println(eiAcceptQuote.toString());
+		int encodingLengthPlusHeader = EiQuotePayloadEncoderDecoder.encode(eiAcceptQuotePayloadEncoder, buffer, messageHeaderEncoder, eiAcceptQuote);
+		byte[] validBytes = new byte[encodingLengthPlusHeader];
+		buffer.getBytes(0, validBytes);
+		HttpEntity<byte[]> eiAcceptQuoteArray = new HttpEntity<>(validBytes, headers);
+		
+	
 		// And forward to the LMA
 		restTemplate = builder.build();
-		EiCreatedQuotePayload result = restTemplate.postForObject("http://localhost:8080/lma/acceptQuote",
-				eiAcceptQuote, EiCreatedQuotePayload.class);
+		EiCreatedQuotePayload result = restTemplate.postForObject
+				("http://localhost:8080/lma/acceptQuote", 
+						eiAcceptQuoteArray, EiCreatedQuotePayload.class);
 
 		// and put CtsTenderId in ClientCreatedTenderPayload
-		tempReturn = new ClientAcceptedQuotePayload();
+		tempReturn = new ClientAcceptedQuotePayload();		
 		// Set the market order ID
 		tempReturn.setReferencedQuoteId(result.getMarketOrderId());
-		;
 		tempReturn.setInfo("ClientAcceptedQuotePayload");
 		tempReturn.setPrice(clientAcceptQuote.getPrice());
 		tempReturn.setQuantity(clientAcceptQuote.getQuantity());
@@ -992,11 +1019,6 @@ public class TeuaRestController {
 		int templateId = messageHeaderDecoder.templateId();
 		int actingBlockLength = messageHeaderDecoder.blockLength();
 		int actingVersion = messageHeaderDecoder.version();
-
-		System.out.println("Decoded MessageHeader:");
-		System.out.println("Template ID: " + templateId);
-		System.out.println("Block Length: " + actingBlockLength);
-		System.out.println("Schema Version: " + actingVersion);
 
 		EiManagedTickerSubscriptionPayload eiManagedTickerSubscriptionResponse = EiTickerSubscriptionPayloadEncoderDecoder.EiManagedTickerSubscriptionPayloadDecode(
 				eiManagedTickerSubscriptionPayloadDecoder,

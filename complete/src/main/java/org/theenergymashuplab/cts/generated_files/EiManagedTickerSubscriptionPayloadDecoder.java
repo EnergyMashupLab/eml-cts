@@ -11,7 +11,7 @@ import org.agrona.DirectBuffer;
 @SuppressWarnings("all")
 public final class EiManagedTickerSubscriptionPayloadDecoder
 {
-    public static final int BLOCK_LENGTH = 39;
+    public static final int BLOCK_LENGTH = 43;
     public static final int TEMPLATE_ID = 10;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 2;
@@ -191,7 +191,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int responseEncodingLength()
     {
-        return 29;
+        return 33;
     }
 
     public static String responseMetaAttribute(final MetaAttribute metaAttribute)
@@ -224,7 +224,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int subscriptionActionTakenEncodingOffset()
     {
-        return 30;
+        return 34;
     }
 
     public static int subscriptionActionTakenEncodingLength()
@@ -244,12 +244,12 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public short subscriptionActionTakenRaw()
     {
-        return ((short)(buffer.getByte(offset + 30) & 0xFF));
+        return ((short)(buffer.getByte(offset + 34) & 0xFF));
     }
 
     public SubscriptionActionType subscriptionActionTaken()
     {
-        return SubscriptionActionType.get(((short)(buffer.getByte(offset + 30) & 0xFF)));
+        return SubscriptionActionType.get(((short)(buffer.getByte(offset + 34) & 0xFF)));
     }
 
 
@@ -265,7 +265,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public static int subscriptionRequestIdEncodingOffset()
     {
-        return 31;
+        return 35;
     }
 
     public static int subscriptionRequestIdEncodingLength()
@@ -300,7 +300,7 @@ public final class EiManagedTickerSubscriptionPayloadDecoder
 
     public long subscriptionRequestId()
     {
-        return buffer.getLong(offset + 31, BYTE_ORDER);
+        return buffer.getLong(offset + 35, BYTE_ORDER);
     }
 
 
