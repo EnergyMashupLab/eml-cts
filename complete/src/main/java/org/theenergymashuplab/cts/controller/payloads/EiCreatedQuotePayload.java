@@ -19,7 +19,7 @@ package org.theenergymashuplab.cts.controller.payloads;
 import java.sql.Ref;
 
 import org.theenergymashuplab.cts.ActorIdType;
-import org.theenergymashuplab.cts.EiResponse;
+import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.EiResponseType;
 import org.theenergymashuplab.cts.MarketOrderIdType;
 import org.theenergymashuplab.cts.RefIdType;
@@ -37,14 +37,14 @@ public class EiCreatedQuotePayload {
 	public MarketOrderIdType marketOrderId;
 	public ActorIdType partyId;
 	public TenderIdType quoteId;
-	public EiResponse response;
+	public EiResponseType response;
 
 	public EiCreatedQuotePayload() {
 
 	}
 
 	public EiCreatedQuotePayload(ActorIdType counterPartyId, RefIdType inResponseTo, MarketOrderIdType marketOrderId,
-			ActorIdType partyId, TenderIdType quoteId, EiResponse response) {
+			ActorIdType partyId, TenderIdType quoteId, EiResponseType response) {
 		this.counterPartyId = counterPartyId;
 		this.inResponseTo = inResponseTo;
 		this.marketOrderId = marketOrderId;
@@ -54,7 +54,7 @@ public class EiCreatedQuotePayload {
 	}
 
 	public EiCreatedQuotePayload(ActorIdType counterPartyId, MarketOrderIdType marketOrderId, ActorIdType partyId,
-			TenderIdType quoteId, EiResponse response) {
+			TenderIdType quoteId, EiResponseType response) {
 		this.counterPartyId = counterPartyId;
 		this.marketOrderId = marketOrderId;
 		this.partyId = partyId;
@@ -102,11 +102,11 @@ public class EiCreatedQuotePayload {
 		this.quoteId = quoteId;
 	}
 
-	public EiResponse getResponse() {
+	public EiResponseType getResponse() {
 		return this.response;
 	}
 
-	public void setResponse(EiResponse response) {
+	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
 

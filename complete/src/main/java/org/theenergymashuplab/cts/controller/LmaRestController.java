@@ -76,7 +76,6 @@ public class LmaRestController {
 	 */
 	@PostMapping("/createTender")
 	public EiCreatedTenderPayload postEiCreateTender(@RequestBody EiCreateTenderPayload eiCreateTender) {
-
 		EiCreateTenderPayload tempCreate;
 		// Will pass on eiCreateTender body to LME and return its response
 		// tempPostResponse
@@ -94,22 +93,24 @@ public class LmaRestController {
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
+		logger.debug("Start of LMA / createTender");
+
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", tempCreate,
 				EiCreatedTenderPayload.class);
 
 		logger.trace("LMA after forward to LME and before return " + tempPostResponse.toString());
 
 		/*
-		 * tempCreated = new EiCreatedTender(tempTender.getTenderId(), tempCreate.getPartyId(), tempCreate.getCounterPartyId(),
-		 * new EiResponse(200, "OK"));
+		 * tempCreated = new EiCreatedTender(tempTender.getTenderId(), tempCreate.getPartyId(),
+		 * tempCreate.getCounterPartyId(), new EiResponse(200, "OK"));
 		 */
 
 		return tempPostResponse;
 	}
 
 	/*
-	 * POST - /createTransaction - comes from LME based on market matches RequestBody is EiCreateTransaction ResponseBody is
-	 * EiCreatedTransaction
+	 * POST - /createTransaction - comes from LME based on market matches RequestBody is EiCreateTransaction
+	 * ResponseBody is EiCreatedTransaction
 	 */
 
 	@PostMapping("/createTransaction")
@@ -180,7 +181,8 @@ public class LmaRestController {
 		logger.debug("tempTeuaUri is '" + tempTeuaUri + "'");
 
 		if (tempTeuaUri == null) {
-			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for " + tempCreate.getPartyId().toString());
+			logger.info("tempTeuaUri is null - postLmaToTeuaPartyIdMap had no entry for "
+					+ tempCreate.getPartyId().toString());
 			// dump LmaRestController.postLmaToTeuaPartyIdMap
 			// use the value shown in TEUA initialization of the map
 
@@ -231,8 +233,8 @@ public class LmaRestController {
 		tempCancel = eiCancelTender;
 
 		/*
-		 * tempCanceled = new EICanceledTender( tempCancel.getPartyId(), tempCancel.getCounterPartyId(), new EiResponse(200,
-		 * "OK"));
+		 * tempCanceled = new EICanceledTender( tempCancel.getPartyId(), tempCancel.getCounterPartyId(), new
+		 * EiResponse(200, "OK"));
 		 */
 
 		/*
@@ -247,7 +249,8 @@ public class LmaRestController {
 	}
 
 	@PostMapping("/createStreamTender")
-	public EiCreatedStreamTenderPayload postEiCreateStreamTender(@RequestBody EiCreateStreamTenderPayload eiCreateStreamTender) {
+	public EiCreatedStreamTenderPayload postEiCreateStreamTender(
+			@RequestBody EiCreateStreamTenderPayload eiCreateStreamTender) {
 
 		EiCreateStreamTenderPayload tempEiCreateStreamTender;
 		EiCreatedStreamTenderPayload tempEiCreatedStreamTender;
@@ -261,8 +264,8 @@ public class LmaRestController {
 		tempEiCreateStreamTender = eiCreateStreamTender;
 
 		// Log it
-		logger.debug(
-				"postEiCreateStreamTender to LME. TenderId " + tempEiCreateStreamTender.getTender().getTenderId().toString());
+		logger.debug("postEiCreateStreamTender to LME. TenderId "
+				+ tempEiCreateStreamTender.getTender().getTenderId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
@@ -277,7 +280,8 @@ public class LmaRestController {
 	}
 
 	@PostMapping("/createStreamQuote")
-	public EiCreatedStreamQuotePayload postEiCreateStreamQuote(@RequestBody EiCreateStreamQuotePayload eiCreateStreamQuote) {
+	public EiCreatedStreamQuotePayload postEiCreateStreamQuote(
+			@RequestBody EiCreateStreamQuotePayload eiCreateStreamQuote) {
 
 		EiCreateStreamQuotePayload tempEiCreateStreamQuote;
 		EiCreatedStreamQuotePayload tempEiCreatedStreamQuote;
@@ -291,7 +295,8 @@ public class LmaRestController {
 		tempEiCreateStreamQuote = eiCreateStreamQuote;
 
 		// Log it
-		logger.debug("postEiCreateStreamTender to LME. TenderId " + tempEiCreateStreamQuote.getQuote().getQuoteId().toString());
+		logger.debug("postEiCreateStreamTender to LME. TenderId "
+				+ tempEiCreateStreamQuote.getQuote().getQuoteId().toString());
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
@@ -479,10 +484,10 @@ public class LmaRestController {
 			logger.info("tempTeuaUri is null. Using " + tempTeuaUriTicker);
 
 		} else {
-			logger.trace(
-					"LMA posting EiCreateTran to " + tempTeuaUriTicker + " partyId " + tempQuoteTickerType.getParty().toString()
-							+ " counterPartyId " + tempQuoteTickerType.getCounterParty().toString() + " "
-							+ tempQuoteTickerType.getSubscriptionId().toString());
+			logger.trace("LMA posting EiCreateTran to " + tempTeuaUriTicker + " partyId "
+					+ tempQuoteTickerType.getParty().toString() + " counterPartyId "
+					+ tempQuoteTickerType.getCounterParty().toString() + " "
+					+ tempQuoteTickerType.getSubscriptionId().toString());
 		}
 
 		// Send update back to TEUA

@@ -8,7 +8,7 @@ public class EiCreatedStreamQuotePayload{
     private MarketOrderIdType marketOrderId = new MarketOrderIdType();
     private ActorIdType partyId;
     private ActorIdType counterPartyId;
-    public EiResponse response;
+    public EiResponseType response;
     private List<EiQuoteType> createdQuotes;
 
     // Need clarification as to what this attribute refers to before changing or deleting
@@ -22,7 +22,7 @@ public class EiCreatedStreamQuotePayload{
     public EiCreatedStreamQuotePayload()	{
     }
 
-    public EiCreatedStreamQuotePayload(MarketOrderIdType marketOrderId, ActorIdType partyId, ActorIdType counterPartyId, EiResponse response, List<EiQuoteType> createdQuotes, RefIdType inResponseTo) {
+    public EiCreatedStreamQuotePayload(MarketOrderIdType marketOrderId, ActorIdType partyId, ActorIdType counterPartyId, EiResponseType response, List<EiQuoteType> createdQuotes, RefIdType inResponseTo) {
         this.marketOrderId = marketOrderId;
         this.partyId = partyId;
         this.counterPartyId = counterPartyId;
@@ -51,11 +51,11 @@ public class EiCreatedStreamQuotePayload{
                 + ", inResponseTo=" + inResponseTo +  ", createdTenders=" + createdQuotes + "]";
     }
 
-    public EiResponse getResponse() {
+    public EiResponseType getResponse() {
         return response;
     }
 
-    public void setResponse(EiResponse response) {
+    public void setResponse(EiResponseType response) {
         this.response = response;
     }
 

@@ -38,8 +38,8 @@ public class GeneratePostmanCollection {
                     + "\\\",\\\"quantity\\\":" + tender.getQuantity() + ",\\\"price\\\":" + tender.getPrice()
                     + ",\\\"ctsTenderId\\\":0,\\\"bridgeInterval\\\":{" + tender.getBridgeInterval().toString() + "},"
                     + "\\\"bridgeExpireTime\\\":{" + "\\\"instantString\\\":\\\""
-                    + tender.getBridgeExpireTime().getInstantString() + "\\\"}," + "\\\"segmentId\\\":" + tender.getSegmentId()
-                    + "}\",";
+                    + tender.getBridgeExpireTime().getInstantString() + "\\\"}," + "\\\"segmentId\\\":"
+                    + tender.getSegmentId() + "}\",";
 
             item += raw;
 
