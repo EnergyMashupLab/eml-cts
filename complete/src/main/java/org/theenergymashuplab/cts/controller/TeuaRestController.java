@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -301,7 +301,7 @@ public class TeuaRestController {
 				tempClientCreateTender.getQuantity());
 
 		tender = new EiTenderType(tempClientCreateTender.getBridgeExpireTime().asInstant(),
-				tempClientCreateTender.getSide(), tenderDetail);
+				tempClientCreateTender.getSide(), tenderDetail, tempClientCreateTender.getSegmentId());
 
 		// Construct the EiCreateTender payload to be forwarded to LMA
 		eiCreateTender = new EiCreateTenderPayload(tender, actorIds[numericTeuaId], this.lmePartyId);
@@ -382,7 +382,8 @@ public class TeuaRestController {
 
 		// Construct the EiCreateStreamTender payload to be forwarded to LMA
 		eiCreateStreamTender = new EiCreateStreamTenderPayload(tender, actorIds[numericTeuaId], this.lmePartyId);
-		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		// set party and counterParty -partyId saved in actorIds, counterParty is
+		// lmePartyId
 		eiCreateStreamTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateStreamTender.setCounterPartyId(lmePartyId);
 		// And forward to the LMA
@@ -460,7 +461,8 @@ public class TeuaRestController {
 		// Construct the EiCreateStreamQuote payload to be forwarded to LMA
 		eiCreateStreamQuote = new EiCreateStreamQuotePayload(quote, actorIds[numericTeuaId], this.lmePartyId);
 
-		// set party and counterParty -partyId saved in actorIds, counterParty is lmePartyId
+		// set party and counterParty -partyId saved in actorIds, counterParty is
+		// lmePartyId
 		eiCreateStreamQuote.setPartyId(actorIds[numericTeuaId]);
 		eiCreateStreamQuote.setCounterPartyId(lmePartyId);
 

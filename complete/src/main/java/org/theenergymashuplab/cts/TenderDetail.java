@@ -17,10 +17,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * 
  *  You can learn more about it from the official Jackson Wiki (https://github.com/FasterXML/jackson-docs/wiki/JacksonPolymorphicDeserialization#12-per-class-annotations)
  *  As well as from here: https://www.baeldung.com/jackson-inheritance */
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-    @Type(value = TenderIntervalDetail.class, name = "interval"),  // TODO Once TenderStreamInterval has been added, add its type here
-	@Type(value = TenderStreamDetail.class, name = "stream") //Added type for JSON
+                // TODO Once TenderStreamInterval has been added, add its type here
+                @Type(value = TenderIntervalDetail.class, name = "interval"),
+                @Type(value = TenderStreamDetail.class, name = "stream") // Added type for JSON
 })
 public abstract class TenderDetail {
 

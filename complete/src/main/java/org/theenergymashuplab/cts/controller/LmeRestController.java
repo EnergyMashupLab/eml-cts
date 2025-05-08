@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +16,15 @@
 
 package org.theenergymashuplab.cts.controller;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.theenergymashuplab.cts.*;
+import org.theenergymashuplab.cts.controller.payloads.*;
+
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 
 import org.springframework.boot.rsocket.server.RSocketServer.Transport;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -25,18 +32,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.theenergymashuplab.cts.*;
-import org.theenergymashuplab.cts.controller.payloads.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.antlr.v4.runtime.misc.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/lme")
@@ -49,8 +56,15 @@ public class LmeRestController {
 	 * This quote ticker is will be sent out to subscribers
 	 */
 	private static QuoteTickerType quoteTicker = new QuoteTickerType();
-	// Add a hashmap for our implementation
+
+	// Add a hashmap for quote driven market implementation
 	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
+
+	// Hashmap for Auction market implementation. Tenders only have an expiration time, so that's what is being used in
+	// place of
+	// the instrument
+	private static HashMap<Instant, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
+
 	// Correlate subscriptions to their partyIds
 	private static HashMap<SubscriptionIdType, ActorIdType> subscriptionsToPartyMap = new HashMap<>();
 
@@ -111,7 +125,9 @@ public class LmeRestController {
 	}
 
 	/*
-	 * GET - /lme/party responds with PartyId
+	 * GET - /lme/party
+	 * 
+	 * responds with PartyId
 	 */
 	@GetMapping("/party")
 	public ActorIdType getParty() {
@@ -119,7 +135,231 @@ public class LmeRestController {
 	}
 
 	/*
-	 * POST - /createTender RequestBody is EiCreateTenderPayload from LMA ResponseBody is EiCreatedTenderPayload
+	 * GET - /lme/clear
+	 * 
+	 * Clears the auction for the given instrument
+	 * 
+	 */
+	@GetMapping("/clear")
+	public HashMap<Instant, List<EiCreateTransactionPayload>> clear() {
+		logger.debug("/clear was called");
+		Set<Instant> instruments = auctionTenders.keySet();
+		// <instrument, clearing price>
+		HashMap<Instant, List<EiCreateTransactionPayload>> instrumentClearingMatches = new HashMap<>();
+
+		// Clears for every instrument. Will later take a parameter to clear a specific instrument.
+		for (Instant instrument : instruments) {
+			ArrayList<EiTenderType> tenders = auctionTenders.get(instrument);
+			ArrayList<EiTenderType> buyTenders = new ArrayList<>();
+			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
+			ArrayList<EiTenderType> inTheMoneyTenders = new ArrayList<>();
+			ArrayList<EiTenderType> residuals = new ArrayList<>();
+			// Demand and supply curves <price, quantity>
+			HashMap<Integer, Integer> demandAtPrice = new HashMap<>();
+			HashMap<Integer, Integer> supplyAtPrice = new HashMap<>();
+
+			// Group into buy and sell tenders
+			for (EiTenderType tender : tenders) {
+				if (tender.getSide() == SideType.BUY) {
+					buyTenders.add(tender);
+				} else if (tender.getSide() == SideType.SELL) {
+					sellTenders.add(tender);
+				}
+			}
+
+			// Sum up total quantities of buyTenders at a given price
+			for (EiTenderType tender : buyTenders) {
+				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
+				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
+
+				if (demandAtPrice.get(price) == null) {
+					demandAtPrice.put(price, quantity);
+				} else {
+					demandAtPrice.put(price, demandAtPrice.get(price) + quantity);
+				}
+			}
+
+			// Sum up total quantities of sellTenders at a given price
+			for (EiTenderType tender : sellTenders) {
+				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
+				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
+
+				if (supplyAtPrice.get(price) == null) {
+					supplyAtPrice.put(price, quantity);
+				} else {
+					supplyAtPrice.put(price, supplyAtPrice.get(price) + quantity);
+				}
+			}
+
+			// Reverse aggregate sum of the quantities at each price
+			// Will have decreasing total quantities as you go from left to right (buyers want low prices)
+			Integer[] buyPrices = demandAtPrice.keySet().toArray(new Integer[demandAtPrice.keySet().size()]);
+			Arrays.sort(buyPrices);
+			for (int i = buyPrices[buyPrices.length - 1]; i > buyPrices[0]; i--) {
+				demandAtPrice.put(i - 1, demandAtPrice.get(i) + demandAtPrice.getOrDefault(i - 1, 0));
+			}
+
+			// Caluclate final clearing price for instrument
+			// Start from the lowest price, then go up until demand <= supply
+			int sellingPrice = buyPrices[0];
+			int demand = demandAtPrice.getOrDefault(sellingPrice, 0);
+			int supply = supplyAtPrice.getOrDefault(sellingPrice, 0);
+			while (demand > supply) {
+				sellingPrice += 1;
+				demand = demandAtPrice.getOrDefault(sellingPrice, 0);
+				supply += supplyAtPrice.getOrDefault(sellingPrice, 0);
+				logger.debug("selling price: " + sellingPrice + "\tdemand: " + demand + "\tsupply: " + supply);
+			}
+
+			int finalClearingPrice = sellingPrice;
+
+			for (EiTenderType tender : tenders) {
+				if (tender.getSide() == SideType.BUY
+						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() >= finalClearingPrice) {
+					inTheMoneyTenders.add(tender);
+				} else if (tender.getSide() == SideType.SELL
+						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() <= finalClearingPrice) {
+					inTheMoneyTenders.add(tender);
+				} else {
+					residuals.add(tender);
+				}
+			}
+
+			// Remove all tenders aside from the residuals
+			auctionTenders.put(instrument, residuals);
+
+			logger.debug("Final Clearing Price: {}", finalClearingPrice);
+
+			// Match buy and sell tenders
+			List<EiCreateTransactionPayload> matches = matchBuySellTenders(inTheMoneyTenders, finalClearingPrice);
+			instrumentClearingMatches.put(instrument, matches);
+		}
+
+		return instrumentClearingMatches;
+	}
+
+	/*
+	 * Helper function for clearing the market. Matches buyers and sellers when given a list of tenders and a clearing
+	 * price
+	 */
+	private List<EiCreateTransactionPayload> matchBuySellTenders(List<EiTenderType> inMoneyTenders, int clearingPrice) {
+		final Comparator<EiTenderType> tenderComparator = (t1, t2) -> {
+			TenderIntervalDetail d1 = (TenderIntervalDetail) t1.getTenderDetail();
+			TenderIntervalDetail d2 = (TenderIntervalDetail) t2.getTenderDetail();
+
+			return Long.compare(d2.getQuantity(), d1.getQuantity());
+		};
+
+		logger.debug("Matching Tenders Received: ");
+
+		for (EiTenderType tender : inMoneyTenders) {
+			logger.debug("Tender: {}\n Tender Detail: {}", tender.toString(), tender.getTenderDetail().toString());
+		}
+
+		List<EiCreateTransactionPayload> transactions = new ArrayList<>();
+
+		Iterator<EiTenderType> buyTenders = inMoneyTenders.stream().filter(tender -> tender.getSide() == SideType.BUY)
+				.sorted(tenderComparator).iterator();
+		Iterator<EiTenderType> sellTenders = inMoneyTenders.stream().filter(tender -> tender.getSide() == SideType.SELL)
+				.sorted(tenderComparator).iterator();
+
+		// If there are either no buy or sell offers, no matches can be made
+		if (!buyTenders.hasNext() || !sellTenders.hasNext()) {
+			return transactions;
+		}
+
+		// Reverse-quantity-sorted buy/sells iterated as they run out of quantity in their tender.
+		EiTenderType buyTender = buyTenders.next();
+		TenderIntervalDetail buyDetail = (TenderIntervalDetail) buyTender.getTenderDetail();
+
+		EiTenderType sellTender = sellTenders.next();
+		TenderIntervalDetail sellDetail = (TenderIntervalDetail) sellTender.getTenderDetail();
+
+		// Counters for the remaining amount of each tender, when this reaches 0, we need to
+		// grab the next tender to either accept or provide more energy
+		long remainingBuyAmount = buyDetail.getQuantity();
+		long remainingSellAmount = sellDetail.getQuantity();
+
+		while (true) {
+			long transactionAmount = Math.min(remainingBuyAmount, remainingSellAmount);
+
+			if (transactionAmount > 0) {
+				// The buy and sell payloads contain information regarding the parties involved
+				// in each tender, so we need them for the transactions
+
+				EiCreateTenderPayload buyPayload = LmeRestController.ctsTenderIdToCreateTenderMap
+						.get(buyTender.getTenderId().value());
+				EiCreateTenderPayload sellPayload = LmeRestController.ctsTenderIdToCreateTenderMap
+						.get(sellTender.getTenderId().value());
+
+				ActorIdType buyPartyId = buyPayload.getPartyId();
+				ActorIdType sellPartyId = sellPayload.getPartyId();
+
+				// The price and quantity may change from the original tender, so we need
+				// to create modified tenders for the transactions.
+
+				TenderIntervalDetail buyModifiedDetail = new TenderIntervalDetail(buyDetail.getInterval(),
+						clearingPrice, transactionAmount);
+				TenderIntervalDetail sellModifiedDetail = new TenderIntervalDetail(sellDetail.getInterval(),
+						clearingPrice, transactionAmount);
+
+				EiTenderType buyModifiedTender = new EiTenderType(buyTender.getExpirationTime(), buyTender.getSide(),
+						buyModifiedDetail);
+				EiTenderType sellModifiedTender = new EiTenderType(sellTender.getExpirationTime(), sellTender.getSide(),
+						sellModifiedDetail);
+
+				EiTransaction buyTransaction = new EiTransaction(buyModifiedTender);
+				EiTransaction sellTransaction = new EiTransaction(sellModifiedTender);
+
+				// Finally, create the transaction payloads from the modified tenders
+
+				EiCreateTransactionPayload buyCreateTransactionPayload = new EiCreateTransactionPayload(buyTransaction,
+						buyPartyId, sellPartyId, new TransactionIdType());
+				EiCreateTransactionPayload sellCreateTransactionPayload = new EiCreateTransactionPayload(
+						sellTransaction, sellPartyId, buyPartyId, new TransactionIdType());
+
+				logger.debug("Buy Transaction Created: {}\n Tender Details: {}", buyCreateTransactionPayload.toString(),
+						buyModifiedDetail.toString());
+				logger.debug("Sell Transaction Created: {}\n Tender Details: {}",
+						sellCreateTransactionPayload.toString(), sellModifiedDetail.toString());
+
+				transactions.add(buyCreateTransactionPayload);
+				transactions.add(sellCreateTransactionPayload);
+			}
+
+			remainingBuyAmount -= transactionAmount;
+			remainingSellAmount -= transactionAmount;
+
+			if (remainingBuyAmount == 0) {
+				if (!buyTenders.hasNext())
+					break;
+
+				buyTender = buyTenders.next();
+				buyDetail = (TenderIntervalDetail) buyTender.getTenderDetail();
+
+				remainingBuyAmount = buyDetail.getQuantity();
+			}
+
+			if (remainingSellAmount == 0) {
+				if (!sellTenders.hasNext())
+					break;
+
+				sellTender = sellTenders.next();
+				sellDetail = (TenderIntervalDetail) sellTender.getTenderDetail();
+
+				remainingSellAmount = sellDetail.getQuantity();
+			}
+		}
+
+		return transactions;
+	}
+
+	/*
+	 * POST - /createTender
+	 * 
+	 * RequestBody is EiCreateTenderPayload from LMA
+	 * 
+	 * ResponseBody is EiCreatedTenderPayload
 	 */
 
 	@PostMapping("/createTender")
@@ -129,43 +369,71 @@ public class LmeRestController {
 		EiCreateTenderPayload mapPutReturnValue = null;
 		EiCreatedTenderPayload tempCreated;
 		Boolean addQsuccess = false;
+		final int ORDER_BOOK_MARKET_SEGMENT = 1;
+		final int AUCTION_MARKET_SEGMENT = 2;
 
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
-		logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
+		// logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
 		logger.debug("lme/createTender " + eiCreateTender.toString());
 
 		/*
 		 * ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
+		 * 
+		 * /* ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
 		 */
 
 		// Forward to market
 		// Conversion to MarketCreateTenderPayload is in LmeSocketClient here
 		// TODO Non-blocking add returns true if OK, false if queue is full
 
-		// TODO switch .add() to blocking .take() after verification
-		addQsuccess = queueFromLme.add(tempCreate);
-		logger.debug("queueFomLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
+		switch (tempTender.getSegmentId()) {
+		case ORDER_BOOK_MARKET_SEGMENT:
+			// TODO switch .add() to blocking .take() after verification
+			addQsuccess = queueFromLme.add(tempCreate);
+			logger.debug("queueFromLme addQsuccess " + addQsuccess + " TenderId " + tempTender.getTenderId());
+			break;
+		case AUCTION_MARKET_SEGMENT:
+			// Add to auction market hashmap
+			ArrayList<EiTenderType> instrumentTenders = auctionTenders.get(tempTender.getExpirationTime());
+
+			if (instrumentTenders == null) {
+				instrumentTenders = new ArrayList<EiTenderType>();
+				instrumentTenders.add(tempTender);
+				auctionTenders.put(tempTender.getExpirationTime(), instrumentTenders);
+				logger.debug("New instrument " + tempTender.getExpirationTime() + " was added to hashmap.");
+			} else {
+				instrumentTenders.add(tempTender);
+				logger.debug("Value " + tempTender.toString() + " was added to instrument "
+						+ tempTender.getExpirationTime());
+			}
+
+			break;
+		}
 
 		/*
 		 * TODO Not conforming with March 2024 spec. The market (parity) is where the market order id should come from
 		 * Currently, there's no way to retrieve the market order id of a tender after it has been submitted. The only
 		 * place where parity sends back it's assigned market order id is after the tender has been matched with a
-		 * different tender, leading to a transaction
-		 * 
-		 * In short, this isn't where the market order id should be set, it should be retrieved from parity
+		 * different tender, leading to a transaction In short, this isn't where the market order id should be set, it
+		 * should be retrieved from parity
 		 */
 		tempTender.setMarketOrderId(new MarketOrderIdType());
 		// put EiCreateTenderPayload in map to build EiCreateTransactionPayload
 		// from MarketCreateTransaction
 		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(), tempCreate);
 
+		logger.debug("After adding to tender map");
+
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		// TODO consider return value if value already in map
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(), tempCreate.getPartyId(),
 				tempCreate.getCounterPartyId(), new EiResponseType(200, "OK", ResponseDetailType.SUCCESS),
 				tempCreate.getRequestId());
+
+		logger.debug(tempCreated.toString());
+		// logger.debug("End of LME create tender: tempCreated = " + tempCreated.toString());
 
 		return tempCreated;
 	}
@@ -202,13 +470,18 @@ public class LmeRestController {
 		/* ================ Forwarding to the market ====================== */
 
 		/**
-		 * Design of this component: In the CTS market, stream tenders do not exist. They are simply a client-side
-		 * semantic that allows clients to construct a stream tender specifying a stream of resource purchases or sales.
+		 * Design of this component:
+		 * 
+		 * In the CTS market, stream tenders do not exist. They are simply a client-side semantic that allows clients to
+		 * construct a stream tender specifying a stream of resource purchases or sales.
+		 * 
 		 * Stream tenders themselves are just a sequence of separate tenders with different prices and quantities,
-		 * arranged in sequential intervals of the same length. So, we can leverage the existing architecture around
-		 * creating tenders to generate a sequence of createTender requests according to the prices and intervals
-		 * outlined in the stream tender object. This may later be changed with the implementation of "allOrNone", but
-		 * currently, it serves our purposes
+		 * arranged in sequential intervals of the same length.
+		 * 
+		 * So, we can leverage the existing architecture around creating tenders to generate a sequence of createTender
+		 * requests according to the prices and intervals outlined in the stream tender object.
+		 * 
+		 * This may later be changed with the implementation of "allOrNone", but currently, it serves our purposes
 		 */
 
 		// Construct the bridge interval
@@ -260,9 +533,7 @@ public class LmeRestController {
 	}
 
 	/*
-	 * POST EiCreateTransaction to LMA
-	 *
-	 * is in LmeSendTransaction
+	 * POST EiCreateTransaction to LMA is in LmeSendTransaction
 	 */
 
 	/*

@@ -26,6 +26,7 @@ public class EiResponseType {
 	public ResponseDetailType responseDetail;
 
 	public EiResponseType(long responseCode, String responseDescription, ResponseDetailType responseDetail) {
+		createdDateTime = new InstantType(Instant.now().toString());
 		this.responseCode = responseCode;
 		this.responseDescription = responseDescription;
 		this.responseDetail = responseDetail;
@@ -36,6 +37,7 @@ public class EiResponseType {
 	 */
 
 	public EiResponseType() {
+		createdDateTime = new InstantType(Instant.now().toString());
 		responseCode = 0;
 		responseDescription = "";
 		responseDetail = ResponseDetailType.UNSPECIFIED;

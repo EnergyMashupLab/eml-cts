@@ -141,3 +141,6 @@ hs_err_pid*
 /complete/system-run
 
 .idea/
+
+# Generated Postman Collection
+/complete/src/main/resources/Generated_Postman_Collection.json

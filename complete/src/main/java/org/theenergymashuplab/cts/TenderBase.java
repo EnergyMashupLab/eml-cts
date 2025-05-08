@@ -123,18 +123,10 @@ public abstract class TenderBase {
 
     @Override
     public String toString() {
-        return "TenderBase{" +
-                "allOrNone=" + allOrNone +
-                ", executionInstructions='" + executionInstructions + '\'' +
-                ", expirationTime=" + expirationTime +
-                ", marketId=" + marketId +
-                ", priceScale=" + priceScale +
-                ", quantityScale=" + quantityScale +
-                ", resourceDesignator=" + resourceDesignator +
-                ", segmentId=" + segmentId +
-                ", side=" + side +
-                ", tenderDetail=" + tenderDetail +
-                ", warrants=" + warrants +
-                '}';
+        return "TenderBase{" + "allOrNone=" + allOrNone + ", executionInstructions='" + executionInstructions + '\''
+                + ", expirationTime=" + expirationTime + ", marketId=" + marketId + ", priceScale=" + priceScale
+                + ", quantityScale=" + quantityScale + ", resourceDesignator=" + resourceDesignator + ", segmentId="
+                + segmentId
+                + ", side=" + side + ", tenderDetail=" + tenderDetail + ", warrants=" + warrants + '}';
     }
 }

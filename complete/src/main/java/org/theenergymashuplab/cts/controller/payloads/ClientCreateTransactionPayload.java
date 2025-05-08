@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,19 +25,19 @@ public class ClientCreateTransactionPayload {
 	private long price;
 	// external price is multiplied by 10**decimal fraction digits - 3 by convention
 	// ctsTenderId is the CTS ID of the tender made by this SC that cleared
-	
+
 	long ctsTenderId; // matched in Parity
-	
+
 	public ClientCreateTransactionPayload(SideType side, long quantity,
-										long price, long tenderId)	{
+			long price, long tenderId) {
 		// values from EiTransaction that are not implicit (e.g. market, product)
 		this.side = side;
 		this.quantity = quantity;
 		this.price = price;
-		this.ctsTenderId= tenderId;
+		this.ctsTenderId = tenderId;
 	}
-	
-	public String toString()	{
+
+	public String toString() {
 		return (info + " side " + side.toString() + " quantity " +
 				Long.toString(quantity) + " price " +
 				Long.toString(price) + " ctsTenderId " + ctsTenderId);
@@ -82,5 +82,5 @@ public class ClientCreateTransactionPayload {
 	public void setCtsTenderId(long ctsTenderId) {
 		this.ctsTenderId = ctsTenderId;
 	}
-	
+
 }

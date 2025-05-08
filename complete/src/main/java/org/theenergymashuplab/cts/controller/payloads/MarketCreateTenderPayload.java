@@ -44,10 +44,10 @@ public class MarketCreateTenderPayload {
 	private BridgeInterval bridgeInterval;
 	private BridgeInstant expireTime;
 
-	public MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Interval interval, Instant expireTime)	{
+	public MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Interval interval,
+			Instant expireTime) {
 		/*
-		 * Ensure that the number of decimal fraction digits
-		 * in price and quantity align with the global one which is presently 3
+		 * Ensure that the number of decimal fraction digits in price and quantity align with the global one which is presently 3
 		 * 
 		 * This converts from the external price, e.g. one dollar is 1000L
 		 */
@@ -58,20 +58,18 @@ public class MarketCreateTenderPayload {
 		this.bridgeInterval = new BridgeInterval(interval.getDuration().toMinutes(), interval.getDtStart());
 		this.expireTime = new BridgeInstant(expireTime);
 	}
-	
+
 	// Default constructor for JSON
-	MarketCreateTenderPayload()	{
-	}
-	
+	MarketCreateTenderPayload() {}
+
 	@Override
-	public String toString()	{
+	public String toString() {
 		SideType tempSide = this.side;
 		String tempString;
 
-		tempString = (tempSide == SideType.BUY)? "B" : "S";
-		
-		return (info + " side " + tempString + " quantity " +
-				quantity + " price " + price);
+		tempString = (tempSide == SideType.BUY) ? "B" : "S";
+
+		return (info + " side " + tempString + " quantity " + quantity + " price " + price);
 	}
 
 	public String getInfo() {
@@ -129,7 +127,5 @@ public class MarketCreateTenderPayload {
 	public void setExpireTime(BridgeInstant expireTime) {
 		this.expireTime = expireTime;
 	}
-
-
 
 }
