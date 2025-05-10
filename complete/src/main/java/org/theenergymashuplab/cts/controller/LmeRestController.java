@@ -60,10 +60,13 @@ public class LmeRestController {
 	// Add a hashmap for quote driven market implementation
 	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
 
-	// Hashmap for Auction market implementation. Tenders only have an expiration time, so that's what is being used in
-	// place of
-	// the instrument
-	private static HashMap<Instant, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
+	/*
+	 * Hashmap for Auction market implementation.
+	 * 
+	 * Key is the String representation of an Interval, since Interval class needs hashCode() and equals() overrides to
+	 * work in a hashmap
+	 */
+	private static HashMap<String, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
 
 	// Correlate subscriptions to their partyIds
 	private static HashMap<SubscriptionIdType, ActorIdType> subscriptionsToPartyMap = new HashMap<>();
@@ -141,14 +144,14 @@ public class LmeRestController {
 	 * 
 	 */
 	@GetMapping("/clear")
-	public HashMap<Instant, List<EiCreateTransactionPayload>> clear() {
-		logger.debug("/clear was called");
-		Set<Instant> instruments = auctionTenders.keySet();
+	public HashMap<String, List<EiCreateTransactionPayload>> clear() {
+		logger.debug("Clearing auction market");
+		Set<String> instruments = auctionTenders.keySet();
 		// <instrument, clearing price>
-		HashMap<Instant, List<EiCreateTransactionPayload>> instrumentClearingMatches = new HashMap<>();
+		HashMap<String, List<EiCreateTransactionPayload>> instrumentClearingMatches = new HashMap<>();
 
 		// Clears for every instrument. Will later take a parameter to clear a specific instrument.
-		for (Instant instrument : instruments) {
+		for (String instrument : instruments) {
 			ArrayList<EiTenderType> tenders = auctionTenders.get(instrument);
 			ArrayList<EiTenderType> buyTenders = new ArrayList<>();
 			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
@@ -375,9 +378,6 @@ public class LmeRestController {
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
-		// logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
-		logger.debug("lme/createTender " + eiCreateTender.toString());
-
 		/*
 		 * ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
 		 * 
@@ -396,18 +396,21 @@ public class LmeRestController {
 			break;
 		case AUCTION_MARKET_SEGMENT:
 			// Add to auction market hashmap
-			ArrayList<EiTenderType> instrumentTenders = auctionTenders.get(tempTender.getExpirationTime());
+			String tenderInterval = ((TenderIntervalDetail) tempTender.getTenderDetail()).getInterval().toString();
+			ArrayList<EiTenderType> instrumentTenders = auctionTenders.get(tenderInterval);
+			logger.debug("Added tender to auction market with interval: " + tenderInterval);
 
 			if (instrumentTenders == null) {
 				instrumentTenders = new ArrayList<EiTenderType>();
 				instrumentTenders.add(tempTender);
-				auctionTenders.put(tempTender.getExpirationTime(), instrumentTenders);
-				logger.debug("New instrument " + tempTender.getExpirationTime() + " was added to hashmap.");
+				auctionTenders.put(tenderInterval.toString(), instrumentTenders);
+				// logger.debug("NEW INSTRUMENT " + tenderInterval + " was added to hashmap.");
 			} else {
 				instrumentTenders.add(tempTender);
-				logger.debug("Value " + tempTender.toString() + " was added to instrument "
-						+ tempTender.getExpirationTime());
+				// logger.debug("TENDER " + tempTender.toString() + " was added to instrument " + tenderInterval);
 			}
+
+			instrumentTenders = auctionTenders.get(tenderInterval);
 
 			break;
 		}
@@ -424,8 +427,6 @@ public class LmeRestController {
 		// from MarketCreateTransaction
 		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(), tempCreate);
 
-		logger.debug("After adding to tender map");
-
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		// TODO consider return value if value already in map
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(), tempCreate.getPartyId(),
@@ -433,7 +434,6 @@ public class LmeRestController {
 				tempCreate.getRequestId());
 
 		logger.debug(tempCreated.toString());
-		// logger.debug("End of LME create tender: tempCreated = " + tempCreated.toString());
 
 		return tempCreated;
 	}
