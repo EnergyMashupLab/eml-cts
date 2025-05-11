@@ -85,21 +85,14 @@ public class EiQuoteType extends TenderBase {
 
 	@Override
 	public String toString() {
-		return "EiQuoteType{" +
-				"marketQuoteId=" + marketQuoteId +
-				", privateQuote=" + privateQuote +
-				", quoteId=" + quoteId +
-				", rfqId=" + rfqId +
-				", tradeable=" + tradeable +
-				", tenderDetail: " + this.getTenderDetail().toString() +
-				'}';
+		return "EiQuoteType{" + "marketQuoteId=" + marketQuoteId + ", privateQuote=" + privateQuote + ", quoteId="
+				+ quoteId + ", rfqId=" + rfqId + ", tradeable=" + tradeable + ", tenderDetail: "
+				+ this.getTenderDetail().toString() + '}';
 	}
 
 	/**
-	 * We are guaranteed to have a unique market order ID, and the AcceptQuote will
-	 * reference
-	 * a quote via the marketQuoteId. As such, it makes sense to index by it in a
-	 * hashset
+	 * We are guaranteed to have a unique market order ID, and the AcceptQuote will reference a quote via the
+	 * marketQuoteId. As such, it makes sense to index by it in a hashset
 	 */
 	@Override
 	public int hashCode() {

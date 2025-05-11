@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,34 +26,31 @@ public class EiReplyPosition {
 	private ArrayList<EiPosition> positionList = new ArrayList<EiPosition>();
 	private RefIdType requestId = new RefIdType();
 	public EiResponseType response;
-	
+
 	// Superceded by updated PositionManager - delete in future release
-	
+
 	/*
-	 * For queries to the position manager - the bounding interval for position information.
-	 * A position is for a particular time so product can be acquired in advance
-	 * Initial draft is <Interval, value> pairs
+	 * For queries to the position manager - the bounding interval for position information. A position is for a
+	 * particular time so product can be acquired in advance Initial draft is <Interval, value> pairs
 	 */
-	EiReplyPosition()	{
+	EiReplyPosition() {
 		// for JSON serialization - uses setters and getters
 		// attrubutes left as initialized to null
 	}
-	
-	EiReplyPosition(Interval boundingInterval, ArrayList<EiPosition> positionList, EiResponseType response)	{
+
+	EiReplyPosition(Interval boundingInterval, ArrayList<EiPosition> positionList, EiResponseType response) {
 		// will have a list of positions passed in as an ArrayList<EiPosition>
 		this.boundingInterval = boundingInterval;
 		this.positionList = positionList;
 		this.response = response;
 	}
-	
-	public String toString()	{
-		String formattedString = 
-				"EiReplyPosition party '%s' requestor '%s' request %d boundingInterval '%s' positionList %s";
 
-		String.format(formattedString,
-				positionParty.toString(), requestor.toString(),
-				request.toString(), positionList.toString());
-		
+	public String toString() {
+		String formattedString = "EiReplyPosition party '%s' requestor '%s' request %d boundingInterval '%s' positionList %s";
+
+		String.format(formattedString, positionParty.toString(), requestor.toString(), request.toString(),
+				positionList.toString());
+
 		return formattedString;
 	}
 
@@ -112,5 +109,5 @@ public class EiReplyPosition {
 	public void setResponse(EiResponseType response) {
 		this.response = response;
 	}
-	
+
 }

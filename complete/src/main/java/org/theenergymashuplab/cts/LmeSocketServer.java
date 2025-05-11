@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,13 +91,13 @@ public class LmeSocketServer extends Thread {
 		EiCreateTransactionPayload matchEiCreateTransaction, tempCreate;
 
 		/*
-		 * The Map takes (Long)MarketCreateTransactionPayload.getMatchNumber() to the EiCreateTenderPayload built from that
-		 * MarketCreateTransaction.
+		 * The Map takes (Long)MarketCreateTransactionPayload.getMatchNumber() to the EiCreateTenderPayload built from
+		 * that MarketCreateTransaction.
 		 * 
 		 * In the while loop we take a MarketCreateTransaction and build an EiCreateTransactionPayload.
 		 * 
-		 * If the matchNumber is in the Map (the first of two transactions has been processed) we send the one stored in the Map
-		 * (and delete the entry).
+		 * If the matchNumber is in the Map (the first of two transactions has been processed) we send the one stored in
+		 * the Map (and delete the entry).
 		 * 
 		 * Then we send the one in hand that correlated by matchNumber.
 		 */
@@ -183,11 +183,12 @@ public class LmeSocketServer extends Thread {
 
 					logger.trace("LmeSocketServer EiCreateTransaction " + eiCreateTransaction.toString());
 					/*
-					 * Determine whether a previous EiCreateTransaction built from the same Parity matchNumber was saved in
-					 * eiCreateTransactionMatchNumberMap
+					 * Determine whether a previous EiCreateTransaction built from the same Parity matchNumber was saved
+					 * in eiCreateTransactionMatchNumberMap
 					 * 
 					 * If so, send it then send the current EiCreateTransactionPay;oad If not, save this
-					 * EiCrerateTransactionPayload in Map key value is matchNumber in MarketCreateTransactionPayload from Parity
+					 * EiCrerateTransactionPayload in Map key value is matchNumber in MarketCreateTransactionPayload
+					 * from Parity
 					 */
 					matchEiCreateTransaction = eiCreateTransactionMatchNumberMap.get(matchNumberLong);
 					if (matchEiCreateTransaction == null) {

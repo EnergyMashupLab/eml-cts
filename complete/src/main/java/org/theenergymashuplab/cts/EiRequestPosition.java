@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ package org.theenergymashuplab.cts;
 
 public class EiRequestPosition {
 	private ActorIdType requestor;
-	private ActorIdType positionParty;	// the party whose position is described
+	private ActorIdType positionParty; // the party whose position is described
 	private RefIdType request;
 	private Interval boundingInterval;
 	private RefIdType requestId = new RefIdType();
@@ -30,16 +30,15 @@ public class EiRequestPosition {
 	/*
 	 * Default constructor for JSON deserialization.
 	 */
-	public EiRequestPosition()	{
-		
+	public EiRequestPosition() {
+
 		this.requestor = new ActorIdType();
 		this.positionParty = new ActorIdType();
 		this.request = new RefIdType();
 	}
 
-	/* 
-	 * Parallel to EiCreateTransaction, EiCreateTender, etc:
-	 * 		pass an Interval
+	/*
+	 * Parallel to EiCreateTransaction, EiCreateTender, etc: pass an Interval
 	 * 
 	 * Add positionParty, requestorParty, and requestId for the message payload.
 	 */
@@ -50,21 +49,16 @@ public class EiRequestPosition {
 		this.positionParty = positionParty;
 		this.requestor = requestorParty;
 		this.request = new RefIdType();
-		
-		System.err.println("EiRequestPosition Constructor before this.print()" + this.toString());	
+
+		System.err.println("EiRequestPosition Constructor before this.print()" + this.toString());
 	}
-	
+
 	public String toString() {
-		String printStringFormat = 
-				"EiRequestPosition.print() partyId %d requestorPartyId %d requestId %d  dtStart %s duration %s";
-			
-		String.format(printStringFormat,
-				positionParty.value(), 
-				requestor.value(),
-				request.value(),
-				boundingInterval.dtStart.toString(),
-				boundingInterval.duration.toString());
-		
+		String printStringFormat = "EiRequestPosition.print() partyId %d requestorPartyId %d requestId %d  dtStart %s duration %s";
+
+		String.format(printStringFormat, positionParty.value(), requestor.value(), request.value(),
+				boundingInterval.dtStart.toString(), boundingInterval.duration.toString());
+
 		return printStringFormat;
 	}
 
@@ -107,6 +101,5 @@ public class EiRequestPosition {
 	public void setRequestId(RefIdType requestId) {
 		this.requestId = requestId;
 	}
-	
-	
+
 }

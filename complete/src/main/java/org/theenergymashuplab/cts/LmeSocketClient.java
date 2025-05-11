@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -104,12 +104,12 @@ public class LmeSocketClient extends Thread {
 				TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
 
 				toJson = new MarketCreateTenderPayload(tender.getSide(), tenderIntervalDetail.getQuantity(),
-						tenderIntervalDetail.getPrice(), tender.getTenderId().value(), tenderIntervalDetail.getInterval(),
-						tender.getExpirationTime());
+						tenderIntervalDetail.getPrice(), tender.getTenderId().value(),
+						tenderIntervalDetail.getInterval(), tender.getExpirationTime());
 
 				/*
-				 * TODO Retrieve the parity order id after the tender has been submitted and processed The parity order id should
-				 * become the tender's market order id, as soon as it's known
+				 * TODO Retrieve the parity order id after the tender has been submitted and processed The parity order
+				 * id should become the tender's market order id, as soon as it's known
 				 */
 
 				// TODO save EiCreateTenderPayload in Map <long, EiCreateTenderPayload> for

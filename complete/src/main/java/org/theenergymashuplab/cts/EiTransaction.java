@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,37 +23,36 @@ package org.theenergymashuplab.cts;
  */
 
 public class EiTransaction {
-	private final TransactionIdType transactionId = new TransactionIdType();	// will be passed to constructor
+	private final TransactionIdType transactionId = new TransactionIdType(); // will be passed to constructor
 	private EiTenderType tender;
 	private TransactiveState transactiveState = TransactiveState.TRANSACTION;
-	
+
 	/*
 	 * Default constructor for JSON deserialization.
 	 */
-	public EiTransaction()	{		
-	}
+	public EiTransaction() {}
 
 	public EiTransaction(EiTenderType tender) {
-//		System.err.println("in EiTransaction Constructor tenderId " + tender.getTenderId().getTenderId());
+		// System.err.println("in EiTransaction Constructor tenderId " + tender.getTenderId().getTenderId());
 		this.tender = tender;
-//		this.print();
+		// this.print();
 	}
 
 	public TransactionIdType getTransactionId() {
 		return this.transactionId;
 	}
-	
-	public EiTenderType getTender()	{
+
+	public EiTenderType getTender() {
 		return tender;
 	}
 
-	public void setTender(EiTenderType tender){
+	public void setTender(EiTenderType tender) {
 		this.tender = tender;
 	}
-	
+
 	public String toString() {
-		return ("EiTransaction transactionId " + this.transactionId.toString() +
-				 " tenderId " + this.tender.getTenderId().value());
+		return ("EiTransaction transactionId " + this.transactionId.toString() + " tenderId "
+				+ this.tender.getTenderId().value());
 	}
 
 	public TransactiveState getTransactiveState() {
@@ -62,6 +61,6 @@ public class EiTransaction {
 
 	public void setTransactiveState(TransactiveState transactiveState) {
 		this.transactiveState = transactiveState;
-	}	
-	
+	}
+
 }
