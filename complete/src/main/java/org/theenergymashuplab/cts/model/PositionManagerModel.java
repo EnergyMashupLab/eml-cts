@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,29 +39,29 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name="Position")
+@Table(name = "Position")
 public class PositionManagerModel {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "counter_id")
 	private long counterId;
-	
+
 	@Column(name = "position_Party")
 	private long positionParty;
 
 	@Column(name = "Transaction_id")
 	private long transactionId;
-	
+
 	@Column(name = "Quantity")
 	private long quantity;
 
 	@Column(name = "Market_id")
 	private long marketId;
-	
+
 	@Column(name = "Start_Time")
 	@NotNull
 	private Instant startTime;
-	
+
 	@Column(name = "End_Time")
 	@NotNull
 	private Instant endTime;
@@ -72,14 +72,8 @@ public class PositionManagerModel {
 	private ResourceDesignator resourceDesignator;
 
 	// Class Constructor
-	public PositionManagerModel(
-			long positionParty,
-			long transaction_id,
-			long quantity,
-			long marketId,
-			Instant startTime,
-			long durationinSeconds,
-			ResourceDesignator resourceDesignator) {
+	public PositionManagerModel(long positionParty, long transaction_id, long quantity, long marketId,
+			Instant startTime, long durationinSeconds, ResourceDesignator resourceDesignator) {
 		this.positionParty = positionParty;
 		this.transactionId = transaction_id; // Always 0 at this point of time.(Future updated)
 		this.quantity = quantity;
@@ -88,8 +82,8 @@ public class PositionManagerModel {
 		this.endTime = startTime.plusSeconds(durationinSeconds);
 		this.resourceDesignator = resourceDesignator;
 	}
-	
-	//Default Constructor.
+
+	// Default Constructor.
 	public PositionManagerModel() {
 		this.positionParty = 0;
 		this.transactionId = 0;
@@ -99,18 +93,14 @@ public class PositionManagerModel {
 		this.endTime = null;
 		this.resourceDesignator = ResourceDesignator.ENERGY;
 	}
-	
+
 	@Override
-	public String toString()	{
-		return "PositionManagerModel counterId " + counterId +
-				" positionParty " + positionParty +
-				" transactionId " + transactionId +
-				" quantity " + quantity +
-				" startTime " + startTime.toString() +
-				" endTime " + endTime.toString() +
-				" resourceDesignator " + resourceDesignator;
+	public String toString() {
+		return "PositionManagerModel counterId " + counterId + " positionParty " + positionParty + " transactionId "
+				+ transactionId + " quantity " + quantity + " startTime " + startTime.toString() + " endTime "
+				+ endTime.toString() + " resourceDesignator " + resourceDesignator;
 	}
-	
+
 	/**
 	 * @return the startTime
 	 */
@@ -194,7 +184,7 @@ public class PositionManagerModel {
 	public void setQuantity(long quantity) {
 		this.quantity = quantity;
 	}
-	
+
 	public ResourceDesignator getResourceDesignator() {
 		return this.resourceDesignator;
 	}
