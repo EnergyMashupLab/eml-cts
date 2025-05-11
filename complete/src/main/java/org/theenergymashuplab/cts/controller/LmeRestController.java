@@ -48,6 +48,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/lme")
 public class LmeRestController {
+
+	private final ClientRestController clientRestController;
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
@@ -103,7 +105,7 @@ public class LmeRestController {
 
 	private static final Logger logger = LogManager.getLogger(LmeRestController.class);
 
-	LmeRestController() {
+	LmeRestController(ClientRestController clientRestController) {
 		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
 
 		// Start thread to read createTransactionQ and send
@@ -125,6 +127,8 @@ public class LmeRestController {
 		}
 
 		quoteTicker.setCounterParty(partyId);
+
+		this.clientRestController = clientRestController;
 	}
 
 	/*
@@ -160,6 +164,7 @@ public class LmeRestController {
 			// Demand and supply curves <price, quantity>
 			HashMap<Integer, Integer> demandAtPrice = new HashMap<>();
 			HashMap<Integer, Integer> supplyAtPrice = new HashMap<>();
+			int lowestSellPrice = Integer.MAX_VALUE;
 
 			// Group into buy and sell tenders
 			for (EiTenderType tender : tenders) {
@@ -168,6 +173,12 @@ public class LmeRestController {
 				} else if (tender.getSide() == SideType.SELL) {
 					sellTenders.add(tender);
 				}
+			}
+
+			// If no buy tenders or no sell tenders, exit early
+			if (buyTenders.size() == 0 || sellTenders.size() == 0) {
+				logger.debug("No buy tenders or no sell tenders, so nothing to clear.");
+				return instrumentClearingMatches;
 			}
 
 			// Sum up total quantities of buyTenders at a given price
@@ -186,6 +197,10 @@ public class LmeRestController {
 			for (EiTenderType tender : sellTenders) {
 				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
 				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
+
+				if (price < lowestSellPrice) {
+					lowestSellPrice = price;
+				}
 
 				if (supplyAtPrice.get(price) == null) {
 					supplyAtPrice.put(price, quantity);
@@ -207,21 +222,26 @@ public class LmeRestController {
 			int sellingPrice = buyPrices[0];
 			int demand = demandAtPrice.getOrDefault(sellingPrice, 0);
 			int supply = supplyAtPrice.getOrDefault(sellingPrice, 0);
-			while (demand > supply) {
-				sellingPrice += 1;
-				demand = demandAtPrice.getOrDefault(sellingPrice, 0);
-				supply += supplyAtPrice.getOrDefault(sellingPrice, 0);
-				logger.debug("selling price: " + sellingPrice + "\tdemand: " + demand + "\tsupply: " + supply);
+
+			if (sellingPrice > lowestSellPrice) {
+				sellingPrice = lowestSellPrice;
 			}
 
-			int finalClearingPrice = sellingPrice;
+			while (demand > supply) {
+				demand = demandAtPrice.getOrDefault(sellingPrice, buyPrices[0]);
+				supply += supplyAtPrice.getOrDefault(sellingPrice, 0);
+				logger.debug("selling price: " + sellingPrice + "\tdemand: " + demand + "\tsupply: " + supply);
+				sellingPrice += 1;
+			}
+
+			int finalClearingPrice = sellingPrice - 1;
 
 			for (EiTenderType tender : tenders) {
-				if (tender.getSide() == SideType.BUY
-						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() >= finalClearingPrice) {
+				int tenderPrice = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
+
+				if (tender.getSide() == SideType.BUY && tenderPrice >= finalClearingPrice) {
 					inTheMoneyTenders.add(tender);
-				} else if (tender.getSide() == SideType.SELL
-						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() <= finalClearingPrice) {
+				} else if (tender.getSide() == SideType.SELL && tenderPrice <= finalClearingPrice) {
 					inTheMoneyTenders.add(tender);
 				} else {
 					residuals.add(tender);
