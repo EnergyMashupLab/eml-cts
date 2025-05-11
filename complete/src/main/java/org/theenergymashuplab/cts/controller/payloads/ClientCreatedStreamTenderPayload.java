@@ -1,25 +1,40 @@
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.theenergymashuplab.cts.controller.payloads;
 
 import java.util.List;
 
-public class ClientCreatedStreamTenderPayload{
-	//We will return a list of all of the created tenders that we made
+public class ClientCreatedStreamTenderPayload {
+	// We will return a list of all of the created tenders that we made
 	private List<Long> ctsStreamTenderIds;
 	private Boolean success = false;
 	private long id;
 	private String info = "ClientCreatedStreamTenderPayload";
 
-	//JSON
-	public ClientCreatedStreamTenderPayload() {
-	}
+	// JSON
+	public ClientCreatedStreamTenderPayload() {}
 
-	//JSON
+	// JSON
 	public ClientCreatedStreamTenderPayload(long id) {
 		this.id = id;
 		this.success = true;
 	}
 
-	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds){
+	public ClientCreatedStreamTenderPayload(List<Long> ctsStreamTenderIds) {
 		this.ctsStreamTenderIds = ctsStreamTenderIds;
 		this.success = true;
 	}
@@ -46,11 +61,11 @@ public class ClientCreatedStreamTenderPayload{
 		this.success = success;
 	}
 
-	public long getId(){
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(long id){
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -64,10 +79,7 @@ public class ClientCreatedStreamTenderPayload{
 
 	@Override
 	public String toString() {
-		return "ClientCreatedStreamTenderPayload{" +
-				"ctsStreamTenderIds=" + ctsStreamTenderIds.toString() +
-				", success=" + success +
-				", info='" + info + '\'' +
-				'}';
+		return "ClientCreatedStreamTenderPayload{" + "ctsStreamTenderIds=" + ctsStreamTenderIds.toString()
+				+ ", success=" + success + ", info='" + info + '\'' + '}';
 	}
 }

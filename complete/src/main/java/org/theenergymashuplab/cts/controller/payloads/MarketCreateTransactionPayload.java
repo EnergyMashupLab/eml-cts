@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,22 +40,18 @@ import org.theenergymashuplab.cts.SideType;
 public class MarketCreateTransactionPayload {
 	private String info = "MarketCreateTransactionPayload";
 	private SideType side;
-	long quantity = 0;	// quantity transacted. At least two Transactions created for a match
-	long price = 0;		//price may not be that tendered
-	long ctsTenderId = 0;	// set before sending -- Map maintained by CtsBridge	
-	String parityOrderId = null;	// parity order id for this match from engine
-	long matchNumber = 0;	// parity matchNumber for this match from engine
-		
-	MarketCreateTransactionPayload()	{	// json
+	long quantity = 0; // quantity transacted. At least two Transactions created for a match
+	long price = 0; // price may not be that tendered
+	long ctsTenderId = 0; // set before sending -- Map maintained by CtsBridge
+	String parityOrderId = null; // parity order id for this match from engine
+	long matchNumber = 0; // parity matchNumber for this match from engine
+
+	MarketCreateTransactionPayload() { // json
 	}
-	
+
 	// Not used on LME end
-	MarketCreateTransactionPayload(String parityOrderId,
-			long ctsTenderId,
-			long quantity,
-			long price,
-			long matchNumber,
-			SideType side)	{
+	MarketCreateTransactionPayload(String parityOrderId, long ctsTenderId, long quantity, long price, long matchNumber,
+			SideType side) {
 		this.parityOrderId = parityOrderId;
 		this.ctsTenderId = ctsTenderId;
 		this.quantity = quantity;
@@ -63,19 +59,15 @@ public class MarketCreateTransactionPayload {
 		this.matchNumber = matchNumber;
 		this.side = side;
 	}
-	
-	@Override
-	public String toString()	{
-		SideType tempSide = this.side;
-		String tempString;	
 
-		tempString = (tempSide == SideType.BUY)? "B" : "S";		
-		return (info + " parityOrderId " + parityOrderId +
-				" ctsTenderId " + ctsTenderId +
-				" side " + tempString +
-				" quantity " + quantity 
-				+ " price " + price +
-				" matchNumber " + matchNumber);
+	@Override
+	public String toString() {
+		SideType tempSide = this.side;
+		String tempString;
+
+		tempString = (tempSide == SideType.BUY) ? "B" : "S";
+		return (info + " parityOrderId " + parityOrderId + " ctsTenderId " + ctsTenderId + " side " + tempString
+				+ " quantity " + quantity + " price " + price + " matchNumber " + matchNumber);
 	}
 
 	public String getInfo() {

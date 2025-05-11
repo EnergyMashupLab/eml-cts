@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,12 +29,11 @@ public class EiCreateTransactionPayload {
 	private ActorIdType partyId;
 	private RefIdType requestId;
 	private EiTransaction transaction;
-	
-	// Default initializer for JSON serialization
-	public EiCreateTransactionPayload() {
-	}
 
-	public EiCreateTransactionPayload(EiTransaction eiTransaction)	{
+	// Default initializer for JSON serialization
+	public EiCreateTransactionPayload() {}
+
+	public EiCreateTransactionPayload(EiTransaction eiTransaction) {
 		this.counterPartyId = new ActorIdType();
 		this.partyId = new ActorIdType();
 		this.requestId = new RefIdType();
@@ -42,27 +41,26 @@ public class EiCreateTransactionPayload {
 		this.marketTransactionId = new TransactionIdType();
 	}
 
-	/* 
-	 * Parallel for EiCreateTransactionPayload, EiCreateTender:
-	 * 		pass in a completed Tender/Transaction which includes through its Tender interval, quantity, price,
-	 * 		or for EiCancelTender only the TenderId.
+	/*
+	 * Parallel for EiCreateTransactionPayload, EiCreateTender: pass in a completed Tender/Transaction which includes
+	 * through its Tender interval, quantity, price, or for EiCancelTender only the TenderId.
 	 * 
 	 * Add party, counterParty, and requestId for the message payload.
 	 */
-	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party,
-				ActorIdType counterParty, TransactionIdType marketTransactionId) {
+	public EiCreateTransactionPayload(EiTransaction transaction, ActorIdType party, ActorIdType counterParty,
+			TransactionIdType marketTransactionId) {
 		this.transaction = transaction;
 		this.partyId = party;
 		this.counterPartyId = counterParty;
 		this.marketTransactionId = marketTransactionId;
 		this.requestId = new RefIdType();
 	}
-	
+
 	@Override
 	public String toString() {
-//		String printStringFormat = 
-//			"EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d  dtStart %s";
-		
+		// String printStringFormat =
+		// "EiCreateTransactionPayload transactionId %d partyId %d counterPartyId %d requestId %d dtStart %s";
+
 		// CURRENTLY, TENDER DETAIL IMPLEMENTATION IS UNSTABLE
 		// THIS IS A WORKAROUND TO ENSURE THAT APPLICATION AT LEAST
 		// WORKS WITH INTERVAL TENDERS
@@ -71,15 +69,12 @@ public class EiCreateTransactionPayload {
 			throw new IllegalArgumentException("Currently only support simple Interval Tenders");
 		}
 		TenderIntervalDetail tenderIntervalDetail = (TenderIntervalDetail) tenderDetail;
-		
-		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() +
-				" partyid " + partyId.toString() +
-				" counterPartyid " + counterPartyId.toString() +
-				" marketTransactionid " + marketTransactionId.toString() +			
-				" requestId " + requestId.value() + " TenderId " +
-				transaction.getTender().getTenderId().value() +
-				" quantity " + tenderIntervalDetail.getQuantity() +
-				" price " + tenderIntervalDetail.getPrice());
+
+		return ("EiCreateTransactionPayload transactionId " + transaction.getTransactionId().value() + " partyid "
+				+ partyId.toString() + " counterPartyid " + counterPartyId.toString() + " marketTransactionid "
+				+ marketTransactionId.toString() + " requestId " + requestId.value() + " TenderId "
+				+ transaction.getTender().getTenderId().value() + " quantity " + tenderIntervalDetail.getQuantity()
+				+ " price " + tenderIntervalDetail.getPrice());
 	}
 
 	public ActorIdType getCounterPartyId() {
@@ -121,5 +116,5 @@ public class EiCreateTransactionPayload {
 	public void setMarketTransactionId(TransactionIdType marketTransactionId) {
 		this.marketTransactionId = marketTransactionId;
 	}
-	
+
 }

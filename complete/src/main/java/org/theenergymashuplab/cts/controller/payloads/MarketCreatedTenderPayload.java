@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,23 +27,23 @@ public class MarketCreatedTenderPayload {
 	public Boolean success = false;
 	private String info = "ClientCreatedTenderPayload";
 	private String parityOrderId = null;
-	
-	MarketCreatedTenderPayload(){
+
+	MarketCreatedTenderPayload() {
 		success = true;
 	}
-	
-	MarketCreatedTenderPayload(long id){
+
+	MarketCreatedTenderPayload(long id) {
 		ctsTenderId = id;
 		// parityOrderId is known after Order is entered
 		this.success = true;
 	}
-	
-	MarketCreatedTenderPayload(long ctsTenderId, String parityOrderId)	{
+
+	MarketCreatedTenderPayload(long ctsTenderId, String parityOrderId) {
 		this.ctsTenderId = ctsTenderId;
 		this.parityOrderId = parityOrderId;
 		this.success = true;
 	}
-	
+
 	public String getParityOrderId() {
 		return parityOrderId;
 	}
@@ -53,9 +53,8 @@ public class MarketCreatedTenderPayload {
 	}
 
 	@Override
-	public String toString()	{
-		return (info + " success is " + success.toString() +
-				" CtsTenderId " + Long.toString(ctsTenderId));
+	public String toString() {
+		return (info + " success is " + success.toString() + " CtsTenderId " + Long.toString(ctsTenderId));
 	}
 
 	public long getCtsTenderId() {

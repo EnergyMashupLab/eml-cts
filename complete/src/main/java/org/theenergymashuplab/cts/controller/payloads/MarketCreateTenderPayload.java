@@ -1,12 +1,12 @@
 /*
- * Copyright 2019-2020 The Energy Mashup Lab
- *
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,7 +47,8 @@ public class MarketCreateTenderPayload {
 	public MarketCreateTenderPayload(SideType side, long quantity, long price, long ctsTenderId, Interval interval,
 			Instant expireTime) {
 		/*
-		 * Ensure that the number of decimal fraction digits in price and quantity align with the global one which is presently 3
+		 * Ensure that the number of decimal fraction digits in price and quantity align with the global one which is
+		 * presently 3
 		 * 
 		 * This converts from the external price, e.g. one dollar is 1000L
 		 */
