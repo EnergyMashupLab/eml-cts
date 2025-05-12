@@ -60,9 +60,7 @@ public class ProductType extends ResourceType {
 
 	@Override
 	public String toString() {
-		return "ProductType {" +
-				" duration = " + duration +
-				", quantityScale = " + quantityScale +
-				", warrantId = " + warrants + " }";
+		return "ProductType {" + " duration = " + duration + ", quantityScale = " + quantityScale + ", warrantId = "
+				+ warrants + " }";
 	}
 }

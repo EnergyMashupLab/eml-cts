@@ -1,5 +1,20 @@
-package org.theenergymashuplab.cts;
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+package org.theenergymashuplab.cts;
 
 /**
  * @author crossover
@@ -24,10 +39,11 @@ public class MarketReferenceDataType {
 	public Long tickSize;
 	public DurationType timeOffset;
 
-	public MarketReferenceDataType(String currency, String currencyCodeSource, MarketIdType marketId, Integer marketMechanismLevelTwo,
-								   String marketName, ActorIdType marketPartyI, Integer maximumResourceAmount, Integer maximumResourceDuration,
-								   Integer maximumResourceUnit, Integer maximumTrade, Integer priceScale, ResourceDesignatorType resourceDesignator,
-								   SegmentReferenceDataType segments, Long tickSize, DurationType timeOffset) {
+	public MarketReferenceDataType(String currency, String currencyCodeSource, MarketIdType marketId,
+			Integer marketMechanismLevelTwo, String marketName, ActorIdType marketPartyI, Integer maximumResourceAmount,
+			Integer maximumResourceDuration, Integer maximumResourceUnit, Integer maximumTrade, Integer priceScale,
+			ResourceDesignatorType resourceDesignator, SegmentReferenceDataType segments, Long tickSize,
+			DurationType timeOffset) {
 		this.currency = currency;
 		this.currencyCodeSource = currencyCodeSource;
 		this.marketId = marketId;
@@ -167,12 +183,12 @@ public class MarketReferenceDataType {
 
 	@Override
 	public String toString() {
-		return "MarketReferenceDataType [currency=" + currency + ", currencyCodeSource=" + currencyCodeSource +
-				", marketId=" + marketId + ", marketMechanismLevelTwo=" + marketMechanismLevelTwo +
-				", marketName=" + marketName + ", marketPartyId=" + marketPartyId + ", maximumResourceAmount="
-				+ maximumResourceAmount + ", maximumResourceDuration=" + maximumResourceDuration +
-				", maximumResourceUnit=" + maximumResourceUnit + ", maximumTrade=" + maximumTrade +
-				", priceScale=" + priceScale + ", resourceDesignator=" + resourceDesignator +
-				", segments=" + segments + ", timeOffset=" + timeOffset + "]";
+		return "MarketReferenceDataType [currency=" + currency + ", currencyCodeSource=" + currencyCodeSource
+				+ ", marketId=" + marketId + ", marketMechanismLevelTwo=" + marketMechanismLevelTwo + ", marketName="
+				+ marketName + ", marketPartyId=" + marketPartyId + ", maximumResourceAmount=" + maximumResourceAmount
+				+ ", maximumResourceDuration=" + maximumResourceDuration + ", maximumResourceUnit="
+				+ maximumResourceUnit + ", maximumTrade=" + maximumTrade + ", priceScale=" + priceScale
+				+ ", resourceDesignator=" + resourceDesignator + ", segments=" + segments + ", timeOffset=" + timeOffset
+				+ "]";
 	}
 }

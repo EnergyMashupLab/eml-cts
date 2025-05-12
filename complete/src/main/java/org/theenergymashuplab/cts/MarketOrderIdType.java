@@ -22,8 +22,7 @@ public class MarketOrderIdType extends UidType {
 		super(uidId);
 	}
 
-	public MarketOrderIdType() {
-	}
+	public MarketOrderIdType() {}
 
 	/**
 	 * This will be used in the explicit case that we want a duplicate
@@ -47,8 +46,6 @@ public class MarketOrderIdType extends UidType {
 
 	@Override
 	public String toString() {
-		return "MarketOrderIdType{" +
-				"myUidId=" + myUidId +
-				'}';
+		return "MarketOrderIdType{" + "myUidId=" + myUidId + '}';
 	}
 }

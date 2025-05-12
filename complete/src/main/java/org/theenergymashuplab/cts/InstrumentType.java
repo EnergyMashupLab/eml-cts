@@ -38,15 +38,9 @@ public class InstrumentType extends ProductType {
 
 	@Override
 	public String toString() {
-		return "InstrumentType{" +
-				"instrumentStart=" + instrumentStart +
-				", duration=" + duration +
-				", quantityScale=" + quantityScale +
-				", warrantId=" + warrants +
-				", resourceAttributes='" + resourceAttributes + '\'' +
-				", resourceDescription='" + resourceDescription + '\'' +
-				", resourceDesignator=" + resourceDesignator +
-				", resourceUnit='" + resourceUnit + '\'' +
-				'}';
+		return "InstrumentType{" + "instrumentStart=" + instrumentStart + ", duration=" + duration + ", quantityScale="
+				+ quantityScale + ", warrantId=" + warrants + ", resourceAttributes='" + resourceAttributes + '\''
+				+ ", resourceDescription='" + resourceDescription + '\'' + ", resourceDesignator=" + resourceDesignator
+				+ ", resourceUnit='" + resourceUnit + '\'' + '}';
 	}
 }

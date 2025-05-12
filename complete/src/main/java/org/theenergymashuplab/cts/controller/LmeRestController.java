@@ -400,8 +400,6 @@ public class LmeRestController {
 
 		/*
 		 * ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
-		 * 
-		 * /* ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
 		 */
 
 		// Forward to market

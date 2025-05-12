@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.theenergymashuplab.cts.controller.payloads;
 
 import org.theenergymashuplab.cts.BridgeInstant;
@@ -11,18 +27,17 @@ public class ClientCreateStreamQuotePayload {
     // Side that we are on
     private SideType side;
     private long ctsQuoteId;
-    //A list of our streamIntervals
+    // A list of our streamIntervals
     private List<CtsStreamIntervalType> streamIntervals;
     private BridgeInstant streamStart;
     private BridgeInstant bridgeExpireTime;
     private long intervalDurationInMinutes;
 
+    public ClientCreateStreamQuotePayload() {}
 
-
-    public ClientCreateStreamQuotePayload() {
-    }
-
-    public ClientCreateStreamQuotePayload(String info, SideType side, long ctsQuoteId, List<CtsStreamIntervalType> streamIntervals, BridgeInstant streamStart, BridgeInstant bridgeExpireTime, long intervalDurationInMinutes) {
+    public ClientCreateStreamQuotePayload(String info, SideType side, long ctsQuoteId,
+            List<CtsStreamIntervalType> streamIntervals, BridgeInstant streamStart, BridgeInstant bridgeExpireTime,
+            long intervalDurationInMinutes) {
         this.info = info;
         this.side = side;
         this.ctsQuoteId = ctsQuoteId;
@@ -90,14 +105,9 @@ public class ClientCreateStreamQuotePayload {
 
     @Override
     public String toString() {
-        return "ClientCreateStreamQuotePayload{" +
-                "info='" + info + '\'' +
-                ", side=" + side +
-                ", ctsQuoteId=" + ctsQuoteId +
-                ", streamIntervals=" + streamIntervals +
-                ", streamStart=" + streamStart +
-                ", bridgeExpireTime=" + bridgeExpireTime +
-                ", intervalDurationInMinutes=" + intervalDurationInMinutes +
-                '}';
+        return "ClientCreateStreamQuotePayload{" + "info='" + info + '\'' + ", side=" + side + ", ctsQuoteId="
+                + ctsQuoteId + ", streamIntervals=" + streamIntervals + ", streamStart=" + streamStart
+                + ", bridgeExpireTime=" + bridgeExpireTime + ", intervalDurationInMinutes=" + intervalDurationInMinutes
+                + '}';
     }
 }

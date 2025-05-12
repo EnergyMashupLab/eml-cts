@@ -1,5 +1,20 @@
-package org.theenergymashuplab.cts;
+/*
+ * Copyright 2019-2025 The Energy Mashup Lab
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+package org.theenergymashuplab.cts;
 
 /**
  * @author crossover
@@ -19,13 +34,13 @@ public class SessionDataType {
 	public SessionStatusType sessionStatus;
 	public IntervalType tradeableInstrumentRange;
 
-	public SessionDataType(){
+	public SessionDataType() {
 
 	}
 
 	public SessionDataType(MmtLevelTwoPhase currentTradingPhase, MarketIdType marketId, InstantType messageTimeStamp,
-						   int segmentId, InstantType sessionClose, InstantType sessionOpen, InstantType sessionPreClose,
-						   InstantType sessionStart, SessionStatusType sessionStatus, IntervalType tradeableInstrumentRange){
+			int segmentId, InstantType sessionClose, InstantType sessionOpen, InstantType sessionPreClose,
+			InstantType sessionStart, SessionStatusType sessionStatus, IntervalType tradeableInstrumentRange) {
 		this.currentTradingPhase = currentTradingPhase;
 		this.marketId = marketId;
 		this.messageTimeStamp = messageTimeStamp;
@@ -38,58 +53,92 @@ public class SessionDataType {
 		this.tradeableInstrumentRange = tradeableInstrumentRange;
 	}
 
-	public MmtLevelTwoPhase getCurrentTradingPhase() { return currentTradingPhase; }
+	public MmtLevelTwoPhase getCurrentTradingPhase() {
+		return currentTradingPhase;
+	}
 
-	public void setCurrentTradingPhase(MmtLevelTwoPhase currentTradingPhase) { this.currentTradingPhase = currentTradingPhase; }
+	public void setCurrentTradingPhase(MmtLevelTwoPhase currentTradingPhase) {
+		this.currentTradingPhase = currentTradingPhase;
+	}
 
-	public MarketIdType getMarketId() { return marketId; }
+	public MarketIdType getMarketId() {
+		return marketId;
+	}
 
-	public void setMarketId(MarketIdType marketId) { this.marketId = marketId; }
+	public void setMarketId(MarketIdType marketId) {
+		this.marketId = marketId;
+	}
 
-	public InstantType getMessageTimeStamp() { return messageTimeStamp; }
+	public InstantType getMessageTimeStamp() {
+		return messageTimeStamp;
+	}
 
-	public void setMessageTimeStamp(InstantType messageTimeStamp) { this.messageTimeStamp = messageTimeStamp; }
+	public void setMessageTimeStamp(InstantType messageTimeStamp) {
+		this.messageTimeStamp = messageTimeStamp;
+	}
 
-	public int getSegmentId() { return segmentId; }
+	public int getSegmentId() {
+		return segmentId;
+	}
 
-	public void setSegmentId(int segmentId) { this.segmentId = segmentId; }		// segmentID + marketId must be unique
+	public void setSegmentId(int segmentId) {
+		this.segmentId = segmentId;
+	} // segmentID + marketId must be unique
 
-	public InstantType getSessionClose() { return sessionClose; }
+	public InstantType getSessionClose() {
+		return sessionClose;
+	}
 
-	public void setSessionClose(InstantType sessionClose) { this.sessionClose = sessionClose; }
+	public void setSessionClose(InstantType sessionClose) {
+		this.sessionClose = sessionClose;
+	}
 
-	public InstantType getSessionOpen() { return sessionOpen; }
+	public InstantType getSessionOpen() {
+		return sessionOpen;
+	}
 
-	public void setSessionOpen(InstantType sessionOpen) { this.sessionOpen = sessionOpen; }
+	public void setSessionOpen(InstantType sessionOpen) {
+		this.sessionOpen = sessionOpen;
+	}
 
-	public InstantType getSessionPreClose() { return sessionPreClose; }
+	public InstantType getSessionPreClose() {
+		return sessionPreClose;
+	}
 
-	public void setSessionPreClose(InstantType sessionPreClose) { this.sessionPreClose = sessionPreClose; }
+	public void setSessionPreClose(InstantType sessionPreClose) {
+		this.sessionPreClose = sessionPreClose;
+	}
 
-	public InstantType getSessionStart() { return sessionStart; }
+	public InstantType getSessionStart() {
+		return sessionStart;
+	}
 
-	public void setSessionStart(InstantType sessionStart) { this.sessionStart = sessionStart; }
+	public void setSessionStart(InstantType sessionStart) {
+		this.sessionStart = sessionStart;
+	}
 
-	public SessionStatusType getSessionStatus() { return sessionStatus; }
+	public SessionStatusType getSessionStatus() {
+		return sessionStatus;
+	}
 
-	public void setSessionStatus(SessionStatusType sessionStatus) { this.sessionStatus = sessionStatus; }
+	public void setSessionStatus(SessionStatusType sessionStatus) {
+		this.sessionStatus = sessionStatus;
+	}
 
-	public IntervalType getTradeableInstrumentRange() { return tradeableInstrumentRange; }
+	public IntervalType getTradeableInstrumentRange() {
+		return tradeableInstrumentRange;
+	}
 
-	public void setTradeableInstrumentRange(IntervalType tradeableInstrumentRange) { this.tradeableInstrumentRange = tradeableInstrumentRange; }
+	public void setTradeableInstrumentRange(IntervalType tradeableInstrumentRange) {
+		this.tradeableInstrumentRange = tradeableInstrumentRange;
+	}
 
 	@Override
 	public String toString() {
-		return "SessionDataType {" +
-				" currentTradingPhase = " + currentTradingPhase +
-				", marketId = " + marketId +
-				", messageTimeStamp = " + messageTimeStamp +
-				", segmentId = " + segmentId +
-				", sessionClose = " + sessionClose +
-				", sessionOpen = " + sessionOpen +
-				", sessionPreClose = " + sessionPreClose +
-				", sessionStart = " + sessionStart +
-				", sessionStatus = " + sessionStatus +
-				", tradeableInstrumentRange = " + tradeableInstrumentRange + " }";
+		return "SessionDataType {" + " currentTradingPhase = " + currentTradingPhase + ", marketId = " + marketId
+				+ ", messageTimeStamp = " + messageTimeStamp + ", segmentId = " + segmentId + ", sessionClose = "
+				+ sessionClose + ", sessionOpen = " + sessionOpen + ", sessionPreClose = " + sessionPreClose
+				+ ", sessionStart = " + sessionStart + ", sessionStatus = " + sessionStatus
+				+ ", tradeableInstrumentRange = " + tradeableInstrumentRange + " }";
 	}
 }
