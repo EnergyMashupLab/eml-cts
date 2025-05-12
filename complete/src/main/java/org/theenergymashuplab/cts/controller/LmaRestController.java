@@ -88,13 +88,10 @@ public class LmaRestController {
 
 		// save CreateTender message as sent by TEUA
 		tempCreate = eiCreateTender;
-
-		logger.debug("postEiCreateTender to LME. TenderId " + tempCreate.getTender().getTenderId().toString());
+		
 		/*
 		 * Pass on to LME and use POST responseBody in reply to origin
 		 */
-		logger.debug("Start of LMA / createTender");
-
 		tempPostResponse = restTemplate.postForObject("http://localhost:8080/lme/createTender", tempCreate,
 				EiCreatedTenderPayload.class);
 

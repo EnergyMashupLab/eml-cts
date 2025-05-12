@@ -257,6 +257,8 @@ public class TeuaRestController {
 		Integer numericTeuaId = -1;
 		String positionUri;
 
+		logger.debug("Start of clientCreateTender " + clientCreateTender.toString());
+
 		final RestTemplateBuilder builder = new RestTemplateBuilder();
 		// scope is function postEiCreateTender
 		RestTemplate restTemplate = builder.build();
@@ -309,8 +311,6 @@ public class TeuaRestController {
 		eiCreateTender.setPartyId(actorIds[numericTeuaId]);
 		eiCreateTender.setCounterPartyId(lmePartyId);
 
-		logger.trace("TEUA sending EiCreateTender to LMA " + eiCreateTender.toString());
-
 		// And forward to the LMA
 		restTemplate = builder.build();
 		EiCreatedTenderPayload result = restTemplate.postForObject("http://localhost:8080/lma/createTender",
@@ -318,7 +318,6 @@ public class TeuaRestController {
 
 		// and put CtsTenderId in ClientCreatedTenderPayload
 		tempReturn = new ClientCreatedTenderPayload(result.getTenderId().value());
-		logger.trace("TEUA before return ClientCreatedTender to Client/SC " + tempReturn.toString());
 
 		return result;
 	}

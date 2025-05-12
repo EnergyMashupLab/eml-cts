@@ -48,6 +48,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/lme")
 public class LmeRestController {
+
+	private final ClientRestController clientRestController;
 	private static final AtomicLong counter = new AtomicLong();
 	private static EiTenderType currentTender;
 	private static EiTransaction currentTransaction;
@@ -60,10 +62,13 @@ public class LmeRestController {
 	// Add a hashmap for quote driven market implementation
 	private static HashMap<Integer, EiQuoteType> currentQuotes = new HashMap<>();
 
-	// Hashmap for Auction market implementation. Tenders only have an expiration time, so that's what is being used in
-	// place of
-	// the instrument
-	private static HashMap<Instant, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
+	/*
+	 * Hashmap for Auction market implementation.
+	 * 
+	 * Key is the String representation of an Interval, since Interval class needs hashCode() and equals() overrides to
+	 * work in a hashmap
+	 */
+	private static HashMap<String, ArrayList<EiTenderType>> auctionTenders = new HashMap<>();
 
 	// Correlate subscriptions to their partyIds
 	private static HashMap<SubscriptionIdType, ActorIdType> subscriptionsToPartyMap = new HashMap<>();
@@ -100,7 +105,7 @@ public class LmeRestController {
 
 	private static final Logger logger = LogManager.getLogger(LmeRestController.class);
 
-	LmeRestController() {
+	LmeRestController(ClientRestController clientRestController) {
 		logger.trace("LmeRestController zero arg constructor. partyId " + partyId);
 
 		// Start thread to read createTransactionQ and send
@@ -122,6 +127,8 @@ public class LmeRestController {
 		}
 
 		quoteTicker.setCounterParty(partyId);
+
+		this.clientRestController = clientRestController;
 	}
 
 	/*
@@ -141,14 +148,14 @@ public class LmeRestController {
 	 * 
 	 */
 	@GetMapping("/clear")
-	public HashMap<Instant, List<EiCreateTransactionPayload>> clear() {
-		logger.debug("/clear was called");
-		Set<Instant> instruments = auctionTenders.keySet();
+	public HashMap<String, List<EiCreateTransactionPayload>> clear() {
+		logger.debug("Clearing auction market");
+		Set<String> instruments = auctionTenders.keySet();
 		// <instrument, clearing price>
-		HashMap<Instant, List<EiCreateTransactionPayload>> instrumentClearingMatches = new HashMap<>();
+		HashMap<String, List<EiCreateTransactionPayload>> instrumentClearingMatches = new HashMap<>();
 
 		// Clears for every instrument. Will later take a parameter to clear a specific instrument.
-		for (Instant instrument : instruments) {
+		for (String instrument : instruments) {
 			ArrayList<EiTenderType> tenders = auctionTenders.get(instrument);
 			ArrayList<EiTenderType> buyTenders = new ArrayList<>();
 			ArrayList<EiTenderType> sellTenders = new ArrayList<>();
@@ -157,6 +164,7 @@ public class LmeRestController {
 			// Demand and supply curves <price, quantity>
 			HashMap<Integer, Integer> demandAtPrice = new HashMap<>();
 			HashMap<Integer, Integer> supplyAtPrice = new HashMap<>();
+			int lowestSellPrice = Integer.MAX_VALUE;
 
 			// Group into buy and sell tenders
 			for (EiTenderType tender : tenders) {
@@ -165,6 +173,12 @@ public class LmeRestController {
 				} else if (tender.getSide() == SideType.SELL) {
 					sellTenders.add(tender);
 				}
+			}
+
+			// If no buy tenders or no sell tenders, exit early
+			if (buyTenders.size() == 0 || sellTenders.size() == 0) {
+				logger.debug("No buy tenders or no sell tenders, so nothing to clear.");
+				return instrumentClearingMatches;
 			}
 
 			// Sum up total quantities of buyTenders at a given price
@@ -183,6 +197,10 @@ public class LmeRestController {
 			for (EiTenderType tender : sellTenders) {
 				int price = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
 				int quantity = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getQuantity();
+
+				if (price < lowestSellPrice) {
+					lowestSellPrice = price;
+				}
 
 				if (supplyAtPrice.get(price) == null) {
 					supplyAtPrice.put(price, quantity);
@@ -204,21 +222,26 @@ public class LmeRestController {
 			int sellingPrice = buyPrices[0];
 			int demand = demandAtPrice.getOrDefault(sellingPrice, 0);
 			int supply = supplyAtPrice.getOrDefault(sellingPrice, 0);
-			while (demand > supply) {
-				sellingPrice += 1;
-				demand = demandAtPrice.getOrDefault(sellingPrice, 0);
-				supply += supplyAtPrice.getOrDefault(sellingPrice, 0);
-				logger.debug("selling price: " + sellingPrice + "\tdemand: " + demand + "\tsupply: " + supply);
+
+			if (sellingPrice > lowestSellPrice) {
+				sellingPrice = lowestSellPrice;
 			}
 
-			int finalClearingPrice = sellingPrice;
+			while (demand > supply) {
+				demand = demandAtPrice.getOrDefault(sellingPrice, buyPrices[0]);
+				supply += supplyAtPrice.getOrDefault(sellingPrice, 0);
+				logger.debug("selling price: " + sellingPrice + "\tdemand: " + demand + "\tsupply: " + supply);
+				sellingPrice += 1;
+			}
+
+			int finalClearingPrice = sellingPrice - 1;
 
 			for (EiTenderType tender : tenders) {
-				if (tender.getSide() == SideType.BUY
-						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() >= finalClearingPrice) {
+				int tenderPrice = (int) ((TenderIntervalDetail) tender.getTenderDetail()).getPrice();
+
+				if (tender.getSide() == SideType.BUY && tenderPrice >= finalClearingPrice) {
 					inTheMoneyTenders.add(tender);
-				} else if (tender.getSide() == SideType.SELL
-						&& ((TenderIntervalDetail) tender.getTenderDetail()).getPrice() <= finalClearingPrice) {
+				} else if (tender.getSide() == SideType.SELL && tenderPrice <= finalClearingPrice) {
 					inTheMoneyTenders.add(tender);
 				} else {
 					residuals.add(tender);
@@ -375,9 +398,6 @@ public class LmeRestController {
 		tempCreate = eiCreateTender;
 		tempTender = eiCreateTender.getTender();
 
-		// logger.debug("LmeController before constructor for EiCreatedTender " + tempTender.toString());
-		logger.debug("lme/createTender " + eiCreateTender.toString());
-
 		/*
 		 * ResponseBody public EiCreatedTender( TenderId tenderId, ActorId partyId,queueF EiResponse response)
 		 * 
@@ -396,18 +416,21 @@ public class LmeRestController {
 			break;
 		case AUCTION_MARKET_SEGMENT:
 			// Add to auction market hashmap
-			ArrayList<EiTenderType> instrumentTenders = auctionTenders.get(tempTender.getExpirationTime());
+			String tenderInterval = ((TenderIntervalDetail) tempTender.getTenderDetail()).getInterval().toString();
+			ArrayList<EiTenderType> instrumentTenders = auctionTenders.get(tenderInterval);
+			logger.debug("Added tender to auction market with interval: " + tenderInterval);
 
 			if (instrumentTenders == null) {
 				instrumentTenders = new ArrayList<EiTenderType>();
 				instrumentTenders.add(tempTender);
-				auctionTenders.put(tempTender.getExpirationTime(), instrumentTenders);
-				logger.debug("New instrument " + tempTender.getExpirationTime() + " was added to hashmap.");
+				auctionTenders.put(tenderInterval.toString(), instrumentTenders);
+				// logger.debug("NEW INSTRUMENT " + tenderInterval + " was added to hashmap.");
 			} else {
 				instrumentTenders.add(tempTender);
-				logger.debug("Value " + tempTender.toString() + " was added to instrument "
-						+ tempTender.getExpirationTime());
+				// logger.debug("TENDER " + tempTender.toString() + " was added to instrument " + tenderInterval);
 			}
+
+			instrumentTenders = auctionTenders.get(tenderInterval);
 
 			break;
 		}
@@ -424,8 +447,6 @@ public class LmeRestController {
 		// from MarketCreateTransaction
 		mapPutReturnValue = ctsTenderIdToCreateTenderMap.put(tempCreate.getTender().getTenderId().value(), tempCreate);
 
-		logger.debug("After adding to tender map");
-
 		// Decouple orderEntered insertion from market with immediate return to LMA
 		// TODO consider return value if value already in map
 		tempCreated = new EiCreatedTenderPayload(tempTender.getTenderId(), tempCreate.getPartyId(),
@@ -433,7 +454,6 @@ public class LmeRestController {
 				tempCreate.getRequestId());
 
 		logger.debug(tempCreated.toString());
-		// logger.debug("End of LME create tender: tempCreated = " + tempCreated.toString());
 
 		return tempCreated;
 	}
